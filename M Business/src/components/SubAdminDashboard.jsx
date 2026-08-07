@@ -956,65 +956,57 @@ function InvoicesListPage({ invoices, onViewInvoice, clients = [], projects = []
   const all = invoices || [];
   const findClient = (inv) => clients.find(c => c._id === inv.clientId || (c.clientName || c.name) === (inv.clientName || inv.client));
   const findProject = (inv) => projects.find(p => p._id === inv.projectId || (p.name || "") === (inv.project || inv.projectName || ""));
+  const badgeCfg = (status) => {
+    const ok = (status || "").toLowerCase() === "paid";
+    return ok ? { bg: "#dcfce7", fg: "#16a34a" } : { bg: "#fef2f2", fg: "#dc2626" };
+  };
   return (
-    <div style={{ padding: "24px 28px" }}>
-      <div style={{ fontSize: 14, fontWeight: 700, color: "#607D86", marginBottom: 16 }}>
-        Total Invoices: {all.length}
+    <div style={{ padding: "16px 14px", background: "#F5F8FA", minHeight: "100%", boxSizing: "border-box", maxWidth: "100%", overflowX: "hidden" }}>
+      <div style={{ fontSize: 15, fontWeight: 800, color: "#1A2332", marginBottom: 14 }}>
+        Total Invoices: <span style={{ color: "var(--app-accent, #00BCD4)" }}>{all.length}</span>
       </div>
-      <div style={{ background: "#fff", border: "1px solid #E0EEF0", borderRadius: 12, overflow: "hidden" }}>
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead>
-            <tr style={{ background: "#F5FAFA" }}>
-              <th style={{ textAlign: "left", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, borderBottom: "1px solid #E0EEF0", width: 60 }}>S.No.</th>
-              <th style={{ textAlign: "left", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, borderBottom: "1px solid #E0EEF0" }}>Client</th>
-              <th style={{ textAlign: "left", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, borderBottom: "1px solid #E0EEF0" }}>Project</th>
-              <th style={{ textAlign: "right", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, borderBottom: "1px solid #E0EEF0", width: 120 }}>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {all.map((inv, i) => {
-              const matchedClient = findClient(inv);
-              const matchedProject = findProject(inv);
-              return (
-                <tr
-                  key={inv._id || inv.invoiceNo || i}
-                  style={{ borderBottom: i === all.length - 1 ? "none" : "1px solid #E0EEF0" }}
-                >
-                  <td style={{ padding: "14px 16px", fontSize: 13, color: "#607D86", fontWeight: 600, verticalAlign: "middle" }}>{i + 1}</td>
-                  <td style={{ padding: "14px 16px", verticalAlign: "middle" }}>
-                    <span
-                      onClick={() => matchedClient && onViewClient && onViewClient(matchedClient)}
-                      style={{ fontWeight: 700, color: matchedClient ? "var(--app-accent, #00BCD4)" : "#1A2332", fontSize: 14, cursor: matchedClient ? "pointer" : "default", textDecoration: matchedClient ? "underline" : "none" }}
-                    >
-                      {inv.clientName || inv.client || "—"}
-                    </span>
-                  </td>
-                  <td style={{ padding: "14px 16px", verticalAlign: "middle" }}>
-                    {matchedProject ? (
-                      <span
-                        onClick={() => onViewProject && onViewProject(matchedProject)}
-                        style={{ fontWeight: 700, color: "var(--app-accent, #00BCD4)", fontSize: 14, cursor: "pointer", textDecoration: "underline" }}
-                      >
-                        {matchedProject.name}
-                      </span>
-                    ) : (
-                      <span style={{ fontWeight: 600, color: "#94a3b8", fontSize: 13 }}>—</span>
-                    )}
-                  </td>
-                  <td style={{ padding: "14px 16px", textAlign: "right", verticalAlign: "middle" }}>
-                    <span
-                      onClick={() => onViewInvoice && onViewInvoice(inv)}
-                      style={{ display: "inline-block", fontWeight: 700, fontSize: 12, padding: "4px 12px", borderRadius: 20, background: (inv.status || "").toLowerCase() === "paid" ? "#dcfce7" : "#fef2f2", color: (inv.status || "").toLowerCase() === "paid" ? "#16a34a" : "#dc2626", cursor: "pointer" }}
-                    >
-                      {inv.status || "Unpaid"}
-                    </span>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+      {all.length === 0 ? (
+        <div style={{ padding: "36px 16px", textAlign: "center", color: "#A0B8BE", fontSize: 13, fontWeight: 600, background: "#fff", borderRadius: 12, boxShadow: "0 2px 10px rgba(15,28,46,0.05)" }}>
+          No invoices found.
+        </div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {all.map((inv, i) => {
+            const matchedClient = findClient(inv);
+            const matchedProject = findProject(inv);
+            const bc = badgeCfg(inv.status);
+            return (
+              <div
+                key={inv._id || inv.invoiceNo || i}
+                style={{ background: "#fff", borderRadius: 12, padding: "12px 14px", boxShadow: "0 2px 8px rgba(15,28,46,0.06)", boxSizing: "border-box", maxWidth: "100%" }}
+              >
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, marginBottom: matchedProject ? 6 : 0 }}>
+                  <span
+                    onClick={() => matchedClient && onViewClient && onViewClient(matchedClient)}
+                    style={{ fontWeight: 800, color: matchedClient ? "var(--app-accent, #00BCD4)" : "#0f1c2e", fontSize: 13.5, cursor: matchedClient ? "pointer" : "default", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
+                  >
+                    {inv.clientName || inv.client || "—"}
+                  </span>
+                  <span
+                    onClick={() => onViewInvoice && onViewInvoice(inv)}
+                    style={{ fontWeight: 700, fontSize: 10.5, padding: "4px 10px", borderRadius: 20, background: bc.bg, color: bc.fg, cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap" }}
+                  >
+                    {inv.status || "Unpaid"}
+                  </span>
+                </div>
+                {matchedProject && (
+                  <span
+                    onClick={() => onViewProject && onViewProject(matchedProject)}
+                    style={{ fontWeight: 600, color: "#607D86", fontSize: 11.5, cursor: "pointer" }}
+                  >
+                    <i className="ti ti-folder" style={{ marginRight: 4, fontSize: 11 }} />{matchedProject.name}
+                  </span>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
@@ -2743,41 +2735,44 @@ function UnpaidInvoicesListPage({ invoices, onViewInvoice }) {
     const s = (i.status || "").toLowerCase();
     return s === "pending" || s === "unpaid" || s === "overdue" || s === "sent";
   });
+  const initials = (name) => (name || "?").trim().split(/\s+/).slice(0, 2).map(w => w[0]).join("").toUpperCase();
   return (
-    <div style={{ padding: "24px 28px" }}>
-      <div style={{ fontSize: 14, fontWeight: 700, color: "#607D86", marginBottom: 16 }}>
-        Total Unpaid Invoices: {unpaid.length}
+    <div style={{ padding: "16px 14px", background: "#F5F8FA", minHeight: "100%", boxSizing: "border-box", maxWidth: "100%", overflowX: "hidden" }}>
+      <div style={{ fontSize: 15, fontWeight: 800, color: "#1A2332", marginBottom: 14 }}>
+        Total Unpaid Invoices: <span style={{ color: "#dc2626" }}>{unpaid.length}</span>
       </div>
-      <div style={{ background: "#fff", border: "1px solid #E0EEF0", borderRadius: 12, overflow: "hidden" }}>
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead>
-            <tr style={{ background: "#F5FAFA" }}>
-              <th style={{ textAlign: "left", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, border: "1px solid #E0EEF0", width: 60 }}>S.No.</th>
-              <th style={{ textAlign: "left", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, border: "1px solid #E0EEF0" }}>Client / Invoice</th>
-              <th style={{ textAlign: "right", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, border: "1px solid #E0EEF0", width: 120 }}>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {unpaid.map((inv, i) => (
-              <tr
+      {unpaid.length === 0 ? (
+        <div style={{ padding: "36px 16px", textAlign: "center", color: "#A0B8BE", fontSize: 13, fontWeight: 600, background: "#fff", borderRadius: 12, boxShadow: "0 2px 10px rgba(15,28,46,0.05)" }}>
+          No unpaid invoices found.
+        </div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {unpaid.map((inv, i) => {
+            const name = inv.clientName || inv.client || inv.invoiceNo || "—";
+            return (
+              <div
                 key={inv._id || inv.invoiceNo || i}
                 onClick={() => onViewInvoice && onViewInvoice(inv)}
-                style={{ cursor: "pointer", borderBottom: i === unpaid.length - 1 ? "none" : "1px solid #E0EEF0" }}
+                style={{ display: "flex", alignItems: "center", gap: 12, background: "#fff", borderRadius: 12, padding: "12px 14px", boxShadow: "0 2px 8px rgba(15,28,46,0.06)", cursor: "pointer", boxSizing: "border-box", maxWidth: "100%" }}
               >
-                <td style={{ padding: "14px 16px", fontSize: 13, color: "#607D86", fontWeight: 600, verticalAlign: "middle", border: "1px solid #E0EEF0" }}>{i + 1}</td>
-                <td style={{ padding: "14px 16px", verticalAlign: "middle", border: "1px solid #E0EEF0" }}>
-                  <span style={{ fontWeight: 700, color: "#1A2332", fontSize: 14 }}>{inv.clientName || inv.client || inv.invoiceNo || "—"}</span>
-                </td>
-                <td style={{ padding: "14px 16px", textAlign: "right", verticalAlign: "middle" }}>
-                  <span style={{ display: "inline-block", fontWeight: 700, fontSize: 12, padding: "4px 12px", borderRadius: 20, background: "#fef2f2", color: "#dc2626" }}>
-                    {inv.status || "Unpaid"}
-                  </span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                <div style={{ width: 38, height: 38, borderRadius: 10, flexShrink: 0, background: "rgba(220,38,38,0.1)", color: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800 }}>
+                  {initials(name)}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontWeight: 800, color: "#0f1c2e", fontSize: 13.5, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                    {name}
+                  </div>
+                  <div style={{ fontSize: 11, color: "#94A7AF", fontWeight: 600, marginTop: 2 }}>#{i + 1}</div>
+                </div>
+                <span style={{ fontWeight: 700, fontSize: 10.5, padding: "4px 10px", borderRadius: 20, background: "#fef2f2", color: "#dc2626", flexShrink: 0, whiteSpace: "nowrap" }}>
+                  {inv.status || "Unpaid"}
+                </span>
+                <i className="ti ti-chevron-right" style={{ fontSize: 15, color: "#C2D0D4", flexShrink: 0 }} />
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
@@ -3307,41 +3302,48 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
   const inactiveCount = employees.filter(e => e.status === "Inactive" || e.status === "Rejected").length;
 
   if (typeof window !== "undefined" && window.innerWidth < 769) {
+    const initials = (name) => (name || "?").trim().split(/\s+/).slice(0, 2).map(w => w[0]).join("").toUpperCase();
+    const badgeCfg = (status) => {
+      const ok = status === "Active" || status === "Approved";
+      return ok ? { bg: "#dcfce7", fg: "#16a34a" } : { bg: "#fef2f2", fg: "#dc2626" };
+    };
     return (
-      <div style={{ padding: "24px 28px" }}>
-        <div style={{ fontSize: 14, fontWeight: 700, color: "#607D86", marginBottom: 16 }}>
-          Total Team: {employees.length}
+      <div style={{ padding: "16px 14px", background: "#F5F8FA", minHeight: "100%", boxSizing: "border-box", maxWidth: "100%", overflowX: "hidden" }}>
+        <div style={{ fontSize: 15, fontWeight: 800, color: "#1A2332", marginBottom: 14 }}>
+          Total Team: <span style={{ color: "var(--app-accent, #00BCD4)" }}>{employees.length}</span>
         </div>
-        <div style={{ background: "#fff", border: "1px solid #E0EEF0", borderRadius: 12, overflow: "hidden" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead>
-              <tr style={{ background: "#F5FAFA" }}>
-                <th style={{ textAlign: "left", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, border: "1px solid #E0EEF0", width: 60 }}>S.No.</th>
-                <th style={{ textAlign: "left", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, border: "1px solid #E0EEF0" }}>Employee Name</th>
-                <th style={{ textAlign: "right", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, border: "1px solid #E0EEF0", width: 120 }}>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {employees.map((e, i) => (
-                <tr
+        {employees.length === 0 ? (
+          <div style={{ padding: "36px 16px", textAlign: "center", color: "#A0B8BE", fontSize: 13, fontWeight: 600, background: "#fff", borderRadius: 12, boxShadow: "0 2px 10px rgba(15,28,46,0.05)" }}>
+            No team members found.
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {employees.map((e, i) => {
+              const bc = badgeCfg(e.status);
+              return (
+                <div
                   key={e._id || i}
                   onClick={() => { setViewEmp(e); loadEmpDocs(e); }}
-                  style={{ cursor: "pointer", borderBottom: i === employees.length - 1 ? "none" : "1px solid #E0EEF0" }}
+                  style={{ display: "flex", alignItems: "center", gap: 12, background: "#fff", borderRadius: 12, padding: "12px 14px", boxShadow: "0 2px 8px rgba(15,28,46,0.06)", cursor: "pointer", boxSizing: "border-box", maxWidth: "100%" }}
                 >
-                  <td style={{ padding: "14px 16px", fontSize: 13, color: "#607D86", fontWeight: 600, verticalAlign: "middle", border: "1px solid #E0EEF0" }}>{i + 1}</td>
-                  <td style={{ padding: "14px 16px", verticalAlign: "middle", border: "1px solid #E0EEF0" }}>
-                    <span style={{ fontWeight: 700, color: "#1A2332", fontSize: 14 }}>{e.name || "—"}</span>
-                  </td>
-                  <td style={{ padding: "14px 16px", textAlign: "right", verticalAlign: "middle" }}>
-                    <span style={{ display: "inline-block", fontWeight: 700, fontSize: 12, padding: "4px 12px", borderRadius: 20, background: (e.status === "Active" || e.status === "Approved") ? "#dcfce7" : "#fef2f2", color: (e.status === "Active" || e.status === "Approved") ? "#16a34a" : "#dc2626" }}>
-                      {e.status || "Active"}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                  <div style={{ width: 38, height: 38, borderRadius: 10, flexShrink: 0, background: "rgba(0,188,212,0.12)", color: "var(--app-accent, #00BCD4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800 }}>
+                    {initials(e.name)}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontWeight: 800, color: "#0f1c2e", fontSize: 13.5, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      {e.name || "—"}
+                    </div>
+                    <div style={{ fontSize: 11, color: "#94A7AF", fontWeight: 600, marginTop: 2 }}>#{i + 1}</div>
+                  </div>
+                  <span style={{ fontWeight: 700, fontSize: 10.5, padding: "4px 10px", borderRadius: 20, background: bc.bg, color: bc.fg, flexShrink: 0, whiteSpace: "nowrap" }}>
+                    {e.status || "Active"}
+                  </span>
+                  <i className="ti ti-chevron-right" style={{ fontSize: 15, color: "#C2D0D4", flexShrink: 0 }} />
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     );
   }
@@ -4760,47 +4762,50 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
 
 
   if (!window.__fullProjectsList && typeof window !== "undefined" && window.innerWidth < 769) {
+    const plist = projectsWithProgress || [];
+    const initials = (name) => (name || "?").trim().split(/\s+/).slice(0, 2).map(w => w[0]).join("").toUpperCase();
+    const badgeCfg = (status) => {
+      const ok = (status || "Active").toLowerCase() === "active";
+      return ok ? { bg: "#dcfce7", fg: "#16a34a" } : { bg: "#fef2f2", fg: "#dc2626" };
+    };
     return (
-
-      <div style={{ padding: "24px 28px" }}>
-
-        <div style={{ fontSize: 14, fontWeight: 700, color: "#607D86", marginBottom: 16 }}>
-          Total Projects: {(projectsWithProgress || []).length}
+      <div style={{ padding: "16px 14px", background: "#F5F8FA", minHeight: "100%", boxSizing: "border-box", maxWidth: "100%", overflowX: "hidden" }}>
+        <div style={{ fontSize: 15, fontWeight: 800, color: "#1A2332", marginBottom: 14 }}>
+          Total Projects: <span style={{ color: "var(--app-accent, #00BCD4)" }}>{plist.length}</span>
         </div>
-
-        <div style={{ background: "#fff", border: "1px solid #E0EEF0", borderRadius: 12, overflow: "hidden" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead>
-              <tr style={{ background: "#F5FAFA" }}>
-                <th style={{ textAlign: "left", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, border: "1px solid #E0EEF0", width: 60 }}>S.No.</th>
-                <th style={{ textAlign: "left", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, border: "1px solid #E0EEF0" }}>Project Name</th>
-                <th style={{ textAlign: "right", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, border: "1px solid #E0EEF0", width: 120 }}>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {(projectsWithProgress || []).map((p, i) => (
-                <tr
+        {plist.length === 0 ? (
+          <div style={{ padding: "36px 16px", textAlign: "center", color: "#A0B8BE", fontSize: 13, fontWeight: 600, background: "#fff", borderRadius: 12, boxShadow: "0 2px 10px rgba(15,28,46,0.05)" }}>
+            No projects found.
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {plist.map((p, i) => {
+              const bc = badgeCfg(p.status);
+              return (
+                <div
                   key={p._id || p.id || i}
                   onClick={() => onViewProject && onViewProject(p)}
-                  style={{ cursor: "pointer", borderBottom: i === (projectsWithProgress || []).length - 1 ? "none" : "1px solid #E0EEF0" }}
+                  style={{ display: "flex", alignItems: "center", gap: 12, background: "#fff", borderRadius: 12, padding: "12px 14px", boxShadow: "0 2px 8px rgba(15,28,46,0.06)", cursor: "pointer", boxSizing: "border-box", maxWidth: "100%" }}
                 >
-                  <td style={{ padding: "14px 16px", fontSize: 13, color: "#607D86", fontWeight: 600, verticalAlign: "middle", border: "1px solid #E0EEF0" }}>{i + 1}</td>
-                  <td style={{ padding: "14px 16px", verticalAlign: "middle", border: "1px solid #E0EEF0" }}>
-                    <span style={{ fontWeight: 700, color: "#1A2332", fontSize: 14 }}>{p.name || "—"}</span>
-                  </td>
-                  <td style={{ padding: "14px 16px", textAlign: "right", verticalAlign: "middle" }}>
-                    <span style={{ display: "inline-block", fontWeight: 700, fontSize: 12, padding: "4px 12px", borderRadius: 20, background: (p.status || "Active").toLowerCase() === "active" ? "#dcfce7" : "#fef2f2", color: (p.status || "Active").toLowerCase() === "active" ? "#16a34a" : "#dc2626" }}>
-                      {p.status || "Active"}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
+                  <div style={{ width: 38, height: 38, borderRadius: 10, flexShrink: 0, background: "rgba(0,188,212,0.12)", color: "var(--app-accent, #00BCD4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800 }}>
+                    {initials(p.name)}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontWeight: 800, color: "#0f1c2e", fontSize: 13.5, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      {p.name || "—"}
+                    </div>
+                    <div style={{ fontSize: 11, color: "#94A7AF", fontWeight: 600, marginTop: 2 }}>#{i + 1}</div>
+                  </div>
+                  <span style={{ fontWeight: 700, fontSize: 10.5, padding: "4px 10px", borderRadius: 20, background: bc.bg, color: bc.fg, flexShrink: 0, whiteSpace: "nowrap" }}>
+                    {p.status || "Active"}
+                  </span>
+                  <i className="ti ti-chevron-right" style={{ fontSize: 15, color: "#C2D0D4", flexShrink: 0 }} />
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
-
     );
   }
 
@@ -13569,7 +13574,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
             {showMobileInvoiceModal && (
               <div style={{ position: "fixed", inset: 0, zIndex: 9000, background: "rgba(15,23,42,0.5)", display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}>
-                <div style={{ background: "var(--app-bg, #f5f7fb)", width: "100%", maxWidth: 520, maxHeight: "90vh", overflowY: "auto", borderRadius: 18, padding: "16px" }}>
+            <div style={{ background: "var(--app-bg, #f5f7fb)", width: "100%", maxWidth: 520, maxHeight: "90vh", overflowY: "auto", overflowX: "hidden", borderRadius: 18, padding: "12px", boxSizing: "border-box" }}>
                   <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 8 }}>
                     <button onClick={() => setShowMobileInvoiceModal(false)} style={{ background: "none", border: "none", fontSize: 22, cursor: "pointer", color: "var(--app-muted)" }}>✕</button>
                   </div>

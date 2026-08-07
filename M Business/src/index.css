@@ -6837,8 +6837,8 @@ tbody tr:last-child td {
 
 .inv-creator-payment-terms-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
   margin-bottom: 14px;
 }
 
@@ -7483,8 +7483,8 @@ input::-webkit-inner-spin-button {
 
 .inv-creator-payment-terms-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
   margin-bottom: 14px;
 }
 

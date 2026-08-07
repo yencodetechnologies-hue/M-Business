@@ -718,8 +718,14 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   const [receiptEntry, setReceiptEntry] = useState(null);
   const [editingReceipt, setEditingReceipt] = useState(false);
   const [listSearch, setListSearch] = useState("");
-  const [filterTab, setFilterTab] = useState("all");
-  const [sortOrder, setSortOrder] = useState("desc");
+const [filterTab, setFilterTab] = useState("all");
+const [isMobileWidth, setIsMobileWidth] = useState(typeof window !== "undefined" && window.innerWidth < 769);
+useEffect(() => {
+  const onResize = () => setIsMobileWidth(window.innerWidth < 769);
+  window.addEventListener("resize", onResize);
+  return () => window.removeEventListener("resize", onResize);
+}, []);
+const [sortOrder, setSortOrder] = useState("desc");
   const [clientFilter, setClientFilter] = useState("all");
   const [sigTab, setSigTab] = useState("draw");
   const [viewAsModal, setViewAsModal] = useState(!!(jumpInvoice && (jumpInvoice._id || jumpInvoice.id || jumpInvoice.invoiceNo)));
@@ -1882,18 +1888,29 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
           </div>
         </div>
 
-        {/* TABS */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
-          <div className="tabs" style={{ display: "flex", gap: 10, alignItems: "center" }}>
-
-            {["all", "paid", "part_paid", "pending", "overdue", "draft"].map(t => (
-              <button key={t} className={`tab ${filterTab === t ? "active" : ""}`} onClick={() => setFilterTab(t)} style={{ textTransform: "capitalize" }}>{t === "part_paid" ? "Part Paid" : t}</button>
-            ))}
-          </div>
-          <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (typeof e.nativeEvent?.stopImmediatePropagation === 'function') e.nativeEvent.stopImmediatePropagation(); clearForm(); setStep("form"); setInternalNav(true); }} type="button" style={{ padding: "8px 16px", background: "var(--teal)", color: "#fff", border: "none", borderRadius: 8, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>
-            <i className="ti ti-plus"></i> New Invoice
-          </button>
-        </div>
+      {/* TABS */}
+<div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20, gap: 10 }}>
+  {isMobileWidth ? (
+    <select
+      value={filterTab}
+      onChange={e => setFilterTab(e.target.value)}
+      style={{ flex: 1, padding: "10px 32px 10px 14px", borderRadius: 10, border: "1.5px solid var(--app-border)", background: "#fff", fontSize: 13, fontWeight: 700, color: "var(--app-accent, #00BCD4)", outline: "none", WebkitAppearance: "none", backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2300BCD4' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 14px center" }}
+    >
+      {["all", "paid", "part_paid", "pending", "overdue", "draft"].map(t => (
+        <option key={t} value={t}>{t === "part_paid" ? "Part Paid" : t === "all" ? "All" : t.charAt(0).toUpperCase() + t.slice(1)}</option>
+      ))}
+    </select>
+  ) : (
+    <div className="tabs" style={{ display: "flex", gap: 10, alignItems: "center" }}>
+      {["all", "paid", "part_paid", "pending", "overdue", "draft"].map(t => (
+        <button key={t} className={`tab ${filterTab === t ? "active" : ""}`} onClick={() => setFilterTab(t)} style={{ textTransform: "capitalize" }}>{t === "part_paid" ? "Part Paid" : t}</button>
+      ))}
+    </div>
+  )}
+  <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (typeof e.nativeEvent?.stopImmediatePropagation === 'function') e.nativeEvent.stopImmediatePropagation(); clearForm(); setStep("form"); setInternalNav(true); }} type="button" style={{ padding: "8px 16px", background: "var(--teal)", color: "#fff", border: "none", borderRadius: 8, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
+    <i className="ti ti-plus"></i>{!isMobileWidth && " New Invoice"}
+  </button>
+</div>
 
         {/* INVOICE TABLE */}
         <div className="table-panel">

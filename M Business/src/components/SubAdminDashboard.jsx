@@ -2185,41 +2185,124 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
   const inactiveClientsCount = clients.filter(c => (c.status || "").toLowerCase() === "inactive").length;
 
   if (!activeClient && !window.__fullClientsList && typeof window !== "undefined" && window.innerWidth < 769) {
+    const mListSearch = (typeof search === "string" ? search : "");
+    const mListFiltered = clients.filter(c => {
+      const nameMatch = (c.clientName || c.name || "").toLowerCase().includes(mListSearch.toLowerCase());
+      const st = (c.status || "Active").toLowerCase();
+      const modeOk = !filterMode || filterMode === "all" ? true : st === filterMode;
+      return nameMatch && modeOk;
+    });
+
+    const badgeCfg = (status) => {
+      const s = (status || "Active").toLowerCase();
+      if (s === "active") return { bg: "#dcfce7", fg: "#16a34a" };
+      if (s === "inactive") return { bg: "#fef2f2", fg: "#dc2626" };
+      if (s === "pending") return { bg: "#fef3c7", fg: "#b45309" };
+      return { bg: "#f1f5f9", fg: "#475569" };
+    };
+
+    const initials = (name) => (name || "?").trim().split(/\s+/).slice(0, 2).map(w => w[0]).join("").toUpperCase();
+
     return (
-      <div className="clients-list-only-root" style={{ padding: "24px 28px" }}>
-        <div style={{ fontSize: 14, fontWeight: 700, color: "#607D86", marginBottom: 16 }}>
-          Total Clients: {clients.length}
+      <div className="clients-list-only-root" style={{ padding: "16px 14px", background: "#F5F8FA", minHeight: "100%", boxSizing: "border-box", maxWidth: "100%", overflowX: "hidden" }}>
+
+        <div style={{ fontSize: 15, fontWeight: 800, color: "#1A2332", marginBottom: 12 }}>
+          Total Clients: <span style={{ color: "var(--app-accent, #00BCD4)" }}>{clients.length}</span>
         </div>
-        <div style={{ background: "#E0F7FA", border: "1px solid #B2EBF2", borderRadius: 12, overflow: "hidden" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead>
-              <tr>
-                <th style={{ textAlign: "left", padding: "10px 14px", fontSize: 11, fontWeight: 800, color: "#607D86", borderBottom: "1px solid #B2EBF2" }}>S.No.</th>
-                <th style={{ textAlign: "left", padding: "10px 14px", fontSize: 11, fontWeight: 800, color: "#607D86", borderBottom: "1px solid #B2EBF2" }}>Client Name</th>
-                <th style={{ textAlign: "right", padding: "10px 14px", fontSize: 11, fontWeight: 800, color: "#607D86", borderBottom: "1px solid #B2EBF2" }}>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {clients.map((c, i) => (
-                <tr
+
+        <div style={{ position: "relative", marginBottom: 10 }}>
+          <i className="ti ti-search" style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", fontSize: 14, color: "#A0B8BE" }} />
+          <input
+            type="text"
+            placeholder="Search clients..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            style={{ width: "100%", padding: "10px 12px 10px 34px", border: "1.5px solid #E0EEF0", borderRadius: 10, fontSize: 13, outline: "none", background: "#fff", color: "#1A2E35", boxSizing: "border-box" }}
+          />
+        </div>
+
+        <div style={{ display: "flex", gap: 6, marginBottom: 14 }}>
+          {["all", "active", "inactive"].map(f => (
+            <button
+              key={f}
+              onClick={() => setFilterMode(f)}
+              style={{
+                flex: 1,
+                padding: "8px 4px",
+                borderRadius: 9,
+                border: "none",
+                fontSize: 12,
+                fontWeight: 700,
+                cursor: "pointer",
+                textTransform: "capitalize",
+                background: filterMode === f ? "var(--app-accent, #00BCD4)" : "#fff",
+                color: filterMode === f ? "#fff" : "#607D86",
+                boxShadow: filterMode === f ? "none" : "0 1px 4px rgba(15,28,46,0.05)",
+                transition: "all 0.15s ease"
+              }}
+            >
+              {f}
+            </button>
+          ))}
+        </div>
+
+        {mListFiltered.length === 0 ? (
+          <div style={{ padding: "36px 16px", textAlign: "center", color: "#A0B8BE", fontSize: 13, fontWeight: 600, background: "#fff", borderRadius: 12, boxShadow: "0 2px 10px rgba(15,28,46,0.05)" }}>
+            No clients found.
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {mListFiltered.map((c, i) => {
+              const bc = badgeCfg(c.status);
+              const name = c.clientName || c.name || "—";
+              return (
+                <div
                   key={c._id || i}
                   onClick={() => { setActiveClientId(c._id); setActiveTab("overview"); }}
-                  style={{ cursor: "pointer", borderBottom: i === clients.length - 1 ? "none" : "1px solid #B2EBF2" }}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 12,
+                    background: "#fff",
+                    borderRadius: 12,
+                    padding: "12px 14px",
+                    boxShadow: "0 2px 8px rgba(15,28,46,0.06)",
+                    cursor: "pointer",
+                    boxSizing: "border-box",
+                    maxWidth: "100%"
+                  }}
                 >
-                  <td style={{ padding: "12px 14px", fontSize: 12, color: "#607D86", fontWeight: 600 }}>{i + 1}</td>
-                  <td style={{ padding: "12px 14px" }}>
-                    <span style={{ fontWeight: 800, color: "#0f1c2e", fontSize: 14 }}>{c.clientName || c.name || "—"}</span>
-                  </td>
-                  <td style={{ padding: "12px 14px", textAlign: "right" }}>
-                    <span style={{ fontWeight: 700, fontSize: 12, padding: "4px 12px", borderRadius: 20, background: (c.status || "Active").toLowerCase() === "active" ? "#dcfce7" : "#fef2f2", color: (c.status || "Active").toLowerCase() === "active" ? "#16a34a" : "#dc2626" }}>
-                      {c.status || "Active"}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                  <div style={{
+                    width: 38, height: 38, borderRadius: 10, flexShrink: 0,
+                    background: "rgba(0,188,212,0.12)", color: "var(--app-accent, #00BCD4)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: 13, fontWeight: 800
+                  }}>
+                    {initials(name)}
+                  </div>
+
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontWeight: 800, color: "#0f1c2e", fontSize: 13.5, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      {name}
+                    </div>
+                    <div style={{ fontSize: 11, color: "#94A7AF", fontWeight: 600, marginTop: 2 }}>
+                      #{i + 1}
+                    </div>
+                  </div>
+
+                  <span style={{
+                    fontWeight: 700, fontSize: 10.5, padding: "4px 10px", borderRadius: 20,
+                    background: bc.bg, color: bc.fg, flexShrink: 0, whiteSpace: "nowrap"
+                  }}>
+                    {c.status || "Active"}
+                  </span>
+
+                  <i className="ti ti-chevron-right" style={{ fontSize: 15, color: "#C2D0D4", flexShrink: 0 }} />
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     );
   }

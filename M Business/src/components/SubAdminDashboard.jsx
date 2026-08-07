@@ -10767,14 +10767,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                       </div>
 
 
-                      <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 6 }}>
-                        <span style={{ fontSize: 42, fontWeight: 900, letterSpacing: -1, color: "#ffffff" }}>
-                          Rs.{(totalRevenue || 0).toLocaleString()}
-                        </span>
-                        <span style={{ background: "rgba(74,222,128,0.15)", color: "#4ade80", fontSize: 12, fontWeight: 800, padding: "5px 10px", borderRadius: 20, display: "flex", alignItems: "center", gap: 4 }}>
-                          <i className="ti ti-trending-up"></i> 12%
-                        </span>
-                      </div>
+
 
                       <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
                         <div style={{ flex: 1, background: "rgba(255,255,255,0.14)", borderRadius: 14, padding: "12px 14px", backdropFilter: "blur(6px)" }}>
@@ -11131,6 +11124,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   </div>
 
                   {/* FLOATING STAT STRIP — draggable reorder, sits below hero (no overlap) */}
+                  <div style={{ margin: "16px 16px 0", fontSize: 15, fontWeight: 800, color: "#0f1c2e" }}>Quick Actions</div>
                   <div style={{ margin: "8px 16px 0", position: "relative", zIndex: 5, display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12 }}>
                     {mobStatCardOrder.map((s, i) => (
                       <div
@@ -11162,7 +11156,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                         <div style={{ width: 56, height: 56, borderRadius: 16, background: s.grad, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 8px", color: "#fff", fontSize: 22, boxShadow: "0 6px 14px rgba(0,0,0,0.15)" }}>
                           <i className={`ti ${s.icon}`}></i>
                         </div>
-                        <div style={{ fontSize: 13, fontWeight: 800, color: "#0f0a29" }}>{s.label}</div>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: "#0f0a29" }}>{s.label}</div>
                         <div style={{ fontSize: 10.5, color: "#94a3b8", fontWeight: 600, marginTop: 1 }}>{s.val}</div>
                       </div>))}
                     {mobSecondRowOrder.map((s, i) => (
@@ -11206,7 +11200,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                         <div style={{ width: 56, height: 56, borderRadius: 16, background: s.grad, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 8px", fontSize: 22, boxShadow: "0 6px 14px rgba(0,0,0,0.15)" }}>
                           <i className={`ti ${s.icon}`}></i>
                         </div>
-                        <div style={{ fontSize: 13, fontWeight: 800, color: "#0f0a29" }}>{s.label}</div>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: "#0f0a29" }}>{s.label}</div>
                         <div style={{ fontSize: 10.5, color: "#94a3b8", fontWeight: 600, marginTop: 1 }}>{s.val}</div>
                       </div>
                     ))}

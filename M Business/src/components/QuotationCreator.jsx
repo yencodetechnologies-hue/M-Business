@@ -910,6 +910,35 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
   const lbl = { display: "block", fontSize: 12, color: "var(--app-muted)", fontWeight: 700, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.5px" };
 
   // ---------- LIST ----------
+  if (step === "list" && !window.__fullQuotationsList) {
+    const enrichedMinimal = qtList.map((e) => {
+      const expiry = e.qt?.expiryDate || e.expiryDate;
+      let status = e.status || "draft";
+      if (status === "sent" && expiry && new Date(expiry) < new Date()) status = "expired";
+      return { ...e, status };
+    });
+    return (
+      <div style={{ padding: "24px 28px" }}>
+        <div style={{ fontSize: 14, fontWeight: 700, color: "#607D86", marginBottom: 16 }}>
+          Total Quotations: {enrichedMinimal.length}
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {enrichedMinimal.map((entry, i) => (
+            <div
+              key={entry.id || entry.quoteNo || i}
+              onClick={() => { loadEntry(entry); setStep("preview"); }}
+              style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 16px", border: "1.5px solid #E0EEF0", borderRadius: 12, cursor: "pointer", background: "#fff" }}
+            >
+              <span style={{ fontWeight: 700, color: "#1A2332", fontSize: 14 }}>{entry.qt?.client || entry.client || entry.quoteNo || "—"}</span>
+              <span style={{ fontWeight: 700, fontSize: 12, color: (entry.status === "approved" || entry.status === "converted") ? "#16a34a" : "#dc2626" }}>
+                {entry.status || "Draft"}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
   if (step === "list") {
     // toast is rendered below inside the list return, handled globally
     const enriched = qtList.map((e) => {

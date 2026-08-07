@@ -1770,6 +1770,29 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
   const activeCount = proposals.filter(p => p.status === "sent" || p.status === "negotiation" || p.status === "pending").length;
   const decided = proposals.filter(p => ["won", "approved", "lost", "rejected"].includes(p.status)).length;
   const successRate = decided > 0 ? Math.round((wonCount / decided) * 100) : 0;
+  if (view === "list" && !window.__fullProposalsList) {
+    return (
+      <div style={{ padding: "24px 28px" }}>
+        <div style={{ fontSize: 14, fontWeight: 700, color: "#607D86", marginBottom: 16 }}>
+          Total Proposals: {proposals.length}
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {proposals.map((p, i) => (
+            <div
+              key={p._id || i}
+              onClick={() => setViewingProposal(p)}
+              style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 16px", border: "1.5px solid #E0EEF0", borderRadius: 12, cursor: "pointer", background: "#fff" }}
+            >
+              <span style={{ fontWeight: 700, color: "#1A2332", fontSize: 14 }}>{p.title || p.clientName || "—"}</span>
+              <span style={{ fontWeight: 700, fontSize: 12, color: (p.status === "approved" || p.status === "won") ? "#16a34a" : "#dc2626" }}>
+                {p.status || "Draft"}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
   if (view === "list") {
     const total = proposals.length;
     const totalVal = proposals.reduce((s, p) => s + (Number(p.value) || Number(p.total) || 0), 0);

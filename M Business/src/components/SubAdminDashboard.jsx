@@ -963,7 +963,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
   const [filterMode, setFilterMode] = useState("all");
   const [sortMode, setSortMode] = useState("newest");
 
-  const [activeClientId, setActiveClientId] = useState(null);
+  const [activeClientId, setActiveClientId] = useState(activeClientIdForReturn || null);
 
   // Keep the saved selection in sync so a page refresh (or re-login) reopens
   // the same client instead of falling back to the first one in the list.
@@ -11226,6 +11226,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                           key={i}
                           onClick={() => {
                             closeMobilePopup();
+                            setJumpInvoice(inv);
                             setActive("invoices");
                           }}
                           style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(255,255,255,0.2)", paddingBottom: 8, cursor: "pointer" }}
@@ -11235,7 +11236,6 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                         </div>
                       ))} </div>
                   </MobilePopup>
-
 
 
 
@@ -11479,8 +11479,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                             setOpenedFromMobileAddMenu(true);
                           }
                           setActive(n.key);
-                        }} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, color: (active === n.key || (n.key === "invoices" && active === "invoices")) ? "#fff" : "#fff", padding: "4px 10px" }}>
-                          <i className={`ti ${n.icon}`} style={{ fontSize: 19 }}></i>
+                        }} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, color: (active === n.key || (n.key === "invoices" && active === "invoices")) ? "#fff" : "#fff", padding: "4px 10px" }}>   <i className={`ti ${n.icon}`} style={{ fontSize: 19 }}></i>
                           <span style={{ fontSize: 9.5, fontWeight: 700 }}>{n.label}</span>
                         </div>
                       ))}
@@ -12343,7 +12342,15 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
                                       ].map((q, i) => (
-                                        <div key={i} onClick={() => setActive(q.act)} style={{ display: "flex", alignItems: "center", gap: 12, padding: 12, borderRadius: 12, border: "1px solid rgba(0,0,0,0.05)", cursor: "pointer", transition: "all 0.2s" }}>
+                                        <div key={i} onClick={() => {
+                                          if (q.act === "invoices") {
+                                            setJumpProject(null);
+                                            setJumpInvoice(null);
+                                            setInvoicePrefill(null);
+                                            setSidebarNavClickId(id => id + 1);
+                                          }
+                                          setActive(q.act);
+                                        }} style={{ display: "flex", alignItems: "center", gap: 12, padding: 12, borderRadius: 12, border: "1px solid rgba(0,0,0,0.05)", cursor: "pointer", transition: "all 0.2s" }}>
                                           <div style={{ width: 34, height: 34, borderRadius: 10, background: q.bg, color: q.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>
                                             <i className={`ti ${q.icon}`}></i>
                                           </div>

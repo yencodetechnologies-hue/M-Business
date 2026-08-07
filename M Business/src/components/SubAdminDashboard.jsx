@@ -1081,7 +1081,12 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
 
   const activeClient = clients.find(c => c._id === activeClientId) || null;
-
+ const [isMobileWidth, setIsMobileWidth] = useState(typeof window !== "undefined" && window.innerWidth < 769);
+  useEffect(() => {
+    const onResize = () => setIsMobileWidth(window.innerWidth < 769);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
 
 
   useEffect(() => {
@@ -2315,16 +2320,16 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
       </div>
 
       {/* STAT PILLS — matches Projects page style */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 20 }}>
-        <div style={{ cursor: "pointer", background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+      <div className="client-stat-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 20 }}>
+        <div style={{ cursor: "pointer", background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)", boxSizing: "border-box", height: 80, minWidth: 0 }}>
           <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(0,188,212,0.1)", color: "var(--app-accent)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}><i className="ti ti-users" /></div>
           <div><div style={{ fontSize: 24, fontWeight: 800, color: "#1A2332" }}>{totalClients}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#607D86" }}>All Clients</div></div>
         </div>
-        <div style={{ cursor: "pointer", background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+        <div style={{ cursor: "pointer", background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)", boxSizing: "border-box", height: 80, minWidth: 0 }}>
           <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(22,163,74,0.1)", color: "#16a34a", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}><i className="ti ti-user-check" /></div>
           <div><div style={{ fontSize: 24, fontWeight: 800, color: "#1A2332" }}>{activeClientsCount}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#607D86" }}>Active</div></div>
         </div>
-        <div style={{ cursor: "pointer", background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+        <div style={{ cursor: "pointer", background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)", boxSizing: "border-box", height: 80, minWidth: 0 }}>
           <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(220,38,38,0.1)", color: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}><i className="ti ti-user-off" /></div>
           <div><div style={{ fontSize: 24, fontWeight: 800, color: "#1A2332" }}>{inactiveClientsCount}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#607D86" }}>Inactive</div></div>
         </div>
@@ -2403,9 +2408,10 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
         {/* ── DETAIL PANEL ── */}
 
-        {activeClient ? (
+{activeClient ? (
 
-          <div className="client-detail-panel" style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minWidth: 0 }}>
+          <div className={`client-detail-panel ${isMobileWidth ? "client-detail-modal" : ""}`} style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minWidth: 0 }}>
+            <button onClick={() => setActiveClientId(null)} style={{ position: "sticky", top: 8, left: "100%", transform: "translateX(-8px)", width: 32, height: 32, borderRadius: "50%", background: "#F5FAFA", border: "1px solid #E0EEF0", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 16, color: "#607D86", zIndex: 10 }}><i className="ti ti-x"></i></button>            <button className="client-detail-modal-close" onClick={() => setActiveClientId(null)} style={{ display: "none" }}><i className="ti ti-x"></i></button>
 
 
 
@@ -2612,10 +2618,9 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
       {deleteTarget && <ConfirmModal title="Delete Client" message={`Are you sure you want to delete "${deleteTarget.clientName || deleteTarget.name}"?`} onConfirm={doDelete} onCancel={() => setDeleteTarget(null)} />}
 
-      {viewClientModal && activeClient && (
+   {false && viewClientModal && activeClient && (
 
-        <Mdl title="Client Details" onClose={() => setViewClientModal(false)} maxWidth={600}>
-
+        <Mdl title="Client Details" onClose={() => { setViewClientModal(false); setActiveClientId(null); }} maxWidth={700}>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
 
             <div style={{ display: "flex", justifyContent: "center", marginBottom: 10 }}>

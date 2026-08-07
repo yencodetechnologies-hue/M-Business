@@ -10703,7 +10703,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   `}</style>
 
                   {/* TEAL NAME/BELL STRIP — sits above the logo row */}
-                  <div style={{ background: "linear-gradient(160deg, var(--app-accent) 0%, #00BCD4 100%)", padding: "6px 16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div style={{ background: "linear-gradient(160deg, var(--app-accent) 0%, #00BCD4 100%)", padding: "6px 20px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <div
                       data-profile-anchor="true"
                       onClick={(e) => { e.stopPropagation(); setProfileDropdownOpen(v => !v); setShowProfile(false); }}
@@ -10730,7 +10730,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                         <i className="ti ti-building" style={{ fontSize: 16, color: "var(--app-accent, #00BCD4)" }}></i>
                       )}
                     </div>
-                    <div onClick={() => setSidebarOpen(true)} style={{ width: 35, height: 35, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+                    <div onClick={() => setSidebarOpen(true)} style={{ width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
                       <i className="ti ti-menu-2" style={{ fontSize: 20, color: "var(--app-accent, #00BCD4)" }}></i>
                     </div>
                   </div>

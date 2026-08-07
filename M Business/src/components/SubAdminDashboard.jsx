@@ -11115,7 +11115,17 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                           setDraggingSecondRow(null);
                         }}
                         onDragEnd={() => setDraggingSecondRow(null)}
-                        onClick={() => setActive(s.page)}
+                        onClick={() => {
+                          if (s.id === "totalInv") {
+                            setJumpProject(null);
+                            setJumpInvoice(null);
+                            setInvoicePrefill(null);
+                            setSidebarNavClickId(id => id + 1);
+                            setActive("invoices");
+                            return;
+                          }
+                          setActive(s.page);
+                        }}
                         style={{ animationDelay: `${i * 60}ms`, background: "transparent", borderRadius: 0, padding: "4px 4px", boxShadow: "none", textAlign: "center", border: "none", cursor: "grab", opacity: draggingSecondRow === s.id ? 0.4 : 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}
                       >
                         <div style={{ width: 72, height: 72, borderRadius: 18, background: s.grad, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 8px", fontSize: 30, boxShadow: "0 6px 14px rgba(0,0,0,0.15)" }}>

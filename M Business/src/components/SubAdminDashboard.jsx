@@ -11337,7 +11337,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   {
                     <div style={{ margin: "16px 16px 0", position: "relative", zIndex: 1 }}>
                       <div style={{ background: "#fff", borderRadius: 18, boxShadow: "0 10px 30px rgba(15,10,41,0.12)", border: "1px solid rgba(0,0,0,0.03)", overflow: "hidden" }}>
-                        <div onClick={(e) => { setClientResponsesExpanded(v => !v); const scroller = e.currentTarget.closest('.mobile-dashboard-view'); if (scroller) requestAnimationFrame(() => scroller.scrollTop = Math.min(scroller.scrollTop, scroller.scrollHeight - scroller.clientHeight)); }} style={{ padding: "14px 16px", borderBottom: clientResponsesExpanded ? "1px solid #f1f5f9" : "none", display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer" }}>
+                        <div onClick={() => setClientResponsesExpanded(v => !v)} style={{ padding: "14px 16px", borderBottom: clientResponsesExpanded ? "1px solid #f1f5f9" : "none", display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer" }}>
                           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                             <i className="ti ti-clipboard-check" style={{ color: "var(--app-accent)" }}></i>
                             <span style={{ fontSize: 14, fontWeight: 800, color: "#0f1c2e" }}>Recent Activity</span>

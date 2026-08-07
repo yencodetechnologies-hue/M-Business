@@ -2712,7 +2712,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                             });
                           })()}
                         </div>
-                        <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 4 }}>Select one or more team members.</div>
+
                       </div>
 
                       {/* Error message */}

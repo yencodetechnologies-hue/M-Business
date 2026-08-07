@@ -4411,7 +4411,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                       <div style={{ fontSize: 12, color: P.textLight, padding: '4px' }}>No employees assigned to this project.</div>
                     )}
                   </div>
-                  <div style={{ fontSize: 11, color: P.textLight, marginTop: 4 }}>Select one or more team members.</div>
+                  
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
                   <button type="button" className="mpd-btn mpd-btn-outline" onClick={() => { setShowAddTaskModal(false); if (onCancelReturnToDashboard) onCancelReturnToDashboard(); }}>Cancel</button>

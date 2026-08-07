@@ -7637,7 +7637,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   <div style={{ width: "100%", maxHeight: 150, overflowY: "auto", padding: "8px", borderRadius: 8, border: "1.5px solid #e2e8f0", boxSizing: "border-box", background: "#fff" }}>
                     <div style={{ fontSize: 12, color: "#94a3b8", padding: "4px" }}>No employees assigned to this project.</div>
                   </div>
-                  <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 4 }}>Select one or more team members.</div>
+                  <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 4 }}></div>
                 </div>
 
                 {/* Actions */}
@@ -11106,7 +11106,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                               <div style={{ width: "100%", maxHeight: 150, overflowY: "auto", padding: "8px", borderRadius: 8, border: "1.5px solid #e2e8f0", boxSizing: "border-box", background: "#fff" }}>
                                 <div style={{ fontSize: 12, color: "#94a3b8", padding: "4px" }}>No employees assigned to this project.</div>
                               </div>
-                              <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 4 }}>Select one or more team members.</div>
+
                             </div>
                             <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
                               <button

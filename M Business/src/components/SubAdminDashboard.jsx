@@ -11133,7 +11133,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   </div>
 
                   {/* FLOATING STAT STRIP — draggable reorder, sits below hero (no overlap) */}
-                  <div style={{ margin: "8px 16px 0", position: "relative", zIndex: 5, display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14 }}>
+<div style={{ margin: "8px 16px 0", position: "relative", zIndex: 5, display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12 }}>
                     {mobStatCardOrder.map((s, i) => (
                       <div
                         key={s.id}

@@ -7604,7 +7604,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 {statusGroups.map(g => {
                   const list = invoicesByStatus(g.key);
                   return (
-                    <div key={g.key} style={{ background: "#fff", borderRadius: 14, padding: 16, border: "1px solid rgba(0,0,0,0.08)" }}>
+                    <div key={g.key} style={{ background: "#fff", borderRadius: 14, padding: 16, border: "1px solid rgba(0,0,0,0.08)", height: 260, overflowY: "auto", boxSizing: "border-box" }}>
                       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: list.length ? 10 : 0 }}>
                         <span style={{ background: g.bg, color: g.color, padding: "4px 10px", borderRadius: 8, fontSize: 11, fontWeight: 800 }}>{g.label}</span>
                         <span style={{ fontSize: 12, color: "rgba(15,28,46,0.5)", fontWeight: 700 }}>{list.length}</span>

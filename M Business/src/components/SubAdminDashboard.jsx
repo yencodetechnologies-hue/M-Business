@@ -3199,9 +3199,7 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
       </div>
     );
   }
-}
 
-function _EmployeesPageOriginalBody() {
   return (
 
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
@@ -11133,7 +11131,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   </div>
 
                   {/* FLOATING STAT STRIP — draggable reorder, sits below hero (no overlap) */}
-<div style={{ margin: "8px 16px 0", position: "relative", zIndex: 5, display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12 }}>
+                  <div style={{ margin: "8px 16px 0", position: "relative", zIndex: 5, display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12 }}>
                     {mobStatCardOrder.map((s, i) => (
                       <div
                         key={s.id}
@@ -11161,7 +11159,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                         }}
                         style={{ animationDelay: `${i * 60}ms`, background: "transparent", borderRadius: 0, padding: "4px 4px", boxShadow: "none", textAlign: "center", border: "none", cursor: "grab", opacity: draggingStatCard === s.id ? 0.4 : 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}
                       >
-                        <div style={{ width: 72, height: 72, borderRadius: 18, background: s.grad, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 8px", color: "#fff", fontSize: 30, boxShadow: "0 6px 14px rgba(0,0,0,0.15)" }}>
+                        <div style={{ width: 56, height: 56, borderRadius: 16, background: s.grad, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 8px", color: "#fff", fontSize: 22, boxShadow: "0 6px 14px rgba(0,0,0,0.15)" }}>
                           <i className={`ti ${s.icon}`}></i>
                         </div>
                         <div style={{ fontSize: 13, fontWeight: 800, color: "#0f0a29" }}>{s.label}</div>
@@ -11205,7 +11203,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                           setActive(s.page);
                         }} style={{ animationDelay: `${i * 60}ms`, background: "transparent", borderRadius: 0, padding: "4px 4px", boxShadow: "none", textAlign: "center", border: "none", cursor: "grab", opacity: draggingSecondRow === s.id ? 0.4 : 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}
                       >
-                        <div style={{ width: 72, height: 72, borderRadius: 18, background: s.grad, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 8px", fontSize: 30, boxShadow: "0 6px 14px rgba(0,0,0,0.15)" }}>
+                        <div style={{ width: 56, height: 56, borderRadius: 16, background: s.grad, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 8px", fontSize: 22, boxShadow: "0 6px 14px rgba(0,0,0,0.15)" }}>
                           <i className={`ti ${s.icon}`}></i>
                         </div>
                         <div style={{ fontSize: 13, fontWeight: 800, color: "#0f0a29" }}>{s.label}</div>

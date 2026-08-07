@@ -10741,7 +10741,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     background: "linear-gradient(160deg, var(--app-accent) 0%, #00BCD4 60%, #00BCD4 100%)",
                     borderRadius: "0",
                     margin: "0",
-                    padding: "18px 18px 90px",
+                    padding: "18px 18px 60px",
 
                     color: "#fff",
                     overflow: "hidden"
@@ -10751,7 +10751,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     <div style={{ position: "absolute", bottom: -80, left: -30, width: 180, height: 180, borderRadius: "50%", background: "radial-gradient(circle, #00BCD4 0%, transparent 70%)", opacity: 0.25, filter: "blur(14px)" }} />
 
                     <div style={{ position: "relative", zIndex: 2 }}>
-                      <div style={{ display: "flex", flexDirection: "column", gap: 14, marginBottom: 20 }}>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 14, marginBottom: 4 }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                           <div >
                             <div

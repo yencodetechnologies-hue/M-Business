@@ -197,19 +197,54 @@ body {
 
 /* Responsive Grids to prevent overflow */
 @media (max-width: 768px) {
-  .modal-2col {
-    grid-template-columns: 1fr !important;
+  .table-toolbar {
+    flex-wrap: nowrap;
+    gap: 8px;
   }
 
-  .two-col {
-    grid-template-columns: 1fr !important;
+  .toolbar-search {
+    display: none;
   }
 
-  .stat-grid {
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) !important;
+  .toolbar-left {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .sort-btn,
+  .export-btn {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 8px;
+    justify-content: center;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .export-btn {
+    flex: 1 1 0;
+    min-width: 0;
+    margin-left: 0;
+  }
+
+  .tabs-row-mobile-fix {
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
+  }
+
+  .tabs-row-mobile-fix > select,
+  .tabs-row-mobile-fix > .tabs {
+    flex: 1 1 0;
+    min-width: 0;
+    width: auto !important;
+  }
+
+  .tabs-row-mobile-fix > button {
+    flex-shrink: 0;
+    white-space: nowrap;
+    padding: 10px 14px !important;
   }
 }
-
 @media (max-width: 480px) {
   .stat-grid {
     grid-template-columns: 1fr !important;
@@ -1924,7 +1959,37 @@ td.exp-name {
   background: var(--app-accent);
   color: #fff;
 }
+@media (max-width: 768px) {
+  .table-toolbar {
+    flex-wrap: nowrap;
+    gap: 8px;
+  }
 
+  .toolbar-search {
+    display: none;
+  }
+
+  .toolbar-left {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .sort-btn,
+  .export-btn {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 8px;
+    justify-content: center;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .export-btn {
+    flex: 1 1 0;
+    min-width: 0;
+    margin-left: 0;
+  }
+}
 table {
   width: 100%;
   border-collapse: collapse;

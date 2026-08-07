@@ -1887,7 +1887,7 @@ const [sortOrder, setSortOrder] = useState("desc");
             <div className="stat-bar-wrap"><div className="stat-bar-fill" style={{ width: "11%", background: "var(--red)" }}></div></div>
           </div>
         </div>
-
+<div className="tabs-row-mobile-fix" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20, gap: 10 }}></div>
       {/* TABS */}
 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20, gap: 10 }}>
   {isMobileWidth ? (
@@ -1908,7 +1908,7 @@ const [sortOrder, setSortOrder] = useState("desc");
     </div>
   )}
   <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (typeof e.nativeEvent?.stopImmediatePropagation === 'function') e.nativeEvent.stopImmediatePropagation(); clearForm(); setStep("form"); setInternalNav(true); }} type="button" style={{ padding: "8px 16px", background: "var(--teal)", color: "#fff", border: "none", borderRadius: 8, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
-    <i className="ti ti-plus"></i>{!isMobileWidth && " New Invoice"}
+    <i className="ti ti-plus"></i> New Invoice
   </button>
 </div>
 

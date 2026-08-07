@@ -959,19 +959,35 @@ function InvoicesListPage({ invoices, onViewInvoice }) {
       <div style={{ fontSize: 14, fontWeight: 700, color: "#607D86", marginBottom: 16 }}>
         Total Invoices: {all.length}
       </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        {all.map((inv, i) => (
-          <div
-            key={inv._id || inv.invoiceNo || i}
-            onClick={() => onViewInvoice && onViewInvoice(inv)}
-            style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 16px", border: "1.5px solid #E0EEF0", borderRadius: 12, cursor: "pointer", background: "#fff" }}
-          >
-            <span style={{ fontWeight: 700, color: "#1A2332", fontSize: 14 }}>{inv.clientName || inv.client || inv.invoiceNo || "—"}</span>
-            <span style={{ fontWeight: 700, fontSize: 12, color: (inv.status || "").toLowerCase() === "paid" ? "#16a34a" : "#dc2626" }}>
-              {inv.status || "Unpaid"}
-            </span>
-          </div>
-        ))}
+      <div style={{ background: "#fff", border: "1px solid #E0EEF0", borderRadius: 12, overflow: "hidden" }}>
+        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <thead>
+            <tr style={{ background: "#F5FAFA" }}>
+              <th style={{ textAlign: "left", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, borderBottom: "1px solid #E0EEF0", width: 60 }}>S.No.</th>
+              <th style={{ textAlign: "left", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, borderBottom: "1px solid #E0EEF0" }}>Client / Invoice</th>
+              <th style={{ textAlign: "right", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, borderBottom: "1px solid #E0EEF0", width: 120 }}>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {all.map((inv, i) => (
+              <tr
+                key={inv._id || inv.invoiceNo || i}
+                onClick={() => onViewInvoice && onViewInvoice(inv)}
+                style={{ cursor: "pointer", borderBottom: i === all.length - 1 ? "none" : "1px solid #E0EEF0" }}
+              >
+                <td style={{ padding: "14px 16px", fontSize: 13, color: "#607D86", fontWeight: 600, verticalAlign: "middle" }}>{i + 1}</td>
+                <td style={{ padding: "14px 16px", verticalAlign: "middle" }}>
+                  <span style={{ fontWeight: 700, color: "#1A2332", fontSize: 14 }}>{inv.clientName || inv.client || inv.invoiceNo || "—"}</span>
+                </td>
+                <td style={{ padding: "14px 16px", textAlign: "right", verticalAlign: "middle" }}>
+                  <span style={{ display: "inline-block", fontWeight: 700, fontSize: 12, padding: "4px 12px", borderRadius: 20, background: (inv.status || "").toLowerCase() === "paid" ? "#dcfce7" : "#fef2f2", color: (inv.status || "").toLowerCase() === "paid" ? "#16a34a" : "#dc2626" }}>
+                    {inv.status || "Unpaid"}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
@@ -2650,19 +2666,35 @@ function UnpaidInvoicesListPage({ invoices, onViewInvoice }) {
       <div style={{ fontSize: 14, fontWeight: 700, color: "#607D86", marginBottom: 16 }}>
         Total Unpaid Invoices: {unpaid.length}
       </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        {unpaid.map((inv, i) => (
-          <div
-            key={inv._id || inv.invoiceNo || i}
-            onClick={() => onViewInvoice && onViewInvoice(inv)}
-            style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 16px", border: "1.5px solid #E0EEF0", borderRadius: 12, cursor: "pointer", background: "#fff" }}
-          >
-            <span style={{ fontWeight: 700, color: "#1A2332", fontSize: 14 }}>{inv.clientName || inv.client || inv.invoiceNo || "—"}</span>
-            <span style={{ fontWeight: 700, fontSize: 12, color: "#dc2626" }}>
-              {inv.status || "Unpaid"}
-            </span>
-          </div>
-        ))}
+      <div style={{ background: "#fff", border: "1px solid #E0EEF0", borderRadius: 12, overflow: "hidden" }}>
+        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <thead>
+            <tr style={{ background: "#F5FAFA" }}>
+              <th style={{ textAlign: "left", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, borderBottom: "1px solid #E0EEF0", width: 60 }}>S.No.</th>
+              <th style={{ textAlign: "left", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, borderBottom: "1px solid #E0EEF0" }}>Client / Invoice</th>
+              <th style={{ textAlign: "right", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, borderBottom: "1px solid #E0EEF0", width: 120 }}>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {unpaid.map((inv, i) => (
+              <tr
+                key={inv._id || inv.invoiceNo || i}
+                onClick={() => onViewInvoice && onViewInvoice(inv)}
+                style={{ cursor: "pointer", borderBottom: i === unpaid.length - 1 ? "none" : "1px solid #E0EEF0" }}
+              >
+                <td style={{ padding: "14px 16px", fontSize: 13, color: "#607D86", fontWeight: 600, verticalAlign: "middle" }}>{i + 1}</td>
+                <td style={{ padding: "14px 16px", verticalAlign: "middle" }}>
+                  <span style={{ fontWeight: 700, color: "#1A2332", fontSize: 14 }}>{inv.clientName || inv.client || inv.invoiceNo || "—"}</span>
+                </td>
+                <td style={{ padding: "14px 16px", textAlign: "right", verticalAlign: "middle" }}>
+                  <span style={{ display: "inline-block", fontWeight: 700, fontSize: 12, padding: "4px 12px", borderRadius: 20, background: "#fef2f2", color: "#dc2626" }}>
+                    {inv.status || "Unpaid"}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
@@ -3198,19 +3230,35 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
         <div style={{ fontSize: 14, fontWeight: 700, color: "#607D86", marginBottom: 16 }}>
           Total Team: {employees.length}
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {employees.map((e, i) => (
-            <div
-              key={e._id || i}
-              onClick={() => { setViewEmp(e); loadEmpDocs(e); }}
-              style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 16px", border: "1.5px solid #E0EEF0", borderRadius: 12, cursor: "pointer", background: "#fff" }}
-            >
-              <span style={{ fontWeight: 700, color: "#1A2332", fontSize: 14 }}>{e.name || "—"}</span>
-              <span style={{ fontWeight: 700, fontSize: 12, color: (e.status === "Active" || e.status === "Approved") ? "#16a34a" : "#dc2626" }}>
-                {e.status || "Active"}
-              </span>
-            </div>
-          ))}
+        <div style={{ background: "#fff", border: "1px solid #E0EEF0", borderRadius: 12, overflow: "hidden" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead>
+              <tr style={{ background: "#F5FAFA" }}>
+                <th style={{ textAlign: "left", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, borderBottom: "1px solid #E0EEF0", width: 60 }}>S.No.</th>
+                <th style={{ textAlign: "left", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, borderBottom: "1px solid #E0EEF0" }}>Employee Name</th>
+                <th style={{ textAlign: "right", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, borderBottom: "1px solid #E0EEF0", width: 120 }}>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {employees.map((e, i) => (
+                <tr
+                  key={e._id || i}
+                  onClick={() => { setViewEmp(e); loadEmpDocs(e); }}
+                  style={{ cursor: "pointer", borderBottom: i === employees.length - 1 ? "none" : "1px solid #E0EEF0" }}
+                >
+                  <td style={{ padding: "14px 16px", fontSize: 13, color: "#607D86", fontWeight: 600, verticalAlign: "middle" }}>{i + 1}</td>
+                  <td style={{ padding: "14px 16px", verticalAlign: "middle" }}>
+                    <span style={{ fontWeight: 700, color: "#1A2332", fontSize: 14 }}>{e.name || "—"}</span>
+                  </td>
+                  <td style={{ padding: "14px 16px", textAlign: "right", verticalAlign: "middle" }}>
+                    <span style={{ display: "inline-block", fontWeight: 700, fontSize: 12, padding: "4px 12px", borderRadius: 20, background: (e.status === "Active" || e.status === "Approved") ? "#dcfce7" : "#fef2f2", color: (e.status === "Active" || e.status === "Approved") ? "#16a34a" : "#dc2626" }}>
+                      {e.status || "Active"}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     );
@@ -4638,19 +4686,35 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
           Total Projects: {(projectsWithProgress || []).length}
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {(projectsWithProgress || []).map((p, i) => (
-            <div
-              key={p._id || p.id || i}
-              onClick={() => onViewProject && onViewProject(p)}
-              style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 16px", border: "1.5px solid #E0EEF0", borderRadius: 12, cursor: "pointer", background: "#fff" }}
-            >
-              <span style={{ fontWeight: 700, color: "#1A2332", fontSize: 14 }}>{p.name || "—"}</span>
-              <span style={{ fontWeight: 700, fontSize: 12, color: (p.status || "Active").toLowerCase() === "active" ? "#16a34a" : "#dc2626" }}>
-                {p.status || "Active"}
-              </span>
-            </div>
-          ))}
+        <div style={{ background: "#fff", border: "1px solid #E0EEF0", borderRadius: 12, overflow: "hidden" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead>
+              <tr style={{ background: "#F5FAFA" }}>
+                <th style={{ textAlign: "left", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, borderBottom: "1px solid #E0EEF0", width: 60 }}>S.No.</th>
+                <th style={{ textAlign: "left", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, borderBottom: "1px solid #E0EEF0" }}>Project Name</th>
+                <th style={{ textAlign: "right", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, borderBottom: "1px solid #E0EEF0", width: 120 }}>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {(projectsWithProgress || []).map((p, i) => (
+                <tr
+                  key={p._id || p.id || i}
+                  onClick={() => onViewProject && onViewProject(p)}
+                  style={{ cursor: "pointer", borderBottom: i === (projectsWithProgress || []).length - 1 ? "none" : "1px solid #E0EEF0" }}
+                >
+                  <td style={{ padding: "14px 16px", fontSize: 13, color: "#607D86", fontWeight: 600, verticalAlign: "middle" }}>{i + 1}</td>
+                  <td style={{ padding: "14px 16px", verticalAlign: "middle" }}>
+                    <span style={{ fontWeight: 700, color: "#1A2332", fontSize: 14 }}>{p.name || "—"}</span>
+                  </td>
+                  <td style={{ padding: "14px 16px", textAlign: "right", verticalAlign: "middle" }}>
+                    <span style={{ display: "inline-block", fontWeight: 700, fontSize: 12, padding: "4px 12px", borderRadius: 20, background: (p.status || "Active").toLowerCase() === "active" ? "#dcfce7" : "#fef2f2", color: (p.status || "Active").toLowerCase() === "active" ? "#16a34a" : "#dc2626" }}>
+                      {p.status || "Active"}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
 
       </div>
@@ -11337,7 +11401,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   {
                     <div style={{ margin: "16px 16px 0", position: "relative", zIndex: 1 }}>
                       <div style={{ background: "#fff", borderRadius: 18, boxShadow: "0 10px 30px rgba(15,10,41,0.12)", border: "1px solid rgba(0,0,0,0.03)", overflow: "hidden" }}>
-                        <div onClick={() => setClientResponsesExpanded(v => !v)} style={{ padding: "14px 16px", borderBottom: clientResponsesExpanded ? "1px solid #f1f5f9" : "none", display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer" }}>
+                        <div onClick={() => setClientResponsesExpanded(v => !v)} style={{ padding: "14px 16px", borderBottom: clientResponsesExpanded ? "1px solid #f1f5f9" : "none", background: "#fff", display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer" }}>
                           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                             <i className="ti ti-clipboard-check" style={{ color: "var(--app-accent)" }}></i>
                             <span style={{ fontSize: 14, fontWeight: 800, color: "#0f1c2e" }}>Recent Activity</span>

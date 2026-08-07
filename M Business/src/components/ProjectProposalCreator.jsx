@@ -1776,19 +1776,35 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
         <div style={{ fontSize: 14, fontWeight: 700, color: "#607D86", marginBottom: 16 }}>
           Total Proposals: {proposals.length}
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {proposals.map((p, i) => (
-            <div
-              key={p._id || i}
-              onClick={() => setViewingProposal(p)}
-              style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 16px", border: "1.5px solid #E0EEF0", borderRadius: 12, cursor: "pointer", background: "#fff" }}
-            >
-              <span style={{ fontWeight: 700, color: "#1A2332", fontSize: 14 }}>{p.title || p.clientName || "—"}</span>
-              <span style={{ fontWeight: 700, fontSize: 12, color: (p.status === "approved" || p.status === "won") ? "#16a34a" : "#dc2626" }}>
-                {p.status || "Draft"}
-              </span>
-            </div>
-          ))}
+        <div style={{ background: "#fff", border: "1px solid #E0EEF0", borderRadius: 12, overflow: "hidden" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead>
+              <tr style={{ background: "#F5FAFA" }}>
+                <th style={{ textAlign: "left", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, borderBottom: "1px solid #E0EEF0", width: 60 }}>S.No.</th>
+                <th style={{ textAlign: "left", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, borderBottom: "1px solid #E0EEF0" }}>Proposal / Client</th>
+                <th style={{ textAlign: "right", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, borderBottom: "1px solid #E0EEF0", width: 120 }}>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {proposals.map((p, i) => (
+                <tr
+                  key={p._id || i}
+                  onClick={() => setViewingProposal(p)}
+                  style={{ cursor: "pointer", borderBottom: i === proposals.length - 1 ? "none" : "1px solid #E0EEF0" }}
+                >
+                  <td style={{ padding: "14px 16px", fontSize: 13, color: "#607D86", fontWeight: 600, verticalAlign: "middle" }}>{i + 1}</td>
+                  <td style={{ padding: "14px 16px", verticalAlign: "middle" }}>
+                    <span style={{ fontWeight: 700, color: "#1A2332", fontSize: 14 }}>{p.title || p.clientName || "—"}</span>
+                  </td>
+                  <td style={{ padding: "14px 16px", textAlign: "right", verticalAlign: "middle" }}>
+                    <span style={{ display: "inline-block", fontWeight: 700, fontSize: 12, padding: "4px 12px", borderRadius: 20, background: (p.status === "approved" || p.status === "won") ? "#dcfce7" : "#fef2f2", color: (p.status === "approved" || p.status === "won") ? "#16a34a" : "#dc2626" }}>
+                      {p.status || "Draft"}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     );

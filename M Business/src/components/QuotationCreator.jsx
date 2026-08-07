@@ -922,19 +922,35 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
         <div style={{ fontSize: 14, fontWeight: 700, color: "#607D86", marginBottom: 16 }}>
           Total Quotations: {enrichedMinimal.length}
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {enrichedMinimal.map((entry, i) => (
-            <div
-              key={entry.id || entry.quoteNo || i}
-              onClick={() => { loadEntry(entry); setStep("preview"); }}
-              style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 16px", border: "1.5px solid #E0EEF0", borderRadius: 12, cursor: "pointer", background: "#fff" }}
-            >
-              <span style={{ fontWeight: 700, color: "#1A2332", fontSize: 14 }}>{entry.qt?.client || entry.client || entry.quoteNo || "—"}</span>
-              <span style={{ fontWeight: 700, fontSize: 12, color: (entry.status === "approved" || entry.status === "converted") ? "#16a34a" : "#dc2626" }}>
-                {entry.status || "Draft"}
-              </span>
-            </div>
-          ))}
+        <div style={{ background: "#fff", border: "1px solid #E0EEF0", borderRadius: 12, overflow: "hidden" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead>
+              <tr style={{ background: "#F5FAFA" }}>
+                <th style={{ textAlign: "left", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, borderBottom: "1px solid #E0EEF0", width: 60 }}>S.No.</th>
+                <th style={{ textAlign: "left", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, borderBottom: "1px solid #E0EEF0" }}>Client / Quote No.</th>
+                <th style={{ textAlign: "right", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, borderBottom: "1px solid #E0EEF0", width: 120 }}>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {enrichedMinimal.map((entry, i) => (
+                <tr
+                  key={entry.id || entry.quoteNo || i}
+                  onClick={() => { loadEntry(entry); setStep("preview"); }}
+                  style={{ cursor: "pointer", borderBottom: i === enrichedMinimal.length - 1 ? "none" : "1px solid #E0EEF0" }}
+                >
+                  <td style={{ padding: "14px 16px", fontSize: 13, color: "#607D86", fontWeight: 600, verticalAlign: "middle" }}>{i + 1}</td>
+                  <td style={{ padding: "14px 16px", verticalAlign: "middle" }}>
+                    <span style={{ fontWeight: 700, color: "#1A2332", fontSize: 14 }}>{entry.qt?.client || entry.client || entry.quoteNo || "—"}</span>
+                  </td>
+                  <td style={{ padding: "14px 16px", textAlign: "right", verticalAlign: "middle" }}>
+                    <span style={{ display: "inline-block", fontWeight: 700, fontSize: 12, padding: "4px 12px", borderRadius: 20, background: (entry.status === "approved" || entry.status === "converted") ? "#dcfce7" : "#fef2f2", color: (entry.status === "approved" || entry.status === "converted") ? "#16a34a" : "#dc2626" }}>
+                      {entry.status || "Draft"}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     );

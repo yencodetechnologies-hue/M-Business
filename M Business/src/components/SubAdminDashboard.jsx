@@ -10984,7 +10984,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     >
                       <MobIdleInvoiceArmer projectsWithProgress={projectsWithProgress} invoices={invoices} mobShowInvoiceList={mobShowInvoiceList} setMobShowInvoiceList={setMobShowInvoiceList} />
                       {!mobShowInvoiceList && (
-                        <div style={{ background: "#E0F7FA", border: "1px solid #B2EBF2", borderRadius: 12, overflow: "hidden", minHeight: 210 }}>
+                        <div style={{ background: "#E0F7FA", border: "1px solid #B2EBF2", borderRadius: 12, overflow: "hidden" }}>
                           {(mobShowAllProjects ? projectsWithProgress : projectsWithProgress.slice(0, 3)).map((p, idx) => {
                             const parseAmt = (val) => {
                               if (val === undefined || val === null) return 0;
@@ -11077,7 +11077,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                             </span>
                           )}
                         </div>
-                        <div style={{ background: "#E0F7FA", border: "1px solid #B2EBF2", borderRadius: 12, overflow: "hidden", minHeight: 210 }}>
+                        <div style={{ background: "#E0F7FA", border: "1px solid #B2EBF2", borderRadius: 12, overflow: "hidden" }}>
                           {(() => {
                             const statusMeta = (raw) => {
                               const s = (raw || "").toLowerCase();

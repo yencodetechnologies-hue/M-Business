@@ -926,9 +926,9 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ background: "#F5FAFA" }}>
-                <th style={{ textAlign: "left", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, borderBottom: "1px solid #E0EEF0", width: 60 }}>S.No.</th>
-                <th style={{ textAlign: "left", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, borderBottom: "1px solid #E0EEF0" }}>Client / Quote No.</th>
-                <th style={{ textAlign: "right", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, borderBottom: "1px solid #E0EEF0", width: 120 }}>Status</th>
+                <th style={{ textAlign: "left", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, border: "1px solid #E0EEF0", width: 60 }}>S.No.</th>
+                <th style={{ textAlign: "left", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, border: "1px solid #E0EEF0" }}>Client / Quote No.</th>
+                <th style={{ textAlign: "right", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, border: "1px solid #E0EEF0", width: 120 }}>Status</th>
               </tr>
             </thead>
             <tbody>
@@ -938,8 +938,8 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
                   onClick={() => { loadEntry(entry); setStep("preview"); }}
                   style={{ cursor: "pointer", borderBottom: i === enrichedMinimal.length - 1 ? "none" : "1px solid #E0EEF0" }}
                 >
-                  <td style={{ padding: "14px 16px", fontSize: 13, color: "#607D86", fontWeight: 600, verticalAlign: "middle" }}>{i + 1}</td>
-                  <td style={{ padding: "14px 16px", verticalAlign: "middle" }}>
+                  <td style={{ padding: "14px 16px", fontSize: 13, color: "#607D86", fontWeight: 600, verticalAlign: "middle", border: "1px solid #E0EEF0" }}>{i + 1}</td>
+                  <td style={{ padding: "14px 16px", verticalAlign: "middle", border: "1px solid #E0EEF0" }}>
                     <span style={{ fontWeight: 700, color: "#1A2332", fontSize: 14 }}>{entry.qt?.client || entry.client || entry.quoteNo || "—"}</span>
                   </td>
                   <td style={{ padding: "14px 16px", textAlign: "right", verticalAlign: "middle" }}>

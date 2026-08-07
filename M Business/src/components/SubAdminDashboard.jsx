@@ -952,8 +952,10 @@ function ClientDropdown({ clients, value, onChange, error, onAddClient }) {
 
 
 
-function InvoicesListPage({ invoices, onViewInvoice }) {
+function InvoicesListPage({ invoices, onViewInvoice, clients = [], projects = [], onViewClient, onViewProject }) {
   const all = invoices || [];
+  const findClient = (inv) => clients.find(c => c._id === inv.clientId || (c.clientName || c.name) === (inv.clientName || inv.client));
+  const findProject = (inv) => projects.find(p => p._id === inv.projectId || (p.name || "") === (inv.project || inv.projectName || ""));
   return (
     <div style={{ padding: "24px 28px" }}>
       <div style={{ fontSize: 14, fontWeight: 700, color: "#607D86", marginBottom: 16 }}>
@@ -964,28 +966,52 @@ function InvoicesListPage({ invoices, onViewInvoice }) {
           <thead>
             <tr style={{ background: "#F5FAFA" }}>
               <th style={{ textAlign: "left", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, borderBottom: "1px solid #E0EEF0", width: 60 }}>S.No.</th>
-              <th style={{ textAlign: "left", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, borderBottom: "1px solid #E0EEF0" }}>Client / Invoice</th>
+              <th style={{ textAlign: "left", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, borderBottom: "1px solid #E0EEF0" }}>Client</th>
+              <th style={{ textAlign: "left", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, borderBottom: "1px solid #E0EEF0" }}>Project</th>
               <th style={{ textAlign: "right", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, borderBottom: "1px solid #E0EEF0", width: 120 }}>Status</th>
             </tr>
           </thead>
           <tbody>
-            {all.map((inv, i) => (
-              <tr
-                key={inv._id || inv.invoiceNo || i}
-                onClick={() => onViewInvoice && onViewInvoice(inv)}
-                style={{ cursor: "pointer", borderBottom: i === all.length - 1 ? "none" : "1px solid #E0EEF0" }}
-              >
-                <td style={{ padding: "14px 16px", fontSize: 13, color: "#607D86", fontWeight: 600, verticalAlign: "middle" }}>{i + 1}</td>
-                <td style={{ padding: "14px 16px", verticalAlign: "middle" }}>
-                  <span style={{ fontWeight: 700, color: "#1A2332", fontSize: 14 }}>{inv.clientName || inv.client || inv.invoiceNo || "—"}</span>
-                </td>
-                <td style={{ padding: "14px 16px", textAlign: "right", verticalAlign: "middle" }}>
-                  <span style={{ display: "inline-block", fontWeight: 700, fontSize: 12, padding: "4px 12px", borderRadius: 20, background: (inv.status || "").toLowerCase() === "paid" ? "#dcfce7" : "#fef2f2", color: (inv.status || "").toLowerCase() === "paid" ? "#16a34a" : "#dc2626" }}>
-                    {inv.status || "Unpaid"}
-                  </span>
-                </td>
-              </tr>
-            ))}
+            {all.map((inv, i) => {
+              const matchedClient = findClient(inv);
+              const matchedProject = findProject(inv);
+              return (
+                <tr
+                  key={inv._id || inv.invoiceNo || i}
+                  style={{ borderBottom: i === all.length - 1 ? "none" : "1px solid #E0EEF0" }}
+                >
+                  <td style={{ padding: "14px 16px", fontSize: 13, color: "#607D86", fontWeight: 600, verticalAlign: "middle" }}>{i + 1}</td>
+                  <td style={{ padding: "14px 16px", verticalAlign: "middle" }}>
+                    <span
+                      onClick={() => matchedClient && onViewClient && onViewClient(matchedClient)}
+                      style={{ fontWeight: 700, color: matchedClient ? "var(--app-accent, #00BCD4)" : "#1A2332", fontSize: 14, cursor: matchedClient ? "pointer" : "default", textDecoration: matchedClient ? "underline" : "none" }}
+                    >
+                      {inv.clientName || inv.client || "—"}
+                    </span>
+                  </td>
+                  <td style={{ padding: "14px 16px", verticalAlign: "middle" }}>
+                    {matchedProject ? (
+                      <span
+                        onClick={() => onViewProject && onViewProject(matchedProject)}
+                        style={{ fontWeight: 700, color: "var(--app-accent, #00BCD4)", fontSize: 14, cursor: "pointer", textDecoration: "underline" }}
+                      >
+                        {matchedProject.name}
+                      </span>
+                    ) : (
+                      <span style={{ fontWeight: 600, color: "#94a3b8", fontSize: 13 }}>—</span>
+                    )}
+                  </td>
+                  <td style={{ padding: "14px 16px", textAlign: "right", verticalAlign: "middle" }}>
+                    <span
+                      onClick={() => onViewInvoice && onViewInvoice(inv)}
+                      style={{ display: "inline-block", fontWeight: 700, fontSize: 12, padding: "4px 12px", borderRadius: 20, background: (inv.status || "").toLowerCase() === "paid" ? "#dcfce7" : "#fef2f2", color: (inv.status || "").toLowerCase() === "paid" ? "#16a34a" : "#dc2626", cursor: "pointer" }}
+                    >
+                      {inv.status || "Unpaid"}
+                    </span>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
@@ -1334,29 +1360,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
           <div style={{ fontSize: 11, color: "#A0B8BE", marginTop: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.companyName || c.company || "—"}</div>
 
         </div>
-        {(() => {
-          const parseAmt = (val) => {
-            if (val === undefined || val === null) return 0;
-            if (typeof val === "number") return val;
-            const num = Number(String(val).replace(/[^0-9.-]+/g, ""));
-            return isNaN(num) ? 0 : num;
-          };
-          const budgetNum = parseAmt(c.budget);
-          const spentNum = (c.expenses || []).reduce((sum, exp) => sum + parseAmt(exp.amount), 0);
-          const budgetPct = budgetNum > 0 ? Math.min(100, Math.round((spentNum / budgetNum) * 100)) : 0;
-          return (
-            <div style={{ marginTop: 6 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "#0f1c2e" }}>
-                <span>Budget Used</span>
-                <span style={{ fontWeight: 700, color: "#0f1c2e" }}>{budgetPct}%</span>
-              </div>
-              <div style={{ height: 4, background: "#f1f5f9", borderRadius: 4, overflow: "hidden" }}>
-                <div style={{ width: `${budgetPct}%`, height: "100%", background: "#00BCD4", borderRadius: 4 }} />
-              </div>
-            </div>
-          );
-        })()}
-
+       
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
 
 
@@ -2182,7 +2186,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
   const activeClientsCount = clients.filter(c => (c.status || "Active").toLowerCase() === "active").length;
   const inactiveClientsCount = clients.filter(c => (c.status || "").toLowerCase() === "inactive").length;
 
-  if (!activeClient && typeof window !== "undefined" && window.innerWidth < 769) {
+  if (!activeClient && !window.__fullClientsList && typeof window !== "undefined" && window.innerWidth < 769) {
     return (
       <div className="clients-list-only-root" style={{ padding: "24px 28px" }}>
         <div style={{ fontSize: 14, fontWeight: 700, color: "#607D86", marginBottom: 16 }}>
@@ -2670,9 +2674,9 @@ function UnpaidInvoicesListPage({ invoices, onViewInvoice }) {
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr style={{ background: "#F5FAFA" }}>
-              <th style={{ textAlign: "left", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, borderBottom: "1px solid #E0EEF0", width: 60 }}>S.No.</th>
-              <th style={{ textAlign: "left", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, borderBottom: "1px solid #E0EEF0" }}>Client / Invoice</th>
-              <th style={{ textAlign: "right", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, borderBottom: "1px solid #E0EEF0", width: 120 }}>Status</th>
+              <th style={{ textAlign: "left", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, border: "1px solid #E0EEF0", width: 60 }}>S.No.</th>
+              <th style={{ textAlign: "left", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, border: "1px solid #E0EEF0" }}>Client / Invoice</th>
+              <th style={{ textAlign: "right", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, border: "1px solid #E0EEF0", width: 120 }}>Status</th>
             </tr>
           </thead>
           <tbody>
@@ -2682,8 +2686,8 @@ function UnpaidInvoicesListPage({ invoices, onViewInvoice }) {
                 onClick={() => onViewInvoice && onViewInvoice(inv)}
                 style={{ cursor: "pointer", borderBottom: i === unpaid.length - 1 ? "none" : "1px solid #E0EEF0" }}
               >
-                <td style={{ padding: "14px 16px", fontSize: 13, color: "#607D86", fontWeight: 600, verticalAlign: "middle" }}>{i + 1}</td>
-                <td style={{ padding: "14px 16px", verticalAlign: "middle" }}>
+                <td style={{ padding: "14px 16px", fontSize: 13, color: "#607D86", fontWeight: 600, verticalAlign: "middle", border: "1px solid #E0EEF0" }}>{i + 1}</td>
+                <td style={{ padding: "14px 16px", verticalAlign: "middle", border: "1px solid #E0EEF0" }}>
                   <span style={{ fontWeight: 700, color: "#1A2332", fontSize: 14 }}>{inv.clientName || inv.client || inv.invoiceNo || "—"}</span>
                 </td>
                 <td style={{ padding: "14px 16px", textAlign: "right", verticalAlign: "middle" }}>
@@ -3234,9 +3238,9 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ background: "#F5FAFA" }}>
-                <th style={{ textAlign: "left", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, borderBottom: "1px solid #E0EEF0", width: 60 }}>S.No.</th>
-                <th style={{ textAlign: "left", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, borderBottom: "1px solid #E0EEF0" }}>Employee Name</th>
-                <th style={{ textAlign: "right", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, borderBottom: "1px solid #E0EEF0", width: 120 }}>Status</th>
+                <th style={{ textAlign: "left", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, border: "1px solid #E0EEF0", width: 60 }}>S.No.</th>
+                <th style={{ textAlign: "left", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, border: "1px solid #E0EEF0" }}>Employee Name</th>
+                <th style={{ textAlign: "right", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, border: "1px solid #E0EEF0", width: 120 }}>Status</th>
               </tr>
             </thead>
             <tbody>
@@ -3246,8 +3250,8 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
                   onClick={() => { setViewEmp(e); loadEmpDocs(e); }}
                   style={{ cursor: "pointer", borderBottom: i === employees.length - 1 ? "none" : "1px solid #E0EEF0" }}
                 >
-                  <td style={{ padding: "14px 16px", fontSize: 13, color: "#607D86", fontWeight: 600, verticalAlign: "middle" }}>{i + 1}</td>
-                  <td style={{ padding: "14px 16px", verticalAlign: "middle" }}>
+                  <td style={{ padding: "14px 16px", fontSize: 13, color: "#607D86", fontWeight: 600, verticalAlign: "middle", border: "1px solid #E0EEF0" }}>{i + 1}</td>
+                  <td style={{ padding: "14px 16px", verticalAlign: "middle", border: "1px solid #E0EEF0" }}>
                     <span style={{ fontWeight: 700, color: "#1A2332", fontSize: 14 }}>{e.name || "—"}</span>
                   </td>
                   <td style={{ padding: "14px 16px", textAlign: "right", verticalAlign: "middle" }}>
@@ -4677,7 +4681,7 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
 
 
 
-  if (typeof window !== "undefined" && window.innerWidth < 769) {
+  if (!window.__fullProjectsList && typeof window !== "undefined" && window.innerWidth < 769) {
     return (
 
       <div style={{ padding: "24px 28px" }}>
@@ -4690,9 +4694,9 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ background: "#F5FAFA" }}>
-                <th style={{ textAlign: "left", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, borderBottom: "1px solid #E0EEF0", width: 60 }}>S.No.</th>
-                <th style={{ textAlign: "left", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, borderBottom: "1px solid #E0EEF0" }}>Project Name</th>
-                <th style={{ textAlign: "right", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, borderBottom: "1px solid #E0EEF0", width: 120 }}>Status</th>
+                <th style={{ textAlign: "left", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, border: "1px solid #E0EEF0", width: 60 }}>S.No.</th>
+                <th style={{ textAlign: "left", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, border: "1px solid #E0EEF0" }}>Project Name</th>
+                <th style={{ textAlign: "right", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, border: "1px solid #E0EEF0", width: 120 }}>Status</th>
               </tr>
             </thead>
             <tbody>
@@ -4702,8 +4706,8 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
                   onClick={() => onViewProject && onViewProject(p)}
                   style={{ cursor: "pointer", borderBottom: i === (projectsWithProgress || []).length - 1 ? "none" : "1px solid #E0EEF0" }}
                 >
-                  <td style={{ padding: "14px 16px", fontSize: 13, color: "#607D86", fontWeight: 600, verticalAlign: "middle" }}>{i + 1}</td>
-                  <td style={{ padding: "14px 16px", verticalAlign: "middle" }}>
+                  <td style={{ padding: "14px 16px", fontSize: 13, color: "#607D86", fontWeight: 600, verticalAlign: "middle", border: "1px solid #E0EEF0" }}>{i + 1}</td>
+                  <td style={{ padding: "14px 16px", verticalAlign: "middle", border: "1px solid #E0EEF0" }}>
                     <span style={{ fontWeight: 700, color: "#1A2332", fontSize: 14 }}>{p.name || "—"}</span>
                   </td>
                   <td style={{ padding: "14px 16px", textAlign: "right", verticalAlign: "middle" }}>
@@ -10314,7 +10318,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
     ? "mysubscriptions"
 
-    : ((findNavItem(active) || active === "addClient" || active === "tasks" || active === "create-project" || active === "edit-project" || active === "project-details" || active === "projects" || active === "invoices") ? active : navItems[0]?.key || "dashboard");
+    : ((findNavItem(active) || active === "addClient" || active === "tasks" || active === "create-project" || active === "edit-project" || active === "project-details" || active === "projects" || active === "invoices" || active === "unpaidInvoices" || active === "invoiceDetails") ? active : navItems[0]?.key || "dashboard");
 
 
 
@@ -11631,8 +11635,15 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                             setJumpInvoice(null);
                             setInvoicePrefill(null);
                             setSidebarNavClickId(id => id + 1);
+                            setActive("invoiceDetails");
+                            return;
                           }
-                          if (n.key === "invoices" || n.key === "projects" || n.key === "clients") {
+                          if (n.key === "projects") {
+                            window.__fullProjectsList = true;
+                            setOpenedFromMobileAddMenu(true);
+                          }
+                          if (n.key === "clients") {
+                            window.__fullClientsList = true;
                             setOpenedFromMobileAddMenu(true);
                           }
                           setActive(n.key);
@@ -13434,7 +13445,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-            {validActive === "invoices" && typeof window !== "undefined" && window.innerWidth < 769 && <InvoicesListPage invoices={invoices} onViewInvoice={(inv) => { setJumpInvoice({ ...inv, _t: Date.now() }); setPrevActiveBeforeInvoice("invoices"); setActive("invoiceDetails"); }} />}
+            {validActive === "invoices" && typeof window !== "undefined" && window.innerWidth < 769 && <InvoicesListPage invoices={invoices} clients={clients} projects={projects} onViewInvoice={(inv) => { setJumpInvoice({ ...inv, _t: Date.now() }); setPrevActiveBeforeInvoice("invoices"); setActive("invoiceDetails"); }} onViewClient={(c) => { setActiveClientIdForReturn(c._id); setActive("clients"); }} onViewProject={(p) => { setJumpProject(p); setProjectDetailsReadOnly(false); setSidebarOverride("dashboard"); setActive("project-details"); }} />}
 
             {validActive === "invoices" && !(typeof window !== "undefined" && window.innerWidth < 769) && <InvoiceCreator key={`invoices-full-${sidebarNavClickId}`} forceListView={true} onConsumeForceListView={() => { }} user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={() => { setSidebarOverride(null); setActive("dashboard"); }} onSaveSuccess={() => { setActive("invoices"); }} jumpInvoice={null} newInvoicePrefill={invoicePrefill || jumpInvoicePrefill} newClientName={pendingInvoiceClientName} onNewClientConsumed={() => setPendingInvoiceClientName(null)} onAddClient={() => { }} onAddProject={() => { setJumpProject(null); setActive("create-project"); }} />}
 
@@ -13472,8 +13483,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             }} onAddProject={() => { setJumpProject(null); setSidebarOverride("invoices"); setActive("create-project"); }} />}
 
             {showMobileInvoiceModal && (
-              <div style={{ position: "fixed", inset: 0, zIndex: 9000, background: "rgba(15,23,42,0.5)", display: "flex", alignItems: "flex-end" }}>
-                <div style={{ background: "var(--app-bg, #f5f7fb)", width: "100%", maxHeight: "92vh", overflowY: "auto", borderRadius: "18px 18px 0 0", padding: "16px" }}>
+              <div style={{ position: "fixed", inset: 0, zIndex: 9000, background: "rgba(15,23,42,0.5)", display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}>
+                <div style={{ background: "var(--app-bg, #f5f7fb)", width: "100%", maxWidth: 520, maxHeight: "90vh", overflowY: "auto", borderRadius: 18, padding: "16px" }}>
                   <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 8 }}>
                     <button onClick={() => setShowMobileInvoiceModal(false)} style={{ background: "none", border: "none", fontSize: 22, cursor: "pointer", color: "var(--app-muted)" }}>✕</button>
                   </div>

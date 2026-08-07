@@ -1353,7 +1353,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
         </div>
 
-        <div style={{ flex: 1, minWidth: 0 }}>
+ <div style={{ flex: 1, minWidth: 0 }}>
 
           <div style={{ fontSize: 13, fontWeight: 700, color: "#1A2E35", lineHeight: 1.3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.clientName || c.name || "—"}</div>
 
@@ -1366,9 +1366,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
 
 
-
         </div>
-
       </div>
 
     );
@@ -11642,6 +11640,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                           if (n.key === "clients") {
                             window.__fullClientsList = true;
                             setOpenedFromMobileAddMenu(true);
+                            if (clients.length > 0) {
+                              setActiveClientIdForReturn(clients[0]._id);
+                            }
                           }
                           setActive(n.key);
                         }} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, color: (active === n.key || (n.key === "invoices" && active === "invoices")) ? "#fff" : "#fff", padding: "4px 10px" }}>   <i className={`ti ${n.icon}`} style={{ fontSize: 19 }}></i>

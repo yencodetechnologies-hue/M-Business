@@ -11086,7 +11086,10 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                           setDraggingStatCard(null);
                         }}
                         onDragEnd={() => setDraggingStatCard(null)}
-                        onClick={() => setActive(s.id.replace(/^mob/, "").toLowerCase())}
+                        onClick={() => {
+                          if (s.id === "mobTeam") { setActive("employees"); return; }
+                          setActive(s.id.replace(/^mob/, "").toLowerCase());
+                        }}
                         style={{ animationDelay: `${i * 60}ms`, background: "transparent", borderRadius: 0, padding: "4px 4px", boxShadow: "none", textAlign: "center", border: "none", cursor: "grab", opacity: draggingStatCard === s.id ? 0.4 : 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}
                       >
                         <div style={{ width: 72, height: 72, borderRadius: 18, background: s.grad, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 8px", color: "#fff", fontSize: 30, boxShadow: "0 6px 14px rgba(0,0,0,0.15)" }}>
@@ -11116,7 +11119,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                         }}
                         onDragEnd={() => setDraggingSecondRow(null)}
                         onClick={() => {
-                          if (s.id === "totalInv") {
+                          if (s.id === "unpaidInv" || s.id === "totalInv") {
                             setJumpProject(null);
                             setJumpInvoice(null);
                             setInvoicePrefill(null);
@@ -11124,6 +11127,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                             setActive("invoices");
                             return;
                           }
+                          if (s.id === "totalProp") { setActive("proposals"); return; }
+                          if (s.id === "totalQuote") { setActive("quotations"); return; }
                           setActive(s.page);
                         }}
                         style={{ animationDelay: `${i * 60}ms`, background: "transparent", borderRadius: 0, padding: "4px 4px", boxShadow: "none", textAlign: "center", border: "none", cursor: "grab", opacity: draggingSecondRow === s.id ? 0.4 : 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}

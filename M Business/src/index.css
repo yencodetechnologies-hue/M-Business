@@ -1903,6 +1903,7 @@ td.exp-name {
 .export-btn {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   padding: 8px 14px;
   background: rgba(var(--app-accent-rgb), 0.1);
@@ -1914,6 +1915,9 @@ td.exp-name {
   cursor: pointer;
   font-family: inherit;
   margin-left: auto;
+  white-space: nowrap;
+  flex-shrink: 0;
+  box-sizing: border-box;
 }
 
 .export-btn:hover {
@@ -2104,6 +2108,12 @@ tbody tr td {
   grid-template-columns: 1fr 320px;
   gap: 20px;
   align-items: start;
+}
+@media (max-width: 768px) {
+  .bottom-row {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
 }
 
 .summary-panel,
@@ -4146,7 +4156,12 @@ tbody tr td {
   grid-template-columns: 1fr 300px;
   gap: 20px
 }
-
+@media (max-width: 768px) {
+  .bottom-row {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+}
 /* BILLING TABLE */
 .panel {
   background: var(--surface);

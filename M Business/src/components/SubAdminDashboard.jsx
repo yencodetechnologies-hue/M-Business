@@ -2498,19 +2498,16 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
             </div>
 
           </div>
-        ) : (
+      ) : clients.length === 0 ? (
           <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "var(--app-bg)", minWidth: 0 }}>
             <div style={{ textAlign: "center", padding: 40 }}>
               <div style={{ width: 72, height: 72, borderRadius: "50%", background: "rgba(var(--app-accent-rgb), 0.1)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 18px" }}>
                 <i className="ti ti-users" style={{ color: "var(--app-accent)", fontSize: 32 }} />
               </div>
               <div style={{ fontSize: 16, fontWeight: 800, color: "var(--app-text)", marginBottom: 8 }}>No clients found</div>
-
-
             </div>
           </div>
-        )}
-
+        ) : null}
 
 
       </div>

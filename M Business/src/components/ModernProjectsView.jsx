@@ -584,12 +584,13 @@ export default function ModernProjectsView({
                     {/* Row 1: category (left) + menu (right) */}
                     <div className="mpv-card-row1" style={{ flexWrap: 'nowrap', justifyContent: 'space-between' }}>
                       <div className="mpv-card-title" style={{ margin: 0, flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 2, flexShrink: 0 }}>
                         <span className={`mpv-badge ${statusCls}`} style={{ flexShrink: 0 }}>{statusLabel}</span>
                         {(onEdit || onDelete || onAssign || onNewInvoice) && (
                           <div style={{ position: 'relative' }} onClick={e => e.stopPropagation()}>
                             <button
                               className="mpv-more-btn"
+                              style={{ padding: '2px 4px' }}
                               onClick={() => setOpenMenu(isMenuOpen ? null : (p._id || p.id))}
                             >
                               <i className="ti ti-dots-vertical" />

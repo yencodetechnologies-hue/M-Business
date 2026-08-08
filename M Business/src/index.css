@@ -261,52 +261,11 @@ body {
   }
 }
 @media (max-width: 768px) {
-  .client-detail-modal {
-    position: fixed !important;
-    inset: 0 !important;
-    z-index: 3000 !important;
-    background: #fff !important;
-    width: calc(100vw - 32px) !important;
-    height: calc(100vh - 32px) !important;
-    max-width: calc(100vw - 32px) !important;
-    max-height: calc(100vh - 32px) !important;
-    margin: 0 !important;
-    top: 16px !important;
-    left: 16px !important;
-    right: 16px !important;
-    bottom: 16px !important;
-    border-radius: 20px !important;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3) !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-  }
-
-
-
   .client-detail-layout {
     overflow: visible !important;
   }
 }
-.client-detail-modal {
-  position: fixed !important;
-  inset: 0 !important;
-  z-index: 3000 !important;
-  background: #fff !important;
-  width: calc(100vw - 32px) !important;
-  height: calc(100vh - 32px) !important;
-  max-width: calc(100vw - 32px) !important;
-  max-height: calc(100vh - 32px) !important;
-  margin: 0 !important;
-  top: 16px !important;
-  left: 16px !important;
-  right: 16px !important;
-  bottom: 16px !important;
-  border-radius: 20px !important;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.3) !important;
-  overflow: hidden !important;
-  display: flex !important;
-  flex-direction: column !important;
-}
+
 @media (max-width: 768px) {
     .client-details-popup-overlay {
         padding: 0 !important;

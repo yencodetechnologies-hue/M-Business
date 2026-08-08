@@ -2592,7 +2592,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
       {deleteTarget && <ConfirmModal title="Delete Client" message={`Are you sure you want to delete "${deleteTarget.clientName || deleteTarget.name}"?`} onConfirm={doDelete} onCancel={() => setDeleteTarget(null)} />}
 
    {viewClientModal && activeClient && (
-<Mdl title="Client Details" onClose={() => { setViewClientModal(false); }} maxWidth={isMobileWidth ? "100vw" : 400} fullScreenMobile={isMobileWidth}>
+<Mdl title="Client Details" onClose={() => { setViewClientModal(false); }} maxWidth={isMobileWidth ? "calc(100vw - 32px)" : 500} fullScreenMobile={false} zIndex={5000}>
   <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             <div style={{ display: "flex", justifyContent: "center", marginBottom: 10 }}>
 

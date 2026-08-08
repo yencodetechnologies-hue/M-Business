@@ -583,12 +583,9 @@ export default function ModernProjectsView({
                   <div className="mpv-card-top">
                     {/* Row 1: category (left) + menu (right) */}
                     <div className="mpv-card-row1" style={{ flexWrap: 'nowrap', justifyContent: 'space-between' }}>
-                      {view !== 'list' && p.category && (
-                        <div style={{ fontSize: 11, fontWeight: 700, color: P.primary, background: P.primaryLight, padding: '3px 10px', borderRadius: 20, display: 'inline-block', whiteSpace: 'nowrap' }}>
-                          {p.category}
-                        </div>
-                      )}
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0, marginLeft: 'auto' }}>
+                      <div className="mpv-card-title" style={{ margin: 0, flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+                        <span className={`mpv-badge ${statusCls}`} style={{ flexShrink: 0 }}>{statusLabel}</span>
                         {(onEdit || onDelete || onAssign || onNewInvoice) && (
                           <div style={{ position: 'relative' }} onClick={e => e.stopPropagation()}>
                             <button
@@ -647,12 +644,16 @@ export default function ModernProjectsView({
                       </div>
                     ) : (
                       <>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 8, marginBottom: 6 }}>
-                          <span className={`mpv-badge ${statusCls}`} style={{ flexShrink: 0 }}>{statusLabel}</span>
+                        <div className="mpv-card-client" style={{ marginBottom: 6, marginTop: 8 }}><i className="ti ti-building" />{p.client || 'Internal'}</div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, flexWrap: 'nowrap' }}>
                           <span className={`mpv-prio ${prio}`} style={{ flexShrink: 0 }}>{prioLabel}</span>
+                          {p.category && (
+                            <span style={{ fontSize: 11, fontWeight: 700, color: P.primary, background: P.primaryLight, padding: '3px 10px', borderRadius: 20, flexShrink: 0, whiteSpace: 'nowrap' }}>
+                              {p.category}
+                            </span>
+                          )}
                         </div>
-                        <div className="mpv-card-title" style={{ margin: '0 0 8px' }}>{p.name}</div>
-                        <div className="mpv-card-client"><i className="ti ti-building" />{p.client || 'Internal'}</div>
+                           
                         {p.description && (
                           <div style={{ fontSize: 11.5, color: P.textLight, marginBottom: 10, lineHeight: 1.5, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
                             {p.description}

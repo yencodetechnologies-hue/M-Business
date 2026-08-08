@@ -2232,7 +2232,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
               return (
                 <div
                   key={c._id || i}
-                  onClick={() => { setActiveClientId(c._id); setActiveTab("overview"); setViewClientModal(true); }}
+                  onClick={() => { setActiveClientId(c._id); setActiveTab("overview"); }}
                   style={{
                     background: "#fff",
                     borderRadius: 16,

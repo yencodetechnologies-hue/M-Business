@@ -3,7 +3,6 @@ import { BASE_URL } from "../config";
 export async function openPdf(url) {
   if (!url) return;
 
-  // Only sign Cloudinary URLs — local/other URLs open directly
   if (url.includes("res.cloudinary.com")) {
     try {
       const res = await fetch(
@@ -15,7 +14,7 @@ export async function openPdf(url) {
         return;
       }
     } catch {
-      // fall through to direct open
+      // fall through
     }
   }
 

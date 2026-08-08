@@ -345,8 +345,14 @@ body {
 @media (max-width: 768px) {
   .client-detail-modal {
     width: 94vw !important;
+    height: 85vh !important;
     max-height: 85vh !important;
     top: 5vh !important;
+    left: 3vw !important;
+    right: 3vw !important;
+    bottom: auto !important;
+    border-radius: 20px !important;
+    overflow: hidden !important;
   }
 }
 /* Ensure images don't overflow */

@@ -539,7 +539,7 @@ function Mdl({ title, onClose, children, maxWidth = 820, zIndex = 1000, fullScre
 
     >
 
-      <div className="client-details-popup-card" style={{ background: "#fff", borderRadius: fullScreenMobile ? 0 : 20, width: "100%", maxWidth, height: fullScreenMobile ? "100vh" : "auto", maxHeight: fullScreenMobile ? "100vh" : "90vh", overflow: "hidden", overflowX: "hidden", display: "flex", flexDirection: "column", boxShadow: fullScreenMobile ? "none" : "0 32px 80px rgba(var(--app-accent-rgb),0.25)", border: fullScreenMobile ? "none" : "1px solid var(--app-border)" }} onClick={e => e.stopPropagation()}>
+      <div className="client-details-popup-card" style={{ background: "#fff", borderRadius: fullScreenMobile ? 0 : 20, width: "100%", maxWidth, height: fullScreenMobile ? "100vh" : "auto", maxHeight: fullScreenMobile ? "100vh" : "calc(100vh - 32px)", overflow: "hidden", overflowX: "hidden", display: "flex", flexDirection: "column", boxShadow: fullScreenMobile ? "none" : "0 32px 80px rgba(var(--app-accent-rgb),0.25)", border: fullScreenMobile ? "none" : "1px solid var(--app-border)", margin: fullScreenMobile ? 0 : "16px auto" }} onClick={e => e.stopPropagation()}>
 
         <div style={{ padding: fullScreenMobile ? "14px 16px" : "16px 22px", borderBottom: "1px solid var(--app-border)", display: "flex", justifyContent: "space-between", alignItems: "center", background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))", flexShrink: 0 }}>
 
@@ -2340,7 +2340,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
 
       {/* LEFT-PANEL + DETAIL VIEW (always visible, embedded below stat cards) */}
-      <div className="client-detail-layout" style={{ display: "flex", position: "relative", flex: 1, minHeight: 500, background: "#fff", marginTop: 4, border: "1.5px solid #E0EEF0", borderRadius: 14, overflow: "hidden" }}>
+      <div className="client-detail-layout" style={{ display: "flex", position: "relative", flex: 1, minHeight: 0, maxHeight: "60vh", background: "#fff", marginTop: 4, border: "1.5px solid #E0EEF0", borderRadius: 14, overflow: "hidden" }}>
         <div className="client-list-panel" style={{ width: 260, minWidth: 260, borderRight: "1.5px solid #E0EEF0", display: "flex", flexDirection: "column", background: "#fff", overflow: "hidden" }}>
 
           {/* Search + Add */}
@@ -2409,7 +2409,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
 {activeClient ? (
 
-<div className={`client-detail-panel ${isMobileWidth ? "client-detail-modal" : ""}`} style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minWidth: 0, background: "#fff", height: isMobileWidth ? "100vh" : "auto", minHeight: isMobileWidth ? "100vh" : "auto" }}>
+<div className={`client-detail-panel ${isMobileWidth ? "client-detail-modal" : ""}`} style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minWidth: 0, background: "#fff", height: isMobileWidth ? "100%" : "auto", minHeight: isMobileWidth ? "100%" : "auto" }}>
             <button onClick={() => setActiveClientId(null)} style={{ position: "sticky", top: 8, left: "100%", transform: "translateX(-8px)", width: 32, height: 32, borderRadius: "50%", background: "#F5FAFA", border: "1px solid #E0EEF0", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 16, color: "#607D86", zIndex: 10 }}><i className="ti ti-x"></i></button>            <button className="client-detail-modal-close" onClick={() => setActiveClientId(null)} style={{ display: "none" }}><i className="ti ti-x"></i></button>
 
 

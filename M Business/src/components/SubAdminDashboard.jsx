@@ -1020,7 +1020,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
   const [filterMode, setFilterMode] = useState("all");
   const [sortMode, setSortMode] = useState("newest");
 
-  const [activeClientId, setActiveClientId] = useState(activeClientIdForReturn || null);
+  const [activeClientId, setActiveClientId] = useState(activeClientIdForReturn || (clients && clients.length > 0 ? clients[0]._id : null));
 
   // Keep the saved selection in sync so a page refresh (or re-login) reopens
   // the same client instead of falling back to the first one in the list.
@@ -1398,7 +1398,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
             <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
 
-              <span onClick={() => setViewClientModal(true)} title="View" style={{ fontSize: 11, color: "var(--app-accent)", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center" }}>{isMobileWidth ? <i className="ti ti-eye" style={{ fontSize: 15 }} /> : "View"}</span>
+              <span onClick={() => setViewClientModal(true)} title="View" style={{ fontSize: 11, color: "var(--app-accent)", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center" }}>View</span>
 
 
 
@@ -1460,9 +1460,9 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
             </span>
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-              <button onClick={() => onCreateProject && onCreateProject(activeClient)} style={{ background: "var(--app-accent, #00BCD4)", border: "none", borderRadius: 7, padding: "4px 10px", fontSize: 11, color: "#fff", cursor: "pointer", fontWeight: 700, display: "flex", alignItems: "center", gap: 4 }}>
-                <i className="ti ti-plus" style={{ fontSize: 11 }} /> Add Project
-              </button>
+      <button onClick={() => onCreateProject && onCreateProject(activeClient)} style={{ background: "var(--app-accent, #00BCD4)", border: "none", borderRadius: 6, padding: isMobileWidth ? "2px 6px" : "4px 10px", fontSize: isMobileWidth ? 8 : 11, color: "#fff", cursor: "pointer", fontWeight: 600, display: "flex", alignItems: "center", gap: 2 }}>
+  <i className="ti ti-plus" style={{ fontSize: isMobileWidth ? 8 : 11 }} /> Add Project
+</button>
               <span onClick={() => setActiveTab("projects")} style={{ fontSize: 11, color: "var(--app-accent)", fontWeight: 700, cursor: "pointer" }}>View all</span>
             </div>
 
@@ -2412,7 +2412,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
                     <div style={{ position: "relative" }} ref={statusDropRef}>
 
-                      <button onClick={() => setStatusDropOpen(v => !v)} style={{ display: "flex", alignItems: "center", gap: 4, padding: isMobileWidth ? "3px 8px 3px 7px" : "5px 11px 5px 9px", background: st.bg, border: `1.5px solid ${st.dot}`, borderRadius: 20, fontSize: isMobileWidth ? 10 : 11, fontWeight: 800, color: st.color, cursor: "pointer", fontFamily: "inherit" }}>
+                      <button onClick={() => setStatusDropOpen(v => !v)} style={{ display: "flex", alignItems: "center", gap: 2, padding: isMobileWidth ? "1px 5px" : "5px 11px 5px 9px", background: st.bg, border: `1px solid ${st.dot}`, borderRadius: 14, fontSize: isMobileWidth ? 8 : 11, fontWeight: 800, color: st.color, cursor: "pointer", fontFamily: "inherit" }}>
                         {st.label}
                         <i className="ti ti-chevron-down" style={{ fontSize: 11, opacity: .7 }} />
                       </button>
@@ -2594,7 +2594,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
    {viewClientModal && activeClient && (
 
         <Mdl title="Client Details" onClose={() => { setViewClientModal(false); setActiveClientId(null); }} maxWidth={isMobileWidth ? "100vw" : 700}>
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
 
             <div style={{ display: "flex", justifyContent: "center", marginBottom: 10 }}>
 
@@ -2672,12 +2672,11 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
             ].map((row, i) => (
 
-              <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "10px 12px", background: "#F5FAFA", borderRadius: 9, border: "1px solid #E0EEF0" }}>
+          <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8, padding: "7px 10px", background: "#F5FAFA", borderRadius: 8, border: "1px solid #E0EEF0" }}>
 
-                <div style={{ width: 30, height: 30, borderRadius: 8, background: "var(--teal-light, var(--teal-light, #E0F7FA))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: "var(--app-accent, #00BCD4)", flexShrink: 0 }}>
+  <div style={{ width: 24, height: 24, borderRadius: 6, background: "var(--teal-light, var(--teal-light, #E0F7FA))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "var(--app-accent, #00BCD4)", flexShrink: 0 }}>
 
-                  <i className={`ti ${row.icon}`} />
-
+    <i className={`ti ${row.icon}`} />
                 </div>
 
                 <div style={{ flex: 1, minWidth: 0 }}>

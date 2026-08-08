@@ -532,15 +532,15 @@ function Mdl({ title, onClose, children, maxWidth = 820, zIndex = 1000 }) {
 
     <div
 
-      style={{ position: "fixed", inset: 0, background: "rgba(var(--app-accent-rgb),0.55)", backdropFilter: "blur(8px)", zIndex, display: "flex", alignItems: "center", justifyContent: "center", padding: window.innerWidth < 769 ? 0 : "16px" }}
+      className="client-details-popup-overlay"
+
+      style={{ position: "fixed", inset: 0, background: "rgba(var(--app-accent-rgb),0.55)", backdropFilter: "blur(8px)", zIndex, display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}
 
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
 
     >
 
-      <div style={{ background: "var(--app-card)", borderRadius: 20, width: "100%", maxWidth, maxHeight: "90vh", overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 32px 80px rgba(var(--app-accent-rgb),0.25)", border: "1px solid var(--app-border)" }} onClick={e => e.stopPropagation()}>
-
-        <div style={{ padding: "16px 22px", borderBottom: "1px solid var(--app-border)", display: "flex", justifyContent: "space-between", alignItems: "center", background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))", flexShrink: 0 }}>
+      <div className="client-details-popup-card" style={{ background: "#fff", borderRadius: 20, width: "100%", maxWidth, maxHeight: "90vh", overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 32px 80px rgba(var(--app-accent-rgb),0.25)", border: "1px solid var(--app-border)" }} onClick={e => e.stopPropagation()}>        <div style={{ padding: "16px 22px", borderBottom: "1px solid var(--app-border)", display: "flex", justifyContent: "space-between", alignItems: "center", background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))", flexShrink: 0 }}>
 
           <h2 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: T.text }}>{title}</h2>
 

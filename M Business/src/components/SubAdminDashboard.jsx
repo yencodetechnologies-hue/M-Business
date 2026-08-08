@@ -1020,7 +1020,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
   const [filterMode, setFilterMode] = useState("all");
   const [sortMode, setSortMode] = useState("newest");
 
-  const [activeClientId, setActiveClientId] = useState(activeClientIdForReturn || (clients && clients.length > 0 ? clients[0]._id : null));
+  const [activeClientId, setActiveClientId] = useState(activeClientIdForReturn || null);
 
   // Keep the saved selection in sync so a page refresh (or re-login) reopens
   // the same client instead of falling back to the first one in the list.
@@ -11758,9 +11758,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                           if (n.key === "clients") {
                             window.__fullClientsList = true;
                             setOpenedFromMobileAddMenu(true);
-                            if (clients.length > 0) {
-                              setActiveClientIdForReturn(clients[0]._id);
-                            }
+                            setActiveClientIdForReturn(null);
                           }
                           setActive(n.key);
                         }} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, color: (active === n.key || (n.key === "invoices" && active === "invoices")) ? "#fff" : "#fff", padding: "4px 10px" }}>   <i className={`ti ${n.icon}`} style={{ fontSize: 19 }}></i>

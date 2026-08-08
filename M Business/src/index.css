@@ -303,8 +303,9 @@ body {
   bottom: 16px !important;
   border-radius: 20px !important;
   box-shadow: 0 20px 60px rgba(0,0,0,0.3) !important;
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
 }
 @media (max-width: 768px) {
     .client-details-popup-overlay {

@@ -2014,33 +2014,32 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
           </div>
 
           {/* Action Buttons */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-            <button
-              onClick={handleOpenPortal}
-              style={{ padding: "10px 8px", background: "#fff", border: "none", borderRadius: 8, fontSize: 12, fontWeight: 700, color: "#004D5E", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}
-            >
-              <i className="ti ti-external-link" style={{ fontSize: 13 }} /> Open Portal
-            </button>
-            <button
-              onClick={handleCopyLink}
-              style={{ padding: "10px 8px", background: "rgba(255,255,255,.15)", border: "1.5px solid rgba(255,255,255,.25)", borderRadius: 8, fontSize: 12, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}
-            >
-              <i className="ti ti-copy" style={{ fontSize: 13 }} /> Copy Link
-            </button>
-            <button
-              onClick={handleShareWhatsApp}
-              style={{ padding: "10px 8px", background: "#25D366", border: "none", borderRadius: 8, fontSize: 12, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}
-            >
-              💬 WhatsApp
-            </button>
-            <button
-              onClick={handleSendEmail}
-              style={{ padding: "10px 8px", background: "rgba(255,255,255,.15)", border: "1.5px solid rgba(255,255,255,.25)", borderRadius: 8, fontSize: 12, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}
-            >
-              <i className="ti ti-mail" style={{ fontSize: 13 }} /> Email Link
-            </button>
-          </div>
-        </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+  <button
+    onClick={handleOpenPortal}
+    style={{ padding: "4px 4px", background: "#fff", border: "none", borderRadius: 6, fontSize: 10, fontWeight: 700, color: "#004D5E", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 3 }}
+  >
+    <i className="ti ti-external-link" style={{ fontSize: 11 }} /> Open Portal
+  </button>
+  <button
+    onClick={handleCopyLink}
+    style={{ padding: "4px 4px", background: "rgba(255,255,255,.15)", border: "1px solid rgba(255,255,255,.25)", borderRadius: 6, fontSize: 10, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 3 }}
+  >
+    <i className="ti ti-copy" style={{ fontSize: 11 }} /> Copy Link
+  </button>
+  <button
+    onClick={handleShareWhatsApp}
+    style={{ padding: "4px 4px", background: "#25D366", border: "none", borderRadius: 6, fontSize: 10, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 3 }}
+  >
+    💬 WhatsApp
+  </button>
+  <button
+    onClick={handleSendEmail}
+    style={{ padding: "4px 4px", background: "rgba(255,255,255,.15)", border: "1px solid rgba(255,255,255,.25)", borderRadius: 6, fontSize: 10, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 3 }}
+  >
+    <i className="ti ti-mail" style={{ fontSize: 11 }} /> Email Link
+  </button>
+</div>  </div>
 
         {/* Portal Stats */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10, marginBottom: 16 }}>

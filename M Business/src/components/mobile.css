@@ -320,15 +320,19 @@
     }
 
     .client-detail-panel {
-        overflow-y: auto !important;
+        overflow-y: hidden !important;
         max-height: 100% !important;
         height: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
     }
 
     .client-detail-panel>div[style*="overflowY"] {
         overflow-y: auto !important;
         overflow-x: hidden !important;
         max-height: 100% !important;
+        flex: 1 1 auto !important;
+        min-height: 0 !important;
     }
 }
 

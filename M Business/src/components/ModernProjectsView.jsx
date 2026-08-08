@@ -75,7 +75,7 @@ function fmtDate(raw) {
 
 // ── Inline CSS -------------------------------------------------
 const CSS = `
-.mpv-root { font-family:'Nunito',sans-serif; }
+.mpv-root { font-family:'Nunito',sans-serif; overflow-x: hidden; max-width: 100%; }
 .mpv-root * { box-sizing:border-box; }
 
 /* KPI */
@@ -242,17 +242,39 @@ const CSS = `
 @media (max-width: 640px) {
   .mpv-kpi-grid { grid-template-columns:repeat(2,1fr); }
   .mpv-grid {
-    display: flex;
-    grid-template-columns: unset;
-    overflow-x: auto;
-    gap: 14px;
-    padding-bottom: 8px;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    overflow-x: hidden;
+    padding-bottom: 0;
   }
   .mpv-grid .mpv-card {
-    flex: 0 0 85%;
-    scroll-snap-align: center;
+    width: 100%;
+    max-width: 100%;
+  }
+  .mpv-card-top { padding: 12px 12px 0; }
+  .mpv-card-title { font-size: 13px; margin-bottom: 3px; }
+  .mpv-card-client { font-size: 11px; margin-bottom: 8px; }
+  .mpv-prog-row { margin-bottom: 4px; }
+  .mpv-pct { font-size: 12px; }
+  .mpv-pct-lbl { font-size: 10px; }
+  .mpv-prog-bg { height: 6px; }
+  .mpv-divider { margin: 0 12px; }
+  .mpv-card-bottom { padding: 10px 12px; flex-wrap: wrap; gap: 6px; }
+  .mpv-card-meta-row { font-size: 9px; }
+  .mpv-dl-lbl { font-size: 8px; }
+  .mpv-dl-val { font-size: 10px; }
+}
+    .mpv-grid.list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow-x: hidden;
+    width: 100%;
+  }
+  .mpv-grid.list .mpv-card {
+    width: 100%;
+    max-width: 100%;
   }
 }
 `;
@@ -446,8 +468,8 @@ export default function ModernProjectsView({
 
       {/* ── Project Cards ── */}
       {view === 'list' ? (
-        <div className="mpv-table-wrap" style={{ overflow: "visible", background: "#fff", borderRadius: 14, border: "1px solid #EEF2F4" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 900, fontFamily: "'Nunito',sans-serif" }}>
+        <div className="mpv-table-wrap" style={{ overflow: "auto", maxWidth: "100%", background: "#fff", borderRadius: 14, border: "1px solid #EEF2F4" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 0, fontFamily: "'Nunito',sans-serif" }}>
             <thead>
               <tr style={{ background: "#FAFBFC" }}>
                 {["Project", "Client", "Status", "Priority", "Progress", "Deadline", ""].map(h => (

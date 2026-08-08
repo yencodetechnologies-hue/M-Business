@@ -99,7 +99,7 @@ const path = require("path");
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 const messageRoutes = require("./routes/messageroutes");
-
+const filesRoutes = require("./routes/filesroutes");
 app.use("/api/users", userRoutes);
 app.use("/api/interviews", interviewRoutes);
 app.use("/api/auth", authRoutes);
@@ -120,6 +120,8 @@ app.use("/api/expenses", accountRoutes);
 app.use("/api/income", incomeRoutes);
 app.use("/api/reports", reportRoutes);
 app.use("/api/upload", uploadRoutes);
+
+app.use("/api/files", filesRoutes);
 app.use("/api/employee-dashboard", employeeDashRoutes);
 app.use("/api/quotations", QuotationRoutes);
 app.use("/api/proposals", ProposalRoutes);

@@ -313,7 +313,22 @@ body {
   display: flex !important;
   flex-direction: column !important;
 }
+@media (max-width: 768px) {
+    .client-details-popup-overlay {
+        padding: 0 !important;
+    }
 
+    .client-details-popup-card {
+        width: 100vw !important;
+        height: 100vh !important;
+        max-width: 100vw !important;
+        max-height: 100vh !important;
+        border-radius: 0 !important;
+        background: #fff !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+    }
+}
 .client-detail-modal .client-detail-panel {
   height: auto !important;
   min-height: 100% !important;

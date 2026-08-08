@@ -525,8 +525,7 @@ function Search({ value, onChange, placeholder }) {
 }
 
 
-
-function Mdl({ title, onClose, children, maxWidth = 820, zIndex = 1000 }) {
+function Mdl({ title, onClose, children, maxWidth = 820, zIndex = 1000, fullScreenMobile = false }) {
 
   return (
 
@@ -534,21 +533,23 @@ function Mdl({ title, onClose, children, maxWidth = 820, zIndex = 1000 }) {
 
       className="client-details-popup-overlay"
 
-      style={{ position: "fixed", inset: 0, background: "rgba(var(--app-accent-rgb),0.55)", backdropFilter: "blur(8px)", zIndex, display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}
+      style={{ position: "fixed", inset: 0, background: "rgba(var(--app-accent-rgb),0.55)", backdropFilter: "blur(8px)", zIndex, display: "flex", alignItems: "center", justifyContent: "center", padding: fullScreenMobile ? 0 : "16px" }}
 
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
 
     >
 
-      <div className="client-details-popup-card" style={{ background: "#fff", borderRadius: 20, width: "100%", maxWidth, maxHeight: "90vh", overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 32px 80px rgba(var(--app-accent-rgb),0.25)", border: "1px solid var(--app-border)" }} onClick={e => e.stopPropagation()}>        <div style={{ padding: "16px 22px", borderBottom: "1px solid var(--app-border)", display: "flex", justifyContent: "space-between", alignItems: "center", background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))", flexShrink: 0 }}>
+      <div className="client-details-popup-card" style={{ background: "#fff", borderRadius: fullScreenMobile ? 0 : 20, width: "100%", maxWidth, height: fullScreenMobile ? "100vh" : "auto", maxHeight: fullScreenMobile ? "100vh" : "90vh", overflow: "hidden", overflowX: "hidden", display: "flex", flexDirection: "column", boxShadow: fullScreenMobile ? "none" : "0 32px 80px rgba(var(--app-accent-rgb),0.25)", border: fullScreenMobile ? "none" : "1px solid var(--app-border)" }} onClick={e => e.stopPropagation()}>
 
-          <h2 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: T.text }}>{title}</h2>
+        <div style={{ padding: fullScreenMobile ? "14px 16px" : "16px 22px", borderBottom: "1px solid var(--app-border)", display: "flex", justifyContent: "space-between", alignItems: "center", background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))", flexShrink: 0 }}>
+
+          <h2 style={{ margin: 0, fontSize: fullScreenMobile ? 15 : 17, fontWeight: 800, color: T.text }}>{title}</h2>
 
           <button onClick={onClose} style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "var(--app-muted)", padding: "4px 8px" }}>✕</button>
 
         </div>
 
-        <div style={{ overflowY: "auto", padding: "20px 22px", flex: 1 }}>{children}</div>
+        <div style={{ overflowY: "auto", overflowX: "hidden", padding: fullScreenMobile ? "14px 16px" : "20px 22px", flex: 1 }}>{children}</div>
 
       </div>
 
@@ -557,7 +558,6 @@ function Mdl({ title, onClose, children, maxWidth = 820, zIndex = 1000 }) {
   );
 
 }
-
 
 
 function Fld({ label, value, onChange, options, type = "text", error, placeholder, disabled, allowCustom, name, dataField }) {
@@ -1398,7 +1398,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
             <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
 
-              <span onClick={() => setViewClientModal(true)} title="View" style={{ fontSize: 11, color: "var(--app-accent)", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center" }}>View</span>
+              <span onClick={(e) => { e.stopPropagation(); setViewClientModal(true); }} title="View" style={{ fontSize: 11, color: "var(--app-accent)", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center" }}>View</span>
 
 
 
@@ -2592,10 +2592,8 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
       {deleteTarget && <ConfirmModal title="Delete Client" message={`Are you sure you want to delete "${deleteTarget.clientName || deleteTarget.name}"?`} onConfirm={doDelete} onCancel={() => setDeleteTarget(null)} />}
 
    {viewClientModal && activeClient && (
-
-        <Mdl title="Client Details" onClose={() => { setViewClientModal(false); setActiveClientId(null); }} maxWidth={isMobileWidth ? "100vw" : 700}>
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-
+<Mdl title="Client Details" onClose={() => { setViewClientModal(false); }} maxWidth={isMobileWidth ? "100vw" : 400} fullScreenMobile={isMobileWidth}>
+  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             <div style={{ display: "flex", justifyContent: "center", marginBottom: 10 }}>
 
               {activeClient.logoUrl ? (

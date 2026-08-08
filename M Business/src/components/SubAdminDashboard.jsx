@@ -532,7 +532,7 @@ function Mdl({ title, onClose, children, maxWidth = 820, zIndex = 1000 }) {
 
     <div
 
-      style={{ position: "fixed", inset: 0, background: "rgba(var(--app-accent-rgb),0.55)", backdropFilter: "blur(8px)", zIndex, display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}
+      style={{ position: "fixed", inset: 0, background: "rgba(var(--app-accent-rgb),0.55)", backdropFilter: "blur(8px)", zIndex, display: "flex", alignItems: "center", justifyContent: "center", padding: window.innerWidth < 769 ? 0 : "16px" }}
 
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
 
@@ -1398,7 +1398,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
             <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
 
-              <span onClick={() => setViewClientModal(true)} style={{ fontSize: 11, color: "var(--app-accent)", fontWeight: 700, cursor: "pointer" }}>View</span>
+              <span onClick={() => setViewClientModal(true)} title="View" style={{ fontSize: 11, color: "var(--app-accent)", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center" }}>{isMobileWidth ? <i className="ti ti-eye" style={{ fontSize: 15 }} /> : "View"}</span>
 
 
 
@@ -1527,32 +1527,19 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
                     </div>
 
-                    <button onClick={() => onCreateProject && onCreateProject(p, true)} style={{ background: "#FFF7ED", border: "1px solid #FED7AA", borderRadius: 6, padding: "4px 8px", fontSize: 10, color: "#F59E0B", cursor: "pointer", fontWeight: 700 }}>Edit</button>
-
-                    <button onClick={() => onViewProject && onViewProject(p)} style={{ background: "var(--teal-light, var(--teal-light, #E0F7FA))", border: "none", borderRadius: 6, padding: "4px 8px", fontSize: 10, color: "var(--app-accent, #00BCD4)", cursor: "pointer", fontWeight: 700 }}>View </button>
-
-                    <button onClick={async (e) => {
-
-                      e.stopPropagation();
-
-                      if (!window.confirm(`Are you sure you want to delete "${p.name}"?`)) return;
-
-                      try {
-
-                        await axios.delete(`${BASE_URL}/api/projects/${p._id}`);
-
-                        setProjects && setProjects(prev => prev.filter(proj => proj._id !== p._id));
-
-                        showToast(" Project deleted!");
-
-                      } catch (err) {
-
-                        showToast("❌ Delete failed!");
-
-                      }
-
-                    }} style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 6, padding: "4px 10px", fontSize: 11, color: "#EF4444", cursor: "pointer", fontWeight: 700 }}>Delete</button>
-
+<button onClick={() => onCreateProject && onCreateProject(p, true)} title="Edit" style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "#FFF7ED", border: "1px solid #FED7AA", borderRadius: 6, width: 26, height: 26, color: "#F59E0B", cursor: "pointer" }}><i className="ti ti-edit" style={{ fontSize: 13 }} /></button>
+<button onClick={() => onViewProject && onViewProject(p)} title="View" style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "var(--teal-light, var(--teal-light, #E0F7FA))", border: "none", borderRadius: 6, width: 26, height: 26, color: "var(--app-accent, #00BCD4)", cursor: "pointer" }}><i className="ti ti-eye" style={{ fontSize: 13 }} /></button>
+<button onClick={async (e) => {
+  e.stopPropagation();
+  if (!window.confirm(`Are you sure you want to delete "${p.name}"?`)) return;
+  try {
+    await axios.delete(`${BASE_URL}/api/projects/${p._id}`);
+    setProjects && setProjects(prev => prev.filter(proj => proj._id !== p._id));
+    showToast(" Project deleted!");
+  } catch (err) {
+    showToast("❌ Delete failed!");
+  }
+}} title="Delete" style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 6, width: 26, height: 26, color: "#EF4444", cursor: "pointer" }}><i className="ti ti-trash" style={{ fontSize: 13 }} /></button>
                   </div>
 
                 </div>
@@ -1610,33 +1597,19 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
             <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "#E8FAF3", color: "#26C281" }}>{p.status || "Active"}</span>
 
-            {onViewProject && <button onClick={() => onViewProject(p)} style={{ background: "var(--teal-light, var(--teal-light, #E0F7FA))", border: "none", borderRadius: 6, padding: "4px 10px", fontSize: 11, color: "var(--app-accent, #00BCD4)", cursor: "pointer", fontWeight: 700 }}>View </button>}
-
-            <button onClick={() => onCreateProject && onCreateProject(p, true)} style={{ background: "#FFF7ED", border: "1px solid #FED7AA", borderRadius: 6, padding: "4px 10px", fontSize: 11, color: "#F59E0B", cursor: "pointer", fontWeight: 700 }}>Edit</button>
-
-            <button onClick={async (e) => {
-
-              e.stopPropagation();
-
-              if (!window.confirm(`Are you sure you want to delete "${p.name}"?`)) return;
-
-              try {
-
-                await axios.delete(`${BASE_URL}/api/projects/${p._id}`);
-
-                setProjects && setProjects(prev => prev.filter(proj => proj._id !== p._id));
-
-                showToast(" Project deleted!");
-
-              } catch (err) {
-
-                showToast("❌ Delete failed!");
-
-              }
-
-            }} style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 6, padding: "4px 10px", fontSize: 11, color: "#EF4444", cursor: "pointer", fontWeight: 700 }}>Delete</button>
-
-          </div>
+          {onViewProject && <button onClick={() => onViewProject(p)} title="View" style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "var(--teal-light, var(--teal-light, #E0F7FA))", border: "none", borderRadius: 6, width: 28, height: 28, color: "var(--app-accent, #00BCD4)", cursor: "pointer" }}><i className="ti ti-eye" style={{ fontSize: 14 }} /></button>}
+<button onClick={() => onCreateProject && onCreateProject(p, true)} title="Edit" style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "#FFF7ED", border: "1px solid #FED7AA", borderRadius: 6, width: 28, height: 28, color: "#F59E0B", cursor: "pointer" }}><i className="ti ti-edit" style={{ fontSize: 14 }} /></button>
+<button onClick={async (e) => {
+  e.stopPropagation();
+  if (!window.confirm(`Are you sure you want to delete "${p.name}"?`)) return;
+  try {
+    await axios.delete(`${BASE_URL}/api/projects/${p._id}`);
+    setProjects && setProjects(prev => prev.filter(proj => proj._id !== p._id));
+    showToast(" Project deleted!");
+  } catch (err) {
+    showToast("❌ Delete failed!");
+  }
+}} title="Delete" style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 6, width: 28, height: 28, color: "#EF4444", cursor: "pointer" }}><i className="ti ti-trash" style={{ fontSize: 14 }} /></button></div>
 
         </div>
 
@@ -2410,7 +2383,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
 {activeClient ? (
 
-          <div className={`client-detail-panel ${isMobileWidth ? "client-detail-modal" : ""}`} style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minWidth: 0 }}>
+<div className={`client-detail-panel ${isMobileWidth ? "client-detail-modal" : ""}`} style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minWidth: 0, background: "#fff", height: isMobileWidth ? "100vh" : "auto", minHeight: isMobileWidth ? "100vh" : "auto" }}>
             <button onClick={() => setActiveClientId(null)} style={{ position: "sticky", top: 8, left: "100%", transform: "translateX(-8px)", width: 32, height: 32, borderRadius: "50%", background: "#F5FAFA", border: "1px solid #E0EEF0", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 16, color: "#607D86", zIndex: 10 }}><i className="ti ti-x"></i></button>            <button className="client-detail-modal-close" onClick={() => setActiveClientId(null)} style={{ display: "none" }}><i className="ti ti-x"></i></button>
 
 
@@ -2439,7 +2412,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
                     <div style={{ position: "relative" }} ref={statusDropRef}>
 
-                      <button onClick={() => setStatusDropOpen(v => !v)} style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 11px 5px 9px", background: st.bg, border: `1.5px solid ${st.dot}`, borderRadius: 20, fontSize: 11, fontWeight: 800, color: st.color, cursor: "pointer", fontFamily: "inherit" }}>
+                      <button onClick={() => setStatusDropOpen(v => !v)} style={{ display: "flex", alignItems: "center", gap: 4, padding: isMobileWidth ? "3px 8px 3px 7px" : "5px 11px 5px 9px", background: st.bg, border: `1.5px solid ${st.dot}`, borderRadius: 20, fontSize: isMobileWidth ? 10 : 11, fontWeight: 800, color: st.color, cursor: "pointer", fontFamily: "inherit" }}>
                         {st.label}
                         <i className="ti ti-chevron-down" style={{ fontSize: 11, opacity: .7 }} />
                       </button>
@@ -2496,9 +2469,9 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
                 <div style={{ display: "flex", gap: 6, flexShrink: 0, flexWrap: "wrap" }}>
 
-                  <button onClick={() => openEdit(activeClient)} style={{ display: "flex", alignItems: "center", gap: 5, padding: "7px 14px", borderRadius: 9, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all .15s", border: "1.5px solid #E0EEF0", background: "#F5FAFA", color: "#607D86" }} onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--app-accent, #00BCD4)"; e.currentTarget.style.color = "var(--app-accent, #00BCD4)"; }} onMouseLeave={e => { e.currentTarget.style.borderColor = "#E0EEF0"; e.currentTarget.style.color = "#607D86"; }}><i className="ti ti-edit" style={{ fontSize: 13 }} />Edit</button>
+                  <button onClick={() => openEdit(activeClient)} title="Edit" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 5, padding: isMobileWidth ? "7px" : "7px 14px", width: isMobileWidth ? 30 : "auto", height: isMobileWidth ? 30 : "auto", borderRadius: 9, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all .15s", border: "1.5px solid #E0EEF0", background: "#F5FAFA", color: "#607D86" }} onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--app-accent, #00BCD4)"; e.currentTarget.style.color = "var(--app-accent, #00BCD4)"; }} onMouseLeave={e => { e.currentTarget.style.borderColor = "#E0EEF0"; e.currentTarget.style.color = "#607D86"; }}><i className="ti ti-edit" style={{ fontSize: 13 }} />{!isMobileWidth && "Edit"}</button>
 
-                  <button onClick={() => setDeleteTarget(activeClient)} style={{ display: "flex", alignItems: "center", gap: 5, padding: "7px 14px", borderRadius: 9, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all .15s", border: "1.5px solid #E0EEF0", background: "#F5FAFA", color: "#607D86" }} onMouseEnter={e => { e.currentTarget.style.borderColor = "#F05C5C"; e.currentTarget.style.color = "#F05C5C"; }} onMouseLeave={e => { e.currentTarget.style.borderColor = "#E0EEF0"; e.currentTarget.style.color = "#607D86"; }}><i className="ti ti-trash" style={{ fontSize: 13 }} />Delete</button>
+                  <button onClick={() => setDeleteTarget(activeClient)} title="Delete" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 5, padding: isMobileWidth ? "7px" : "7px 14px", width: isMobileWidth ? 30 : "auto", height: isMobileWidth ? 30 : "auto", borderRadius: 9, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all .15s", border: "1.5px solid #E0EEF0", background: "#F5FAFA", color: "#607D86" }} onMouseEnter={e => { e.currentTarget.style.borderColor = "#F05C5C"; e.currentTarget.style.color = "#F05C5C"; }} onMouseLeave={e => { e.currentTarget.style.borderColor = "#E0EEF0"; e.currentTarget.style.color = "#607D86"; }}><i className="ti ti-trash" style={{ fontSize: 13 }} />{!isMobileWidth && "Delete"}</button>
 
                 </div>
 
@@ -2537,7 +2510,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
             {/* TABS */}
 
-            <div className="client-tabs-row" style={{ background: "#fff", borderBottom: "1.5px solid #E0EEF0", padding: "0 28px", display: "flex", flexShrink: 0, overflowX: "auto" }}>
+            <div className="client-tabs-row" style={{ background: "#fff", borderBottom: "1.5px solid #E0EEF0", padding: isMobileWidth ? "0 12px" : "0 28px", display: "flex", flexShrink: 0, overflowX: "auto", overflowY: "hidden", WebkitOverflowScrolling: "touch" }}>
 
               {[
 
@@ -2555,9 +2528,9 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
               ].map(tab => (
 
-                <button key={tab.key} onClick={() => setActiveTab(tab.key)} style={{ padding: "12px 16px", fontSize: 12, fontWeight: 700, color: activeTab === tab.key ? "var(--app-accent, #00BCD4)" : "#607D86", cursor: "pointer", border: "none", background: "none", fontFamily: "inherit", borderBottom: `2.5px solid ${activeTab === tab.key ? "var(--app-accent, #00BCD4)" : "transparent"}`, transition: "all .15s", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 5 }}>
+                <button key={tab.key} onClick={() => setActiveTab(tab.key)} style={{ padding: isMobileWidth ? "9px 7px" : "12px 16px", fontSize: isMobileWidth ? 10 : 12, fontWeight: 700, color: activeTab === tab.key ? "var(--app-accent, #00BCD4)" : "#607D86", cursor: "pointer", border: "none", background: "none", fontFamily: "inherit", borderBottom: `2.5px solid ${activeTab === tab.key ? "var(--app-accent, #00BCD4)" : "transparent"}`, transition: "all .15s", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 3, flexShrink: 0 }}>
 
-                  <i className={`ti ${tab.icon}`} style={{ fontSize: 14 }} />{tab.label}
+                  <i className={`ti ${tab.icon}`} style={{ fontSize: isMobileWidth ? 12 : 14 }} />{tab.label}
 
                 </button>
 
@@ -2618,9 +2591,9 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
       {deleteTarget && <ConfirmModal title="Delete Client" message={`Are you sure you want to delete "${deleteTarget.clientName || deleteTarget.name}"?`} onConfirm={doDelete} onCancel={() => setDeleteTarget(null)} />}
 
-   {false && viewClientModal && activeClient && (
+   {viewClientModal && activeClient && (
 
-        <Mdl title="Client Details" onClose={() => { setViewClientModal(false); setActiveClientId(null); }} maxWidth={700}>
+        <Mdl title="Client Details" onClose={() => { setViewClientModal(false); setActiveClientId(null); }} maxWidth={isMobileWidth ? "100vw" : 700}>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
 
             <div style={{ display: "flex", justifyContent: "center", marginBottom: 10 }}>

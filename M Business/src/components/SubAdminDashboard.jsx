@@ -1020,7 +1020,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
   const [filterMode, setFilterMode] = useState("all");
   const [sortMode, setSortMode] = useState("newest");
 
-  const [activeClientId, setActiveClientId] = useState(activeClientIdForReturn || null);
+  const [activeClientId, setActiveClientId] = useState(activeClientIdForReturn || (clients && clients.length > 0 ? clients[0]._id : null));
 
   // Keep the saved selection in sync so a page refresh (or re-login) reopens
   // the same client instead of falling back to the first one in the list.
@@ -2017,25 +2017,25 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
   <button
     onClick={handleOpenPortal}
-    style={{ padding: "4px 4px", background: "#fff", border: "none", borderRadius: 6, fontSize: 10, fontWeight: 700, color: "#004D5E", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 3 }}
+    style={{ padding: "6px 6px", background: "#fff", border: "none", borderRadius: 6, fontSize: 10, fontWeight: 700, color: "#004D5E", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 3 }}
   >
     <i className="ti ti-external-link" style={{ fontSize: 11 }} /> Open Portal
   </button>
   <button
     onClick={handleCopyLink}
-    style={{ padding: "4px 4px", background: "rgba(255,255,255,.15)", border: "1px solid rgba(255,255,255,.25)", borderRadius: 6, fontSize: 10, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 3 }}
+    style={{ padding: "6px 6px", background: "rgba(255,255,255,.15)", border: "1px solid rgba(255,255,255,.25)", borderRadius: 6, fontSize: 10, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 3 }}
   >
     <i className="ti ti-copy" style={{ fontSize: 11 }} /> Copy Link
   </button>
   <button
     onClick={handleShareWhatsApp}
-    style={{ padding: "4px 4px", background: "#25D366", border: "none", borderRadius: 6, fontSize: 10, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 3 }}
+    style={{ padding: "6px 6px", background: "#25D366", border: "none", borderRadius: 6, fontSize: 10, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 3 }}
   >
     💬 WhatsApp
   </button>
   <button
     onClick={handleSendEmail}
-    style={{ padding: "4px 4px", background: "rgba(255,255,255,.15)", border: "1px solid rgba(255,255,255,.25)", borderRadius: 6, fontSize: 10, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 3 }}
+    style={{ padding: "6px 6px", background: "rgba(255,255,255,.15)", border: "1px solid rgba(255,255,255,.25)", borderRadius: 6, fontSize: 10, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 3 }}
   >
     <i className="ti ti-mail" style={{ fontSize: 11 }} /> Email Link
   </button>
@@ -2461,10 +2461,6 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
                       )}
 
                     </div>
-
-
-
-
 
                   </div>
 

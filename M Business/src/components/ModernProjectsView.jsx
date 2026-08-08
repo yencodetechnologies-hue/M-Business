@@ -155,7 +155,7 @@ const CSS = `
   display:flex; align-items:center; justify-content:center; }
 .mpv-deadline { text-align:right; flex-shrink:0; }
 .mpv-dl-lbl { font-size:9px; color:${P.textLight}; font-weight:600; text-transform:uppercase; }
-.mpv-dl-val { font-size:11px; font-weight:700; }
+.mpv-dl-val { font-size:8px; font-weight:500; }
 .mpv-tasks { font-size:11px; color:${P.textLight}; display:flex; align-items:center; gap:4px; margin-top:5px; }
 .mpv-tasks i { color:${P.primary}; font-size:13px; }
 
@@ -191,12 +191,13 @@ const CSS = `
   border-radius:10px;
   box-shadow:0 8px 24px rgba(0,0,0,.1);
   z-index:99999;
-  min-width:170px;
+  min-width:130px;
   white-space:nowrap;
   overflow:visible;
 }
-.mpv-menu-item { padding:9px 14px; font-size:13px; font-weight:600; cursor:pointer; color:${P.textMid};
-  display:flex; align-items:center; gap:8px; transition:all .12s; border-bottom:1px solid ${P.bg}; }
+.mpv-menu-item { padding:6px 10px; font-size:11px; font-weight:600; cursor:pointer; color:${P.textMid};
+  display:flex; align-items:center; gap:6px; transition:all .12s; border-bottom:1px solid ${P.bg}; }
+.mpv-menu-item i { font-size:12px; }
 .mpv-menu-item:last-child { border-bottom:none; }
 .mpv-menu-item:hover { background:${P.primaryLight}; color:${P.primary}; }
 .mpv-menu-item.danger { color:${P.red}; }
@@ -580,18 +581,14 @@ export default function ModernProjectsView({
                   }}
                 >
                   <div className="mpv-card-top">
-                    {/* Row 1: status badge + priority + action menu */}
-                    <div className="mpv-card-row1">
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-                        <span className={`mpv-badge ${statusCls}`}>{statusLabel}</span>
-                        {p.category && (
-                          <span style={{ fontSize: 10, fontWeight: 700, color: P.primary, background: P.primaryLight, padding: '3px 8px', borderRadius: 20 }}>
-                            {p.category}
-                          </span>
-                        )}
-                      </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <span className={`mpv-prio ${prio}`}>{prioLabel}</span>
+                    {/* Row 1: category (left) + menu (right) */}
+                    <div className="mpv-card-row1" style={{ flexWrap: 'nowrap', justifyContent: 'space-between' }}>
+                      {view !== 'list' && p.category && (
+                        <div style={{ fontSize: 11, fontWeight: 700, color: P.primary, background: P.primaryLight, padding: '3px 10px', borderRadius: 20, display: 'inline-block', whiteSpace: 'nowrap' }}>
+                          {p.category}
+                        </div>
+                      )}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0, marginLeft: 'auto' }}>
                         {(onEdit || onDelete || onAssign || onNewInvoice) && (
                           <div style={{ position: 'relative' }} onClick={e => e.stopPropagation()}>
                             <button
@@ -650,7 +647,11 @@ export default function ModernProjectsView({
                       </div>
                     ) : (
                       <>
-                        <div className="mpv-card-title">{p.name}</div>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 8, marginBottom: 6 }}>
+                          <span className={`mpv-badge ${statusCls}`} style={{ flexShrink: 0 }}>{statusLabel}</span>
+                          <span className={`mpv-prio ${prio}`} style={{ flexShrink: 0 }}>{prioLabel}</span>
+                        </div>
+                        <div className="mpv-card-title" style={{ margin: '0 0 8px' }}>{p.name}</div>
                         <div className="mpv-card-client"><i className="ti ti-building" />{p.client || 'Internal'}</div>
                         {p.description && (
                           <div style={{ fontSize: 11.5, color: P.textLight, marginBottom: 10, lineHeight: 1.5, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
@@ -723,7 +724,7 @@ export default function ModernProjectsView({
                       <div className="mpv-dl-lbl">
                         {statusCls === 'completed' ? 'Delivered' : 'Deadline'}
                       </div>
-                      <div className="mpv-dl-val" style={{ color: dlColor }}>
+                      <div className="mpv-dl-val" style={{ color: dlColor, fontSize: 9, fontWeight: 700 }}>
                         {fmtDate(deadline)}
                       </div>
                     </div>

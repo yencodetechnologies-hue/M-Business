@@ -2252,11 +2252,54 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
                         fontSize: 14, fontWeight: 800
                       }}>
                         {initials(name)}
+                   <div>
+                  <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 10, gap: 8 }}>
+                    <div style={{ display: "flex", alignItems: "flex-start", gap: 10, minWidth: 0, flex: 1 }}>
+                      <div style={{
+                        width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
+                        background: "linear-gradient(135deg, var(--app-accent, #00BCD4), #0891b2)", color: "#fff",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        fontSize: 14, fontWeight: 800
+                      }}>
+                        {initials(name)}
                       </div>
-                      <div>
-                        <div style={{ fontWeight: 800, color: "#0f1c2e", fontSize: 14.5 }}>{name}</div>
-                                 </div>
+                      <div style={{ minWidth: 0, flex: 1 }}>
+                        <div style={{ fontWeight: 800, color: "#0f1c2e", fontSize: 14.5, wordBreak: "break-word" }}>{name}</div>
+                        {c.email && (
+                          <div style={{ display: "flex", alignItems: "flex-start", gap: 4, marginTop: 3, fontSize: 11.5, color: "#607D86", fontWeight: 600 }}>
+                            <i className="ti ti-mail" style={{ fontSize: 12, flexShrink: 0, marginTop: 1 }} />
+                            <span style={{ wordBreak: "break-word" }}>{c.email}</span>
+                          </div>
+                        )}
+                        {c.contactPersonNo && (
+                          <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 2, fontSize: 11.5, color: "#607D86", fontWeight: 600 }}>
+                            <i className="ti ti-phone" style={{ fontSize: 12, flexShrink: 0 }} />
+                            {c.contactPersonNo}
+                          </div>
+                        )}
+                      </div>
                     </div>
+                    <span style={{
+                      fontWeight: 700, fontSize: 10.5, padding: "5px 12px", borderRadius: 20,
+                      background: bc.bg, color: bc.fg, flexShrink: 0, whiteSpace: "nowrap"
+                    }}>
+                      {c.status || "Active"}
+                    </span>
+                  </div>      {c.email && (
+                          <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 2, fontSize: 11.5, color: "#607D86", fontWeight: 600 }}>
+                            <i className="ti ti-mail" style={{ fontSize: 12 }} />
+                            {c.email}
+                          </div>
+                        )}
+                        {c.contactPersonNo && (
+                          <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 2, fontSize: 11.5, color: "#607D86", fontWeight: 600 }}>
+                            <i className="ti ti-phone" style={{ fontSize: 12 }} />
+                            {c.contactPersonNo}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                     <span style={{
                       fontWeight: 700, fontSize: 10.5, padding: "5px 12px", borderRadius: 20,
                       background: bc.bg, color: bc.fg, flexShrink: 0, whiteSpace: "nowrap"

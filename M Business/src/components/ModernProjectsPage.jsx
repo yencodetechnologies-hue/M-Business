@@ -188,12 +188,9 @@ export default function ModernProjectsPage({ user }) {
   }
 
   // ── Open create form ------------------------------------------
-  function openCreate() {
-    setEditProject(null);
-    setForm(EMPTY_FORM);
-    setShowForm(true);
+function openCreate() {
+    navigate("/modern-projects/new");
   }
-
   // ── Open edit form --------------------------------------------
   function openEdit(p, e) {
     e && e.stopPropagation();

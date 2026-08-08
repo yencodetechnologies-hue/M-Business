@@ -23,7 +23,7 @@ const InterviewApplyForm = lazy(() => import("./components/InterviewApplyForm"))
 const EmployeeOnboarding = lazy(() => import("./components/EmployeeOnboarding"));
 const CanvasPage = lazy(() => import("./components/CanvasPage"));
 const ModernProjectsPage = lazy(() => import("./components/ModernProjectsPage"));
-
+const ModernProjectCreator = lazy(() => import("./components/ModernProjectCreator"));
 export default function App() {
   const [user, setUser] = useState(() => {
     const saved = localStorage.getItem("user");
@@ -148,6 +148,7 @@ export default function App() {
           <Route path="/interview-apply/:companySlug" element={<InterviewApplyForm />} />
           <Route path="/employee-onboarding" element={<EmployeeOnboarding />} />
           <Route path="/modern-projects" element={user ? <ModernProjectsPage user={user} /> : <Navigate to="/" replace />} />
+<Route path="/modern-projects/new" element={user ? <ModernProjectCreator onBack={() => window.history.back()} onSuccess={() => window.location.href = "/modern-projects"} /> : <Navigate to="/" replace />} />
 
           <Route
             path="/client-portal/:clientId"

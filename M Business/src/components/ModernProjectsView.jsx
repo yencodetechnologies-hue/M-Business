@@ -444,7 +444,7 @@ export default function ModernProjectsView({
           <option value="deadline">By Deadline</option>
           <option value="progress">By Progress</option>
         </select>
-        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
+       <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
           <span style={{ fontSize: 12, color: P.textLight, fontWeight: 600 }}>
             {paginated.length} of {displayed.length} projects
           </span>
@@ -464,8 +464,15 @@ export default function ModernProjectsView({
               <i className="ti ti-list" />
             </button>
           </div>
-        </div>
-      </div>
+          {onAddProject && (
+            <button
+              onClick={onAddProject}
+              style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'var(--app-accent, #00BCD4)', color: '#fff', border: 'none', borderRadius: 10, padding: '9px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
+            >
+              <i className="ti ti-plus" style={{ fontSize: 14 }} /> New Project
+            </button>
+          )}
+        </div> </div>
 
       {/* ── Project Cards ── */}
       {view === 'list' ? (

@@ -2239,7 +2239,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const addManager = async () => { const errors = {}; if (!nm.managerName.trim()) errors.managerName = "Name is required"; if (!nm.email.trim()) errors.email = "Email is required"; if (!nm.password.trim()) errors.password = "Password is required"; if (Object.keys(errors).length > 0) { setNmError(errors); return; } try { setMgrSaveLoading(true); const res = await axios.post(BASE_URL + "/api/managers/add", nm); setManagers(prev => [res.data.manager, ...prev]); setNm({ managerName: "", email: "", phone: "", department: "", role: "Manager", address: "", password: "", status: "Active" }); setNmError({}); setModal(null); } catch (err) { setNmError({ email: err.response?.data?.message || err.response?.data?.msg || "Failed to save" }); } finally { setMgrSaveLoading(false); } };
 
   const navItems = getNavForRole(user?.role);
-  const validActive = (navItems.find(n => n.key === active) || active === "addClient") ? active : navItems[0]?.key || "dashboard";
+  const validActive = (navItems.find(n => n.key === active) || active === "addClient" || active === "new-project") ? active : navItems[0]?.key || "dashboard";
   const page = navItems.find(n => n.key === validActive) || navItems.find(n => n.key === "clients") || navItems[0];
   useEffect(() => { if (validActive !== active) setActive(validActive); }, [user?.role, active]);
 
@@ -2312,7 +2312,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             <div className="header-actions" style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0, fontSize: "14px" }}>
               {validActive === "clients" && <button onClick={() => { setActive("addClient"); }} style={B("var(--app-accent)")}>+ Add Client</button>}
               {validActive === "employees" && <button onClick={() => { setNeError({}); setModal("employee"); }} style={B("var(--app-accent)")}>+ Add Employee</button>}
-              {validActive === "projects" && <button onClick={() => { setNpError({}); setModal("project"); }} style={B("var(--app-muted)")}>+ New Project</button>}
+           {validActive === "projects" && <button onClick={() => { setNpError({}); setActive("new-project"); }} style={B("var(--app-muted)")}>+ New Project</button>}
               {validActive === "managers" && <button onClick={() => { setNmError({}); setShowMgrPass(false); setModal("manager"); }} style={B("#f59e0b")}>+ Add Manager</button>}
 
               <div onClick={() => setShowProfile(true)} className="mob-topbar-hide" style={{ background: "#fff", border: "1.5px solid #e2e8f0", borderRadius: 12, padding: "6px 12px", display: "flex", alignItems: "center", gap: 10, cursor: "pointer", boxShadow: "0 2px 10px rgba(0,0,0,0.05)", flexShrink: 0 }}>
@@ -2833,8 +2833,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           }} />}
           {validActive === "employees" && <EmployeesPage employees={employees} setEmployees={setEmployees} />}
           {validActive === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}
-          {validActive === "projects" && <ProjectsPage projects={projects} setProjects={setProjects} clients={clients} employees={employees} config={config} onViewTasks={(p) => { setSelectedProjectForTasks(p); setActive("tasks"); }} />}
-
+       {validActive === "projects" && <ProjectsPage projects={projects} setProjects={setProjects} clients={clients} employees={employees} config={config} onViewTasks={(p) => { setSelectedProjectForTasks(p); setActive("tasks"); }} />}
+{validActive === "new-project" && <ModernProjectCreator clients={clients} employees={employees} onBack={() => setActive("projects")} onSuccess={(newProj) => { setProjects(prev => [...prev, newProj]); setActive("projects"); }} onAddEmployeeClick={() => setModal("employee")} />}
           {validActive === "invoices" && <InvoiceCreator clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => setModal("client")} onAddProject={() => setActive("projects")} forceListView={sidebarInvoiceClick} onConsumeForceListView={() => setSidebarInvoiceClick(false)} key="global-invoice-creator" />}
           {validActive === "quotations" && <QuotationCreator clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => setModal("client")} onAddProject={() => setActive("projects")} />}
           {validActive === "proposals" && <ProjectProposalCreator clients={clients} companyLogo={user?.logoUrl} companyName={user?.companyName || "M Business"} />}

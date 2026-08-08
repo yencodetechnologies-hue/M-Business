@@ -2232,7 +2232,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
               return (
                 <div
                   key={c._id || i}
-                  onClick={() => { setActiveClientId(c._id); setActiveTab("overview"); }}
+                  onClick={() => { setActiveClientId(c._id); setActiveTab("overview"); setViewClientModal(true); }}
                   style={{
                     background: "#fff",
                     borderRadius: 16,
@@ -2243,16 +2243,6 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
                     borderLeft: `4px solid ${bc.fg}`
                   }}
                 >
-                  <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 10 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                      <div style={{
-                        width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
-                        background: "linear-gradient(135deg, var(--app-accent, #00BCD4), #0891b2)", color: "#fff",
-                        display: "flex", alignItems: "center", justifyContent: "center",
-                        fontSize: 14, fontWeight: 800
-                      }}>
-                        {initials(name)}
-                   <div>
                   <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 10, gap: 8 }}>
                     <div style={{ display: "flex", alignItems: "flex-start", gap: 10, minWidth: 0, flex: 1 }}>
                       <div style={{
@@ -2279,11 +2269,6 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
                         )}
                       </div>
                     </div>
-                 
-                  </div>      
-                      </div>
-                    </div>
-                  </div>
                     <span style={{
                       fontWeight: 700, fontSize: 10.5, padding: "5px 12px", borderRadius: 20,
                       background: bc.bg, color: bc.fg, flexShrink: 0, whiteSpace: "nowrap"

@@ -80,7 +80,6 @@ router.post("/", upload.single("file"), async (req, res) => {
   const ext = path.extname(req.file.originalname || "");
   const baseName = path.basename(req.file.originalname || "file", ext).replace(/[^a-zA-Z0-9_-]/g, "_");
   const uniqueName = `${baseName}-${Date.now()}${ext}`;
-
   const isPdf = req.file.mimetype === "application/pdf";
   const uploadStream = cloudinary.uploader.upload_stream(
     {
@@ -159,8 +158,10 @@ router.get("/proxy-pdf", async (req, res) => {
     res.setHeader('Content-Disposition', 'inline');
     response.data.pipe(res);
   } catch (error) {
-    console.error("PDF Proxy Error:", error);
-    res.status(500).send("Failed to load PDF");
+    console.error("PDF Proxy Error:", error.response?.status, error.response?.statusText, error.message);
+    res.status(error.response?.status || 500).send(
+      `Failed to load PDF: ${error.response?.status || ""} ${error.response?.statusText || error.message}`
+    );
   }
 });
 

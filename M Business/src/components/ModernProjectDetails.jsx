@@ -172,48 +172,22 @@ const CSS = `
     padding: 10px 8px !important;
   }
   .mpd-acc-stats > * > div:first-child {
-    font-size: 9px !important;
+    font-size: 8px !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .mpd-acc-stats > * > div:nth-child(2) {
-    font-size: 13px !important;
+    font-size: 8px !important;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
   .mpd-acc-stats > * > div:last-child {
-    font-size: 9px !important;
+    font-size: 8px !important;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-  }
-}
-
-@media (max-width: 768px) {
-  .mpd-acc-actions,
-  .mpd-acc-boxes {
-    flex-direction: column;
-    overflow-x: visible;
-  }
-  .mpd-acc-actions > *,
-  .mpd-acc-boxes > * {
-    width: 100%;
-    min-width: 0;
-    flex: 1 1 auto;
-  }
-  .mpd-acc-stats {
-    overflow-x: visible;
-    gap: 6px;
-  }
-  .mpd-acc-stats > * {
-    flex: 1 1 0;
-    min-width: 0;
-    padding: 10px 8px !important;
-  }
-  .mpd-acc-stats > * > div:first-child {
-    font-size: 10px !important;
-  }
-  .mpd-acc-stats > * > div:last-child > div:first-child {
-    font-size: 14px !important;
   }
 }
 
@@ -2403,9 +2377,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               const liveReceived = (currProject.paymentsReceived || []).reduce((s, p) => s + parseAmt(p.amount), 0);
               const livePending = Math.max(0, liveBilled - liveReceived);
               return [
-                { lbl: 'Total Invoiced', val: projectInvoicesLoading ? 'Loading…' : `${mergedInvoices.length} invoice(s)`, sub: '', color: '#3B82F6', icon: 'ti-file-invoice' },
-                { lbl: 'Received', val: projectInvoicesLoading ? 'Loading…' : `${liveBilled > 0 ? Math.round((liveReceived / liveBilled) * 100) : 0}% collected`, sub: '', color: '#22C55E', icon: 'ti-circle-check' },
-                { lbl: 'Outstanding', val: 'Balance due', sub: '', color: '#EF4444', icon: 'ti-alert-circle' },
+                { lbl: 'Total Invoiced', val: '', sub: projectInvoicesLoading ? 'Loading…' : `${mergedInvoices.length} invoice(s)`, color: '#3B82F6', icon: 'ti-file-invoice' },
+                { lbl: 'Received', val: '', sub: projectInvoicesLoading ? 'Loading…' : `${liveBilled > 0 ? Math.round((liveReceived / liveBilled) * 100) : 0}% collected`, color: '#22C55E', icon: 'ti-circle-check' },
+                { lbl: 'Outstanding', val: '', sub: 'Balance due', color: '#EF4444', icon: 'ti-alert-circle' },
               ];
             })().map(s => (
               <div key={s.lbl} style={{ background: '#fff', border: '1px solid #E8EDF2', borderRadius: 12, padding: '14px 16px', position: 'relative', overflow: 'hidden' }}>
@@ -4227,8 +4201,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
 
 
-        {/* TEAM + BUDGET — side by side */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'stretch', marginTop: 24, marginLeft: 0, paddingLeft: 0 }}>
+        {/* TEAM + BUDGET — stacked, Team on top, Budget directly below */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 20, alignItems: 'stretch', marginTop: 24, marginLeft: 0, paddingLeft: 0 }}>
           {/* TEAM SIDEBAR */}
           <div className="mpd-card" style={{ marginBottom: 0, display: 'flex', flexDirection: 'column', height: '100%', paddingTop: 8, paddingLeft: 6, paddingRight: 6 }}>
             <div className="mpd-card-header">

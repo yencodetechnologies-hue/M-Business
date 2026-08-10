@@ -366,6 +366,45 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
           .invoice-paper { page-break-after: always; }
           .invoice-paper:last-child { page-break-after: auto; }
         }
+        @media (max-width: 768px) {
+          .invoice-preview-modal-wrap {
+            max-width: 100% !important;
+            width: 100% !important;
+            padding: 0 !important;
+          }
+          .invoice-paper {
+            padding: 16px !important;
+            font-size: 11px !important;
+            border-radius: 10px !important;
+            min-height: auto !important;
+            box-sizing: border-box !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            overflow-x: hidden !important;
+          }
+          .invoice-paper .inv-parties {
+            grid-template-columns: 1fr !important;
+            gap: 12px !important;
+            padding: 10px 12px !important;
+          }
+          .invoice-paper .inv-title-word {
+            font-size: 20px !important;
+            transform: none !important;
+          }
+          .invoice-paper .inv-header {
+            flex-wrap: wrap !important;
+          }
+          .invoice-paper table {
+            font-size: 11px !important;
+          }
+          .invoice-paper .inv-table-wrap,
+          .invoice-paper table {
+            display: block !important;
+            width: 100% !important;
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+          }
+        }
       `}</style>
       {pages.map((pageItems, pageIdx) => {
         const isFirstPage = pageIdx === 0;
@@ -2183,7 +2222,7 @@ const [sortOrder, setSortOrder] = useState("desc");
 
         {step === "preview" && viewAsModal && (
           <div style={{ position: "fixed", inset: 0, zIndex: 999999, background: "rgba(15,28,46,0.55)", overflowY: "auto", padding: "20px 12px" }} onClick={() => { if (jumpInvoice && onBack) { onBack(); } else { setStep("list"); } }}>
-            <div onClick={(e) => e.stopPropagation()} style={{ maxWidth: 830, margin: "0 auto", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            <div className="invoice-preview-modal-wrap" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 830, margin: "0 auto", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
               <div className="no-print" style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 4, flexWrap: "wrap" }}>
                 <button onClick={() => { if (jumpInvoice && onBack) { onBack(); } else { setStep("list"); } }} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>Close</button>
                 <button onClick={() => setShareModalEntry({ id: editingId, invoiceNo: inv.invoiceNo, total: total })} style={{ padding: "10px 22px", background: "#eff6ff", border: "1.5px solid #bfdbfe", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#2563eb", fontFamily: "inherit" }}>Share</button>

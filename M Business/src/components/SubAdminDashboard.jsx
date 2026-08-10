@@ -952,56 +952,129 @@ function ClientDropdown({ clients, value, onChange, error, onAddClient }) {
 
 
 
-function InvoicesListPage({ invoices, onViewInvoice, clients = [], projects = [], onViewClient, onViewProject }) {
+function InvoicesListPage({ invoices, onViewInvoice, clients = [], projects = [], onBack }) {
+  const [search, setSearch] = useState("");
+  const [filterMode, setFilterMode] = useState("all");
   const all = invoices || [];
-  const findClient = (inv) => clients.find(c => c._id === inv.clientId || (c.clientName || c.name) === (inv.clientName || inv.client));
-  const findProject = (inv) => projects.find(p => p._id === inv.projectId || (p.name || "") === (inv.project || inv.projectName || ""));
+  const filtered = all.filter(inv => {
+    const name = (inv.clientName || inv.client || "").toLowerCase();
+    const matchQ = !search || name.includes(search.toLowerCase());
+    const s = (inv.status || "").toLowerCase();
+    const matchF = filterMode === "all" || s === filterMode;
+    return matchQ && matchF;
+  });
+  const initials = (name) => (name || "?").trim().split(/\s+/).slice(0, 2).map(w => w[0]).join("").toUpperCase();
   const badgeCfg = (status) => {
     const ok = (status || "").toLowerCase() === "paid";
     return ok ? { bg: "#dcfce7", fg: "#16a34a" } : { bg: "#fef2f2", fg: "#dc2626" };
   };
   return (
     <div style={{ padding: "16px 14px", background: "#F5F8FA", minHeight: "100%", boxSizing: "border-box", maxWidth: "100%", overflowX: "hidden" }}>
-      <div style={{ fontSize: 15, fontWeight: 800, color: "#1A2332", marginBottom: 14 }}>
-        Total Invoices: <span style={{ color: "var(--app-accent, #00BCD4)" }}>{all.length}</span>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #00BCD4), #0891b2)", borderRadius: 16, padding: "16px 18px", marginBottom: 14, boxShadow: "0 6px 18px rgba(0,188,212,0.25)" }}>
+        <div>
+          <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.8)", letterSpacing: 0.5, textTransform: "uppercase" }}>Total Invoices</div>
+          <div style={{ fontSize: 26, fontWeight: 800, color: "#fff" }}>{all.length}</div>
+        </div>
+        <div style={{ width: 46, height: 46, borderRadius: 13, background: "rgba(255,255,255,0.18)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <i className="ti ti-file-invoice" style={{ fontSize: 22, color: "#fff" }} />
+        </div>
       </div>
-      {all.length === 0 ? (
-        <div style={{ padding: "36px 16px", textAlign: "center", color: "#A0B8BE", fontSize: 13, fontWeight: 600, background: "#fff", borderRadius: 12, boxShadow: "0 2px 10px rgba(15,28,46,0.05)" }}>
+
+      <div style={{ position: "relative", marginBottom: 12 }}>
+        <i className="ti ti-search" style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", fontSize: 15, color: "#A0B8BE" }} />
+        <input
+          type="text"
+          placeholder="Search invoices..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          style={{ width: "100%", padding: "12px 12px 12px 38px", border: "none", borderRadius: 12, fontSize: 13, outline: "none", background: "#fff", color: "#1A2E35", boxSizing: "border-box", boxShadow: "0 2px 10px rgba(15,28,46,0.06)" }}
+        />
+      </div>
+
+      <div style={{ display: "flex", gap: 8, marginBottom: 16, overflowX: "auto" }}>
+        {["all", "paid", "pending", "unpaid", "overdue"].map(f => (
+          <button
+            key={f}
+            onClick={() => setFilterMode(f)}
+            style={{
+              padding: "7px 16px",
+              borderRadius: 20,
+              border: filterMode === f ? "none" : "1.5px solid #E0EEF0",
+              fontSize: 12,
+              fontWeight: 700,
+              cursor: "pointer",
+              textTransform: "capitalize",
+              background: filterMode === f ? "#1A2332" : "#fff",
+              color: filterMode === f ? "#fff" : "#607D86",
+              whiteSpace: "nowrap",
+              transition: "all 0.15s ease"
+            }}
+          >
+            {f === "all" ? "All" : f}
+          </button>
+        ))}
+      </div>
+
+      {filtered.length === 0 ? (
+        <div style={{ padding: "40px 16px", textAlign: "center", color: "#A0B8BE", fontSize: 13, fontWeight: 600, background: "#fff", borderRadius: 16, boxShadow: "0 2px 10px rgba(15,28,46,0.05)" }}>
           No invoices found.
         </div>
       ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {all.map((inv, i) => {
-            const matchedClient = findClient(inv);
-            const matchedProject = findProject(inv);
+        <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 12 }}>
+          {filtered.map((inv, i) => {
             const bc = badgeCfg(inv.status);
+            const name = inv.clientName || inv.client || "—";
+            const matchedProject = projects.find(p => p._id === inv.projectId || (p.name || "") === (inv.project || inv.projectName || ""));
             return (
               <div
                 key={inv._id || inv.invoiceNo || i}
-                style={{ background: "#fff", borderRadius: 12, padding: "12px 14px", boxShadow: "0 2px 8px rgba(15,28,46,0.06)", boxSizing: "border-box", maxWidth: "100%" }}
+                onClick={() => onViewInvoice && onViewInvoice(inv)}
+                style={{
+                  background: "#fff",
+                  borderRadius: 16,
+                  padding: "16px",
+                  boxShadow: "0 3px 14px rgba(15,28,46,0.07)",
+                  cursor: "pointer",
+                  boxSizing: "border-box",
+                  borderLeft: `4px solid ${bc.fg}`
+                }}
               >
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, marginBottom: matchedProject ? 6 : 0 }}>
-                  <span
-                    onClick={() => matchedClient && onViewClient && onViewClient(matchedClient)}
-                    style={{ fontWeight: 800, color: matchedClient ? "var(--app-accent, #00BCD4)" : "#0f1c2e", fontSize: 13.5, cursor: matchedClient ? "pointer" : "default", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
-                  >
-                    {inv.clientName || inv.client || "—"}
-                  </span>
-                  <span
-                    onClick={() => onViewInvoice && onViewInvoice(inv)}
-                    style={{ fontWeight: 700, fontSize: 10.5, padding: "4px 10px", borderRadius: 20, background: bc.bg, color: bc.fg, cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap" }}
-                  >
+                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 10, gap: 8 }}>
+                  <div style={{ display: "flex", alignItems: "flex-start", gap: 10, minWidth: 0, flex: 1 }}>
+                    <div style={{
+                      width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
+                      background: "linear-gradient(135deg, var(--app-accent, #00BCD4), #0891b2)", color: "#fff",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: 14, fontWeight: 800
+                    }}>
+                      {initials(name)}
+                    </div>
+                    <div style={{ minWidth: 0, flex: 1 }}>
+                      <div style={{ fontWeight: 800, color: "#0f1c2e", fontSize: 14.5, wordBreak: "break-word" }}>{name}</div>
+                      {matchedProject && (
+                        <div style={{ display: "flex", alignItems: "flex-start", gap: 4, marginTop: 3, fontSize: 11.5, color: "#607D86", fontWeight: 600 }}>
+                          <i className="ti ti-folder" style={{ fontSize: 12, flexShrink: 0, marginTop: 1 }} />
+                          <span style={{ wordBreak: "break-word" }}>{matchedProject.name}</span>
+                        </div>
+                      )}
+                      {(inv.grandTotal || inv.total) && (
+                        <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 2, fontSize: 11.5, color: "#607D86", fontWeight: 600 }}>
+                          <i className="ti ti-currency-rupee" style={{ fontSize: 12, flexShrink: 0 }} />
+                          {Number(inv.grandTotal || inv.total).toLocaleString("en-IN")}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <span style={{
+                    fontWeight: 700, fontSize: 10.5, padding: "5px 12px", borderRadius: 20,
+                    background: bc.bg, color: bc.fg, flexShrink: 0, whiteSpace: "nowrap"
+                  }}>
                     {inv.status || "Unpaid"}
                   </span>
                 </div>
-                {matchedProject && (
-                  <span
-                    onClick={() => onViewProject && onViewProject(matchedProject)}
-                    style={{ fontWeight: 600, color: "#607D86", fontSize: 11.5, cursor: "pointer" }}
-                  >
-                    <i className="ti ti-folder" style={{ marginRight: 4, fontSize: 11 }} />{matchedProject.name}
-                  </span>
-                )}
+                <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 4, color: "var(--app-accent, #00BCD4)", fontSize: 12, fontWeight: 700 }}>
+                  View details <i className="ti ti-chevron-right" style={{ fontSize: 13 }} />
+                </div>
               </div>
             );
           })}
@@ -2729,44 +2802,402 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
   );
 
 }
-function UnpaidInvoicesListPage({ invoices, onViewInvoice }) {
+function UnpaidInvoicesListPage({ invoices, onViewInvoice, onBack }) {
+  const [search, setSearch] = useState("");
+  const [filterMode, setFilterMode] = useState("all");
   const unpaid = (invoices || []).filter(i => {
     const s = (i.status || "").toLowerCase();
     return s === "pending" || s === "unpaid" || s === "overdue" || s === "sent";
   });
+  const filtered = unpaid.filter(i => {
+    const name = (i.clientName || i.client || "").toLowerCase();
+    const matchQ = !search || name.includes(search.toLowerCase());
+    const s = (i.status || "").toLowerCase();
+    const matchF = filterMode === "all" || s === filterMode;
+    return matchQ && matchF;
+  });
   const initials = (name) => (name || "?").trim().split(/\s+/).slice(0, 2).map(w => w[0]).join("").toUpperCase();
+  const badgeCfg = (status) => {
+    const s = (status || "").toLowerCase();
+    if (s === "overdue") return { bg: "#fef2f2", fg: "#dc2626" };
+    if (s === "sent") return { bg: "#eff6ff", fg: "#2563eb" };
+    return { bg: "#fef2f2", fg: "#dc2626" };
+  };
   return (
     <div style={{ padding: "16px 14px", background: "#F5F8FA", minHeight: "100%", boxSizing: "border-box", maxWidth: "100%", overflowX: "hidden" }}>
-      <div style={{ fontSize: 15, fontWeight: 800, color: "#1A2332", marginBottom: 14 }}>
-        Total Unpaid Invoices: <span style={{ color: "#dc2626" }}>{unpaid.length}</span>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #00BCD4), #0891b2)", borderRadius: 16, padding: "16px 18px", marginBottom: 14, boxShadow: "0 6px 18px rgba(0,188,212,0.25)" }}>
+        <div>
+          <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.8)", letterSpacing: 0.5, textTransform: "uppercase" }}>Total Unpaid Invoices</div>
+          <div style={{ fontSize: 26, fontWeight: 800, color: "#fff" }}>{unpaid.length}</div>
+        </div>
+        <div style={{ width: 46, height: 46, borderRadius: 13, background: "rgba(255,255,255,0.18)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <i className="ti ti-file-invoice" style={{ fontSize: 22, color: "#fff" }} />
+        </div>
       </div>
-      {unpaid.length === 0 ? (
-        <div style={{ padding: "36px 16px", textAlign: "center", color: "#A0B8BE", fontSize: 13, fontWeight: 600, background: "#fff", borderRadius: 12, boxShadow: "0 2px 10px rgba(15,28,46,0.05)" }}>
+
+      <div style={{ position: "relative", marginBottom: 12 }}>
+        <i className="ti ti-search" style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", fontSize: 15, color: "#A0B8BE" }} />
+        <input
+          type="text"
+          placeholder="Search invoices..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          style={{ width: "100%", padding: "12px 12px 12px 38px", border: "none", borderRadius: 12, fontSize: 13, outline: "none", background: "#fff", color: "#1A2E35", boxSizing: "border-box", boxShadow: "0 2px 10px rgba(15,28,46,0.06)" }}
+        />
+      </div>
+
+      <div style={{ display: "flex", gap: 8, marginBottom: 16, overflowX: "auto" }}>
+        {["all", "pending", "unpaid", "overdue"].map(f => (
+          <button
+            key={f}
+            onClick={() => setFilterMode(f)}
+            style={{
+              padding: "7px 16px",
+              borderRadius: 20,
+              border: filterMode === f ? "none" : "1.5px solid #E0EEF0",
+              fontSize: 12,
+              fontWeight: 700,
+              cursor: "pointer",
+              textTransform: "capitalize",
+              background: filterMode === f ? "#1A2332" : "#fff",
+              color: filterMode === f ? "#fff" : "#607D86",
+              whiteSpace: "nowrap",
+              transition: "all 0.15s ease"
+            }}
+          >
+            {f === "all" ? "All" : f}
+          </button>
+        ))}
+      </div>
+
+      {filtered.length === 0 ? (
+        <div style={{ padding: "40px 16px", textAlign: "center", color: "#A0B8BE", fontSize: 13, fontWeight: 600, background: "#fff", borderRadius: 16, boxShadow: "0 2px 10px rgba(15,28,46,0.05)" }}>
           No unpaid invoices found.
         </div>
       ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {unpaid.map((inv, i) => {
-            const name = inv.clientName || inv.client || inv.invoiceNo || "—";
+        <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 12 }}>
+          {filtered.map((inv, i) => {
+            const bc = badgeCfg(inv.status);
+            const name = inv.clientName || inv.client || "—";
             return (
               <div
                 key={inv._id || inv.invoiceNo || i}
                 onClick={() => onViewInvoice && onViewInvoice(inv)}
-                style={{ display: "flex", alignItems: "center", gap: 12, background: "#fff", borderRadius: 12, padding: "12px 14px", boxShadow: "0 2px 8px rgba(15,28,46,0.06)", cursor: "pointer", boxSizing: "border-box", maxWidth: "100%" }}
+                style={{
+                  background: "#fff",
+                  borderRadius: 16,
+                  padding: "16px",
+                  boxShadow: "0 3px 14px rgba(15,28,46,0.07)",
+                  cursor: "pointer",
+                  boxSizing: "border-box",
+                  borderLeft: `4px solid ${bc.fg}`
+                }}
               >
-                <div style={{ width: 38, height: 38, borderRadius: 10, flexShrink: 0, background: "rgba(220,38,38,0.1)", color: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800 }}>
-                  {initials(name)}
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontWeight: 800, color: "#0f1c2e", fontSize: 13.5, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                    {name}
+                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 10, gap: 8 }}>
+                  <div style={{ display: "flex", alignItems: "flex-start", gap: 10, minWidth: 0, flex: 1 }}>
+                    <div style={{
+                      width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
+                      background: "linear-gradient(135deg, var(--app-accent, #00BCD4), #0891b2)", color: "#fff",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: 14, fontWeight: 800
+                    }}>
+                      {initials(name)}
+                    </div>
+                    <div style={{ minWidth: 0, flex: 1 }}>
+                      <div style={{ fontWeight: 800, color: "#0f1c2e", fontSize: 14.5, wordBreak: "break-word" }}>{name}</div>
+                      {inv.invoiceNo && (
+                        <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 3, fontSize: 11.5, color: "#607D86", fontWeight: 600 }}>
+                          <i className="ti ti-hash" style={{ fontSize: 12, flexShrink: 0 }} />
+                          <span>{inv.invoiceNo}</span>
+                        </div>
+                      )}
+                      {(inv.grandTotal || inv.total) && (
+                        <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 2, fontSize: 11.5, color: "#607D86", fontWeight: 600 }}>
+                          <i className="ti ti-currency-rupee" style={{ fontSize: 12, flexShrink: 0 }} />
+                          {Number(inv.grandTotal || inv.total).toLocaleString("en-IN")}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                  <div style={{ fontSize: 11, color: "#94A7AF", fontWeight: 600, marginTop: 2 }}>#{i + 1}</div>
+                  <span style={{
+                    fontWeight: 700, fontSize: 10.5, padding: "5px 12px", borderRadius: 20,
+                    background: bc.bg, color: bc.fg, flexShrink: 0, whiteSpace: "nowrap"
+                  }}>
+                    {inv.status || "Unpaid"}
+                  </span>
                 </div>
-                <span style={{ fontWeight: 700, fontSize: 10.5, padding: "4px 10px", borderRadius: 20, background: "#fef2f2", color: "#dc2626", flexShrink: 0, whiteSpace: "nowrap" }}>
-                  {inv.status || "Unpaid"}
-                </span>
-                <i className="ti ti-chevron-right" style={{ fontSize: 15, color: "#C2D0D4", flexShrink: 0 }} />
+                <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 4, color: "var(--app-accent, #00BCD4)", fontSize: 12, fontWeight: 700 }}>
+                  View details <i className="ti ti-chevron-right" style={{ fontSize: 13 }} />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+       <div
+        onClick={() => onBack && onBack()}
+        style={{ display: "flex", alignItems: "center", gap: 6, padding: "16px 4px 4px", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #00BCD4)" }}
+      >
+        <i className="ti ti-arrow-left" style={{ fontSize: 16 }}></i> Back to Dashboard
+      </div>
+    </div>
+  );
+}
+
+function ProposalsListPage({ proposals, onViewProposal, onBack }) {
+  const [search, setSearch] = useState("");
+  const [filterMode, setFilterMode] = useState("all");
+  const all = proposals || [];
+  const filtered = all.filter(p => {
+    const title = (p.title || p.client || p.clientName || "New Proposal").toLowerCase();
+    const matchQ = !search || title.includes(search.toLowerCase());
+    const s = (p.status || "draft").toLowerCase();
+    const matchF = filterMode === "all" || s === filterMode;
+    return matchQ && matchF;
+  });
+  const initials = (name) => (name || "P").trim().split(/\s+/).slice(0, 2).map(w => w[0]).join("").toUpperCase();
+  const badgeCfg = (status) => {
+    const s = (status || "draft").toLowerCase();
+    if (s === "approved") return { bg: "#dcfce7", fg: "#16a34a" };
+    if (s === "sent") return { bg: "#eff6ff", fg: "#2563eb" };
+    if (s === "rejected") return { bg: "#fef2f2", fg: "#dc2626" };
+    return { bg: "#fef2f2", fg: "#dc2626" };
+  };
+  return (
+    <div style={{ padding: "16px 14px", background: "#F5F8FA", minHeight: "100%", boxSizing: "border-box", maxWidth: "100%", overflowX: "hidden" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #00BCD4), #0891b2)", borderRadius: 16, padding: "16px 18px", marginBottom: 14, boxShadow: "0 6px 18px rgba(0,188,212,0.25)" }}>
+        <div>
+          <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.8)", letterSpacing: 0.5, textTransform: "uppercase" }}>Total Proposals</div>
+          <div style={{ fontSize: 26, fontWeight: 800, color: "#fff" }}>{all.length}</div>
+        </div>
+        <div style={{ width: 46, height: 46, borderRadius: 13, background: "rgba(255,255,255,0.18)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <i className="ti ti-clipboard-list" style={{ fontSize: 22, color: "#fff" }} />
+        </div>
+      </div>
+
+      <div style={{ position: "relative", marginBottom: 12 }}>
+        <i className="ti ti-search" style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", fontSize: 15, color: "#A0B8BE" }} />
+        <input
+          type="text"
+          placeholder="Search proposals..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          style={{ width: "100%", padding: "12px 12px 12px 38px", border: "none", borderRadius: 12, fontSize: 13, outline: "none", background: "#fff", color: "#1A2E35", boxSizing: "border-box", boxShadow: "0 2px 10px rgba(15,28,46,0.06)" }}
+        />
+      </div>
+
+      <div style={{ display: "flex", gap: 8, marginBottom: 16, overflowX: "auto" }}>
+        {["all", "draft", "sent", "approved", "rejected"].map(f => (
+          <button
+            key={f}
+            onClick={() => setFilterMode(f)}
+            style={{
+              padding: "7px 16px",
+              borderRadius: 20,
+              border: filterMode === f ? "none" : "1.5px solid #E0EEF0",
+              fontSize: 12,
+              fontWeight: 700,
+              cursor: "pointer",
+              textTransform: "capitalize",
+              background: filterMode === f ? "#1A2332" : "#fff",
+              color: filterMode === f ? "#fff" : "#607D86",
+              whiteSpace: "nowrap",
+              transition: "all 0.15s ease"
+            }}
+          >
+            {f === "all" ? "All" : f}
+          </button>
+        ))}
+      </div>
+
+      {filtered.length === 0 ? (
+        <div style={{ padding: "40px 16px", textAlign: "center", color: "#A0B8BE", fontSize: 13, fontWeight: 600, background: "#fff", borderRadius: 16, boxShadow: "0 2px 10px rgba(15,28,46,0.05)" }}>
+          No proposals found.
+        </div>
+      ) : (
+        <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 12 }}>
+          {filtered.map((p, i) => {
+            const bc = badgeCfg(p.status);
+            const title = p.title || p.client || p.clientName || "New Proposal";
+            return (
+              <div
+                key={p._id || p.id || i}
+                onClick={() => onViewProposal && onViewProposal(p)}
+                style={{
+                  background: "#fff",
+                  borderRadius: 16,
+                  padding: "16px",
+                  boxShadow: "0 3px 14px rgba(15,28,46,0.07)",
+                  cursor: "pointer",
+                  boxSizing: "border-box",
+                  borderLeft: `4px solid ${bc.fg}`
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 10, gap: 8 }}>
+                  <div style={{ display: "flex", alignItems: "flex-start", gap: 10, minWidth: 0, flex: 1 }}>
+                    <div style={{
+                      width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
+                      background: "linear-gradient(135deg, var(--app-accent, #00BCD4), #0891b2)", color: "#fff",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: 14, fontWeight: 800
+                    }}>
+                      {initials(title)}
+                    </div>
+                    <div style={{ minWidth: 0, flex: 1 }}>
+                      <div style={{ fontWeight: 800, color: "#0f1c2e", fontSize: 14.5, wordBreak: "break-word" }}>{title}</div>
+                      {p.reviewComment && (
+                        <div style={{ display: "flex", alignItems: "flex-start", gap: 4, marginTop: 3, fontSize: 11.5, color: "#607D86", fontWeight: 600 }}>
+                          <i className="ti ti-message-2" style={{ fontSize: 12, flexShrink: 0, marginTop: 1 }} />
+                          <span style={{ wordBreak: "break-word" }}>{p.reviewComment}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <span style={{
+                    fontWeight: 700, fontSize: 10.5, padding: "5px 12px", borderRadius: 20,
+                    background: bc.bg, color: bc.fg, flexShrink: 0, whiteSpace: "nowrap"
+                  }}>
+                    {(p.status || "draft").toUpperCase()}
+                  </span>
+                </div>
+                <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 4, color: "var(--app-accent, #00BCD4)", fontSize: 12, fontWeight: 700 }}>
+                  View details <i className="ti ti-chevron-right" style={{ fontSize: 13 }} />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+function QuotationsListPage({ quotations, onViewQuotation, onBack }) {
+  const [search, setSearch] = useState("");
+  const [filterMode, setFilterMode] = useState("all");
+  const all = quotations || [];
+  const filtered = all.filter(q => {
+    const client = (q.qt?.client || q.client || q.clientName || "").toLowerCase();
+    const matchQ = !search || client.includes(search.toLowerCase());
+    const s = (q.status || "draft").toLowerCase();
+    const matchF = filterMode === "all" || s === filterMode;
+    return matchQ && matchF;
+  });
+  const initials = (name) => (name || "Q").trim().split(/\s+/).slice(0, 2).map(w => w[0]).join("").toUpperCase();
+  const badgeCfg = (status) => {
+    const s = (status || "draft").toLowerCase();
+    if (s === "approved") return { bg: "#dcfce7", fg: "#16a34a" };
+    if (s === "sent") return { bg: "#eff6ff", fg: "#2563eb" };
+    if (s === "rejected") return { bg: "#fef2f2", fg: "#dc2626" };
+    return { bg: "#fef2f2", fg: "#dc2626" };
+  };
+  return (
+    <div style={{ padding: "16px 14px", background: "#F5F8FA", minHeight: "100%", boxSizing: "border-box", maxWidth: "100%", overflowX: "hidden" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #00BCD4), #0891b2)", borderRadius: 16, padding: "16px 18px", marginBottom: 14, boxShadow: "0 6px 18px rgba(0,188,212,0.25)" }}>
+        <div>
+          <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.8)", letterSpacing: 0.5, textTransform: "uppercase" }}>Total Quotations</div>
+          <div style={{ fontSize: 26, fontWeight: 800, color: "#fff" }}>{all.length}</div>
+        </div>
+        <div style={{ width: 46, height: 46, borderRadius: 13, background: "rgba(255,255,255,0.18)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <i className="ti ti-receipt" style={{ fontSize: 22, color: "#fff" }} />
+        </div>
+      </div>
+
+      <div style={{ position: "relative", marginBottom: 12 }}>
+        <i className="ti ti-search" style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", fontSize: 15, color: "#A0B8BE" }} />
+        <input
+          type="text"
+          placeholder="Search quotations..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          style={{ width: "100%", padding: "12px 12px 12px 38px", border: "none", borderRadius: 12, fontSize: 13, outline: "none", background: "#fff", color: "#1A2E35", boxSizing: "border-box", boxShadow: "0 2px 10px rgba(15,28,46,0.06)" }}
+        />
+      </div>
+
+      <div style={{ display: "flex", gap: 8, marginBottom: 16, overflowX: "auto" }}>
+        {["all", "draft", "sent", "approved", "rejected"].map(f => (
+          <button
+            key={f}
+            onClick={() => setFilterMode(f)}
+            style={{
+              padding: "7px 16px",
+              borderRadius: 20,
+              border: filterMode === f ? "none" : "1.5px solid #E0EEF0",
+              fontSize: 12,
+              fontWeight: 700,
+              cursor: "pointer",
+              textTransform: "capitalize",
+              background: filterMode === f ? "#1A2332" : "#fff",
+              color: filterMode === f ? "#fff" : "#607D86",
+              whiteSpace: "nowrap",
+              transition: "all 0.15s ease"
+            }}
+          >
+            {f === "all" ? "All" : f}
+          </button>
+        ))}
+      </div>
+
+      {filtered.length === 0 ? (
+        <div style={{ padding: "40px 16px", textAlign: "center", color: "#A0B8BE", fontSize: 13, fontWeight: 600, background: "#fff", borderRadius: 16, boxShadow: "0 2px 10px rgba(15,28,46,0.05)" }}>
+          No quotations found.
+        </div>
+      ) : (
+        <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 12 }}>
+          {filtered.map((q, i) => {
+            const bc = badgeCfg(q.status);
+            const client = q.qt?.client || q.client || q.clientName || "—";
+            const quoteNo = q.qt?.quoteNo || q.quoteNo || "";
+            const total = q.total || q.qt?.total || q.amount;
+            return (
+              <div
+                key={q._id || q.id || i}
+                onClick={() => onViewQuotation && onViewQuotation(q)}
+                style={{
+                  background: "#fff",
+                  borderRadius: 16,
+                  padding: "16px",
+                  boxShadow: "0 3px 14px rgba(15,28,46,0.07)",
+                  cursor: "pointer",
+                  boxSizing: "border-box",
+                  borderLeft: `4px solid ${bc.fg}`
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 10, gap: 8 }}>
+                  <div style={{ display: "flex", alignItems: "flex-start", gap: 10, minWidth: 0, flex: 1 }}>
+                    <div style={{
+                      width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
+                      background: "linear-gradient(135deg, var(--app-accent, #00BCD4), #0891b2)", color: "#fff",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: 14, fontWeight: 800
+                    }}>
+                      {initials(client)}
+                    </div>
+                    <div style={{ minWidth: 0, flex: 1 }}>
+                      <div style={{ fontWeight: 800, color: "#0f1c2e", fontSize: 14.5, wordBreak: "break-word" }}>{client}</div>
+                      {quoteNo && (
+                        <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 3, fontSize: 11.5, color: "#607D86", fontWeight: 600 }}>
+                          <i className="ti ti-hash" style={{ fontSize: 12, flexShrink: 0 }} />
+                          <span>{quoteNo}</span>
+                        </div>
+                      )}
+                      {total && (
+                        <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 2, fontSize: 11.5, color: "#607D86", fontWeight: 600 }}>
+                          <i className="ti ti-currency-rupee" style={{ fontSize: 12, flexShrink: 0 }} />
+                          {Number(total).toLocaleString("en-IN")}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <span style={{
+                    fontWeight: 700, fontSize: 10.5, padding: "5px 12px", borderRadius: 20,
+                    background: bc.bg, color: bc.fg, flexShrink: 0, whiteSpace: "nowrap"
+                  }}>
+                    {q.status || "sent"}
+                  </span>
+                </div>
+                <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 4, color: "var(--app-accent, #00BCD4)", fontSize: 12, fontWeight: 700 }}>
+                  View details <i className="ti ti-chevron-right" style={{ fontSize: 13 }} />
+                </div>
               </div>
             );
           })}
@@ -13629,7 +14060,13 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
             {validActive === "subadmins" && <SubadminsPage subadmins={subadmins} setSubadmins={setSubadmins} employees={employees} managers={managers} quotations={quotations} />}
 
-            {validActive === "unpaidInvoices" && <UnpaidInvoicesListPage invoices={invoices} onViewInvoice={(inv) => { setJumpInvoice({ ...inv, _t: Date.now() }); setPrevActiveBeforeInvoice("unpaidInvoices"); setActive("invoices"); }} />}
+            {validActive === "unpaidInvoices" && (
+  <UnpaidInvoicesListPage
+    invoices={invoices}
+    onViewInvoice={(inv) => { setJumpInvoice({ ...inv, _t: Date.now() }); setPrevActiveBeforeInvoice("unpaidInvoices"); setActive("invoices"); }}
+    onBack={() => setActive("dashboard")}
+  />
+)}
 
 
 

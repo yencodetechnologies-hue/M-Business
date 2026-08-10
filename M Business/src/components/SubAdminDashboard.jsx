@@ -972,7 +972,7 @@ function InvoicesListPage({ invoices, onViewInvoice, clients = [], projects = []
     <div style={{ padding: "16px 14px", background: "#F5F8FA", minHeight: "100%", boxSizing: "border-box", maxWidth: "100%", overflowX: "hidden" }}>
       {/* Back to Dashboard — top-left, fixed position for every page */}
       <div
-        onClick={() => onBack && onBack()}
+        onClick={() => setActive("dashboard")}
         style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 4px 16px", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #00BCD4)" }}
       >
         <i className="ti ti-arrow-left" style={{ fontSize: 16 }}></i> Back to Dashboard
@@ -2835,7 +2835,7 @@ function UnpaidInvoicesListPage({ invoices, onViewInvoice, onBack }) {
 
       {/* Back to Dashboard — top-left, fixed position for every page */}
       <div
-        onClick={() => onBack && onBack()}
+      onClick={() => setActive("dashboard")}
         style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 4px 16px", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #00BCD4)" }}
       >
         <i className="ti ti-arrow-left" style={{ fontSize: 16 }}></i> Back to Dashboard
@@ -2977,7 +2977,7 @@ function ProposalsListPage({ proposals, onViewProposal, onBack }) {
     <div style={{ padding: "16px 14px", background: "#F5F8FA", minHeight: "100%", boxSizing: "border-box", maxWidth: "100%", overflowX: "hidden" }}>
        {/* Back to Dashboard — top-left, fixed position for every page */}
       <div
-        onClick={() => onBack && onBack()}
+        onClick={() => setActive("dashboard")}
         style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 4px 16px", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #00BCD4)" }}
       >
         <i className="ti ti-arrow-left" style={{ fontSize: 16 }}></i> Back to Dashboard
@@ -3112,7 +3112,7 @@ function QuotationsListPage({ quotations, onViewQuotation, onBack }) {
      
         {/* Back to Dashboard — top-left, fixed position for every page */}
       <div
-        onClick={() => onBack && onBack()}
+        onClick={() => setActive("dashboard")}
         style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 4px 16px", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #00BCD4)" }}
       >
         <i className="ti ti-arrow-left" style={{ fontSize: 16 }}></i> Back to Dashboard
@@ -3764,12 +3764,12 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
    return (
       <div style={{ padding: "16px 14px", background: "#F5F8FA", minHeight: "100%", boxSizing: "border-box", maxWidth: "100%", overflowX: "hidden" }}>
    {/* Back to Dashboard — top-left, fixed position for every page */}
-      <div
-        onClick={() => onBack && onBack()}
-        style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 4px 16px", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #00BCD4)" }}
-      >
-        <i className="ti ti-arrow-left" style={{ fontSize: 16 }}></i> Back to Dashboard
-      </div>
+     <div
+onClick={() => setActive("dashboard")}
+  style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 4px 16px", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #00BCD4)" }}
+>
+  <i className="ti ti-arrow-left" style={{ fontSize: 16 }}></i> Back to Dashboard
+</div>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #00BCD4), #0891b2)", borderRadius: 16, padding: "16px 18px", marginBottom: 14, boxShadow: "0 6px 18px rgba(0,188,212,0.25)" }}>
           <div>
             <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.8)", letterSpacing: 0.5, textTransform: "uppercase" }}>Total Team</div>
@@ -5304,7 +5304,7 @@ return (
       <div style={{ padding: "16px 14px", background: "#F5F8FA", minHeight: "100%", boxSizing: "border-box", maxWidth: "100%", overflowX: "hidden" }}>
    {/* Back to Dashboard — top-left, fixed position for every page */}
       <div
-        onClick={() => onBack && onBack()}
+        onClick={() => setActive("dashboard")}
         style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 4px 16px", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #00BCD4)" }}
       >
         <i className="ti ti-arrow-left" style={{ fontSize: 16 }}></i> Back to Dashboard
@@ -16381,14 +16381,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           </div>
           
         </div>
-{!isDesktopWidth && ["clients", "employees", "managers", "projects", "invoices", "quotations", "proposals", "project-details", "edit-project", "create-project"].includes(validActive) && (
-            <div
-              onClick={() => setActive("dashboard")}
-              style={{ display: "flex", alignItems: "center", gap: 6, padding: "12px 16px", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #00BCD4)", background: "#fff", borderBottom: "1px solid var(--app-border)" }}
-            >
-              <i className="ti ti-arrow-left" style={{ fontSize: 16 }}></i> Back to Dashboard
-            </div>
-          )}
+
       </div >
 
     </div >

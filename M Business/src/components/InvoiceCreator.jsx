@@ -603,7 +603,7 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
   );
 }
 // ------------------------------------------------------------
-export default function InvoiceCreator({ user, clients = [], projects = [], companyLogo, companyName, onLogoChange, onAddClient, onAddProject, onBack, jumpInvoice, newInvoicePrefill, onSaveLocalInvoice, onSaveSuccess, forceListView, onConsumeForceListView, hideLivePreview = false }) {
+export default function InvoiceCreator({ user, clients = [], projects = [], companyLogo, companyName, onLogoChange, onAddClient, onAddProject, onBack, jumpInvoice, newInvoicePrefill, onSaveLocalInvoice, onSaveSuccess, forceListView, onConsumeForceListView, hideLivePreview = false, onOpenNewInvoiceModal }) {
   const effectiveLogo = companyLogo || DEFAULT_LOGO_URL;
   const effectiveCompanyName = companyName || "";
 
@@ -1923,7 +1923,7 @@ const [sortOrder, setSortOrder] = useState("desc");
 
         {/* STATS */}
         <div className="stats-row">
-          <div className="stat-card" onClick={() => { clearForm(); setStep("form"); setInternalNav(true); }}>
+          <div className="stat-card" onClick={() => { if (onOpenNewInvoiceModal) { onOpenNewInvoiceModal(); return; } clearForm(); setStep("form"); setInternalNav(true); }}>
             <div className="stat-card-inner">
               <div className="stat-icon" style={{ background: "var(--teal-light)", color: "var(--teal)" }}><i className="ti ti-receipt-2"></i></div>
               <div>
@@ -1988,7 +1988,7 @@ const [sortOrder, setSortOrder] = useState("desc");
       ))}
     </div>
   )}
-  <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (typeof e.nativeEvent?.stopImmediatePropagation === 'function') e.nativeEvent.stopImmediatePropagation(); clearForm(); setStep("form"); setInternalNav(true); }} type="button" style={{ padding: "8px 16px", background: "var(--teal)", color: "#fff", border: "none", borderRadius: 8, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
+  <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (typeof e.nativeEvent?.stopImmediatePropagation === 'function') e.nativeEvent.stopImmediatePropagation(); if (onOpenNewInvoiceModal) { onOpenNewInvoiceModal(); return; } clearForm(); setStep("form"); setInternalNav(true); }} type="button" style={{ padding: "8px 16px", background: "var(--teal)", color: "#fff", border: "none", borderRadius: 8, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
     <i className="ti ti-plus"></i> New Invoice
   </button>
 </div>

@@ -303,9 +303,6 @@ body {
 
 @media (max-width: 768px) {
   .client-detail-modal {
-    position: fixed !important;
-    z-index: 3000 !important;
-    background: #fff !important;
     width: 94vw !important;
     height: 85vh !important;
     max-height: 85vh !important;
@@ -313,12 +310,8 @@ body {
     left: 3vw !important;
     right: 3vw !important;
     bottom: auto !important;
-    margin: 0 !important;
     border-radius: 20px !important;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3) !important;
     overflow: hidden !important;
-    display: flex !important;
-    flex-direction: column !important;
   }
 }
 /* Ensure images don't overflow */

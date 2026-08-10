@@ -5421,12 +5421,10 @@ return (
           setJumpProject(null);
           if (setActive) setActive("create-project");
         }}
-        onNewInvoice={(p, editInv, editIdx) => {
+    onNewInvoice={(p, editInv, editIdx) => {
           if (!p) return;
-          if (setInvoicePrefill) setInvoicePrefill({ client: p.client || "", project: p.name || "", _t: Date.now(), skipTemplateStep: true, ...(editInv ? { editData: editInv, editIndex: editIdx, projectId: p._id } : {}) });
-          if (setJumpInvoice) setJumpInvoice(true);
-          setPrevActiveBeforeInvoice(active);
-          if (setActive) setActive("invoices");
+          if (setInvoicePrefill) setInvoicePrefill({ client: p.client || "", project: p.name || "", _t: Date.now(), projectId: p._id, ...(editInv ? { editData: editInv, editIndex: editIdx } : {}) });
+          setShowMobileInvoiceModal(true);
         }}
         onViewInvoice={(entry) => {
           setJumpInvoice({ ...entry, _t: Date.now() });
@@ -13843,14 +13841,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   setActive("proposals");
                 }}
 
-                onNewInvoice={(proj, editInv) => {
+           onNewInvoice={(proj, editInv) => {
                   if (!proj) return;
-                  setPrevActiveBeforeInvoice(active);
                   setJumpInvoice(null);
-                  setInvoicePrefill({ client: proj.client || "", project: proj.name || "", _t: Date.now(), skipTemplateStep: true, ...(editInv ? { editData: editInv, projectId: proj._id } : {}) });
-                  setSidebarNavClickId(id => id + 1);
-                  setSidebarOverride("projects");
-                  setActive("invoices");
+                  setInvoicePrefill({ client: proj.client || "", project: proj.name || "", _t: Date.now(), projectId: proj._id, ...(editInv ? { editData: editInv } : {}) });
+                  setShowMobileInvoiceModal(true);
                 }}
                 onViewInvoice={(entry) => {
                   setJumpInvoice({ ...entry, _t: Date.now() });

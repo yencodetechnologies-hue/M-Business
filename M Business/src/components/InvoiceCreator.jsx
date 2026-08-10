@@ -908,7 +908,21 @@ const [sortOrder, setSortOrder] = useState("desc");
     try { localStorage.setItem("invoiceCreatorItems_subadmin", JSON.stringify(items)); } catch (e) { }
   }, [items]);
   const [editingId, setEditingId] = useState(null); // backend _id if editing existing
-  const [templateConfirmed, setTemplateConfirmed] = useState(() => !!(newInvoicePrefill && newInvoicePrefill.skipTemplateStep)); // gate: Invoice Details form hidden until a template is picked
+  const [templateConfirmed, setTemplateConfirmed] = useState(() => !!(newInvoicePrefill && newInvoicePrefill.skipTemplateStep));
+
+  // Reset the Template gate whenever we land on the "form" step for a brand
+  // new invoice (no editingId, no explicit skip flag) — this covers entry
+  // points that open the form directly (e.g. Dashboard "Create Invoice",
+  // bottom-nav "Invoice") which don't go through clearForm().
+  const prevStepRef = useRef(step);
+  useEffect(() => {
+    const wasNotForm = prevStepRef.current !== "form";
+    prevStepRef.current = step;
+    if (step === "form" && wasNotForm && !editingId) {
+      const shouldSkip = !!(newInvoicePrefill && newInvoicePrefill.skipTemplateStep);
+      setTemplateConfirmed(shouldSkip);
+    }
+  }, [step]);
 
 
 
@@ -2494,39 +2508,8 @@ const [sortOrder, setSortOrder] = useState("desc");
             </div>
           </div>
 
-          {/* FROM (SENDER) */}
-          {/* <div className="inv-creator-card">
-            <div className="inv-creator-card-header">
-              <div className="inv-creator-card-icon" style={{background:"var(--teal-light)",color:"var(--teal)"}}><i className="ti ti-building"></i></div>
-              <div className="inv-creator-card-title">From (Your Details)</div>
-            </div>
-            <div className="inv-creator-card-body">
-              <div className="inv-creator-form-row">
-                <div className="inv-creator-form-group">
-                  <label className="inv-creator-form-label">Company Name</label>
-                  <input className="inv-creator-form-input" type="text" value={inv.companyName} onChange={(e) => upd("companyName", e.target.value)} />
-                </div>
-                <div className="inv-creator-form-group">
-                  <label className="inv-creator-form-label">GST Number</label>
-                  <input className="inv-creator-form-input" type="text" value={inv.fromGST || "33ABCDE1234F1Z5"} onChange={(e) => upd("fromGST", e.target.value)} />
-                </div>
-              </div>
-              <div className="inv-creator-form-row">
-                <div className="inv-creator-form-group">
-                  <label className="inv-creator-form-label">Email</label>
-                  <input className="inv-creator-form-input" type="email" value={inv.companyEmail} onChange={(e) => upd("companyEmail", e.target.value)} />
-                </div>
-                <div className="inv-creator-form-group">
-                  <label className="inv-creator-form-label">Phone</label>
-                  <input className="inv-creator-form-input" type="tel" value={inv.companyPhone} onChange={(e) => upd("companyPhone", e.target.value)} />
-                </div>
-              </div>
-              <div className="inv-creator-form-group">
-                <label className="inv-creator-form-label">Address</label>
-                <input className="inv-creator-form-input" type="text" value={inv.companyAddress} onChange={(e) => upd("companyAddress", e.target.value)} />
-              </div>
-            </div>
-          </div> */}
+
+
 
           {/* BILL TO (CLIENT) */}
           <div className="inv-creator-card">

@@ -1020,7 +1020,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
   const [filterMode, setFilterMode] = useState("all");
   const [sortMode, setSortMode] = useState("newest");
 
-  const [activeClientId, setActiveClientId] = useState(activeClientIdForReturn || (clients && clients.length > 0 ? clients[0]._id : null));
+  const [activeClientId, setActiveClientId] = useState(activeClientIdForReturn || null);
 
   // Keep the saved selection in sync so a page refresh (or re-login) reopens
   // the same client instead of falling back to the first one in the list.
@@ -2394,7 +2394,25 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
 {activeClient ? (
 
-<div className={`client-detail-panel ${isMobileWidth ? "client-detail-modal" : ""}`} style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minWidth: 0, background: "#fff", height: isMobileWidth ? "100%" : "auto", minHeight: isMobileWidth ? "100%" : "auto" }}>
+<div className={`client-detail-panel ${isMobileWidth ? "client-detail-modal" : ""}`} style={isMobileWidth ? {
+  position: "fixed",
+  top: "5vh",
+  left: "3vw",
+  right: "3vw",
+  bottom: "auto",
+  width: "94vw",
+  height: "85vh",
+  maxHeight: "85vh",
+  margin: 0,
+  zIndex: 3000,
+  borderRadius: 20,
+  boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
+  overflow: "hidden",
+  display: "flex",
+  flexDirection: "column",
+  minWidth: 0,
+  background: "#fff"
+} : { flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minWidth: 0, background: "#fff", height: "auto", minHeight: "auto" }}>
             <button onClick={() => setActiveClientId(null)} style={{ position: "sticky", top: 8, left: "100%", transform: "translateX(-8px)", width: 32, height: 32, borderRadius: "50%", background: "#F5FAFA", border: "1px solid #E0EEF0", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 16, color: "#607D86", zIndex: 10 }}><i className="ti ti-x"></i></button>            <button className="client-detail-modal-close" onClick={() => setActiveClientId(null)} style={{ display: "none" }}><i className="ti ti-x"></i></button>
 
 

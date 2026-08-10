@@ -382,10 +382,24 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
             max-width: 100% !important;
             overflow-x: hidden !important;
           }
-          .invoice-paper .inv-parties {
-            grid-template-columns: 1fr !important;
-            gap: 12px !important;
-            padding: 10px 12px !important;
+      .invoice-paper .inv-parties {
+            grid-template-columns: 1fr 1fr !important;
+            gap: 8px !important;
+            padding: 8px 10px !important;
+          }
+          .invoice-paper .inv-parties > div:last-child {
+            margin-left: 0 !important;
+            width: 100% !important;
+            font-size: 9px !important;
+          }
+          .invoice-paper .inv-party-label,
+          .invoice-paper .inv-party-name,
+          .invoice-paper .inv-party-detail,
+          .invoice-paper .inv-party-detail div {
+            font-size: 9px !important;
+          }
+          .invoice-paper .inv-parties strong {
+            font-size: 9px !important;
           }
           .invoice-paper .inv-title-word {
             font-size: 20px !important;

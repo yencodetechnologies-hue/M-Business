@@ -143,11 +143,14 @@ const CSS = `
 .mpv-prog-fill { height:100%; border-radius:20px; }
 .mpv-divider { height:1px; background:${P.bg}; margin:0 18px; }
 .mpv-card-bottom { padding:14px 18px; display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
-.mpv-card-meta { display:flex; flex-direction:column; gap:4px; min-width:0; }
+.mpv-card-meta { display:flex; flex-direction:column; gap:6px; min-width:0; }
 .mpv-card-meta-row { display:flex; align-items:center; gap:4px; font-size:10px; color:${P.textLight}; font-weight:600; white-space:nowrap; }
 .mpv-card-meta-row i { color:${P.primary}; font-size:12px; flex-shrink:0; }
 .mpv-card-budget { color:#059669 !important; font-weight:700 !important; }
 .mpv-card-budget i { color:#059669 !important; }
+.mpv-date-row { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; width:100%; }
+.mpv-date-col { display:flex; flex-direction:column; gap:2px; min-width:0; }
+.mpv-date-col-right { text-align:right; flex-shrink:0; margin-left:auto; }
 .mpv-team-stack { display:flex; }
 .mpv-team-stack .mpv-av { border:2px solid #fff; margin-right:-8px; }
 .mpv-av-extra { width:26px; height:26px; border-radius:50%; border:2px solid #fff;
@@ -244,14 +247,16 @@ const CSS = `
   .mpv-kpi-grid { grid-template-columns:repeat(2,1fr); }
   .mpv-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
-    overflow-x: hidden;
+    overflow: visible;
     padding-bottom: 0;
   }
   .mpv-grid .mpv-card {
     width: 100%;
     max-width: 100%;
+    min-width: 0;
+    overflow: hidden;
   }
   .mpv-card-top { padding: 12px 12px 0; }
   .mpv-card-title { font-size: 13px; margin-bottom: 3px; }
@@ -264,7 +269,9 @@ const CSS = `
   .mpv-card-bottom { padding: 10px 12px; flex-wrap: wrap; gap: 6px; }
   .mpv-card-meta-row { font-size: 9px; }
   .mpv-dl-lbl { font-size: 8px; }
-  .mpv-dl-val { font-size: 10px; }
+  .mpv-dl-val { font-size: 8px; }
+  .mpv-date-row { gap: 8px; }
+  .mpv-date-col { min-width: 45%; }
 }
     .mpv-grid.list {
     display: flex;
@@ -712,27 +719,31 @@ export default function ModernProjectsView({
                             {taskText}
                           </div>
                         )}
-                        {p.start && (
-                          <div className="mpv-card-meta-row">
-                            <i className="ti ti-calendar-event" />
-                            Start: {fmtDate(p.start)}
+                        <div className="mpv-date-row">
+                          {p.start && (
+                            <div className="mpv-date-col">
+                              <div className="mpv-dl-lbl">Start Date</div>
+                              <div className="mpv-card-meta-row">
+                                <i className="ti ti-calendar-event" />
+                                {fmtDate(p.start)}
+                              </div>
+                            </div>
+                          )}
+                          <div className="mpv-date-col mpv-date-col-right">
+                            <div className="mpv-dl-lbl">
+                              {statusCls === 'completed' ? 'Delivered' : 'Deadline'}
+                            </div>
+                            <div className="mpv-dl-val" style={{ color: dlColor, fontSize: 11, fontWeight: 700 }}>
+                              {fmtDate(deadline)}
+                            </div>
                           </div>
-                        )}
+                        </div>
                         {p.budget ? (
                           <div className="mpv-card-meta-row mpv-card-budget">
                             <i className="ti ti-currency-rupee" />
                             Budget: {p.currency || '₹'}{Number(p.budget).toLocaleString('en-IN')}
                           </div>
                         ) : null}
-                      </div>
-                    </div>
-
-                    <div className="mpv-deadline">
-                      <div className="mpv-dl-lbl">
-                        {statusCls === 'completed' ? 'Delivered' : 'Deadline'}
-                      </div>
-                      <div className="mpv-dl-val" style={{ color: dlColor, fontSize: 9, fontWeight: 700 }}>
-                        {fmtDate(deadline)}
                       </div>
                     </div>
                   </div>

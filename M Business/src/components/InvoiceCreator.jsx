@@ -1604,9 +1604,20 @@ const [sortOrder, setSortOrder] = useState("desc");
       <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "var(--app-bg)", minHeight: "100vh", padding: "40px 20px" }}>
 
         <div className="no-print" style={{ display: "flex", gap: 12, justifyContent: "center", marginBottom: 30 }}>
-          <button onClick={() => jumpInvoice ? onBack() : (setEditingReceipt(false), setStep("list"))} style={{ padding: "12px 24px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>{jumpInvoice ? " Back to Dashboard" : " Back to List"}</button>
-          {!editingReceipt && <button onClick={() => setEditingReceipt(true)} style={{ padding: "12px 24px", background: "#fff7ed", border: "1.5px solid #fed7aa", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#ea580c", fontFamily: "inherit" }}>Edit</button>}
-          {!editingReceipt && <button onClick={() => window.print()} style={{ padding: "12px 28px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#fff", fontFamily: "inherit", boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237),0.3)" }}>Print Receipt</button>}
+        <button onClick={() => jumpInvoice ? onBack() : (setEditingReceipt(false), setStep("list"))} style={{ padding: "12px 24px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>{jumpInvoice ? " Back to Dashboard" : " Back to List"}</button>
+
+{!editingReceipt && (
+  <button
+    onClick={() => {
+      const entry = invoiceList.find(e => (e._id || e.id) === editingId) || { inv, items };
+      loadEntry(entry, "form");
+      window.scrollTo(0, 0);
+    }}
+    style={{ padding: "12px 24px", background: "#eef2ff", border: "1.5px solid #c7d2fe", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#4338ca", fontFamily: "inherit" }}
+  >
+    Edit Invoice
+  </button>
+)}  {!editingReceipt && <button onClick={() => window.print()} style={{ padding: "12px 28px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#fff", fontFamily: "inherit", boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237),0.3)" }}>Print Receipt</button>}
         </div>
 
         <div className="receipt-paper" style={{ maxWidth: 500, margin: "0 auto", background: "var(--app-card)", borderRadius: 24, boxShadow: "var(--app-shadow)", overflow: "hidden", border: "1px solid var(--app-border)" }}>
@@ -2235,12 +2246,19 @@ const [sortOrder, setSortOrder] = useState("desc");
         </div>
 
         {step === "preview" && viewAsModal && (
-          <div style={{ position: "fixed", inset: 0, zIndex: 999999, background: "rgba(15,28,46,0.55)", overflowY: "auto", padding: "20px 12px" }} onClick={() => { if (jumpInvoice && onBack) { onBack(); } else { setStep("list"); } }}>
+          <div style={{ position: "fixed", inset: 0, zIndex: 999999, background: "rgba(15,28,46,0.55)", overflowY: "auto", padding: "20px 12px" }} onClick={() => { if (onBack) { onBack(); } else { setStep("list"); } }}>
             <div className="invoice-preview-modal-wrap" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 830, margin: "0 auto", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
               <div className="no-print" style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 4, flexWrap: "wrap" }}>
-                <button onClick={() => { if (jumpInvoice && onBack) { onBack(); } else { setStep("list"); } }} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>Close</button>
-                <button onClick={() => setShareModalEntry({ id: editingId, invoiceNo: inv.invoiceNo, total: total })} style={{ padding: "10px 22px", background: "#eff6ff", border: "1.5px solid #bfdbfe", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#2563eb", fontFamily: "inherit" }}>Share</button>
-                <button onClick={() => triggerPDFShare({ id: editingId, invoiceNo: inv.invoiceNo, total: total }, "print")} style={{ padding: "10px 22px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>Print / PDF</button>
+              <button onClick={() => { if (onBack) { onBack(); } else { setStep("list"); } }} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>Close</button>
+<button
+  onClick={() => {
+    const entry = invoiceList.find(e => (e._id || e.id) === editingId) || { inv, items };
+    loadEntry(entry, "form");
+    window.scrollTo(0, 0);
+  }}
+  style={{ padding: "10px 22px", background: "#fff7ed", border: "1.5px solid #fed7aa", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#ea580c", fontFamily: "inherit" }}
+>Edit</button>
+<button onClick={() => setShareModalEntry({ id: editingId, invoiceNo: inv.invoiceNo, total: total })} style={{ padding: "10px 22px", background: "#eff6ff", border: "1.5px solid #bfdbfe", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#2563eb", fontFamily: "inherit" }}>Share</button>  <button onClick={() => triggerPDFShare({ id: editingId, invoiceNo: inv.invoiceNo, total: total }, "print")} style={{ padding: "10px 22px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>Print / PDF</button>
               </div>
               <InvoiceLivePreview
                 inv={inv} items={items} effectiveLogo={effectiveLogo} effectiveCompanyName={effectiveCompanyName}

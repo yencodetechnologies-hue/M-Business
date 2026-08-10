@@ -14110,7 +14110,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
             {validActive === "invoices" && !(typeof window !== "undefined" && window.innerWidth < 769) && <InvoiceCreator key={`invoices-full-${sidebarNavClickId}`} forceListView={true} onConsumeForceListView={() => { }} user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={() => { setSidebarOverride(null); setActive("dashboard"); }} onSaveSuccess={() => { setActive("invoices"); }} jumpInvoice={null} newInvoicePrefill={invoicePrefill || jumpInvoicePrefill} newClientName={pendingInvoiceClientName} onNewClientConsumed={() => setPendingInvoiceClientName(null)} onAddClient={() => { }} onAddProject={() => { setJumpProject(null); setActive("create-project"); }} />}
 
-            {validActive === "invoiceDetails" && <InvoiceCreator key={`invoices-${sidebarNavClickId}`} forceListView={false} onConsumeForceListView={() => { }} user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={() => { setSidebarOverride(null); setActive("dashboard"); }} onSaveSuccess={() => {
+            {validActive === "invoiceDetails" && <InvoiceCreator key={`invoices-${sidebarNavClickId}`} forceListView={false} onConsumeForceListView={() => { }} user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={() => { setSidebarOverride(null); setActive("invoices"); }} onSaveSuccess={() => {
               if (jumpProject && (jumpProject._id || jumpProject.id)) {
                 setSidebarOverride(sidebarOverride || "projects");
                 setActive("project-details");
@@ -14210,7 +14210,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 onAddProject={() => { }}
               />
             )}
-            {validActive === "quotations" && <QuotationCreatorModern key={quotationViewEntry ? `view-${quotationViewEntry._id || quotationViewEntry.id}` : (quotationReturnProject ? `new-${quotationReturnProject._id}` : 'list')} user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} prefillProject={quotationPrefillProject} onPrefillConsumed={() => setQuotationPrefillProject(null)} initialViewEntry={quotationViewEntry} onBackOverride={quotationViewEntry ? () => {
+            {validActive === "quotations" && !quotationViewEntry && typeof window !== "undefined" && window.innerWidth < 769 && <QuotationsListPage quotations={quotations} onViewQuotation={(q) => { setQuotationViewEntry(q); setSidebarOverride("dashboard"); }} onBack={() => setActive("dashboard")} />}
+            {validActive === "quotations" && (quotationViewEntry || !(typeof window !== "undefined" && window.innerWidth < 769)) && <QuotationCreatorModern key={quotationViewEntry ? `view-${quotationViewEntry._id || quotationViewEntry.id}` : (quotationReturnProject ? `new-${quotationReturnProject._id}` : 'list')} user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} prefillProject={quotationPrefillProject} onPrefillConsumed={() => setQuotationPrefillProject(null)} initialViewEntry={quotationViewEntry} onBackOverride={quotationViewEntry ? () => {
               setQuotationViewEntry(null);
               if (sidebarOverride === "dashboard") {
                 setSidebarOverride(null);
@@ -14228,7 +14229,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
             }} onAddProject={() => { setPrevActiveBeforeInvoice(active); setActive("create-project"); }} newlyAddedClientName={quotationNewClientName} />}
 
-            {validActive === "proposals" && <ProjectProposalCreator key={proposalViewEntry ? `view-${proposalViewEntry._id || proposalViewEntry.id}` : 'list'} clients={clients} companyLogo={companyLogo} companyName={companyNameStr} prefillProject={proposalPrefillProject} onPrefillConsumed={() => setProposalPrefillProject(null)} initialViewProposal={proposalViewEntry} onBackOverride={proposalViewEntry ? () => {
+            {validActive === "proposals" && !proposalViewEntry && typeof window !== "undefined" && window.innerWidth < 769 && <ProposalsListPage proposals={proposalsList} onViewProposal={(p) => { setProposalViewEntry(p); setSidebarOverride("dashboard"); }} onBack={() => setActive("dashboard")} />}
+            {validActive === "proposals" && (proposalViewEntry || !(typeof window !== "undefined" && window.innerWidth < 769)) && <ProjectProposalCreator key={proposalViewEntry ? `view-${proposalViewEntry._id || proposalViewEntry.id}` : 'list'} clients={clients} companyLogo={companyLogo} companyName={companyNameStr} prefillProject={proposalPrefillProject} onPrefillConsumed={() => setProposalPrefillProject(null)} initialViewProposal={proposalViewEntry} onBackOverride={proposalViewEntry ? () => {
               setProposalViewEntry(null);
               if (sidebarOverride === "dashboard") {
                 setSidebarOverride(null);

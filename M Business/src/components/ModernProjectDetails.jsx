@@ -151,6 +151,73 @@ const CSS = `
 .mpd-acc-actions > *, .mpd-acc-stats > *, .mpd-acc-boxes > * { flex:1 1 220px; min-width:220px; }
 
 @media (max-width: 768px) {
+  .mpd-acc-actions,
+  .mpd-acc-boxes {
+    flex-direction: column;
+    overflow-x: visible;
+  }
+  .mpd-acc-actions > *,
+  .mpd-acc-boxes > * {
+    width: 100%;
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+  .mpd-acc-stats {
+    overflow-x: visible;
+    gap: 6px;
+  }
+  .mpd-acc-stats > * {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 10px 8px !important;
+  }
+  .mpd-acc-stats > * > div:first-child {
+    font-size: 9px !important;
+  }
+  .mpd-acc-stats > * > div:nth-child(2) {
+    font-size: 13px !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .mpd-acc-stats > * > div:last-child {
+    font-size: 9px !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+@media (max-width: 768px) {
+  .mpd-acc-actions,
+  .mpd-acc-boxes {
+    flex-direction: column;
+    overflow-x: visible;
+  }
+  .mpd-acc-actions > *,
+  .mpd-acc-boxes > * {
+    width: 100%;
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+  .mpd-acc-stats {
+    overflow-x: visible;
+    gap: 6px;
+  }
+  .mpd-acc-stats > * {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 10px 8px !important;
+  }
+  .mpd-acc-stats > * > div:first-child {
+    font-size: 10px !important;
+  }
+  .mpd-acc-stats > * > div:last-child > div:first-child {
+    font-size: 14px !important;
+  }
+}
+
+@media (max-width: 768px) {
   .mpd-acc-actions {
     flex-direction: column;
     overflow-x: visible;

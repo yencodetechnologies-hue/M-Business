@@ -445,9 +445,7 @@ export default function ModernProjectsView({
           <option value="progress">By Progress</option>
         </select>
        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ fontSize: 12, color: P.textLight, fontWeight: 600 }}>
-            {paginated.length} of {displayed.length} projects
-          </span>
+         
           <div className="mpv-view-btns">
             <button
               className={`mpv-vb${view === 'grid' ? ' on' : ''}`}

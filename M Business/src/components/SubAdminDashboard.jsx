@@ -5385,6 +5385,14 @@ return (
 
   return (
     <div>
+      {/* Back to Dashboard — top-left, fixed position for every page */}
+      <div
+        onClick={() => { window.__fullProjectsList = false; setActive("dashboard"); }}
+        style={{ display: "flex", alignItems: "center", gap: 6, padding: "16px 16px 4px", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #00BCD4)" }}
+      >
+        <i className="ti ti-arrow-left" style={{ fontSize: 16 }}></i> Back to Dashboard
+      </div>
+
       <ModernProjectsView
 
         projects={projectsWithProgress}
@@ -14118,7 +14126,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
             {validActive === "invoices" && !(typeof window !== "undefined" && window.innerWidth < 769) && <InvoiceCreator key={`invoices-full-${sidebarNavClickId}`} forceListView={true} onConsumeForceListView={() => { }} user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={() => { setSidebarOverride(null); setActive("dashboard"); }} onSaveSuccess={() => { setActive("invoices"); }} jumpInvoice={null} newInvoicePrefill={invoicePrefill || jumpInvoicePrefill} newClientName={pendingInvoiceClientName} onNewClientConsumed={() => setPendingInvoiceClientName(null)} onAddClient={() => { }} onAddProject={() => { setJumpProject(null); setActive("create-project"); }} />}
 
-            {validActive === "invoiceDetails" && <InvoiceCreator key={`invoices-${sidebarNavClickId}`} forceListView={false} onConsumeForceListView={() => { }} user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={() => { setSidebarOverride(null); setActive("invoices"); }} onSaveSuccess={() => {
+            {validActive === "invoiceDetails" && <InvoiceCreator key={`invoices-${sidebarNavClickId}`} forceListView={false} onConsumeForceListView={() => { }} user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={() => { setSidebarOverride(null); setActive("dashboard"); }} onSaveSuccess={() => {
               if (jumpProject && (jumpProject._id || jumpProject.id)) {
                 setSidebarOverride(sidebarOverride || "projects");
                 setActive("project-details");

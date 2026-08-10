@@ -2325,7 +2325,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
 
       {/* LEFT-PANEL + DETAIL VIEW (always visible, embedded below stat cards) */}
- <div className="client-detail-layout" style={{ display: "flex", position: "relative", flex: 1, minHeight: 0, maxHeight: "60vh", background: "#fff", marginTop: 4, border: "1.5px solid #E0EEF0", borderRadius: 14, overflow: "hidden" }}>
+ <div className="client-detail-layout" style={{ display: "flex", position: "relative", flex: 1, minHeight: 0, maxHeight: isMobileWidth ? "none" : "60vh", background: "#fff", marginTop: 4, border: isMobileWidth ? "none" : "1.5px solid #E0EEF0", borderRadius: isMobileWidth ? 0 : 14, overflow: isMobileWidth ? "visible" : "hidden" }}>
         <div className="client-list-panel" style={{ width: 260, minWidth: 260, borderRight: "1.5px solid #E0EEF0", display: "flex", flexDirection: "column", background: "#fff", overflow: "hidden" }}>
 
           {/* Search + Add */}

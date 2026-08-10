@@ -149,6 +149,18 @@ const CSS = `
 }
 .mpd-acc-actions, .mpd-acc-stats, .mpd-acc-boxes { display:flex; gap:10px; width:100%; box-sizing:border-box; overflow-x:auto; -webkit-overflow-scrolling:touch; }
 .mpd-acc-actions > *, .mpd-acc-stats > *, .mpd-acc-boxes > * { flex:1 1 220px; min-width:220px; }
+
+@media (max-width: 768px) {
+  .mpd-acc-actions {
+    flex-direction: column;
+    overflow-x: visible;
+  }
+  .mpd-acc-actions > * {
+    width: 100%;
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+}
 .mpd-prog-num { font-size:22px; font-weight:900; color:${P.textDark}; letter-spacing:-.3px; }
 .mpd-prog-lbl { font-size:11px; color:${P.textLight}; font-weight:700; text-transform:uppercase; letter-spacing:.6px; margin-bottom:8px; }
 .mpd-progress-bg { background:${P.bg}; border-radius:20px; height:8px; overflow:hidden; margin-right:6px; }
@@ -1926,22 +1938,22 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         <div className="mpd-header-portal-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'stretch', marginBottom: 24 }}>
           <div className="mpd-proj-header" style={{ flex: '1 1 50%', minWidth: 0, paddingTop: 8, paddingLeft: 6, paddingRight: 6, height: '100%', boxSizing: 'border-box', flexWrap: 'nowrap' }}>
             <div className="mpd-ph-left">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8, flexWrap: 'nowrap', minWidth: 0 }}>
-                <div className="mpd-proj-name" title={projName} style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", minWidth: 0, flex: '1 1 auto' }}>{projName}</div>
-                <span className={`mpd-status-badge ${badgeClass}`} style={{ flexShrink: 0 }}>{currProject.status || 'Active'}</span>
-                <span className={`mpd-prio ${prioClass}`} style={{ flexShrink: 0 }}>{priority.charAt(0).toUpperCase() + priority.slice(1)}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+                <div className="mpd-proj-name" title={projName} style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", minWidth: 0, maxWidth: "100%" }}>{projName}</div>
+                <span className={`mpd-status-badge ${badgeClass}`}>{currProject.status || 'Active'}</span>
+                <span className={`mpd-prio ${prioClass}`}>{priority.charAt(0).toUpperCase() + priority.slice(1)}</span>
               </div>
-              <div className="mpd-proj-desc" style={{ wordBreak: 'break-word', overflowWrap: 'break-word', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{currProject.description || "No description provided for this project."}</div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, minWidth: 0 }}>
-                <div className="mpd-pm-item" title={clientName} style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}><i className="ti ti-building"></i> Client: <strong>{clientName}</strong></div>
-                <div className="mpd-pm-item" title={category} style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}><i className="ti ti-tag"></i> Category: <strong>{category}</strong></div>
-                <div className="mpd-pm-item" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}><i className="ti ti-calendar"></i> Start Date: <strong>{startD}</strong></div>
-                <div className="mpd-pm-item" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}><i className="ti ti-calendar-due"></i> End Date: <strong>{endD}</strong></div>
+              <div className="mpd-proj-desc" style={{ wordBreak: 'break-word', overflowWrap: 'break-word', whiteSpace: 'pre-wrap' }}>{currProject.description || "No description provided for this project."}</div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                <div className="mpd-pm-item"><i className="ti ti-building"></i> Client: <strong>{clientName}</strong></div>
+                <div className="mpd-pm-item"><i className="ti ti-tag"></i> Category: <strong>{category}</strong></div>
+                <div className="mpd-pm-item"><i className="ti ti-calendar"></i> Start Date: <strong>{startD}</strong></div>
+                <div className="mpd-pm-item"><i className="ti ti-calendar-due"></i> End Date: <strong>{endD}</strong></div>
                 {(currProject.contactPersonNo || clients?.find(c => (c.clientName || c.name) === clientName)?.contactPersonNo) && (
-                  <div className="mpd-pm-item" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}><i className="ti ti-phone"></i> Contact Phone: <strong>{currProject.contactPersonNo || clients?.find(c => (c.clientName || c.name) === clientName)?.contactPersonNo}</strong></div>
+                  <div className="mpd-pm-item"><i className="ti ti-phone"></i> Contact Phone: <strong>{currProject.contactPersonNo || clients?.find(c => (c.clientName || c.name) === clientName)?.contactPersonNo}</strong></div>
                 )}
                 {(currProject.phone || clients?.find(c => (c.clientName || c.name) === clientName)?.phone) && (
-                  <div className="mpd-pm-item" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}><i className="ti ti-phone-call"></i> Office Phone: <strong>{currProject.phone || clients?.find(c => (c.clientName || c.name) === clientName)?.phone}</strong></div>
+                  <div className="mpd-pm-item"><i className="ti ti-phone-call"></i> Office Phone: <strong>{currProject.phone || clients?.find(c => (c.clientName || c.name) === clientName)?.phone}</strong></div>
                 )}
               </div>
             </div>

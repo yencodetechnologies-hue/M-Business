@@ -16377,7 +16377,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             )}
 
           </div>
-          {!isDesktopWidth && ["clients", "employees", "managers", "projects", "invoices", "quotations", "proposals", "project-details", "edit-project", "create-project"].includes(validActive) && (
+          
+        </div>
+{!isDesktopWidth && ["clients", "employees", "managers", "projects", "invoices", "quotations", "proposals", "project-details", "edit-project", "create-project"].includes(validActive) && (
             <div
               onClick={() => setActive("dashboard")}
               style={{ display: "flex", alignItems: "center", gap: 6, padding: "12px 16px", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #00BCD4)", background: "#fff", borderBottom: "1px solid var(--app-border)" }}
@@ -16385,8 +16387,6 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               <i className="ti ti-arrow-left" style={{ fontSize: 16 }}></i> Back to Dashboard
             </div>
           )}
-        </div>
-
       </div >
 
     </div >

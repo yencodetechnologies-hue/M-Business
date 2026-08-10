@@ -2835,7 +2835,7 @@ function UnpaidInvoicesListPage({ invoices, onViewInvoice, onBack }) {
 
       {/* Back to Dashboard — top-left, fixed position for every page */}
       <div
-      onClick={() => setActive("dashboard")}
+      onClick={() => onBack && onBack()}
         style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 4px 16px", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #00BCD4)" }}
       >
         <i className="ti ti-arrow-left" style={{ fontSize: 16 }}></i> Back to Dashboard

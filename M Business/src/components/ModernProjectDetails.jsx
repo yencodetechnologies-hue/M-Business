@@ -65,6 +65,11 @@ const CSS = `
   .mpd-prog-divider { display: none; }
   .mpd-card-header { flex-wrap: wrap; gap: 10px; }
   .mpd-header-portal-grid { grid-template-columns: 1fr !important; }
+  .mpd-milestones-card { padding: 20px 16px !important; }
+  .mpd-milestones-card .mpd-card-header { gap: 8px !important; margin-bottom: 4px !important; }
+  .mpd-milestones-card button { font-size: 10px !important; padding: 5px 8px !important; }
+  .mpd-milestones-card .mpd-btn-outline { padding: 5px 10px !important; }
+  .mpd-milestones-card .mpd-btn-outline i { font-size: 12px; }
 }
 
 /* BUTTONS */
@@ -97,7 +102,8 @@ const CSS = `
   .mpd-ph-right { align-items: flex-start; width: 100%; }
 }
 .mpd-proj-header::before { content:''; position:absolute; top:-40px; right:-40px; width:180px; height:180px; background:radial-gradient(circle,rgba(0,188,212,.08) 0%,transparent 70%); pointer-events:none; }
-.mpd-ph-left .mpd-proj-name { font-size:24px; font-weight:900; color:${P.textDark}; margin-bottom:8px; letter-spacing:-.3px; }
+.mpd-ph-left .mpd-proj-name { font-size:24px; font-weight:900; color:${P.textDark}; margin-bottom:8px; letter-spacing:-.3px; min-width:0; max-width:100%; }
+.mpd-ph-left { min-width:0; max-width:100%; }
 .mpd-ph-left .mpd-proj-desc { font-size:13px; color:${P.textMid}; line-height:1.7; max-width:560px; margin-bottom:14px; }
 .mpd-ph-meta { display:flex; gap:20px; flex-wrap:wrap; }
 .mpd-pm-item { display:flex; align-items:center; gap:6px; font-size:12px; color:${P.textMid}; background:${P.bg}; padding:5px 10px; border-radius:8px; }
@@ -236,6 +242,13 @@ const CSS = `
 @media (max-width: 480px) {
   .mpd-task-filters { gap:6px; }
   .mpd-tf { padding:4px 10px; font-size:11px; margin-right:6px; }
+  .mpd-pm-item { font-size:11px; padding:5px 8px; flex-wrap:wrap; }
+  .mpd-pm-item strong { white-space:normal; word-break:break-word; overflow-wrap:anywhere; }
+}
+@media (max-width: 600px) {
+  .mpd-portal-actions { gap:6px !important; }
+  .mpd-portal-btn { font-size:10px !important; padding:8px 4px !important; gap:4px !important; white-space:nowrap; }
+  .mpd-portal-btn i { font-size:13px; }
 }
 
 .mpd-tf.mpd-on, .mpd-tf:hover { background:linear-gradient(135deg,${P.primary},${P.primaryDark}); border-color:${P.primary}; color:#fff; box-shadow:0 3px 10px rgba(0,188,212,.3); }
@@ -1979,8 +1992,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         <div className="mpd-header-portal-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'stretch', marginBottom: 24 }}>
           <div className="mpd-proj-header" style={{ flex: '1 1 50%', minWidth: 0, paddingTop: 8, paddingLeft: 6, paddingRight: 6, height: '100%', boxSizing: 'border-box', flexWrap: 'nowrap' }}>
             <div className="mpd-ph-left">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
-                <div className="mpd-proj-name" title={projName} style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", minWidth: 0, maxWidth: "100%" }}>{projName}</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8, minWidth: 0, maxWidth: '100%', flexWrap: 'wrap' }}>
+                <div className="mpd-proj-name" title={projName} style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", minWidth: 0, maxWidth: "100%", flex: "1 1 auto" }}>{projName}</div>
                 <span className={`mpd-status-badge ${badgeClass}`}>{currProject.status || 'Active'}</span>
                 <span className={`mpd-prio ${prioClass}`}>{priority.charAt(0).toUpperCase() + priority.slice(1)}</span>
               </div>
@@ -2029,21 +2042,21 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 </span>
                 <button onClick={copyPortalLink} style={{ flexShrink: 0, padding: '4px 10px', borderRadius: 6, border: 'none', background: 'rgba(255,255,255,0.25)', color: '#fff', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>Copy</button>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+          <div className="mpd-portal-actions" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                 <button onClick={async () => {
                   const link = portalLinkUrl || await generatePortalLink();
                   if (!link) return;
                   window.open(link, '_blank');
-                }} style={{ padding: '10px', borderRadius: 9, border: 'none', background: '#fff', color: P.primaryDark, fontSize: 12, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                }} className="mpd-portal-btn" style={{ padding: '10px', borderRadius: 9, border: 'none', background: '#fff', color: P.primaryDark, fontSize: 12, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
                   <i className="ti ti-external-link"></i> Open Portal
                 </button>
-                <button onClick={copyPortalLink} style={{ padding: '10px', borderRadius: 9, border: '1.5px solid rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.1)', color: '#fff', fontSize: 12, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                <button onClick={copyPortalLink} className="mpd-portal-btn" style={{ padding: '10px', borderRadius: 9, border: '1.5px solid rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.1)', color: '#fff', fontSize: 12, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
                   <i className="ti ti-copy"></i> Copy Link
                 </button>
-                <button onClick={sharePortalLinkViaWhatsApp} style={{ padding: '10px', borderRadius: 9, border: 'none', background: '#25D366', color: '#fff', fontSize: 12, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                <button onClick={sharePortalLinkViaWhatsApp} className="mpd-portal-btn" style={{ padding: '10px', borderRadius: 9, border: 'none', background: '#25D366', color: '#fff', fontSize: 12, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
                   <i className="ti ti-brand-whatsapp"></i> WhatsApp
                 </button>
-                <button onClick={sharePortalLinkViaEmail} style={{ padding: '10px', borderRadius: 9, border: '1.5px solid rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.1)', color: '#fff', fontSize: 12, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                <button onClick={sharePortalLinkViaEmail} className="mpd-portal-btn" style={{ padding: '10px', borderRadius: 9, border: '1.5px solid rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.1)', color: '#fff', fontSize: 12, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
                   <i className="ti ti-mail"></i> Email Link
                 </button>
               </div>

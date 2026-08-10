@@ -5423,7 +5423,7 @@ return (
         }}
         onNewInvoice={(p, editInv, editIdx) => {
           if (!p) return;
-          if (setInvoicePrefill) setInvoicePrefill({ client: p.client || "", project: p.name || "", _t: Date.now(), ...(editInv ? { editData: editInv, editIndex: editIdx, projectId: p._id } : {}) });
+          if (setInvoicePrefill) setInvoicePrefill({ client: p.client || "", project: p.name || "", _t: Date.now(), skipTemplateStep: true, ...(editInv ? { editData: editInv, editIndex: editIdx, projectId: p._id } : {}) });
           if (setJumpInvoice) setJumpInvoice(true);
           setPrevActiveBeforeInvoice(active);
           if (setActive) setActive("invoices");
@@ -13847,7 +13847,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   if (!proj) return;
                   setPrevActiveBeforeInvoice(active);
                   setJumpInvoice(null);
-                  setInvoicePrefill({ client: proj.client || "", project: proj.name || "", _t: Date.now(), ...(editInv ? { editData: editInv, projectId: proj._id } : {}) });
+                  setInvoicePrefill({ client: proj.client || "", project: proj.name || "", _t: Date.now(), skipTemplateStep: true, ...(editInv ? { editData: editInv, projectId: proj._id } : {}) });
                   setSidebarNavClickId(id => id + 1);
                   setSidebarOverride("projects");
                   setActive("invoices");

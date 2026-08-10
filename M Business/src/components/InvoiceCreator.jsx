@@ -697,6 +697,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
 
   useEffect(() => {
     if (newInvoicePrefill) {
+      setTemplateConfirmed(!!newInvoicePrefill.skipTemplateStep);
       if (newInvoicePrefill.editData) {
         loadEntry(newInvoicePrefill.editData, newInvoicePrefill.readOnly ? "preview" : "form");
         return;
@@ -907,6 +908,7 @@ const [sortOrder, setSortOrder] = useState("desc");
     try { localStorage.setItem("invoiceCreatorItems_subadmin", JSON.stringify(items)); } catch (e) { }
   }, [items]);
   const [editingId, setEditingId] = useState(null); // backend _id if editing existing
+  const [templateConfirmed, setTemplateConfirmed] = useState(() => !!(newInvoicePrefill && newInvoicePrefill.skipTemplateStep)); // gate: Invoice Details form hidden until a template is picked
 
 
 
@@ -1133,6 +1135,7 @@ const [sortOrder, setSortOrder] = useState("desc");
     setErrors({});
     setEditingId(null);
     setLocalEditTarget(null);
+    setTemplateConfirmed(false);
   };
 
   // ── API save ------------------------------------------------

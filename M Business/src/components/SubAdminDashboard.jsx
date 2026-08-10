@@ -14106,7 +14106,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-            {validActive === "invoices" && typeof window !== "undefined" && window.innerWidth < 769 && <InvoicesListPage invoices={invoices} clients={clients} projects={projects} onViewInvoice={(inv) => { setJumpInvoice({ ...inv, _t: Date.now() }); setPrevActiveBeforeInvoice("invoices"); setActive("invoiceDetails"); }} onViewClient={(c) => { setActiveClientIdForReturn(c._id); setActive("clients"); }} onViewProject={(p) => { setJumpProject(p); setProjectDetailsReadOnly(false); setSidebarOverride("dashboard"); setActive("project-details"); }} />}
+            {validActive === "invoices" && typeof window !== "undefined" && window.innerWidth < 769 && <InvoicesListPage invoices={invoices} clients={clients} projects={projects} onViewInvoice={(inv) => { setJumpInvoice({ ...inv, _t: Date.now() }); }} onViewClient={(c) => { setActiveClientIdForReturn(c._id); setActive("clients"); }} onViewProject={(p) => { setJumpProject(p); setProjectDetailsReadOnly(false); setSidebarOverride("dashboard"); setActive("project-details"); }} />}
 
             {validActive === "invoices" && !(typeof window !== "undefined" && window.innerWidth < 769) && <InvoiceCreator key={`invoices-full-${sidebarNavClickId}`} forceListView={true} onConsumeForceListView={() => { }} user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={() => { setSidebarOverride(null); setActive("dashboard"); }} onSaveSuccess={() => { setActive("invoices"); }} jumpInvoice={null} newInvoicePrefill={invoicePrefill || jumpInvoicePrefill} newClientName={pendingInvoiceClientName} onNewClientConsumed={() => setPendingInvoiceClientName(null)} onAddClient={() => { }} onAddProject={() => { setJumpProject(null); setActive("create-project"); }} />}
 
@@ -14192,7 +14192,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               </div>
             )}
 
-            {validActive !== "invoices" && jumpInvoice && (
+            {jumpInvoice && (
               <InvoiceCreator
                 key={`invoice-overlay-${jumpInvoice._id || jumpInvoice.id || jumpInvoice.invoiceNo}-${jumpInvoice._t || 0}`}
                 forceListView={false}

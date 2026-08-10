@@ -96,7 +96,7 @@ const CSS = `
 .mpd-card-title i { color:${P.primary}; font-size:18px; }
 
 /* HEADER SECTION */
-.mpd-proj-header { background:#fff; border-radius:18px; padding:32px 36px !important; box-shadow:0 4px 24px rgba(0,188,212,.1), 0 0 0 1px rgba(0,188,212,.08); margin-bottom:20px; display:flex; flex-wrap: wrap; align-items:flex-start; justify-content:space-between; gap:20px; position:relative; overflow:visible; box-sizing: border-box !important; width: 100%; }
+.mpd-proj-header { background:#fff; border-radius:18px; padding:22px 28px !important; box-shadow:0 4px 24px rgba(0,188,212,.1), 0 0 0 1px rgba(0,188,212,.08); margin-bottom:20px; display:flex; flex-wrap: wrap; align-items:flex-start; justify-content:space-between; gap:20px; position:relative; overflow:visible; box-sizing: border-box !important; width: 100%; }
 @media (max-width: 700px) {
   .mpd-proj-header { flex-direction: column; }
   .mpd-ph-right { align-items: flex-start; width: 100%; }
@@ -106,7 +106,7 @@ const CSS = `
 .mpd-ph-left { min-width:0; max-width:100%; }
 .mpd-ph-left .mpd-proj-desc { font-size:13px; color:${P.textMid}; line-height:1.7; max-width:560px; margin-bottom:14px; }
 .mpd-ph-meta { display:flex; gap:20px; flex-wrap:wrap; }
-.mpd-pm-item { display:flex; align-items:center; gap:6px; font-size:12px; color:${P.textMid}; background:${P.bg}; padding:5px 10px; border-radius:8px; }
+.mpd-pm-item { display:flex; align-items:center; gap:6px; font-size:12px; color:${P.textMid}; background:${P.bg}; padding:8px 10px; border-radius:8px; box-sizing:border-box; min-height:34px; }
 .mpd-pm-item i { color:${P.primary}; font-size:14px; }
 .mpd-pm-item strong { color:${P.textDark}; font-weight:700; }
 .mpd-ph-right { display:flex; flex-direction:column; align-items:flex-end; gap:12px; margin-left: auto; }
@@ -145,13 +145,13 @@ const CSS = `
 /* PROGRESS — 4 separate equal-width summary cards */
 .mpd-prog-card { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-top:0; margin-bottom:0; }
 .mpd-prog-item > div:last-child { padding-right: 14px; box-sizing: border-box; }
-.mpd-prog-item { background:#fff; border-radius:16px; padding:32px 30px; box-shadow:0 2px 12px rgba(0,0,0,.07); border:1px solid rgba(0,0,0,.05); min-width:0; min-height:130px; box-sizing: border-box; overflow:hidden; }
+.mpd-prog-item { background:#fff; border-radius:16px; padding:16px 18px; box-shadow:0 2px 12px rgba(0,0,0,.07); border:1px solid rgba(0,0,0,.05); min-width:0; min-height:auto; box-sizing: border-box; overflow:hidden; }
 .mpd-prog-item .mpd-progress-bg { width:100%; }
 .mpd-prog-num { word-break: break-word; }
 @media (max-width: 900px) { .mpd-prog-card { grid-template-columns:repeat(2,1fr); } }
 @media (max-width: 480px) {
   .mpd-prog-card { grid-template-columns:repeat(2,1fr); gap:10px; }
-  .mpd-prog-item { padding:16px 12px !important; min-height:auto; }
+  .mpd-prog-item { padding:12px 10px !important; min-height:auto; }
 }
 .mpd-acc-actions, .mpd-acc-stats, .mpd-acc-boxes { display:flex; gap:10px; width:100%; box-sizing:border-box; overflow-x:auto; -webkit-overflow-scrolling:touch; }
 .mpd-acc-actions > *, .mpd-acc-stats > *, .mpd-acc-boxes > * { flex:1 1 220px; min-width:220px; }
@@ -242,7 +242,7 @@ const CSS = `
 @media (max-width: 480px) {
   .mpd-task-filters { gap:6px; }
   .mpd-tf { padding:4px 10px; font-size:11px; margin-right:6px; }
-  .mpd-pm-item { font-size:11px; padding:5px 8px; flex-wrap:wrap; }
+  .mpd-pm-item { font-size:11px; padding:8px 8px; flex-wrap:wrap; min-height:auto; }
   .mpd-pm-item strong { white-space:normal; word-break:break-word; overflow-wrap:anywhere; }
 }
 @media (max-width: 600px) {
@@ -1977,8 +1977,6 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         <div className="mpd-topbar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28, flexWrap: 'wrap', gap: 10 }}>
           <div className="mpd-breadcrumb" style={{ minWidth: 0, overflow: "hidden" }}>
             <a onClick={onBack} style={{ flexShrink: 0 }}>{showBackLabel ? "Back" : "Projects"}</a>
-            <i className="ti ti-chevron-right" style={{ fontSize: 14, flexShrink: 0 }}></i>
-            <span style={{ color: P.textDark, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", minWidth: 0 }}>{projName}</span>
           </div>
           {onEdit && (
             <button className="mpd-btn mpd-btn-primary" onClick={() => onEdit(currProject)}>
@@ -1990,7 +1988,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
         {/* HEADER + CLIENT PORTAL — side by side, 50/50 on desktop, stacked on mobile */}
         <div className="mpd-header-portal-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'stretch', marginBottom: 24 }}>
-          <div className="mpd-proj-header" style={{ flex: '1 1 50%', minWidth: 0, paddingTop: 8, paddingLeft: 6, paddingRight: 6, height: '100%', boxSizing: 'border-box', flexWrap: 'nowrap' }}>
+          <div className="mpd-proj-header" style={{ flex: '1 1 50%', minWidth: 0, height: '100%', boxSizing: 'border-box', flexWrap: 'nowrap', padding: '22px 28px' }}>
             <div className="mpd-ph-left">
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8, minWidth: 0, maxWidth: '100%', flexWrap: 'wrap' }}>
                 <div className="mpd-proj-name" title={projName} style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", minWidth: 0, maxWidth: "100%", flex: "1 1 auto" }}>{projName}</div>
@@ -1998,7 +1996,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 <span className={`mpd-prio ${prioClass}`}>{priority.charAt(0).toUpperCase() + priority.slice(1)}</span>
               </div>
               <div className="mpd-proj-desc" style={{ wordBreak: 'break-word', overflowWrap: 'break-word', whiteSpace: 'pre-wrap' }}>{currProject.description || "No description provided for this project."}</div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', rowGap: 10, columnGap: 10, alignItems: 'start' }}>
                 <div className="mpd-pm-item"><i className="ti ti-building"></i> Client: <strong>{clientName}</strong></div>
                 <div className="mpd-pm-item"><i className="ti ti-tag"></i> Category: <strong>{category}</strong></div>
                 <div className="mpd-pm-item"><i className="ti ti-calendar"></i> Start Date: <strong>{startD}</strong></div>
@@ -2075,7 +2073,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               <div className="mpd-prog-sub">{doneMilestones} of {totalMilestones} milestones</div>
             </div>
           </div>
-          <div className="mpd-prog-item" style={{ display: 'flex', alignItems: 'flex-start', gap: 14, paddingTop: 26, paddingLeft: 26 }}>
+          <div className="mpd-prog-item" style={{ display: 'flex', alignItems: 'flex-start', gap: 10, minWidth: 0 }}>
             <div className="mpd-kpi-icon" style={{ background: P.purpleLight, flexShrink: 0, marginTop: 6, marginLeft: 4 }}><i className="ti ti-chart-bar" style={{ color: P.purple }}></i></div>
             <div style={{ flex: 1 }}>
               <div className="mpd-prog-num">{budgetUsedPct}%</div>
@@ -2084,14 +2082,14 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               <div className="mpd-prog-sub">{currency}{spent.toLocaleString()} of {currency}{budgetAmt.toLocaleString()}</div>
             </div>
           </div>
-          <div className="mpd-prog-item" style={{ display: 'flex', alignItems: 'flex-start', gap: 14, paddingTop: 26, paddingLeft: 26 }}>
+          <div className="mpd-prog-item" style={{ display: 'flex', alignItems: 'flex-start', gap: 10, minWidth: 0 }}>
             <div className="mpd-kpi-icon" style={{ background: '#FEE2E2', flexShrink: 0, marginTop: 6, marginLeft: 4 }}><i className="ti ti-arrow-up-right" style={{ color: '#EF4444' }}></i></div>
             <div style={{ flex: 1 }}>
               <div className="mpd-prog-num">{currency}{spent.toLocaleString()}</div>
               <div className="mpd-prog-lbl">Spent Amount</div>
             </div>
           </div>
-          <div className="mpd-prog-item" style={{ display: 'flex', alignItems: 'flex-start', gap: 14, paddingTop: 26, paddingLeft: 26 }}>
+          <div className="mpd-prog-item" style={{ display: 'flex', alignItems: 'flex-start', gap: 10, minWidth: 0 }}>
             <div className="mpd-kpi-icon" style={{ background: P.purpleLight, flexShrink: 0, marginTop: 6, marginLeft: 4 }}><i className="ti ti-pig-money" style={{ color: P.purple }}></i></div>
             <div style={{ flex: 1 }}>
               <div className="mpd-prog-num" style={{ color: remaining < 0 ? '#DC2626' : undefined }}>{remaining < 0 ? `-${currency}${Math.abs(remaining).toLocaleString()}` : `${currency}${remaining.toLocaleString()}`}</div>
@@ -2230,18 +2228,17 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
             <div className="mpd-acc-boxes" style={{ marginBottom: 20 }}>
               {true && (
                 <div style={{ background: '#fff', border: '1px solid #E8EDF2', borderRadius: 14, overflow: 'hidden' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 8, padding: '14px 18px', borderBottom: '1px solid #E8EDF2' }}>
-                    <i className="ti ti-file-description" style={{ color: '#7C3AED', fontSize: 15 }}></i>
+                  <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 8, padding: '8px 14px', borderBottom: '1px solid #E8EDF2' }}>
+                    <i className="ti ti-file-description" style={{ color: '#7C3AED', fontSize: 13 }}></i>
                     <span style={{ fontSize: 13, fontWeight: 900, color: '#0D1B2A' }}>Quotations</span>
-                    <span style={{ background: 'rgba(124,58,237,.1)', color: '#7C3AED', fontSize: 10, fontWeight: 900, padding: '2px 8px', borderRadius: 20 }}>{projectQuotations.length}</span>
                     <input id="upload-quotation-input" type="file" onChange={handleQuotationUpload} style={{ display: 'none' }} />
                     <button
                       onClick={() => document.getElementById('upload-quotation-input').click()}
                       disabled={uploadingFile}
                       title="Upload Quotation"
-                      style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 4, padding: '4px 10px', background: '#fff', color: '#7C3AED', border: '1px solid #7C3AED', borderRadius: 6, fontSize: 11, fontWeight: 800, cursor: uploadingFile ? 'not-allowed' : 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap', flexShrink: 0 }}
+                      style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 4, padding: '3px 8px', background: '#fff', color: '#7C3AED', border: '1px solid #7C3AED', borderRadius: 6, fontSize: 10, fontWeight: 800, cursor: uploadingFile ? 'not-allowed' : 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap', flexShrink: 0 }}
                     >
-                      <i className={uploadingFile ? "ti ti-loader-2" : "ti ti-upload"} style={{ fontSize: 12 }}></i> Upload Quotation
+                      <i className={uploadingFile ? "ti ti-loader-2" : "ti ti-upload"} style={{ fontSize: 11 }}></i> Upload Quotation
                     </button>
                   </div>
                   <div style={{ padding: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -2283,18 +2280,17 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               )}
               {true && (
                 <div style={{ background: '#fff', border: '1px solid #E8EDF2', borderRadius: 14, overflow: 'hidden' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 8, padding: '14px 18px', borderBottom: '1px solid #E8EDF2' }}>
-                    <i className="ti ti-file-text" style={{ color: '#0EA5E9', fontSize: 15 }}></i>
+                  <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 8, padding: '8px 14px', borderBottom: '1px solid #E8EDF2' }}>
+                    <i className="ti ti-file-text" style={{ color: '#0EA5E9', fontSize: 13 }}></i>
                     <span style={{ fontSize: 13, fontWeight: 900, color: '#0D1B2A' }}>Project Proposals</span>
-                    <span style={{ background: 'rgba(14,165,233,.1)', color: '#0EA5E9', fontSize: 10, fontWeight: 900, padding: '2px 8px', borderRadius: 20 }}>{projectProposals.length}</span>
                     <input id="upload-proposal-input" type="file" onChange={handleProposalUpload} style={{ display: 'none' }} />
                     <button
                       onClick={() => document.getElementById('upload-proposal-input').click()}
                       disabled={uploadingFile}
                       title="Upload Project Proposal"
-                      style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 4, padding: '4px 10px', background: '#fff', color: '#0EA5E9', border: '1px solid #0EA5E9', borderRadius: 6, fontSize: 11, fontWeight: 800, cursor: uploadingFile ? 'not-allowed' : 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap', flexShrink: 0 }}
+                      style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 4, padding: '3px 8px', background: '#fff', color: '#0EA5E9', border: '1px solid #0EA5E9', borderRadius: 6, fontSize: 10, fontWeight: 800, cursor: uploadingFile ? 'not-allowed' : 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap', flexShrink: 0 }}
                     >
-                      <i className={uploadingFile ? "ti ti-loader-2" : "ti ti-upload"} style={{ fontSize: 12 }}></i> Upload Proposal
+                      <i className={uploadingFile ? "ti ti-loader-2" : "ti ti-upload"} style={{ fontSize: 11 }}></i> Upload Proposal
                     </button>
                   </div>
                   <div style={{ padding: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -2337,10 +2333,18 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               )}
               {true && (
                 <div style={{ background: '#fff', border: '1px solid #E8EDF2', borderRadius: 14, overflow: 'hidden' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', padding: '14px 18px', borderBottom: '1px solid #E8EDF2' }}>
-                    <i className="ti ti-folder" style={{ color: '#6B7280', fontSize: 15, marginRight: 8 }}></i>
+                  <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 8, padding: '8px 14px', borderBottom: '1px solid #E8EDF2' }}>
+                    <i className="ti ti-folder" style={{ color: '#6B7280', fontSize: 13 }}></i>
                     <span style={{ fontSize: 13, fontWeight: 900, color: '#0D1B2A' }}>Other Documents</span>
-                    <span style={{ background: 'rgba(107,114,128,.1)', color: '#6B7280', fontSize: 10, fontWeight: 900, padding: '2px 8px', borderRadius: 20, marginLeft: 8 }}>{(currProject.files || []).length}</span>
+                    <input id="upload-other-doc-input" type="file" multiple onChange={handleFileUpload} style={{ display: 'none' }} />
+                    <button
+                      onClick={() => document.getElementById('upload-other-doc-input').click()}
+                      disabled={uploadingFile}
+                      title="Upload Documents"
+                      style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 4, padding: '3px 8px', background: '#fff', color: '#6B7280', border: '1px solid #6B7280', borderRadius: 6, fontSize: 10, fontWeight: 800, cursor: uploadingFile ? 'not-allowed' : 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap', flexShrink: 0 }}
+                    >
+                      <i className={uploadingFile ? "ti ti-loader-2" : "ti ti-upload"} style={{ fontSize: 11 }}></i> Upload Documents
+                    </button>
                   </div>
                   <div style={{ padding: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
                     {(currProject.files || []).length === 0 && (

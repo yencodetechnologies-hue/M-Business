@@ -1159,14 +1159,8 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
   const activeClient = clients.find(c => c._id === activeClientId) || null;
 
-  // Auto-open the first client's detail view as soon as the Clients page
-  // has data, so clicking "Clients" in the sidebar lands directly on a
-  // client's detail page instead of an empty list-only view.
-  useEffect(() => {
-    if (!activeClientId && filtered.length > 0) {
-      setActiveClientId(filtered[0]._id);
-    }
-  }, [filtered, activeClientId]);
+  // Do not auto-select a client on load/refresh — the details popup
+  // should only open when the user explicitly clicks a client.
 
  const [isMobileWidth, setIsMobileWidth] = useState(typeof window !== "undefined" && window.innerWidth < 769);
   useEffect(() => {

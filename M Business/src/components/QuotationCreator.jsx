@@ -1676,7 +1676,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
 
         <div className="no-print" style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 20, flexWrap: "wrap" }}>
 
-          <button onClick={() => onBackOverride ? onBackOverride() : setStep("list")} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>Document List</button>
+        <button onClick={() => { if (onBackOverride) { onBackOverride(); } else { setViewEntry(null); setStep("list"); } }} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>Document List</button>
        <button onClick={() => {
             const isMobile = typeof window !== "undefined" && window.innerWidth < 769;
             if (isMobile) {

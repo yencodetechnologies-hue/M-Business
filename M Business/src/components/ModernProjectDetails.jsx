@@ -56,7 +56,10 @@ const CSS = `
 .mpd-topbar-actions { display:flex; align-items:center; gap:10px; flex-wrap: wrap; }
 
 @media (max-width: 768px) {
-  .mpd-root { overflow-x: hidden; padding: 0 14px 14px; }
+  .mpd-root { overflow-x: hidden; padding: 0 14px 14px; width: 100%; box-sizing: border-box; }
+  .mpd-card { max-width: 100%; box-sizing: border-box; overflow-x: hidden; }
+  .mpd-brow { flex-wrap: wrap; }
+  .mpd-brow .mpd-val { word-break: break-word; max-width: 100%; }
   .mpd-topbar { flex-wrap: wrap; gap: 12px; }
   .mpd-topbar-actions { width: 100%; }
   .mpd-topbar-actions button { flex: 1 1 auto; min-width: 0; font-size: 12px; padding: 8px 10px; }
@@ -2707,10 +2710,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         {/* MILESTONES STANDALONE CARD */}
         < div className="mpd-card mpd-milestones-card" style={{ marginBottom: 12, }
         }>
-          <div className="mpd-card-header" style={{ paddingBottom: 16, paddingLeft: 4, paddingRight: 4, marginBottom: 8 }}>
+         <div className="mpd-card-header" style={{ paddingBottom: 16, paddingLeft: 4, paddingRight: 4, marginBottom: 8, display: 'flex', flexWrap: 'nowrap', justifyContent: 'space-between', alignItems: 'center', width: '100%', boxSizing: 'border-box' }}>
             <div className="mpd-card-title"><i className="ti ti-flag"></i> Milestone Progress</div>
-            <div style={{ display: 'flex', gap: 24, alignItems: 'center' }}>
-              <div style={{ display: 'flex', background: P.bg, borderRadius: 8, border: `1px solid ${P.border}`, overflow: 'hidden' }}>
+            <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>     <div style={{ display: 'flex', background: P.bg, borderRadius: 8, border: `1px solid ${P.border}`, overflow: 'hidden' }}>
                 <button
                   onClick={() => setMilestoneView('timeline')}
                   style={{ padding: '6px 12px', fontSize: 11, border: 'none', cursor: 'pointer', background: milestoneView === 'timeline' ? P.primary : 'transparent', color: milestoneView === 'timeline' ? '#fff' : P.textLight, fontWeight: 700, transition: 'all .2s' }}
@@ -4219,7 +4221,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
 
         {/* TEAM + BUDGET — stacked, Team on top, Budget directly below */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 20, alignItems: 'stretch', marginTop: 24, marginLeft: 0, paddingLeft: 0 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 20, alignItems: 'stretch', marginTop: 24, marginLeft: 0, paddingLeft: 0, width: '100%', maxWidth: '100%', boxSizing: 'border-box', overflow: 'hidden' }}>
           {/* TEAM SIDEBAR */}
           <div className="mpd-card" style={{ marginBottom: 0, display: 'flex', flexDirection: 'column', height: '100%', paddingTop: 8, paddingLeft: 6, paddingRight: 6 }}>
             <div className="mpd-card-header">
@@ -4288,9 +4290,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 </div>
               </div>
             )}
-            <div className="mpd-brow">
+            <div className="mpd-brow" style={{ flexWrap: 'wrap', gap: 4 }}>
               <span className="mpd-lbl">Total Budget <span style={{ fontSize: 9, color: '#94A3B8', fontWeight: 600, marginLeft: 4 }}></span></span>
-              <span className="mpd-val">{currency}{budgetAmt.toLocaleString()}</span>
+              <span className="mpd-val" style={{ wordBreak: 'break-word', maxWidth: '100%', textAlign: 'right' }}>{currency}{budgetAmt.toLocaleString()}</span>
             </div>
             {[['Advance Paid', 'advance', autoAdvanceTotal, 'mpd-p'], ['Received', 'received', received, 'mpd-g']].map(([lbl, key, val, cls]) => (
               <div key={key} className="mpd-brow">
@@ -4298,9 +4300,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 <span className={`mpd-val ${cls}`}>{currency}{val.toLocaleString()}</span>
               </div>
             ))}
-            <div className="mpd-brow">
+            <div className="mpd-brow" style={{ flexWrap: 'wrap', gap: 4 }}>
               <span className="mpd-lbl">Pending</span>
-              <span className="mpd-val mpd-r">{currency}{pending.toLocaleString()}</span>
+              <span className="mpd-val mpd-r" style={{ wordBreak: 'break-word', maxWidth: '100%', textAlign: 'right' }}>{currency}{pending.toLocaleString()}</span>
             </div>
             <div className="mpd-brow">
               <span className="mpd-lbl">Spent (Expenses)</span>

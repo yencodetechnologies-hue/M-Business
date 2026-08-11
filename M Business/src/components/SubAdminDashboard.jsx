@@ -1100,7 +1100,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
   const [filterMode, setFilterMode] = useState("all");
   const [sortMode, setSortMode] = useState("newest");
 
-  const [activeClientId, setActiveClientId] = useState(activeClientIdForReturn || (clients[0]?._id ?? null));
+  const [activeClientId, setActiveClientId] = useState(activeClientIdForReturn || null);
 
   const [isLoading, setIsLoading] = useState(!!isFetching);
   const [activeTab, setActiveTab] = useState("overview");
@@ -11207,7 +11207,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 *{box-sizing:border-box}
-        html, body, #root { margin: 0 !important; padding: 0 !important; overflow-x: hidden; }
+        html, body, #root { margin: 0 !important; padding: 0 !important; overflow-x: hidden; height: 100%; overflow-y: visible !important; }
+        body { position: relative !important; min-height: 100vh !important; }
 
         ::-webkit-scrollbar{width:5px}
 
@@ -12400,7 +12401,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   {/* FLOATING BOTTOM NAV — glass pill (portaled to body so it always stays fixed to the viewport, mobile only) */}
                   {!isDesktopWidth && createPortal(
-                    <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "var(--app-accent, #00BCD4)", borderRadius: 0, display: "flex", justifyContent: "space-around", alignItems: "center", padding: "12px 6px", zIndex: 4000, boxShadow: "0 -2px 12px rgba(0,0,0,0.15)", position: "fixed" }}>
+                    <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "var(--app-accent, #00BCD4)", borderRadius: 0, display: "flex", justifyContent: "space-around", alignItems: "center", padding: "12px 6px", zIndex: 1000000, boxShadow: "0 -2px 12px rgba(0,0,0,0.15)", position: "fixed" }}>
                       {[
                         { icon: "ti-home", label: "Home", key: "dashboard" },
                         { icon: "ti-file-invoice", label: "Invoice", key: "invoices" },
@@ -14498,11 +14499,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               />
             )}
             {validActive === "quotations" && !quotationViewEntry && typeof window !== "undefined" && window.innerWidth < 769 && <QuotationsListPage quotations={quotations} onViewQuotation={(q) => { setQuotationViewEntry(q); setSidebarOverride("dashboard"); }} onBack={() => setActive("dashboard")} />}
-            {validActive === "quotations" && (quotationViewEntry || !(typeof window !== "undefined" && window.innerWidth < 769)) && <QuotationCreatorModern key={quotationViewEntry ? `view-${quotationViewEntry._id || quotationViewEntry.id}` : (quotationReturnProject ? `new-${quotationReturnProject._id}` : 'list')} user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} prefillProject={quotationPrefillProject} onPrefillConsumed={() => setQuotationPrefillProject(null)} initialViewEntry={quotationViewEntry}onBackOverride={quotationViewEntry ? () => {
+            {validActive === "quotations" && (quotationViewEntry || !(typeof window !== "undefined" && window.innerWidth < 769)) && <QuotationCreatorModern key={quotationViewEntry ? `view-${quotationViewEntry._id || quotationViewEntry.id}` : (quotationReturnProject ? `new-${quotationReturnProject._id}` : 'list')} user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} prefillProject={quotationPrefillProject} onPrefillConsumed={() => setQuotationPrefillProject(null)} initialViewEntry={quotationViewEntry} onBackOverride={quotationViewEntry ? () => {
   setQuotationViewEntry(null);
   setSidebarOverride(null);
   setActive("quotations");
-} : () => setActive("dashboard")}onReturnToProject={quotationReturnProject ? () => { const p = quotationReturnProject; setQuotationReturnProject(null); setJumpProject(p); setSidebarOverride(null); setActive("project-details"); } : null} onAddClient={() => {
+} : () => setActive("dashboard")} onReturnToProject={quotationReturnProject ? () => { const p = quotationReturnProject; setQuotationReturnProject(null); setJumpProject(p); setSidebarOverride(null); setActive("project-details"); } : null} onAddClient={() => {
 
               setNcError({}); setShowClientPass(false);
               setReturnToQuotation(true);

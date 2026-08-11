@@ -782,16 +782,32 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
   const badge = statusMap[st] || statusMap.draft;
 
   return (
-    <div style={{
-      position: "fixed", inset: 0, zIndex: 99999,
-      background: "rgba(0,0,0,0.65)",
-      display: "flex", flexDirection: "column"
-    }}>
+    <div
+      style={{
+        position: "fixed", inset: 0, zIndex: 99999,
+        background: "rgba(0,0,0,0.65)",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        padding: 16
+      }}
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <div style={{
+        background: "#fff",
+        borderRadius: 20,
+        width: "100%",
+        maxWidth: 820,
+        height: "auto",
+        maxHeight: "calc(100vh - 32px)",
+        overflow: "hidden",
+        display: "flex",
+        flexDirection: "column",
+        boxShadow: "0 32px 80px rgba(0,0,0,0.3)"
+      }}>
       {/* ── Top Bar ── */}
       <div style={{
         background: "#fff", borderBottom: "1px solid #e0eef0",
         padding: "12px 24px", display: "flex", alignItems: "center",
-        gap: 14, flexShrink: 0, boxShadow: "0 2px 12px rgba(0,0,0,0.08)"
+        flexWrap: "wrap", gap: 10, flexShrink: 0, boxShadow: "0 2px 12px rgba(0,0,0,0.08)"
       }}>
         <button onClick={onClose} style={{
           background: "#f0fdfe", border: "1.5px solid #e0eef0",
@@ -1041,6 +1057,7 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
 
         </div>
       </div>
+   </div>
     </div>
   );
 }
@@ -1771,41 +1788,95 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
   const decided = proposals.filter(p => ["won", "approved", "lost", "rejected"].includes(p.status)).length;
   const successRate = decided > 0 ? Math.round((wonCount / decided) * 100) : 0;
   if (view === "list" && !window.__fullProposalsList && typeof window !== "undefined" && window.innerWidth < 769) {
+    const initials = (name) => (name || "P").trim().split(/\s+/).slice(0, 2).map(w => w[0]).join("").toUpperCase();
+    const badgeCfg = (status) => {
+      const ok = status === "approved" || status === "won";
+      return ok ? { bg: "#dcfce7", fg: "#16a34a" } : { bg: "#fef2f2", fg: "#dc2626" };
+    };
     return (
-      <div style={{ padding: "24px 28px" }}>
-        <div style={{ fontSize: 14, fontWeight: 700, color: "#607D86", marginBottom: 16 }}>
-          Total Proposals: {proposals.length}
+      <div style={{ padding: "16px 14px", background: "#F5F8FA", minHeight: "100%", boxSizing: "border-box", maxWidth: "100%", overflowX: "hidden" }}>
+        <div
+          onClick={() => onBackOverride && onBackOverride()}
+          style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 4px 16px", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #00BCD4)" }}
+        >
+          <i className="ti ti-arrow-left" style={{ fontSize: 16 }}></i> Back to Dashboard
         </div>
-        <div style={{ background: "#fff", border: "1px solid #E0EEF0", borderRadius: 12, overflow: "hidden" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead>
-              <tr style={{ background: "#F5FAFA" }}>
-                <th style={{ textAlign: "left", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, border: "1px solid #E0EEF0", width: 60 }}>S.No.</th>
-                <th style={{ textAlign: "left", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, border: "1px solid #E0EEF0" }}>Proposal / Client</th>
-                <th style={{ textAlign: "right", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, border: "1px solid #E0EEF0", width: 120 }}>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {proposals.map((p, i) => (
-                <tr
+
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #00BCD4), #0891b2)", borderRadius: 16, padding: "16px 18px", marginBottom: 14, boxShadow: "0 6px 18px rgba(0,188,212,0.25)" }}>
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.8)", letterSpacing: 0.5, textTransform: "uppercase" }}>Total Proposals</div>
+            <div style={{ fontSize: 26, fontWeight: 800, color: "#fff" }}>{proposals.length}</div>
+          </div>
+          <div style={{ width: 46, height: 46, borderRadius: 13, background: "rgba(255,255,255,0.18)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <i className="ti ti-clipboard-list" style={{ fontSize: 22, color: "#fff" }} />
+          </div>
+        </div>
+
+        {proposals.length === 0 ? (
+          <div style={{ padding: "40px 16px", textAlign: "center", color: "#A0B8BE", fontSize: 13, fontWeight: 600, background: "#fff", borderRadius: 16, boxShadow: "0 2px 10px rgba(15,28,46,0.05)" }}>
+            No proposals found.
+          </div>
+        ) : (
+          <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 12 }}>
+            {proposals.map((p, i) => {
+              const bc = badgeCfg(p.status);
+              const title = p.title || p.clientName || "New Proposal";
+              return (
+                <div
                   key={p._id || i}
                   onClick={() => setViewingProposal(p)}
-                  style={{ cursor: "pointer", borderBottom: i === proposals.length - 1 ? "none" : "1px solid #E0EEF0" }}
+                  style={{
+                    background: "#fff",
+                    borderRadius: 16,
+                    padding: "16px",
+                    boxShadow: "0 3px 14px rgba(15,28,46,0.07)",
+                    cursor: "pointer",
+                    boxSizing: "border-box",
+                    borderLeft: `4px solid ${bc.fg}`
+                  }}
                 >
-                  <td style={{ padding: "14px 16px", fontSize: 13, color: "#607D86", fontWeight: 600, verticalAlign: "middle", border: "1px solid #E0EEF0" }}>{i + 1}</td>
-                  <td style={{ padding: "14px 16px", verticalAlign: "middle", border: "1px solid #E0EEF0" }}>
-                    <span style={{ fontWeight: 700, color: "#1A2332", fontSize: 14 }}>{p.title || p.clientName || "—"}</span>
-                  </td>
-                  <td style={{ padding: "14px 16px", textAlign: "right", verticalAlign: "middle" }}>
-                    <span style={{ display: "inline-block", fontWeight: 700, fontSize: 12, padding: "4px 12px", borderRadius: 20, background: (p.status === "approved" || p.status === "won") ? "#dcfce7" : "#fef2f2", color: (p.status === "approved" || p.status === "won") ? "#16a34a" : "#dc2626" }}>
+                  <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 10, gap: 8 }}>
+                    <div style={{ display: "flex", alignItems: "flex-start", gap: 10, minWidth: 0, flex: 1 }}>
+                      <div style={{
+                        width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
+                        background: "linear-gradient(135deg, var(--app-accent, #00BCD4), #0891b2)", color: "#fff",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        fontSize: 14, fontWeight: 800
+                      }}>
+                        {initials(title)}
+                      </div>
+                      <div style={{ minWidth: 0, flex: 1 }}>
+                        <div style={{ fontWeight: 800, color: "#0f1c2e", fontSize: 14.5, wordBreak: "break-word" }}>{title}</div>
+                      </div>
+                    </div>
+                    <span style={{
+                      fontWeight: 700, fontSize: 10.5, padding: "5px 12px", borderRadius: 20,
+                      background: bc.bg, color: bc.fg, flexShrink: 0, whiteSpace: "nowrap"
+                    }}>
                       {p.status || "Draft"}
                     </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 4, color: "var(--app-accent, #00BCD4)", fontSize: 12, fontWeight: 700 }}>
+                    View details <i className="ti ti-chevron-right" style={{ fontSize: 13 }} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+       )}
+        {viewingProposal && (
+          <SubadminProposalViewer
+            proposal={viewingProposal}
+            onClose={() => { setViewingProposal(null); if (onBackOverride) onBackOverride(); }}
+            onPrint={() => printProposal(viewingProposal)}
+            onShare={() => shareProposalPDF(viewingProposal)}
+            BASE_URL={BASE_URL}
+            onUpdated={(updated) => {
+              setProposals(prev => prev.map(p => p._id === updated._id ? updated : p));
+              setViewingProposal(updated);
+            }}
+          />
+        )}
       </div>
     );
   }

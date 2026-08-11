@@ -917,41 +917,89 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
       if (status === "sent" && expiry && new Date(expiry) < new Date()) status = "expired";
       return { ...e, status };
     });
+    const initials = (name) => (name || "Q").trim().split(/\s+/).slice(0, 2).map(w => w[0]).join("").toUpperCase();
+    const badgeCfg = (status) => {
+      const ok = status === "approved" || status === "converted";
+      return ok ? { bg: "#dcfce7", fg: "#16a34a" } : { bg: "#fef2f2", fg: "#dc2626" };
+    };
     return (
-      <div style={{ padding: "24px 28px" }}>
-        <div style={{ fontSize: 14, fontWeight: 700, color: "#607D86", marginBottom: 16 }}>
-          Total Quotations: {enrichedMinimal.length}
+      <div style={{ padding: "16px 14px", background: "#F5F8FA", minHeight: "100%", boxSizing: "border-box", maxWidth: "100%", overflowX: "hidden" }}>
+        <div
+          onClick={() => onBackOverride && onBackOverride()}
+          style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 4px 16px", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #00BCD4)" }}
+        >
+          <i className="ti ti-arrow-left" style={{ fontSize: 16 }}></i> Back to Dashboard
         </div>
-        <div style={{ background: "#fff", border: "1px solid #E0EEF0", borderRadius: 12, overflow: "hidden" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead>
-              <tr style={{ background: "#F5FAFA" }}>
-                <th style={{ textAlign: "left", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, border: "1px solid #E0EEF0", width: 60 }}>S.No.</th>
-                <th style={{ textAlign: "left", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, border: "1px solid #E0EEF0" }}>Client / Quote No.</th>
-                <th style={{ textAlign: "right", padding: "12px 16px", fontSize: 11, fontWeight: 800, color: "#607D86", letterSpacing: 0.4, border: "1px solid #E0EEF0", width: 120 }}>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {enrichedMinimal.map((entry, i) => (
-                <tr
+
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #00BCD4), #0891b2)", borderRadius: 16, padding: "16px 18px", marginBottom: 14, boxShadow: "0 6px 18px rgba(0,188,212,0.25)" }}>
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.8)", letterSpacing: 0.5, textTransform: "uppercase" }}>Total Quotations</div>
+            <div style={{ fontSize: 26, fontWeight: 800, color: "#fff" }}>{enrichedMinimal.length}</div>
+          </div>
+          <div style={{ width: 46, height: 46, borderRadius: 13, background: "rgba(255,255,255,0.18)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <i className="ti ti-receipt" style={{ fontSize: 22, color: "#fff" }} />
+          </div>
+        </div>
+
+        {enrichedMinimal.length === 0 ? (
+          <div style={{ padding: "40px 16px", textAlign: "center", color: "#A0B8BE", fontSize: 13, fontWeight: 600, background: "#fff", borderRadius: 16, boxShadow: "0 2px 10px rgba(15,28,46,0.05)" }}>
+            No quotations found.
+          </div>
+        ) : (
+          <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 12 }}>
+            {enrichedMinimal.map((entry, i) => {
+              const bc = badgeCfg(entry.status);
+              const client = entry.qt?.client || entry.client || entry.quoteNo || "—";
+              const quoteNo = entry.qt?.quoteNo || entry.quoteNo || "";
+              return (
+                <div
                   key={entry.id || entry.quoteNo || i}
                   onClick={() => { loadEntry(entry); setStep("preview"); }}
-                  style={{ cursor: "pointer", borderBottom: i === enrichedMinimal.length - 1 ? "none" : "1px solid #E0EEF0" }}
+                  style={{
+                    background: "#fff",
+                    borderRadius: 16,
+                    padding: "16px",
+                    boxShadow: "0 3px 14px rgba(15,28,46,0.07)",
+                    cursor: "pointer",
+                    boxSizing: "border-box",
+                    borderLeft: `4px solid ${bc.fg}`
+                  }}
                 >
-                  <td style={{ padding: "14px 16px", fontSize: 13, color: "#607D86", fontWeight: 600, verticalAlign: "middle", border: "1px solid #E0EEF0" }}>{i + 1}</td>
-                  <td style={{ padding: "14px 16px", verticalAlign: "middle", border: "1px solid #E0EEF0" }}>
-                    <span style={{ fontWeight: 700, color: "#1A2332", fontSize: 14 }}>{entry.qt?.client || entry.client || entry.quoteNo || "—"}</span>
-                  </td>
-                  <td style={{ padding: "14px 16px", textAlign: "right", verticalAlign: "middle" }}>
-                    <span style={{ display: "inline-block", fontWeight: 700, fontSize: 12, padding: "4px 12px", borderRadius: 20, background: (entry.status === "approved" || entry.status === "converted") ? "#dcfce7" : "#fef2f2", color: (entry.status === "approved" || entry.status === "converted") ? "#16a34a" : "#dc2626" }}>
+                  <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 10, gap: 8 }}>
+                    <div style={{ display: "flex", alignItems: "flex-start", gap: 10, minWidth: 0, flex: 1 }}>
+                      <div style={{
+                        width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
+                        background: "linear-gradient(135deg, var(--app-accent, #00BCD4), #0891b2)", color: "#fff",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        fontSize: 14, fontWeight: 800
+                      }}>
+                        {initials(client)}
+                      </div>
+                      <div style={{ minWidth: 0, flex: 1 }}>
+                        <div style={{ fontWeight: 800, color: "#0f1c2e", fontSize: 14.5, wordBreak: "break-word" }}>{client}</div>
+                        {quoteNo && (
+                          <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 3, fontSize: 11.5, color: "#607D86", fontWeight: 600 }}>
+                            <i className="ti ti-hash" style={{ fontSize: 12, flexShrink: 0 }} />
+                            <span>{quoteNo}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <span style={{
+                      fontWeight: 700, fontSize: 10.5, padding: "5px 12px", borderRadius: 20,
+                      background: bc.bg, color: bc.fg, flexShrink: 0, whiteSpace: "nowrap"
+                    }}>
                       {entry.status || "Draft"}
                     </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 4, color: "var(--app-accent, #00BCD4)", fontSize: 12, fontWeight: 700 }}>
+                    View details <i className="ti ti-chevron-right" style={{ fontSize: 13 }} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     );
   }

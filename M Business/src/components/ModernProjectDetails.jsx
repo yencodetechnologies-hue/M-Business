@@ -2171,7 +2171,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               {onNewQuotation && (
                 <button
                   onClick={() => onNewQuotation(currProject)}
-                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '6px 14px', background: '#fff', color: ' var(--app-accent, #00BCD4)', border: '1px solid  var(--app-accent, #00BCD4)', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'none' }}
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '6px 14px', background: '#fff', color: ' var(--app-accent, #00BCD4)', border: '1px solid  var(--app-accent, #00BCD4)', borderRadius: 8, fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'none' }}
                 >
                   <i className="ti ti-file-description" style={{ fontSize: 13 }}></i> New Quotation
                 </button>
@@ -2179,7 +2179,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               {onNewProposal && (
                 <button
                   onClick={() => onNewProposal(currProject)}
-                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '6px 14px', background: '#fff', color: ' var(--app-accent, #00BCD4)', border: '1px solid  var(--app-accent, #00BCD4)', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'none' }}
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '6px 14px', background: '#fff', color: ' var(--app-accent, #00BCD4)', border: '1px solid  var(--app-accent, #00BCD4)', borderRadius: 8, fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'none' }}
                 >
                   <i className="ti ti-file-text" style={{ fontSize: 13 }}></i> New Project Proposal
                 </button>
@@ -2195,7 +2195,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 <button
                   onClick={() => document.getElementById('other-docs-input').click()}
                   disabled={uploadingFile}
-                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '6px 14px', background: '#fff', color: ' var(--app-accent, #00BCD4)', border: '1px solid  var(--app-accent, #00BCD4)', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: uploadingFile ? 'not-allowed' : 'pointer', fontFamily: 'inherit', textDecoration: 'none' }}
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '6px 14px', background: '#fff', color: ' var(--app-accent, #00BCD4)', border: '1px solid  var(--app-accent, #00BCD4)', borderRadius: 8, fontSize: 12, fontWeight: 500, cursor: uploadingFile ? 'not-allowed' : 'pointer', fontFamily: 'inherit', textDecoration: 'none' }}
                 >
                   <i className={uploadingFile ? "ti ti-loader-2" : "ti ti-folder-plus"} style={{ fontSize: 13 }}></i> {uploadingFile ? 'Uploading…' : 'Other Documents'}
                 </button>
@@ -2236,7 +2236,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                       onClick={() => document.getElementById('upload-quotation-input').click()}
                       disabled={uploadingFile}
                       title="Upload Quotation"
-                      style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 4, padding: '3px 8px', background: '#fff', color: '#7C3AED', border: '1px solid #7C3AED', borderRadius: 6, fontSize: 10, fontWeight: 800, cursor: uploadingFile ? 'not-allowed' : 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap', flexShrink: 0 }}
+                      style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 4, padding: '3px 8px', background: '#fff', color: '#7C3AED', border: '1px solid #7C3AED', borderRadius: 6, fontSize: 10, fontWeight: 500, cursor: uploadingFile ? 'not-allowed' : 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap', flexShrink: 0 }}
                     >
                       <i className={uploadingFile ? "ti ti-loader-2" : "ti ti-upload"} style={{ fontSize: 11 }}></i> Upload Quotation
                     </button>
@@ -2288,7 +2288,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                       onClick={() => document.getElementById('upload-proposal-input').click()}
                       disabled={uploadingFile}
                       title="Upload Project Proposal"
-                      style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 4, padding: '3px 8px', background: '#fff', color: '#0EA5E9', border: '1px solid #0EA5E9', borderRadius: 6, fontSize: 10, fontWeight: 800, cursor: uploadingFile ? 'not-allowed' : 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap', flexShrink: 0 }}
+                      style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 4, padding: '3px 8px', background: '#fff', color: '#0EA5E9', border: '1px solid #0EA5E9', borderRadius: 6, fontSize: 10, fontWeight: 500, cursor: uploadingFile ? 'not-allowed' : 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap', flexShrink: 0 }}
                     >
                       <i className={uploadingFile ? "ti ti-loader-2" : "ti ti-upload"} style={{ fontSize: 11 }}></i> Upload Proposal
                     </button>
@@ -2341,7 +2341,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                       onClick={() => document.getElementById('upload-other-doc-input').click()}
                       disabled={uploadingFile}
                       title="Upload Documents"
-                      style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 4, padding: '3px 8px', background: '#fff', color: '#6B7280', border: '1px solid #6B7280', borderRadius: 6, fontSize: 10, fontWeight: 800, cursor: uploadingFile ? 'not-allowed' : 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap', flexShrink: 0 }}
+                      style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 4, padding: '3px 8px', background: '#fff', color: '#6B7280', border: '1px solid #6B7280', borderRadius: 6, fontSize: 10, fontWeight: 500, cursor: uploadingFile ? 'not-allowed' : 'pointer',  whiteSpace: 'nowrap', flexShrink: 0 }}
                     >
                       <i className={uploadingFile ? "ti ti-loader-2" : "ti ti-upload"} style={{ fontSize: 11 }}></i> Upload Documents
                     </button>
@@ -2418,7 +2418,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               <button
                 key={t.key}
                 onClick={() => { setActivePayTab(t.key); setSelectedPaymentItems([]); }}
-                style={{ flex: '1 1 0', minWidth: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, padding: '8px 4px', borderRadius: 8, border: `1.5px solid ${activePayTab === t.key ? 'var(--app-accent, #00BCD4)' : 'transparent'}`, background: activePayTab === t.key ? 'var(--app-accent, #00BCD4)' : '#fff', color: activePayTab === t.key ? '#fff' : '#374151', fontSize: 11, fontWeight: 800, cursor: 'pointer', transition: 'all .15s', fontFamily: 'inherit', whiteSpace: 'nowrap', overflow: 'visible', textOverflow: 'clip' }}
+                style={{ flex: '1 1 0', minWidth: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, padding: '8px 4px', borderRadius: 8, border: `1.5px solid ${activePayTab === t.key ? 'var(--app-accent, #00BCD4)' : 'transparent'}`, background: activePayTab === t.key ? 'var(--app-accent, #00BCD4)' : '#fff', color: activePayTab === t.key ? '#fff' : '#374151', fontSize: 11, fontWeight: 500, cursor: 'pointer', transition: 'all .15s', fontFamily: 'inherit', whiteSpace: 'nowrap', overflow: 'visible', textOverflow: 'clip' }}
               >
                 <i className={`ti ${t.icon}`} style={{ fontSize: 14, flexShrink: 0 }}></i>
                 {t.label}
@@ -2448,7 +2448,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                       setPaymentModalsState(prev => ({ ...prev, [b.modal]: true }));
                     }
                   }}
-                  style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: ' var(--app-accent, var(--app-accent, #00BCD4))', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'none' }}
+                  style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: ' var(--app-accent, var(--app-accent, #00BCD4))', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'none' }}
                 >
                   <i className={`ti ${b.icon}`} style={{ fontSize: 13 }}></i> {b.label}
                 </button>
@@ -2725,7 +2725,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 </button>
               </div>
               {!hideTopActions && (
-                <button className="mpd-btn mpd-btn-outline" onClick={() => setShowAddMilestone(true)} style={{ padding: '6px 12px', fontSize: 12 }}>
+                <button className="mpd-btn mpd-btn-primary" onClick={() => setShowAddMilestone(true)} style={{ padding: '6px 12px', fontSize: 12 }}>
                   <i className="ti ti-plus"></i> Add Milestone
                 </button>
               )}
@@ -3013,7 +3013,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               <div className="mpd-card-header" style={{ padding: '0 0 12px', marginBottom: 0, borderBottom: `2px solid ${P.border}` }}>
                 <div className="mpd-card-title"><i className="ti ti-list-check"></i> Tasks</div>
                 {!hideTopActions && (
-                  <button className="mpd-btn mpd-btn-outline" onClick={() => { setEditingTask(null); setNewTaskTitle(''); setNewTaskDesc(''); setNewTaskPriority('medium'); setNewTaskAssignTo([]); setNewTaskDue(''); setNewTaskMilestone(''); setShowAddTaskModal(true); }} style={{ padding: '6px 12px', fontSize: 12 }}><i className="ti ti-plus"></i> Add Task</button>
+                  <button className="mpd-btn mpd-btn-primary" onClick={() => { setEditingTask(null); setNewTaskTitle(''); setNewTaskDesc(''); setNewTaskPriority('medium'); setNewTaskAssignTo([]); setNewTaskDue(''); setNewTaskMilestone(''); setShowAddTaskModal(true); }} style={{ padding: '6px 12px', fontSize: 12 }}><i className="ti ti-plus"></i> Add Task</button>
                 )}
 
               </div>

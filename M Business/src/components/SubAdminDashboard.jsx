@@ -5523,7 +5523,7 @@ return (
     onNewInvoice={(p, editInv, editIdx) => {
           if (!p) return;
           if (setInvoicePrefill) setInvoicePrefill({ client: p.client || "", project: p.name || "", _t: Date.now(), projectId: p._id, ...(editInv ? { editData: editInv, editIndex: editIdx } : {}) });
-          setShowMobileInvoiceModal(true);
+          if (typeof window !== "undefined" && window.innerWidth < 769) { setShowMobileInvoiceModal(true); } else { setJumpInvoice(null); setActive("invoiceDetails"); }
         }}
         onViewInvoice={(entry) => {
           setJumpInvoice({ ...entry, _t: Date.now() });
@@ -11707,7 +11707,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     <div style={{ background: "transparent", padding: 0 }}>
                       <div style={{ display: "flex", gap: 12 }}>
                         <button
-                          onClick={() => { setJumpProject(null); setJumpInvoice(null); setInvoicePrefill(null); setShowMobileInvoiceModal(true); }}
+                          onClick={() => { setJumpProject(null); setJumpInvoice(null); setInvoicePrefill(null); if (typeof window !== "undefined" && window.innerWidth < 769) { setShowMobileInvoiceModal(true); } else { setActive("invoiceDetails"); } }}
                           style={{ flex: 1, background: "var(--app-accent, #00BCD4)", color: "#fff", border: "none", borderRadius: 12, padding: "12px 0", fontSize: 13.5, fontWeight: 800, cursor: "pointer", boxShadow: "0 4px 12px rgba(0,188,212,0.3)" }}
                         >
                           Create Invoice
@@ -13944,7 +13944,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   if (!proj) return;
                   setJumpInvoice(null);
                   setInvoicePrefill({ client: proj.client || "", project: proj.name || "", _t: Date.now(), projectId: proj._id, ...(editInv ? { editData: editInv } : {}) });
-                  setShowMobileInvoiceModal(true);
+                  if (typeof window !== "undefined" && window.innerWidth < 769) { setShowMobileInvoiceModal(true); } else { setActive("invoiceDetails"); }
                 }}
                 onViewInvoice={(entry) => {
                   setJumpInvoice({ ...entry, _t: Date.now() });

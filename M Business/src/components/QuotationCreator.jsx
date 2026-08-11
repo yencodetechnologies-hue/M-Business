@@ -1323,7 +1323,8 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
     if (qrData.length > 1000) qrData = `${FRONTEND_URL}/quotation-view?no=${qt.quoteNo}`;
 
     return (
-      <div className="print-wrapper" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "#ecfdf5", minHeight: "100vh", padding: "20px 12px" }}>
+      <div style={{ position: "fixed", inset: 0, zIndex: 999999, background: "rgba(15,28,46,0.55)", overflowY: "auto", padding: "20px 12px", display: "flex", alignItems: "flex-start", justifyContent: "center" }} onClick={() => { if (onBackOverride) onBackOverride(); else setStep("list"); }}>
+      <div className="print-wrapper" onClick={(e) => e.stopPropagation()} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "#fff", borderRadius: 16, overflow: "hidden", maxWidth: 830, width: "100%", boxShadow: "0 32px 80px rgba(0,0,0,0.3)" }}>
         {toastMsg && (
           <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 99999, background: '#1A2E35', color: '#fff', borderRadius: 12, padding: '12px 20px', fontSize: 13, fontWeight: 700, boxShadow: '0 8px 24px rgba(0,0,0,0.18)', display: 'flex', alignItems: 'center', gap: 8 }}>
             <i className="ti ti-check" style={{ fontSize: 15, color: '#26C281' }}></i> {toastMsg}
@@ -1567,6 +1568,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
             <div style={{ fontSize: 11, color: "#6b7280", fontWeight: 600 }}>{qt.quoteNo}</div>
           </div>
         </div>
+      </div>
       </div>
     );
   }

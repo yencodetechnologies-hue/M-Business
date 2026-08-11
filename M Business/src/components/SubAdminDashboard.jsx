@@ -8170,6 +8170,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     return null;
   };
   const [showMobileInvoiceModal, setShowMobileInvoiceModal] = useState(false);
+  const [showMobileEditProjectModal, setShowMobileEditProjectModal] = useState(false);
   const [showMobileQuotationModal, setShowMobileQuotationModal] = useState(false);
   const [showMobileProposalModal, setShowMobileProposalModal] = useState(false);
   const [showMobileTaskModal, setShowMobileTaskModal] = useState(false);
@@ -13889,7 +13890,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   if (updatedProj) setJumpProject(updatedProj);
 
-                  startNavTransition(() => setActive("edit-project"));
+                  if (typeof window !== "undefined" && window.innerWidth < 769) {
+                    setShowMobileEditProjectModal(true);
+                  } else {
+                    startNavTransition(() => setActive("edit-project"));
+                  }
 
                 }}
 
@@ -14300,7 +14305,36 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 </div>
               </div>
             )}
-    
+    {showMobileEditProjectModal && jumpProject && (
+              <div style={{ position: "fixed", inset: 0, zIndex: 9000, background: "rgba(15,23,42,0.5)", display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}>
+                <div style={{ background: "var(--app-bg, #f5f7fb)", width: "100%", maxWidth: 520, maxHeight: "90vh", overflowY: "auto", overflowX: "hidden", borderRadius: 18, padding: "12px", boxSizing: "border-box" }}>
+                  <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 8 }}>
+                    <button onClick={() => setShowMobileEditProjectModal(false)} style={{ background: "none", border: "none", fontSize: 22, cursor: "pointer", color: "var(--app-muted)" }}>✕</button>
+                  </div>
+                  <ModernProjectCreator
+                    key={`mobile-edit-${jumpProject._id || jumpProject.id}`}
+                    editProject={jumpProject}
+                    clients={clients}
+                    employees={employees}
+                    onAddEmployeeClick={() => {
+                      const limit = getSubscriptionLimit("employee", subscription);
+                      if (limit !== Infinity && employees.length >= limit) {
+                        setLimitModal({ type: "employee", limit });
+                        return;
+                      }
+                      setNeError({}); setModal("employee");
+                      fetchSubscription();
+                    }}
+                    onBack={() => setShowMobileEditProjectModal(false)}
+                    onSuccess={async (updatedProj) => {
+                      if (updatedProj) setJumpProject(updatedProj);
+                      await fetchProjects();
+                      setShowMobileEditProjectModal(false);
+                    }}
+                  />
+                </div>
+              </div>
+            )}
             {showMobileInvoiceModal && (
               <div style={{ position: "fixed", inset: 0, zIndex: 9000, background: "rgba(15,23,42,0.5)", display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}>
             <div className="mobile-invoice-modal-scope" style={{ background: "var(--app-bg, #f5f7fb)", width: "100%", maxWidth: 520, maxHeight: "90vh", overflowY: "auto", overflowX: "hidden", borderRadius: 18, padding: "12px", boxSizing: "border-box" }}>

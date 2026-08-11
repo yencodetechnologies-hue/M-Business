@@ -362,64 +362,32 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
   return (
     <>
       <style>{`
-        @media print {
-          .invoice-paper { page-break-after: always; }
-          .invoice-paper:last-child { page-break-after: auto; }
-        }
-        @media (max-width: 768px) {
+     @media print {
+          @page { size: A4 portrait; margin: 6mm; }
+          html, body { margin: 0 !important; padding: 0 !important; height: auto !important; overflow: visible !important; background: #fff !important; }
           .invoice-preview-modal-wrap {
-            max-width: 100% !important;
-            width: 100% !important;
-            padding: 0 !important;
-          }
-          .invoice-paper {
-            padding: 16px !important;
-            font-size: 11px !important;
-            border-radius: 10px !important;
-            min-height: auto !important;
-            box-sizing: border-box !important;
-            width: 100% !important;
-            max-width: 100% !important;
-            overflow-x: hidden !important;
-          }
-      .invoice-paper .inv-parties {
-            grid-template-columns: 1fr 1fr !important;
-            gap: 8px !important;
-            padding: 8px 10px !important;
-          }
-          .invoice-paper .inv-parties > div:last-child {
-            margin-left: 0 !important;
-            width: 100% !important;
-            font-size: 9px !important;
-          }
-          .invoice-paper .inv-party-label,
-          .invoice-paper .inv-party-name,
-          .invoice-paper .inv-party-detail,
-          .invoice-paper .inv-party-detail div {
-            font-size: 9px !important;
-          }
-          .invoice-paper .inv-parties strong {
-            font-size: 9px !important;
-          }
-          .invoice-paper .inv-title-word {
-            font-size: 20px !important;
+            max-height: none !important;
+            overflow: visible !important;
             transform: none !important;
           }
-          .invoice-paper .inv-header {
-            flex-wrap: wrap !important;
-          }
-          .invoice-paper table {
-            font-size: 11px !important;
-          }
-          .invoice-paper .inv-table-wrap,
-          .invoice-paper table {
-            display: block !important;
+          .invoice-paper {
+            page-break-after: auto !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            max-height: none !important;
+            overflow: visible !important;
+            height: auto !important;
+            min-height: 0 !important;
             width: 100% !important;
-            overflow-x: auto !important;
-            -webkit-overflow-scrolling: touch !important;
+            max-width: 100% !important;
+            font-size: 10px !important;
+            padding: 10px !important;
+            transform: scale(0.94);
+            transform-origin: top left;
           }
-        }
-      `}</style>
+          .invoice-paper:last-child { page-break-after: auto; }
+          .no-print, .no-print * { display: none !important; }
+        } `}</style>
       {pages.map((pageItems, pageIdx) => {
         const isFirstPage = pageIdx === 0;
         const isLastPage = pageIdx === pages.length - 1;

@@ -811,21 +811,21 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
       }}>
         <button onClick={onClose} style={{
           background: "#f0fdfe", border: "1.5px solid #e0eef0",
-          borderRadius: 8, padding: "7px 14px", fontSize: 12,
+          borderRadius: 8, padding: "5px 10px", fontSize: 11,
           fontWeight: 700, cursor: "pointer", color: " var(--app-accent, var(--app-accent, #00BCD4))",
-          display: "flex", alignItems: "center", gap: 6
+          display: "flex", alignItems: "center", gap: 4, flexShrink: 0
         }}>
-          <i className="ti ti-arrow-left"></i> Back
+          <i className="ti ti-arrow-left" style={{ fontSize: 12 }}></i> Back
         </button>
 
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{
-            fontSize: 15, fontWeight: 800, color: "#0D2027",
+            fontSize: 12.5, fontWeight: 800, color: "#0D2027",
             whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis"
           }}>
             {prop.title || "Untitled Proposal"}
           </div>
-          <div style={{ fontSize: 11, color: "#96B0B8", marginTop: 2 }}>
+          <div style={{ fontSize: 9.5, color: "#96B0B8", marginTop: 1 }}>
             Client: {prop.client || prop.clientName || "—"} ·{" "}
             {prop.sentAt
               ? new Date(prop.sentAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })

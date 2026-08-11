@@ -1325,7 +1325,32 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
     const isMobileView = typeof window !== "undefined" && window.innerWidth < 769;
     return isMobileView ? (
       <div style={{ position: "fixed", inset: 0, zIndex: 999999, background: "rgba(15,28,46,0.55)", padding: "20px 12px", display: "flex", alignItems: "center", justifyContent: "center" }} onClick={() => { if (onBackOverride) onBackOverride(); else setStep("list"); }}>
-      <div className="print-wrapper" onClick={(e) => e.stopPropagation()} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "#fff", borderRadius: 16, overflow: "hidden", maxWidth: 830, width: "100%", maxHeight: "calc(100vh - 32px)", boxShadow: "0 32px 80px rgba(0,0,0,0.3)", display: "flex", flexDirection: "column" }}>
+      <div className="print-wrapper quotation-mobile-popup-scope" onClick={(e) => e.stopPropagation()} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "#fff", borderRadius: 16, overflow: "hidden", maxWidth: 830, width: "100%", maxHeight: "calc(100vh - 32px)", boxShadow: "0 32px 80px rgba(0,0,0,0.3)", display: "flex", flexDirection: "column" }}>
+        <style>{`
+          .quotation-mobile-popup-scope, .quotation-mobile-popup-scope * { box-sizing: border-box !important; max-width: 100% !important; }
+          .quotation-mobile-popup-scope { overflow-x: hidden !important; }
+          .quotation-mobile-popup-scope .qt-paper { max-width: 100% !important; width: 100% !important; margin: 0 !important; border-radius: 0 !important; box-shadow: none !important; min-height: auto !important; }
+          .quotation-mobile-popup-scope .qt-hgrid { flex-direction: column !important; gap: 10px !important; }
+          .quotation-mobile-popup-scope .qt-btgrid { grid-template-columns: 1fr !important; }
+          .quotation-mobile-popup-scope .qt-table-wrap { overflow-x: auto !important; padding: 12px !important; }
+          .quotation-mobile-popup-scope table { min-width: 0 !important; font-size: 10px !important; }
+          .quotation-mobile-popup-scope th, .quotation-mobile-popup-scope td { padding: 6px !important; font-size: 10px !important; }
+          .quotation-mobile-popup-scope input, .quotation-mobile-popup-scope select, .quotation-mobile-popup-scope textarea {
+            font-size: 11px !important; padding: 6px 8px !important; height: auto !important; width: 100% !important;
+          }
+          .quotation-mobile-popup-scope [style*="padding: 28px 32px"],
+          .quotation-mobile-popup-scope [style*="padding: \\"20px 32px\\""],
+          .quotation-mobile-popup-scope [style*="padding: \\"22px 32px\\""] {
+            padding: 12px !important;
+          }
+          .quotation-mobile-popup-scope [style*="fontSize: 24"] { font-size: 16px !important; }
+          .quotation-mobile-popup-scope [style*="fontSize: 32"] { font-size: 18px !important; }
+          .quotation-mobile-popup-scope [style*="fontSize: 17"] { font-size: 13px !important; }
+          .quotation-mobile-popup-scope [style*="fontSize: 15"] { font-size: 12px !important; }
+          .quotation-mobile-popup-scope [style*="grid-template-columns: 1fr 1fr"] { grid-template-columns: 1fr !important; }
+          .quotation-mobile-popup-scope [style*="display: grid"][style*="gridTemplateColumns"] { grid-template-columns: 1fr !important; }
+          .quotation-mobile-popup-scope button { font-size: 11px !important; padding: 7px 10px !important; }
+        `}</style>
         {toastMsg && (
           <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 99999, background: '#1A2E35', color: '#fff', borderRadius: 12, padding: '12px 20px', fontSize: 13, fontWeight: 700, boxShadow: '0 8px 24px rgba(0,0,0,0.18)', display: 'flex', alignItems: 'center', gap: 8 }}>
             <i className="ti ti-check" style={{ fontSize: 15, color: '#26C281' }}></i> {toastMsg}

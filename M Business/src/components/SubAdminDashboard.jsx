@@ -1100,7 +1100,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
   const [filterMode, setFilterMode] = useState("all");
   const [sortMode, setSortMode] = useState("newest");
 
-  const [activeClientId, setActiveClientId] = useState(activeClientIdForReturn || (clients[0]?._id ?? null));
+  const [activeClientId, setActiveClientId] = useState(activeClientIdForReturn || null);
 
   const [isLoading, setIsLoading] = useState(!!isFetching);
   const [activeTab, setActiveTab] = useState("overview");
@@ -12401,12 +12401,12 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   {/* FLOATING BOTTOM NAV — glass pill (portaled to body so it always stays fixed to the viewport, mobile only) */}
                   {!isDesktopWidth && createPortal(
-                    <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "var(--app-accent, #00BCD4)", borderRadius: 0, display: "flex", justifyContent: "space-around", alignItems: "center", padding: "12px 6px", zIndex: 4000, boxShadow: "0 -2px 12px rgba(0,0,0,0.15)", position: "fixed" }}>
+                    <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "var(--app-accent, #00BCD4)", borderRadius: 0, display: "flex", justifyContent: "space-around", alignItems: "center", padding: "12px 6px", zIndex: 1000000, boxShadow: "0 -2px 12px rgba(0,0,0,0.15)", position: "fixed" }}>
                       {[
                         { icon: "ti-home", label: "Home", key: "dashboard" },
                         { icon: "ti-file-invoice", label: "Invoice", key: "invoices" },
                         { icon: "ti-folder", label: "Projects", key: "projects" },
-
+                   
                         { icon: "ti-users", label: "Clients", key: "clients" },
                         { icon: "ti-settings", label: "Settings", key: "settings" },
                       ].map((n, i) => n.key === "add" ? (

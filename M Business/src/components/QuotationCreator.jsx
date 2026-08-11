@@ -1330,8 +1330,30 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
           .quotation-mobile-popup-scope, .quotation-mobile-popup-scope * { box-sizing: border-box !important; max-width: 100% !important; }
           .quotation-mobile-popup-scope { overflow-x: hidden !important; }
           .quotation-mobile-popup-scope .qt-paper { max-width: 100% !important; width: 100% !important; margin: 0 !important; border-radius: 0 !important; box-shadow: none !important; min-height: auto !important; }
-          .quotation-mobile-popup-scope .qt-hgrid { flex-direction: column !important; gap: 10px !important; }
-          .quotation-mobile-popup-scope .qt-btgrid { grid-template-columns: 1fr !important; }
+          .quotation-mobile-popup-scope .qt-hgrid { flex-direction: row !important; flex-wrap: nowrap !important; gap: 8px !important; align-items: flex-start !important; }
+          .quotation-mobile-popup-scope .qt-hgrid > div { min-width: 0 !important; flex: 1 1 50% !important; }
+          .quotation-mobile-popup-scope .qt-hgrid > div:last-child { text-align: right !important; }
+          .quotation-mobile-popup-scope .qt-btgrid {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 8px !important;
+          }
+          .quotation-mobile-popup-scope .qt-btgrid > div {
+            padding: 10px !important;
+            min-width: 0 !important;
+          }
+          .quotation-mobile-popup-scope .qt-btgrid [style*="fontSize: 17"],
+          .quotation-mobile-popup-scope .qt-btgrid [style*="fontSize: 15"] {
+            font-size: 12px !important;
+            word-break: break-word;
+          }
+          .quotation-mobile-popup-scope .qt-hgrid [style*="fontSize: 24"] { font-size: 13px !important; }
+          .quotation-mobile-popup-scope .qt-hgrid [style*="fontSize: 32"] { font-size: 15px !important; }
+          .quotation-mobile-popup-scope .qt-hgrid [style*="fontSize: 16"] { font-size: 11px !important; }
+          .quotation-mobile-popup-scope .qt-hgrid [style*="fontSize: 12"] { font-size: 9px !important; }
+          .quotation-mobile-popup-scope .qt-hgrid [style*="fontSize: 9"] { font-size: 8px !important; }
+          .quotation-mobile-popup-scope .qt-hgrid img { height: 40px !important; }
+          .quotation-mobile-popup-scope .qt-hgrid > div:first-child [style*="width: 60"] { width: 32px !important; height: 32px !important; font-size: 14px !important; }
           .quotation-mobile-popup-scope .qt-table-wrap { overflow-x: auto !important; padding: 12px !important; }
           .quotation-mobile-popup-scope table { min-width: 0 !important; font-size: 10px !important; }
           .quotation-mobile-popup-scope th, .quotation-mobile-popup-scope td { padding: 6px !important; font-size: 10px !important; }
@@ -1348,7 +1370,20 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
           .quotation-mobile-popup-scope [style*="fontSize: 17"] { font-size: 13px !important; }
           .quotation-mobile-popup-scope [style*="fontSize: 15"] { font-size: 12px !important; }
           .quotation-mobile-popup-scope [style*="grid-template-columns: 1fr 1fr"] { grid-template-columns: 1fr !important; }
-          .quotation-mobile-popup-scope [style*="display: grid"][style*="gridTemplateColumns"] { grid-template-columns: 1fr !important; }
+          .quotation-mobile-popup-scope .qt-btgrid {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 8px !important;
+          }
+          .quotation-mobile-popup-scope .qt-btgrid > div {
+            padding: 10px !important;
+            min-width: 0 !important;
+          }
+          .quotation-mobile-popup-scope .qt-btgrid [style*="fontSize: 17"],
+          .quotation-mobile-popup-scope .qt-btgrid [style*="fontSize: 15"] {
+            font-size: 12px !important;
+            word-break: break-word;
+          }
           .quotation-mobile-popup-scope button { font-size: 11px !important; padding: 7px 10px !important; }
         `}</style>
         {toastMsg && (

@@ -1179,7 +1179,20 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
     if (!stillExists) {
       setActiveClientId(null);
     }
-  }, [clients]); useEffect(() => {
+  }, [clients]);
+
+  // Auto-select the first client so the Clients page opens directly into
+  // a client's details instead of showing an empty state.
+  useEffect(() => {
+    if (activeClientId) return;
+    if (activeClientIdForReturn || newClientId) return;
+    if (isFetching) return;
+    if (filtered.length > 0) {
+      setActiveClientId(filtered[0]._id);
+    }
+  }, [activeClientId, activeClientIdForReturn, newClientId, isFetching, filtered]);
+
+  useEffect(() => {
     if (activeClientIdForReturn) {
       setActiveClientId(activeClientIdForReturn);
       setActiveTab("overview");
@@ -2438,7 +2451,20 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
                 <button
                   key={f}
                   onClick={() => setFilterMode(f)}
-                  style={{ flex: 1, padding: "5px 4px", borderRadius: 7, border: "none", fontSize: 10, fontWeight: 700, cursor: "pointer", background: "var(--teal-lighter, #F0FDFE)", color: "#607D86", textTransform: "capitalize" }}
+                  style={{
+                    flex: 1,
+                    padding: "5px 4px",
+                    borderRadius: 7,
+                    border: filterMode === f ? "1.5px solid var(--app-accent, #00BCD4)" : "1.5px solid transparent",
+                    fontSize: 10,
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    background: filterMode === f ? "var(--app-accent, #00BCD4)" : "var(--teal-lighter, #F0FDFE)",
+                    color: filterMode === f ? "#fff" : "#607D86",
+                    textTransform: "capitalize",
+                    transition: "all 0.15s ease",
+                    boxShadow: filterMode === f ? "0 2px 6px rgba(0,188,212,0.35)" : "none"
+                  }}
                 >
                   {f === "all" ? `All (${clients.length})` : f === "active" ? `Active (${clients.filter(c => (c.status || "Active").toLowerCase() === "active").length})` : `Inactive (${clients.filter(c => (c.status || "").toLowerCase() === "inactive").length})`}
                 </button>

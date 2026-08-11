@@ -12407,7 +12407,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                         { icon: "ti-folder", label: "Projects", key: "projects" },
                         { icon: null, label: "", key: "add" },
                         { icon: "ti-users", label: "Clients", key: "clients" },
-                        { icon: "ti-dots", label: "More", key: "settings" },
+                        { icon: "ti-settings", label: "Settings", key: "settings" },
                       ].map((n, i) => n.key === "add" ? (
                         <div key={i} onClick={() => setShowMobileAddMenu(true)} style={{ width: 52, height: 52, borderRadius: "50%", background: "var(--app-accent, #00BCD4)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 24, lineHeight: 1, boxShadow: "0 10px 24px rgba(0,188,212,0.5)", position: "absolute", top: -30, left: "50%", transform: "translateX(-50%)" }}>+</div>
                       ) : (

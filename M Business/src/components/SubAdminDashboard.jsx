@@ -8170,6 +8170,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     return null;
   };
   const [showMobileInvoiceModal, setShowMobileInvoiceModal] = useState(false);
+  const [showMobileQuotationModal, setShowMobileQuotationModal] = useState(false);
+  const [showMobileProposalModal, setShowMobileProposalModal] = useState(false);
   const [showMobileTaskModal, setShowMobileTaskModal] = useState(false);
 
 
@@ -13920,14 +13922,22 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 onNewProposal={(proj) => {
                   setProposalPrefillProject(proj);
                   setProposalReturnProject(proj);
-                  setSidebarOverride("projects");
-                  setActive("proposals");
+                  if (typeof window !== "undefined" && window.innerWidth < 769) {
+                    setShowMobileProposalModal(true);
+                  } else {
+                    setSidebarOverride("projects");
+                    setActive("proposals");
+                  }
                 }}
                 onNewQuotation={(proj) => {
                   setQuotationPrefillProject(proj);
                   setQuotationReturnProject(proj);
-                  setSidebarOverride("projects");
-                  setActive("quotations");
+                  if (typeof window !== "undefined" && window.innerWidth < 769) {
+                    setShowMobileQuotationModal(true);
+                  } else {
+                    setSidebarOverride("projects");
+                    setActive("quotations");
+                  }
                 }}
                 onViewQuotation={(entry) => {
                   setQuotationViewEntry(entry);
@@ -14252,7 +14262,45 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               setReturnToModal(modal); setModal("client");
 
             }} onAddProject={() => { setJumpProject(null); setSidebarOverride("invoices"); setActive("create-project"); }} />}
-
+{showMobileProposalModal && (
+              <div style={{ position: "fixed", inset: 0, zIndex: 9000, background: "rgba(15,23,42,0.5)", display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}>
+                <div style={{ background: "var(--app-bg, #f5f7fb)", width: "100%", maxWidth: 520, maxHeight: "90vh", overflowY: "auto", overflowX: "hidden", borderRadius: 18, padding: "12px", boxSizing: "border-box" }}>
+                  <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 8 }}>
+                    <button onClick={() => setShowMobileProposalModal(false)} style={{ background: "none", border: "none", fontSize: 22, cursor: "pointer", color: "var(--app-muted)" }}>✕</button>
+                  </div>
+                  <ProjectProposalCreator
+                    key={`mobile-proposal-${sidebarNavClickId}`}
+                    clients={clients}
+                    companyLogo={companyLogo}
+                    companyName={companyNameStr}
+                    prefillProject={proposalPrefillProject}
+                    onPrefillConsumed={() => setProposalPrefillProject(null)}
+                    onReturnToProject={() => setShowMobileProposalModal(false)}
+                    onBackOverride={() => setShowMobileProposalModal(false)}
+                  />
+                </div>
+              </div>
+            )}
+            {showMobileQuotationModal && (
+              <div style={{ position: "fixed", inset: 0, zIndex: 9000, background: "rgba(15,23,42,0.5)", display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}>
+                <div style={{ background: "var(--app-bg, #f5f7fb)", width: "100%", maxWidth: 520, maxHeight: "90vh", overflowY: "auto", overflowX: "hidden", borderRadius: 18, padding: "12px", boxSizing: "border-box" }}>
+                  <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 8 }}>
+                    <button onClick={() => setShowMobileQuotationModal(false)} style={{ background: "none", border: "none", fontSize: 22, cursor: "pointer", color: "var(--app-muted)" }}>✕</button>
+                  </div>
+                  <QuotationCreator
+                    key={`mobile-quotation-${sidebarNavClickId}`}
+                    user={user}
+                    clients={clients}
+                    projects={projects}
+                    companyLogo={companyLogo}
+                    companyName={companyNameStr}
+                    initialStep="form"
+                    onBackOverride={() => setShowMobileQuotationModal(false)}
+                  />
+                </div>
+              </div>
+            )}
+    
             {showMobileInvoiceModal && (
               <div style={{ position: "fixed", inset: 0, zIndex: 9000, background: "rgba(15,23,42,0.5)", display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}>
             <div className="mobile-invoice-modal-scope" style={{ background: "var(--app-bg, #f5f7fb)", width: "100%", maxWidth: 520, maxHeight: "90vh", overflowY: "auto", overflowX: "hidden", borderRadius: 18, padding: "12px", boxSizing: "border-box" }}>

@@ -1383,8 +1383,16 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
   //  empty deps — uses functional setters, no stale closure
 
   const openDoc = (d) => {
-    // Always open the viewer when clicking a proposal card
-    setViewingProposal(d);
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 769;
+    if (isMobile) {
+      // Mobile: show the popup viewer
+      setViewingProposal(d);
+    } else {
+      // Desktop: open the full proposal detail/editor page
+      setDoc(d);
+      setPage(0);
+      setView("form");
+    }
   };
   const createNew = async (initialData = {}) => {
     const nd = {
@@ -2115,7 +2123,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                             <button onClick={e => { e.stopPropagation(); setOpenMenuId(openMenuId === (p.id || p._id) ? null : (p.id || p._id)); }} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text3,#A0B8BE)", fontSize: 17, padding: 4 }}><i className="ti ti-dots-vertical"></i></button>
                             {openMenuId === (p.id || p._id) && (
                               <div onClick={e => e.stopPropagation()} style={{ position: "absolute", top: 28, right: 0, background: "#fff", border: "1.5px solid #e0eef0", borderRadius: 10, boxShadow: "0 8px 24px rgba(0,0,0,0.12)", zIndex: 999, minWidth: 160, overflow: "hidden" }}>
-                                <div onClick={e => { setOpenMenuId(null); setViewingProposal(p); }} style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "#1A2E35", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid #f0f4f8" }} onMouseEnter={e => e.currentTarget.style.background = "#f0fdfe"} onMouseLeave={e => e.currentTarget.style.background = ""}><i className="ti ti-eye" style={{ color: " var(--app-accent, var(--app-accent, #00BCD4))" }}></i> View</div>
+                                <div onClick={e => { setOpenMenuId(null); openDoc(p); }} style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "#1A2E35", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid #f0f4f8" }} onMouseEnter={e => e.currentTarget.style.background = "#f0fdfe"} onMouseLeave={e => e.currentTarget.style.background = ""}><i className="ti ti-eye" style={{ color: " var(--app-accent, var(--app-accent, #00BCD4))" }}></i> View</div>
                                 <div onClick={e => { setOpenMenuId(null); setDoc(p); setPage(0); setView("form"); }} style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "#1A2E35", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid #f0f4f8" }} onMouseEnter={e => e.currentTarget.style.background = "#f0fdfe"} onMouseLeave={e => e.currentTarget.style.background = ""}><i className="ti ti-edit" style={{ color: "#F59E0B" }}></i> Edit</div>
                                 <div onClick={e => { setOpenMenuId(null); shareProposalPDF(p); }} style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "#1A2E35", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid #f0f4f8" }} onMouseEnter={e => e.currentTarget.style.background = "#f0fdfe"} onMouseLeave={e => e.currentTarget.style.background = ""}><i className="ti ti-share" style={{ color: "#7C5CFC" }}></i> Share</div>
                                 <div onClick={e => { setOpenMenuId(null); printProposal(p); }} style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "#1A2E35", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid #f0f4f8" }} onMouseEnter={e => e.currentTarget.style.background = "#f0fdfe"} onMouseLeave={e => e.currentTarget.style.background = ""}><i className="ti ti-download" style={{ color: "#2563EB" }}></i> PDF</div>
@@ -2175,7 +2183,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                           </div>
                           <div style={{ fontSize: 15, fontWeight: 800, color: "var(--teal, var(--app-accent, var(--app-accent, #00BCD4)))" }}>₹{value.toLocaleString("en-IN")}</div>
                           <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }} onClick={e => e.stopPropagation()}>
-                            <button className="pf-btn" onClick={e => { e.stopPropagation(); setViewingProposal(p); }}><i className="ti ti-eye" style={{ fontSize: 12 }}></i> View</button>
+                            <button className="pf-btn" onClick={e => { e.stopPropagation(); openDoc(p); }}><i className="ti ti-eye" style={{ fontSize: 12 }}></i> View</button>
                             <button className="pf-btn" style={{ background: '#22C55E', color: '#fff', borderColor: '#22C55E' }} onClick={e => { e.stopPropagation(); setSendPopupProposal(p); setTargetPortalClient(p.client || p.clientName || ''); setShowSendPopup(true); }}><i className="ti ti-send" style={{ fontSize: 12 }}></i> Send</button>
                             <button className="pf-btn" onClick={e => { e.stopPropagation(); shareProposalPDF(p); }}><i className="ti ti-share" style={{ fontSize: 12 }}></i> Share</button>
 
@@ -2274,9 +2282,9 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
 
         </div >
 
-        {/* PROPOSAL VIEWER MODAL FOR SUBADMIN */}
+        {/* PROPOSAL VIEWER MODAL FOR SUBADMIN — mobile only */}
         {
-          viewingProposal && (
+          viewingProposal && typeof window !== "undefined" && window.innerWidth < 769 && (
             <SubadminProposalViewer
               proposal={viewingProposal}
               onClose={() => { setViewingProposal(null); if (onBackOverride) onBackOverride(); }}

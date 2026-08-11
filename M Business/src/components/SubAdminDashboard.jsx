@@ -1181,16 +1181,8 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
     }
   }, [clients]);
 
-  // Auto-select the first client so the Clients page opens directly into
-  // a client's details instead of showing an empty state.
-  useEffect(() => {
-    if (activeClientId) return;
-    if (activeClientIdForReturn || newClientId) return;
-    if (isFetching) return;
-    if (filtered.length > 0) {
-      setActiveClientId(filtered[0]._id);
-    }
-  }, [activeClientId, activeClientIdForReturn, newClientId, isFetching, filtered]);
+  // Do not auto-select a client on load/refresh — the details popup
+  // should only open when the user explicitly clicks a client.
 
   useEffect(() => {
     if (activeClientIdForReturn) {
@@ -2517,7 +2509,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
   minWidth: 0,
   background: "#fff"
 } : { flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minWidth: 0, background: "#fff", height: "auto", minHeight: "auto" }}>
-            <button onClick={() => { setActiveClientId(null); setViewClientModal(false); }} style={{ position: "sticky", top: 8, left: "100%", transform: "translateX(-8px)", width: 32, height: 32, borderRadius: "50%", background: "#F5FAFA", border: "1px solid #E0EEF0", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 16, color: "#607D86", zIndex: 10 }}><i className="ti ti-x"></i></button>            <button className="client-detail-modal-close" onClick={() => { setActiveClientId(null); setViewClientModal(false); }} style={{ display: "none" }}><i className="ti ti-x"></i></button>
+            <button onClick={() => { setActiveClientId(null); setViewClientModal(false); window.__fullClientsList = true; }} style={{ position: "sticky", top: 8, left: "100%", transform: "translateX(-8px)", width: 32, height: 32, borderRadius: "50%", background: "#F5FAFA", border: "1px solid #E0EEF0", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 16, color: "#607D86", zIndex: 10 }}><i className="ti ti-x"></i></button>            <button className="client-detail-modal-close" onClick={() => { setActiveClientId(null); setViewClientModal(false); window.__fullClientsList = true; }} style={{ display: "none" }}><i className="ti ti-x"></i></button>
 
 
 

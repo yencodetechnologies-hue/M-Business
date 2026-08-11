@@ -1662,15 +1662,19 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
             body > div { height: auto !important; min-height: 0 !important; padding: 0 !important; margin: 0 !important; }
           }
           .avoid-break { page-break-inside: avoid; break-inside: avoid; }
-@media (max-width:600px) { .qt-hgrid { flex-direction:column!important; } .qt-btgrid { grid-template-columns:1fr!important; } }
+@media (max-width:600px) and (min-resolution: 1dppx) { }
           @media (max-width:600px) { .stats-row { grid-template-columns:repeat(2,1fr)!important; } }
         `}</style>
 
         <div className="no-print" style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 20, flexWrap: "wrap" }}>
 
           <button onClick={() => onBackOverride ? onBackOverride() : setStep("list")} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>Document List</button>
-          <button onClick={() => {
-            if (onEditQuotation && viewEntry) {
+       <button onClick={() => {
+            const isMobile = typeof window !== "undefined" && window.innerWidth < 769;
+            if (isMobile) {
+              loadEntry(viewEntry);
+              setStep("form");
+            } else if (onEditQuotation && viewEntry) {
               onEditQuotation(viewEntry);
             } else {
               setStep("form");

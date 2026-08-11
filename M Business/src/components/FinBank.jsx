@@ -275,8 +275,16 @@ a { text-decoration: none; color: inherit; }
               <div className="card">
                 <div style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-dark)', marginBottom: '12px' }}>Export Statement</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <button className="exp-btn exp-pdf" style={{ justifyContent: 'flex-start' }} onClick={downloadStatementPDF}><i className="ti ti-file-type-pdf"></i>Download PDF</button>
-                  <button className="exp-btn exp-excel" style={{ justifyContent: 'flex-start' }} onClick={downloadStatementExcel}><i className="ti ti-file-spreadsheet"></i>Download Excel</button>
+                  <button className="exp-btn exp-pdf" style={{ justifyContent: 'flex-start' }} onClick={() => window.print()}><i className="ti ti-file-type-pdf"></i>Download PDF</button>
+                  <button className="exp-btn exp-excel" style={{ justifyContent: 'flex-start' }} onClick={() => {
+                    const rows = [['Type','Amount'],['Opening Balance','8,62,320'],['Total Credits','18,42,000'],['Total Debits','14,20,000'],['Closing Balance','12,84,320']];
+                    const csv = rows.map(r => r.join(',')).join('\n');
+                    const blob = new Blob([csv], { type: 'text/csv' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url; a.download = 'bank-statement.csv'; a.click();
+                    URL.revokeObjectURL(url);
+                  }}><i className="ti ti-file-spreadsheet"></i>Download Excel</button>
                 </div>
               </div>
             </div>

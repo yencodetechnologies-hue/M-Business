@@ -366,9 +366,19 @@ export default function AccountsPage({
 
   return (
     <div style={{ paddingBottom: 60 }}>
-      {onBack && (
+   {onBack && (
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
-
+          <button
+            onClick={onBack}
+            style={{
+              display: "flex", alignItems: "center", gap: 6,
+              background: "transparent", border: "1.5px solid #E0EEF0",
+              borderRadius: 8, padding: "6px 12px", fontSize: 13,
+              fontWeight: 700, color: THEME.accent, cursor: "pointer"
+            }}
+          >
+            <i className="ti ti-arrow-left" /> Back to Dashboard
+          </button>
           <div style={{ fontSize: 20, fontWeight: 800, color: "#0F172A" }}>Revenue & Accounts</div>
         </div>
       )}

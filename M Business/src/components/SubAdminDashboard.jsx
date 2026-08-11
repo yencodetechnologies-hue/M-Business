@@ -1548,8 +1548,8 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
             </span>
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-      <button onClick={() => onCreateProject && onCreateProject(activeClient)} style={{ background: "var(--app-accent, #00BCD4)", border: "none", borderRadius: 6, padding: isMobileWidth ? "2px 6px" : "4px 10px", fontSize: isMobileWidth ? 8 : 11, color: "#fff", cursor: "pointer", fontWeight: 600, display: "flex", alignItems: "center", gap: 2 }}>
-  <i className="ti ti-plus" style={{ fontSize: isMobileWidth ? 8 : 11 }} /> Add Project
+<button onClick={() => onCreateProject && onCreateProject(activeClient)} style={{ background: "var(--app-accent, #00BCD4)", border: "none", borderRadius: 5, padding: isMobileWidth ? "2px 5px" : "4px 10px", fontSize: isMobileWidth ? 7 : 11, fontFamily: "inherit", fontStyle: "normal", letterSpacing: "0.2px", color: "#fff", cursor: "pointer", fontWeight: 500, display: "flex", alignItems: "center", gap: 1, whiteSpace: "nowrap", flexShrink: 0 }}>
+  <i className="ti ti-plus" style={{ fontSize: isMobileWidth ? 7 : 11 }} /> {isMobileWidth ? "Add Project" : "Add Project"}
 </button>
               <span onClick={() => setActiveTab("projects")} style={{ fontSize: 11, color: "var(--app-accent)", fontWeight: 700, cursor: "pointer" }}>View all</span>
             </div>
@@ -14537,8 +14537,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
             {validActive === "accounts" && <AccountsPage onBack={() => setActive("dashboard")} THEME={currentTheme} initialTab="overview" income={income} setIncome={setIncome} fetchIncome={fetchIncome} expenses={expenses} setExpenses={setExpenses} fetchExpenses={fetchExpenses} />}
 
-            {validActive === "payments" && <AccountsPage THEME={currentTheme} initialTab="income" income={income} setIncome={setIncome} fetchIncome={fetchIncome} expenses={expenses} setExpenses={setExpenses} fetchExpenses={fetchExpenses} />}
-
+          {validActive === "payments" && <AccountsPage THEME={currentTheme} initialTab="income" income={income} setIncome={setIncome} fetchIncome={fetchIncome} expenses={expenses} setExpenses={setExpenses} fetchExpenses={fetchExpenses} onBack={typeof window !== "undefined" && window.innerWidth < 769 ? () => setActive("dashboard") : undefined} />}
             {validActive === "expenses" && <AccountsPage THEME={currentTheme} initialTab="expenses" income={income} setIncome={setIncome} fetchIncome={fetchIncome} expenses={expenses} setExpenses={setExpenses} fetchExpenses={fetchExpenses} />}
 
             {validActive === "interviews" && <InterviewPage companyId={companyId} companyName={companyNameStr} />}

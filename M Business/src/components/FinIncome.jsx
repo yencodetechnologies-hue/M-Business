@@ -128,13 +128,13 @@ export default function FinIncome({ income: propIncome, setIncome: propSetIncome
         </div>
 
         {/* KPI CARDS */}
-        <div style={{ display: 'flex', gap: 16, marginBottom: 22, flexWrap: 'wrap' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginBottom: 22 }} className="fi-kpi-row">
           {[['Total Income', total, '#26C281', 'ti-cash', income.length + ' records'], ['Received', received, '#00BCD4', 'ti-check', income.filter(i => i.status !== 'Pending').length + ' payments'], ['Pending', pending, '#F59E0B', 'ti-clock', income.filter(i => i.status === 'Pending').length + ' outstanding']].map(([label, val, color, icon, sub]) => (
-            <div key={label} style={{ cursor: 'default', flex: '1 1 200px', minWidth: 200, background: '#fff', border: '1.5px solid #E0EEF0', borderRadius: 14, padding: '18px 20px', display: 'flex', alignItems: 'center', gap: 12, boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
-              <div style={{ width: 40, height: 40, borderRadius: 10, background: `${color}1a`, color: color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}><i className={`ti ${icon}`} /></div>
-              <div>
-                <div style={{ fontSize: 24, fontWeight: 800, color: '#1A2332' }}>{fmt(val)}</div>
-                <div style={{ fontSize: 12, fontWeight: 700, color: '#607D86' }}>{label}</div>
+            <div key={label} style={{ cursor: 'default', minWidth: 0, background: '#fff', border: '1.5px solid #E0EEF0', borderRadius: 14, padding: '14px 10px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 8, boxShadow: '0 2px 10px rgba(0,0,0,0.02)', overflow: 'hidden' }}>
+              <div style={{ width: 32, height: 32, borderRadius: 8, background: `${color}1a`, color: color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, flexShrink: 0 }}><i className={`ti ${icon}`} /></div>
+              <div style={{ minWidth: 0, width: '100%' }}>
+                <div style={{ fontSize: 'clamp(13px, 4.2vw, 20px)', fontWeight: 800, color: '#1A2332', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{fmt(val)}</div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: '#607D86', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</div>
               </div>
             </div>
           ))}

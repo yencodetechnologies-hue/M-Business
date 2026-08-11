@@ -1423,7 +1423,11 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
 
           <button onClick={() => onBackOverride ? onBackOverride() : setStep("list")} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>Document List</button>
           <button onClick={() => {
-            if (onEditQuotation && viewEntry) {
+            const isMobile = typeof window !== "undefined" && window.innerWidth < 769;
+            if (isMobile) {
+              loadEntry(viewEntry);
+              setStep("form");
+            } else if (onEditQuotation && viewEntry) {
               onEditQuotation(viewEntry);
             } else {
               setStep("form");
@@ -1893,8 +1897,9 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
     );
   }
 
-  const hasErrors = Object.keys(errors).length > 0;
-  return (
+ const hasErrors = Object.keys(errors).length > 0;
+  const isMobileFormView = typeof window !== "undefined" && window.innerWidth < 769;
+  const formInner = (
     <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", flex: 1 }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');

@@ -14218,7 +14218,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
             {validActive === "invoices" && typeof window !== "undefined" && window.innerWidth < 769 && <InvoicesListPage invoices={invoices} clients={clients} projects={projects} onViewInvoice={(inv) => { setJumpInvoice({ ...inv, _t: Date.now() }); }} onViewClient={(c) => { setActiveClientIdForReturn(c._id); setActive("clients"); }} onViewProject={(p) => { setJumpProject(p); setProjectDetailsReadOnly(false); setSidebarOverride("dashboard"); setActive("project-details"); }} onBack={() => setActive("dashboard")} />}
 
-            {validActive === "invoices" && !(typeof window !== "undefined" && window.innerWidth < 769) && <InvoiceCreator key={`invoices-full-${sidebarNavClickId}`} forceListView={true} onConsumeForceListView={() => { }} onOpenNewInvoiceModal={() => { setInvoicePrefill(null); setShowMobileInvoiceModal(true); }} user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={() => { setSidebarOverride(null); setActive("dashboard"); }} onSaveSuccess={() => { setActive("invoices"); }} jumpInvoice={null} newInvoicePrefill={invoicePrefill || jumpInvoicePrefill} newClientName={pendingInvoiceClientName} onNewClientConsumed={() => setPendingInvoiceClientName(null)} onAddClient={() => { }} onAddProject={() => { setJumpProject(null); setActive("create-project"); }} />}
+            {validActive === "invoices" && !(typeof window !== "undefined" && window.innerWidth < 769) && <InvoiceCreator key={`invoices-full-${sidebarNavClickId}`} forceListView={true} onConsumeForceListView={() => { }} user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={() => { setSidebarOverride(null); setActive("dashboard"); }} onSaveSuccess={() => { setActive("invoices"); }} jumpInvoice={null} newInvoicePrefill={invoicePrefill || jumpInvoicePrefill} newClientName={pendingInvoiceClientName} onNewClientConsumed={() => setPendingInvoiceClientName(null)} onAddClient={() => { }} onAddProject={() => { setJumpProject(null); setActive("create-project"); }} />}
 
             {validActive === "invoiceDetails" && <InvoiceCreator key={`invoices-${sidebarNavClickId}`} forceListView={false} onConsumeForceListView={() => { }} onOpenNewInvoiceModal={() => { setInvoicePrefill(null); setShowMobileInvoiceModal(true); }} user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={() => { setSidebarOverride(null); setActive("dashboard"); }} onSaveSuccess={() => {
               if (jumpProject && (jumpProject._id || jumpProject.id)) {
@@ -14255,7 +14255,33 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
             {showMobileInvoiceModal && (
               <div style={{ position: "fixed", inset: 0, zIndex: 9000, background: "rgba(15,23,42,0.5)", display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}>
-            <div style={{ background: "var(--app-bg, #f5f7fb)", width: "100%", maxWidth: 520, maxHeight: "90vh", overflowY: "auto", overflowX: "hidden", borderRadius: 18, padding: "12px", boxSizing: "border-box" }}>
+            <div className="mobile-invoice-modal-scope" style={{ background: "var(--app-bg, #f5f7fb)", width: "100%", maxWidth: 520, maxHeight: "90vh", overflowY: "auto", overflowX: "hidden", borderRadius: 18, padding: "12px", boxSizing: "border-box" }}>
+              <style>{`
+                .mobile-invoice-modal-scope, .mobile-invoice-modal-scope * { box-sizing: border-box !important; max-width: 100% !important; }
+                .mobile-invoice-modal-scope .invoice-creator-split-container { display: block !important; grid-template-columns: 1fr !important; gap: 0 !important; }
+                .mobile-invoice-modal-scope .inv-creator-form-side { width: 100% !important; min-width: 0 !important; }
+                .mobile-invoice-modal-scope .inv-creator-card { padding: 12px !important; margin-bottom: 12px !important; }
+                .mobile-invoice-modal-scope .inv-creator-card-title { font-size: 13px !important; }
+                .mobile-invoice-modal-scope .inv-creator-card-body { font-size: 12px !important; }
+                .mobile-invoice-modal-scope .inv-creator-template-row { flex-wrap: wrap !important; gap: 6px !important; }
+                .mobile-invoice-modal-scope .inv-creator-template-opt { flex: 1 1 calc(50% - 6px) !important; min-width: 0 !important; padding: 8px 4px !important; font-size: 11px !important; }
+                .mobile-invoice-modal-scope input, .mobile-invoice-modal-scope select, .mobile-invoice-modal-scope textarea {
+                  font-size: 12px !important; padding: 8px 10px !important; height: auto !important; width: 100% !important;
+                }
+                .mobile-invoice-modal-scope label, .mobile-invoice-modal-scope .inv-creator-card-body > div > div:first-child {
+                  font-size: 10px !important;
+                }
+                .mobile-invoice-modal-scope div[style*="grid-template-columns"] {
+                  grid-template-columns: 1fr !important;
+                  gap: 8px !important;
+                }
+                .mobile-invoice-modal-scope div[style*="display: flex"][style*="justify-content: center"] {
+                  flex-wrap: wrap !important;
+                }
+                .mobile-invoice-modal-scope table { width: 100% !important; display: block !important; overflow-x: auto !important; }
+                .mobile-invoice-modal-scope button { font-size: 12px !important; padding: 8px 10px !important; white-space: normal !important; }
+                .mobile-invoice-modal-scope .inv-creator-card-icon { width: 28px !important; height: 28px !important; }
+              `}</style>
                   <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 8 }}>
                     <button onClick={() => setShowMobileInvoiceModal(false)} style={{ background: "none", border: "none", fontSize: 22, cursor: "pointer", color: "var(--app-muted)" }}>✕</button>
                   </div>

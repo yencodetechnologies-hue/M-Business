@@ -178,7 +178,7 @@ export default function QuotationViewer() {
         @media (max-width:600px) { .qt-hgrid { flex-direction:column!important; } .qt-btgrid { grid-template-columns:1fr!important; } }
       `}</style>
 
-      <div className="no-print" style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 20, flexWrap: "wrap" }}>
+      <div className="no-print" style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap", padding: "20px 20px 12px", flexShrink: 0 }}>
 
 
       </div>

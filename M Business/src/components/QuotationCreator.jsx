@@ -1326,7 +1326,8 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
     return isMobileView ? (
       <div style={{ position: "fixed", inset: 0, zIndex: 999999, background: "rgba(15,28,46,0.55)", padding: "20px 12px", display: "flex", alignItems: "center", justifyContent: "center" }} onClick={() => { if (onBackOverride) onBackOverride(); else setStep("list"); }}>
       <div className="print-wrapper quotation-mobile-popup-scope" onClick={(e) => e.stopPropagation()} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "#fff", borderRadius: 16, overflow: "hidden", maxWidth: 830, width: "100%", maxHeight: "calc(100vh - 32px)", boxShadow: "0 32px 80px rgba(0,0,0,0.3)", display: "flex", flexDirection: "column" }}>
-        <style>{`
+     <style>{`
+        @media screen {
           .quotation-mobile-popup-scope, .quotation-mobile-popup-scope * { box-sizing: border-box !important; max-width: 100% !important; }
           .quotation-mobile-popup-scope { overflow-x: hidden !important; }
           .quotation-mobile-popup-scope .qt-paper { max-width: 100% !important; width: 100% !important; margin: 0 !important; border-radius: 0 !important; box-shadow: none !important; min-height: auto !important; }
@@ -1385,6 +1386,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
             word-break: break-word;
           }
           .quotation-mobile-popup-scope button { font-size: 11px !important; padding: 7px 10px !important; }
+        }
         `}</style>
         {toastMsg && (
           <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 99999, background: '#1A2E35', color: '#fff', borderRadius: 12, padding: '12px 20px', fontSize: 13, fontWeight: 700, boxShadow: '0 8px 24px rgba(0,0,0,0.18)', display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -1396,7 +1398,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
           * { box-sizing: border-box; }
           .qt-paper { position: relative; max-width: 794px; margin: 0 auto; background: #fff; border-radius: 18px; box-shadow: 0 24px 80px rgba(5,150,105,0.15); display: flex; flex-direction: column; min-height: 1122px; }
           @media print {
-            @page { size: A4 portrait; margin: 0; }
+            @page { size: A4 portrait; margin: 10mm; }
             html, body { margin: 0 !important; padding: 0 !important; height: auto !important; min-height: 0 !important; overflow: visible !important; background: white !important; }
             .no-print, .no-print * { display: none !important; }
             .print-wrapper { background: white !important; padding: 0 !important; min-height: 0 !important; display: block !important; }
@@ -1406,6 +1408,8 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
               border-radius: 0 !important; box-shadow: none !important; 
               overflow: visible !important; min-height: 0 !important; height: auto !important;
               page-break-after: always; break-after: page;
+              transform: scale(0.96);
+              transform-origin: top left;
             }
             .qt-paper:last-child {
               page-break-after: auto; break-after: auto;
@@ -1651,7 +1655,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
             html, body { margin: 0 !important; padding: 0 !important; height: auto !important; min-height: 0 !important; overflow: visible !important; background: white !important; }
             .no-print, .no-print * { display: none !important; }
             .print-wrapper { background: white !important; padding: 0 !important; min-height: 0 !important; display: block !important; }
-            .qt-paper { 
+          .qt-paper { 
               position: relative !important; top: auto !important; left: auto !important; 
               width: 100% !important; max-width: 100% !important; margin: 0 !important; 
               border-radius: 0 !important; box-shadow: none !important; 
@@ -1939,7 +1943,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
             <label style={lbl}>Quote Number</label>
             <div style={{ display: "flex", gap: 6 }}>
               <input value={qt.quoteNo} onChange={(e) => upd("quoteNo", e.target.value)} style={{ ...inp(), flex: 1 }} />
-              <button onClick={() => upd("quoteNo", generateQuoteNo())} style={{ padding: "0 10px", background: "#f9fafb", border: "1.5px solid #e5e7eb", borderRadius: 8, cursor: "pointer", fontSize: 14, color: "#6b7280" }}></button>
+              <button onClick={() => upd("quoteNo", generateQuoteNo())} style={{ padding: "0 10px", background: "#f9fafb", border: "1.5px solid #e5e7eb", borderRadius: 8, cursor: "pointer", fontSize: 14, color: "#6b7280", display: "flex", alignItems: "center", justifyContent: "center" }}><i className="ti ti-refresh" style={{ fontSize: 15 }}></i></button>
             </div>
           </div>
           <div>
@@ -2003,7 +2007,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
                 {rErr && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 2 }}>Warning Required</div>}
               </div>
               <button onClick={() => removeItem(item.id)} disabled={items.length === 1}
-                style={{ width: 32, height: 42, borderRadius: 8, background: items.length === 1 ? "#f9fafb" : "#fee2e2", border: "none", cursor: items.length === 1 ? "not-allowed" : "pointer", fontSize: 13, color: items.length === 1 ? "#d1d5db" : "#ef4444" }}>Close</button>
+                style={{ width: 32, height: 42, borderRadius: 8, background: items.length === 1 ? "#f9fafb" : "#fee2e2", border: "none", cursor: items.length === 1 ? "not-allowed" : "pointer", fontSize: 13, color: items.length === 1 ? "#d1d5db" : "#ef4444", display: "flex", alignItems: "center", justifyContent: "center" }}><i className="ti ti-trash" style={{ fontSize: 15 }}></i></button>
             </div>
           );
         })}
@@ -2055,6 +2059,20 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
       </div>
     </div>
   );
+
+  if (isMobileFormView) {
+    return (
+      <div style={{ position: "fixed", inset: 0, zIndex: 999999, background: "rgba(15,28,46,0.55)", padding: "20px 12px", display: "flex", alignItems: "center", justifyContent: "center" }} onClick={() => { if (onBackOverride) onBackOverride(); else setStep("list"); }}>
+        <div onClick={(e) => e.stopPropagation()} style={{ background: "#fff", borderRadius: 16, overflow: "hidden", maxWidth: 830, width: "100%", maxHeight: "calc(100vh - 32px)", boxShadow: "0 32px 80px rgba(0,0,0,0.3)", display: "flex", flexDirection: "column" }}>
+          <div style={{ overflowY: "auto", padding: "16px" }}>
+            {formInner}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return formInner;
 }
 
 

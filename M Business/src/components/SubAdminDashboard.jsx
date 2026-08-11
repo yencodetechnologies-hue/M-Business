@@ -12402,6 +12402,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   {!isDesktopWidth && createPortal(
                     <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "var(--app-accent, #00BCD4)", borderRadius: 0, display: "flex", justifyContent: "space-around", alignItems: "center", padding: "12px 6px", zIndex: 4000, boxShadow: "0 -2px 12px rgba(0,0,0,0.15)", position: "fixed" }}>
                       {[
+                        { icon: "ti-home", label: "Home", key: "dashboard" },
                         { icon: "ti-file-invoice", label: "Invoice", key: "invoices" },
                         { icon: "ti-folder", label: "Projects", key: "projects" },
                         { icon: null, label: "", key: "add" },
@@ -12411,6 +12412,10 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                         <div key={i} onClick={() => setShowMobileAddMenu(true)} style={{ width: 52, height: 52, borderRadius: "50%", background: "var(--app-accent, #00BCD4)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 24, lineHeight: 1, boxShadow: "0 10px 24px rgba(0,188,212,0.5)", position: "absolute", top: -30, left: "50%", transform: "translateX(-50%)" }}>+</div>
                       ) : (
                         <div key={i} onClick={() => {
+                          if (n.key === "dashboard") {
+                            setActive("dashboard");
+                            return;
+                          }
                           if (n.key === "invoices") {
                             setJumpProject(null);
                             setJumpInvoice(null);

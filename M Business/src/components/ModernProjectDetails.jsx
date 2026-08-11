@@ -90,7 +90,7 @@ const CSS = `
 /* CARDS */
 .mpd-card { background:#fff; border-radius:16px; box-shadow:0 2px 16px rgba(0,0,0,.07), 0 0 0 1px rgba(0,0,0,.04); padding:32px 36px !important; margin-bottom:20px; transition:box-shadow .2s; box-sizing: border-box !important; }
 .mpd-card:hover { box-shadow:0 6px 24px rgba(0,0,0,.1), 0 0 0 1px rgba(0,188,212,.08); }
-.mpd-milestones-card { padding:48px 36px !important; margin-bottom:24px; box-sizing: border-box !important; }
+.mpd-milestones-card { margin-bottom:24px; box-sizing: border-box !important; }
 .mpd-card-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; padding-bottom:10px; border-bottom:none; }
 .mpd-card-title { font-size:15px; font-weight:800; color:${P.textDark}; display:flex; align-items:center; gap:8px; }
 .mpd-card-title i { color:${P.primary}; font-size:18px; }
@@ -2705,11 +2705,11 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         </div >
 
         {/* MILESTONES STANDALONE CARD */}
-        < div className="mpd-card mpd-milestones-card" style={{ marginBottom: 12 }
+        < div className="mpd-card mpd-milestones-card" style={{ marginBottom: 12, }
         }>
           <div className="mpd-card-header" style={{ paddingBottom: 16, paddingLeft: 4, paddingRight: 4, marginBottom: 8 }}>
             <div className="mpd-card-title"><i className="ti ti-flag"></i> Milestone Progress</div>
-            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <div style={{ display: 'flex', gap: 24, alignItems: 'center' }}>
               <div style={{ display: 'flex', background: P.bg, borderRadius: 8, border: `1px solid ${P.border}`, overflow: 'hidden' }}>
                 <button
                   onClick={() => setMilestoneView('timeline')}
@@ -3116,13 +3116,13 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
             >
               {tabOrder.filter(tab => tab !== 'activity' && tab !== 'payments').map(tab => {
                 let lbl = '', icon = null;
-                if (tab === 'updates') lbl = 'Updates';
+                if (tab === 'updates') { lbl = 'Updates'; icon = 'ti-message-circle-2'; }
                 return (
-                  <button
+<button
                     key={tab}
                     className={`mpd-tab-btn ${activeTab === tab ? 'mpd-active' : ''}`}
                     onClick={() => setActiveTab(tab)}
-                    style={{ transition: 'all 0.2s' }}
+                    style={{ transition: 'all 0.2s', fontWeight: 800,fontSize:"15px", color: tab === 'updates' ? '#1A2332' : undefined }}
                   >
                     {icon && <i className={`ti ${icon}`} style={{ marginRight: 5 }}></i>}{lbl}
                   </button>

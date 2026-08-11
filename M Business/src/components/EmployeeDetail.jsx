@@ -498,7 +498,10 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
         .ed-tenure { font-size: 14px; font-weight: 900; color: #0F172A; }
         .ed-tenure span { display: block; font-size: 11px; font-weight: 600; color: var(--text-muted); margin-top: 2px; }
 
-        .ed-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+       .ed-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+        @media (max-width: 768px) {
+          .ed-grid { grid-template-columns: 1fr !important; }
+        }
         .ed-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
         .ed-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .ed-card-title { font-size: 14px; font-weight: 900; color: #0F172A; display: flex; align-items: center; gap: 8px; }

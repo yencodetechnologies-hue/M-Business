@@ -1491,7 +1491,10 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
             <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
 
-              <span onClick={(e) => { e.stopPropagation(); setViewClientModal(true); }} title="View" style={{ fontSize: 11, color: "var(--app-accent)", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center" }}>View</span>
+              <span onClick={(e) => { e.stopPropagation(); setViewClientModal(
+                
+                
+                true); }} title="View" style={{ fontSize: 11, color: "var(--app-accent)", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center" }}>View</span>
 
 
 
@@ -2451,20 +2454,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
                 <button
                   key={f}
                   onClick={() => setFilterMode(f)}
-                  style={{
-                    flex: 1,
-                    padding: "5px 4px",
-                    borderRadius: 7,
-                    border: filterMode === f ? "1.5px solid var(--app-accent, #00BCD4)" : "1.5px solid transparent",
-                    fontSize: 10,
-                    fontWeight: 700,
-                    cursor: "pointer",
-                    background: filterMode === f ? "var(--app-accent, #00BCD4)" : "var(--teal-lighter, #F0FDFE)",
-                    color: filterMode === f ? "#fff" : "#607D86",
-                    textTransform: "capitalize",
-                    transition: "all 0.15s ease",
-                    boxShadow: filterMode === f ? "0 2px 6px rgba(0,188,212,0.35)" : "none"
-                  }}
+                  style={{ flex: 1, padding: "5px 4px", borderRadius: 7, border: "none", fontSize: 10, fontWeight: 700, cursor: "pointer", background: "var(--teal-lighter, #F0FDFE)", color: "#607D86", textTransform: "capitalize" }}
                 >
                   {f === "all" ? `All (${clients.length})` : f === "active" ? `Active (${clients.filter(c => (c.status || "Active").toLowerCase() === "active").length})` : `Inactive (${clients.filter(c => (c.status || "").toLowerCase() === "inactive").length})`}
                 </button>
@@ -2527,7 +2517,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
   minWidth: 0,
   background: "#fff"
 } : { flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minWidth: 0, background: "#fff", height: "auto", minHeight: "auto" }}>
-            <button onClick={() => setActiveClientId(null)} style={{ position: "sticky", top: 8, left: "100%", transform: "translateX(-8px)", width: 32, height: 32, borderRadius: "50%", background: "#F5FAFA", border: "1px solid #E0EEF0", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 16, color: "#607D86", zIndex: 10 }}><i className="ti ti-x"></i></button>            <button className="client-detail-modal-close" onClick={() => setActiveClientId(null)} style={{ display: "none" }}><i className="ti ti-x"></i></button>
+            <button onClick={() => { setActiveClientId(null); setViewClientModal(false); }} style={{ position: "sticky", top: 8, left: "100%", transform: "translateX(-8px)", width: 32, height: 32, borderRadius: "50%", background: "#F5FAFA", border: "1px solid #E0EEF0", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 16, color: "#607D86", zIndex: 10 }}><i className="ti ti-x"></i></button>            <button className="client-detail-modal-close" onClick={() => { setActiveClientId(null); setViewClientModal(false); }} style={{ display: "none" }}><i className="ti ti-x"></i></button>
 
 
 
@@ -2731,7 +2721,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
       {deleteTarget && <ConfirmModal title="Delete Client" message={`Are you sure you want to delete "${deleteTarget.clientName || deleteTarget.name}"?`} onConfirm={doDelete} onCancel={() => setDeleteTarget(null)} />}
 
    {viewClientModal && activeClient && (
-<Mdl title="Client Details" onClose={() => { setViewClientModal(false); }} maxWidth={isMobileWidth ? "calc(100vw - 32px)" : 500} fullScreenMobile={false} zIndex={5000}>
+<Mdl title="Client Details" onClose={() => { setViewClientModal(false); setActiveClientId(null); }} maxWidth={isMobileWidth ? "calc(100vw - 32px)" : 500} fullScreenMobile={false} zIndex={5000}>
   <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             <div style={{ display: "flex", justifyContent: "center", marginBottom: 10 }}>
 
@@ -3265,7 +3255,12 @@ function QuotationsListPage({ quotations, onViewQuotation, onBack }) {
   );
 }
 function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], setActive, setJumpProject, user, clients = [], onAddEmployeeClick }) {
-
+const [isMobileWidth, setIsMobileWidth] = useState(typeof window !== "undefined" && window.innerWidth < 769);
+  useEffect(() => {
+    const onResize = () => setIsMobileWidth(window.innerWidth < 769);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
   const [search, setSearch] = useState("");
 
   const [deptFilter, setDeptFilter] = useState("All Departments");
@@ -3534,13 +3529,39 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
       </div>
     );
   }
-
-  if (viewEmp) {
+if (viewEmp) {
 
     return (
 
       <>
 
+        {isMobileWidth ? (
+        <div
+          onClick={() => setViewEmp(null)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(15,23,42,0.55)",
+            zIndex: 3000,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 16
+          }}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{
+              width: "100%",
+              maxWidth: 480,
+              maxHeight: "85vh",
+              overflowY: "auto",
+              WebkitOverflowScrolling: "touch",
+              borderRadius: 20,
+              boxShadow: "0 20px 60px rgba(0,0,0,0.35)",
+              background: "#F5F7FA"
+            }}
+          >
         <EmployeeDetail
           emp={viewEmp}
           onBack={() => setViewEmp(null)}
@@ -3629,10 +3650,70 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
             setViewEmp(null);
           }}
 
+       />
+          </div>
+        </div>
+        ) : (
+        <EmployeeDetail
+          emp={viewEmp}
+          onBack={() => setViewEmp(null)}
+          onEdit={() => { openEdit(viewEmp); }}
+          onDelete={() => setDeleteTarget(viewEmp)}
+          onActivate={async () => {
+            if (!window.confirm(`Are you sure you want to activate ${viewEmp.name}?`)) return;
+            try {
+              await axios.put(`${BASE_URL}/api/employees/status/${viewEmp._id}`, { status: "Approved" });
+              setViewEmp(prev => ({ ...prev, status: "Approved" }));
+              setEmployees(prev => prev.map(e => e._id === viewEmp._id ? { ...e, status: "Approved" } : e));
+              showToast("✅ Employee activated!");
+            } catch (err) {
+              showToast("Failed to activate employee", "error");
+            }
+          }}
+          onDeactivate={async () => {
+            if (!window.confirm(`Are you sure you want to deactivate ${viewEmp.name}?`)) return;
+            try {
+              await axios.put(`${BASE_URL}/api/employees/status/${viewEmp._id}`, { status: "Inactive" });
+              setViewEmp(prev => ({ ...prev, status: "Inactive" }));
+              setEmployees(prev => prev.map(e => e._id === viewEmp._id ? { ...e, status: "Inactive" } : e));
+              showToast("👤 Employee deactivated!");
+            } catch (err) {
+              console.error("Failed to deactivate employee:", err);
+              showToast("❌ Failed to deactivate employee");
+            }
+          }}
+          onChangeRole={async () => {
+            const newRole = prompt(`Enter new role/position for ${viewEmp.name}:`, viewEmp.role || "");
+            if (newRole === null) return;
+            try {
+              await axios.put(`${BASE_URL}/api/employees/${viewEmp._id}`, { role: newRole });
+              setViewEmp(prev => ({ ...prev, role: newRole }));
+              setEmployees(prev => prev.map(e => e._id === viewEmp._id ? { ...e, role: newRole } : e));
+              showToast("💼 Role updated successfully!");
+            } catch (err) {
+              console.error("Failed to update role:", err);
+              showToast("❌ Failed to update role");
+            }
+          }}
+          empDocs={empDocs}
+          empDocsLoading={empDocsLoading}
+          projects={projects}
+          tasks={tasks}
+          onViewProject={(p) => {
+            const empName = (viewEmp?.name || '').toLowerCase().trim();
+            const empTasks = (tasks || []).filter(t => {
+              const assignTo = (t.assignTo || '').toLowerCase();
+              return assignTo.includes(empName) &&
+                (t.projectId === p._id || t.projectId === p.id ||
+                  String(t.projectId) === String(p._id));
+            });
+            setViewEmpProject({ project: p, tasks: empTasks, emp: viewEmp });
+            setViewEmp(null);
+          }}
         />
+        )}
 
         {editEmp && editForm && (
-
           <Mdl title="Edit Employee" onClose={() => setEditEmp(null)}>
 
             <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>

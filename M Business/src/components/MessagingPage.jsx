@@ -5,6 +5,7 @@ import { BASE_URL } from "../config";
 
 const QUICK_EMOJIS = ["😀", "😂", "😍", "👍", "🙏", "🎉", "🔥", "❤️", "😢", "😮", "👏", "✅"];
 
+
 export default function MessagingPage({ user }) {
   const [messages, setMessages] = useState([]);
   const [users, setUsers] = useState([]);

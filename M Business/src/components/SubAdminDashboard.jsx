@@ -14280,7 +14280,57 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 }
                 .mobile-invoice-modal-scope table { width: 100% !important; display: block !important; overflow-x: auto !important; }
                 .mobile-invoice-modal-scope button { font-size: 12px !important; padding: 8px 10px !important; white-space: normal !important; }
-                .mobile-invoice-modal-scope .inv-creator-card-icon { width: 28px !important; height: 28px !important; }
+                .mobile-invoice-modal-scope .inv-creator-card-icon { width: 28px !important; height: 28px !important; }.mobile-invoice-modal-scope .inv-creator-item-input.desc { font-size: 12px !important; }
+.mobile-invoice-modal-scope .inv-creator-item-input.num { width: 100% !important; }
+.mobile-invoice-modal-scope table thead { display: none !important; }
+.mobile-invoice-modal-scope table, .mobile-invoice-modal-scope tbody, .mobile-invoice-modal-scope tr, .mobile-invoice-modal-scope td {
+  display: block !important;
+  width: 100% !important;
+}
+.mobile-invoice-modal-scope tr {
+  border: 1px solid var(--app-border, #e5e7eb) !important;
+  border-radius: 10px !important;
+  padding: 10px !important;
+  margin-bottom: 10px !important;
+  background: #fff !important;
+}
+.mobile-invoice-modal-scope td {
+  padding: 4px 0 !important;
+  border: none !important;
+}
+.mobile-invoke-modal-scope td:before { content: none !important; }
+.mobile-invoice-modal-scope .inv-creator-item-total {
+  display: flex !important;
+  justify-content: space-between !important;
+  font-weight: 700 !important;
+  padding-top: 6px !important;
+  border-top: 1px dashed var(--app-border, #e5e7eb) !important;
+  margin-top: 6px !important;
+}
+.mobile-invoice-modal-scope .inv-creator-item-total::before {
+  content: "Total: ";
+  font-weight: 600;
+  color: #64748b;
+  font-size: 11px;
+}
+.mobile-invoice-modal-scope .inv-creator-del-row-btn {
+  width: 100% !important;
+  margin-top: 6px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  padding: 8px !important;
+  border: 1px solid #fecaca !important;
+  border-radius: 8px !important;
+  background: #fef2f2 !important;
+  color: #dc2626 !important;
+}
+.mobile-invoice-modal-scope .inv-creator-del-row-btn::after {
+  content: "Delete";
+  font-size: 12px;
+  font-weight: 700;
+}
               `}</style>
                   <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 8 }}>
                     <button onClick={() => setShowMobileInvoiceModal(false)} style={{ background: "none", border: "none", fontSize: 22, cursor: "pointer", color: "var(--app-muted)" }}>✕</button>

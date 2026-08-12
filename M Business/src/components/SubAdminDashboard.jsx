@@ -7852,7 +7852,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [accountAuthTab, setAccountAuthTab] = useState("register");
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
-const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoices", "proposals", "quotations", "accounts"];
+const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoices", "proposals", "quotations", "accounts", "payments"];
   const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true);
 
   const [isDesktopWidth, setIsDesktopWidth] = useState(() => typeof window !== 'undefined' && window.innerWidth >= 769);

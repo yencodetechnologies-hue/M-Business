@@ -1902,6 +1902,54 @@ td.exp-name {
   border-radius: 2px;
 }
 
+@media (max-width: 900px) {
+  .invoice-page .stats-row,
+  .stats-row {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+  .stat-card {
+    height: auto !important;
+    min-height: 88px !important;
+    max-height: none !important;
+    padding: 12px 14px !important;
+    overflow: hidden !important;
+  }
+  .stat-card-inner {
+    align-items: flex-start !important;
+    gap: 8px !important;
+    min-width: 0 !important;
+  }
+  .stat-card-inner > div {
+    min-width: 0 !important;
+    flex: 1 !important;
+  }
+  .stat-icon {
+    width: 30px !important;
+    height: 30px !important;
+    font-size: 14px !important;
+    flex-shrink: 0 !important;
+  }
+  .stat-num {
+    font-size: 20px !important;
+    letter-spacing: -0.5px !important;
+    word-break: break-word !important;
+  }
+  .stat-label {
+    font-size: 10px !important;
+    white-space: normal !important;
+  }
+  .stat-amount {
+    font-size: 9px !important;
+    white-space: normal !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+  .stat-bar-wrap {
+    margin-top: 8px !important;
+  }
+}
+
 .tabs {
   display: flex;
   gap: 4px;

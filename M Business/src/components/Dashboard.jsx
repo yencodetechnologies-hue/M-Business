@@ -2273,7 +2273,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         ::-webkit-scrollbar-thumb{background:#d8b4fe;border-radius:3px}
         button,input,select,textarea{font-family:inherit}
         @media(min-width:769px){.sidebar{transform:translateX(0)!important;position:sticky!important;top:0!important;}.sidebar-close{display:none!important;}.mob-overlay{display:none!important;}.mob-topbar{display:none!important;}.sidebar-spacer{display:none!important;}}
-      @media(max-width:768px){.sidebar-spacer{display:none!important;}.mob-topbar-hide{display:none!important;}.main-content{padding:12px!important;padding-bottom:96px!important;}.dash-stats{grid-template-columns:repeat(2,1fr)!important;gap:10px!important;}.dash-2col{grid-template-columns:1fr!important;}.modal-2col{grid-template-columns:1fr!important;}.page-header{flex-wrap:wrap;gap:8px;}.header-actions{flex-wrap:wrap;gap:8px;}.app-bottom-nav{display:flex!important;}}
+      @media(min-width:769px){.app-bottom-nav{display:none!important;}}
+      @media(max-width:768px){.sidebar-spacer{display:none!important;}.mob-topbar-hide{display:none!important;}.main-content{padding:12px!important;padding-bottom:96px!important;}.dash-stats{grid-template-columns:repeat(2,1fr)!important;gap:10px!important;}.dash-2col{grid-template-columns:1fr!important;}.modal-2col{grid-template-columns:1fr!important;}.page-header{flex-wrap:wrap;gap:8px;}.header-actions{flex-wrap:wrap;gap:8px;}.app-bottom-nav{display:flex!important;position:fixed!important;bottom:0!important;left:0!important;right:0!important;}}
       `}</style>
 
       <Sidebar active={validActive} setActive={setActive} onLogout={handleLogout} open={sidebarOpen} onClose={() => setSidebarOpen(false)} navItems={navItems} initials={initials} companyName={companyNameStr} companyLogo={companyLogo} setSidebarInvoiceClick={setSidebarInvoiceClick} />
@@ -2849,7 +2850,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           }} user={user} themeColor={getComputedStyle(document.documentElement).getPropertyValue('--app-accent').trim() || accentColor} />}
         </div>
         {/* GLOBAL MOBILE BOTTOM NAV — visible on every page, not just dashboard */}
-        <div className="app-bottom-nav" style={{ position: "fixed", bottom: 14, left: 14, right: 14, background: "rgba(15,10,41,0.94)", backdropFilter: "blur(16px)", borderRadius: 24, justifyContent: "space-around", alignItems: "center", padding: "10px 6px", zIndex: 99999, boxShadow: "0 12px 32px rgba(15,10,41,0.35)" }}>
+        <div className="app-bottom-nav" style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "rgba(15,10,41,0.94)", backdropFilter: "blur(16px)", borderRadius: "20px 20px 0 0", display: "none", justifyContent: "space-around", alignItems: "center", padding: "10px 6px calc(10px + env(safe-area-inset-bottom, 0px))", zIndex: 99999, boxShadow: "0 -4px 24px rgba(15,10,41,0.35)" }}>
           {[
             { icon: "ti-home", label: "Home", key: "dashboard" },
             { icon: "ti-folder", label: "Projects", key: "projects" },

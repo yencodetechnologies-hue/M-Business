@@ -454,7 +454,11 @@
         padding: 16px !important;
     }
 }
+.show-hide-btn { font-size: 12px; }
 
+@media (max-width: 640px) {
+  .show-hide-btn { font-size: 8px !important; }
+}
 /* ---------- Hide desktop-only chrome on small screens ---------- */
 @media (max-width: 768px) {
     .topbar {

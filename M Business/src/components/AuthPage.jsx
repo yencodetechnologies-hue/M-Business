@@ -379,6 +379,10 @@ color: #00BCD4; font-weight: 700;
 }
   .form-side, .form-side.reg-form { padding: 24px 20px !important; }
   .grid2 { grid-template-columns: 1fr !important; }
+  /* SHOW/HIDE text smaller on mobile */
+  .form-side button[style*="letter-spacing"] {
+    font-size: 9px !important;
+  }
 }
 
   `}</style>
@@ -647,8 +651,8 @@ function Icon({ children }) {
 
 function ShowHide({ show, toggle }) {
   return (
-    <button type="button" onClick={toggle}
-      style={{ position: "absolute", right: 0, bottom: 9, background: "none", border: "none", color: "rgba(255,255,255,0.38)", fontSize: 10, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", letterSpacing: .5 }}>
+    <button type="button" onClick={toggle} className="show-hide-btn"
+      style={{ position: "absolute", right: 0, bottom: 9, background: "none", border: "none", color: "rgba(255,255,255,0.38)", fontWeight: 700, cursor: "pointer", fontFamily: "inherit", letterSpacing: .5 }}>
       {show ? "HIDE" : "SHOW"}
     </button>
   );

@@ -2849,7 +2849,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
   );
 
 }
-function UnpaidInvoicesListPage({ invoices, onViewInvoice, onBack }) {
+function UnpaidInvoicesListPage({ invoices, onViewInvoice, onBack, onAddInvoice }) {
   const [search, setSearch] = useState("");
   const [filterMode, setFilterMode] = useState("all");
   const unpaid = (invoices || []).filter(i => {
@@ -2874,11 +2874,18 @@ function UnpaidInvoicesListPage({ invoices, onViewInvoice, onBack }) {
     <div style={{ padding: "16px 14px", background: "#F5F8FA", minHeight: "100%", boxSizing: "border-box", maxWidth: "100%", overflowX: "hidden" }}>
 
       {/* Back to Dashboard — top-left, fixed position for every page */}
-      <div
-      onClick={() => onBack && onBack()}
-        style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 4px 16px", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #00BCD4)" }}
-      >
-        <i className="ti ti-arrow-left" style={{ fontSize: 16 }}></i> Back to Dashboard
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, padding: "4px 4px 16px" }}>
+        <div
+          onClick={() => onBack && onBack()}
+          style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #00BCD4)" }}
+        >
+          <i className="ti ti-arrow-left" style={{ fontSize: 16 }}></i> Back to Dashboard
+        </div>
+        {onAddInvoice && (
+          <button onClick={onAddInvoice} style={{ display: "flex", alignItems: "center", gap: 4, background: "var(--app-accent, #00BCD4)", color: "#fff", border: "none", borderRadius: 20, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", boxShadow: "0 3px 10px rgba(0,188,212,0.35)", whiteSpace: "nowrap" }}>
+            <i className="ti ti-plus" style={{ fontSize: 13 }}></i> New Invoice
+          </button>
+        )}
       </div>
 
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #00BCD4), #0891b2)", borderRadius: 16, padding: "16px 18px", marginBottom: 14, boxShadow: "0 6px 18px rgba(0,188,212,0.25)" }}>
@@ -2994,8 +3001,7 @@ function UnpaidInvoicesListPage({ invoices, onViewInvoice, onBack }) {
   );
 }
 
-function ProposalsListPage({ proposals, onViewProposal, onBack }) {
-  const [search, setSearch] = useState("");
+function ProposalsListPage({ proposals, onViewProposal, onBack, onAddProposal }) {  const [search, setSearch] = useState("");
   const [filterMode, setFilterMode] = useState("all");
   const all = proposals || [];
   const filtered = all.filter(p => {
@@ -3016,12 +3022,19 @@ function ProposalsListPage({ proposals, onViewProposal, onBack }) {
   return (
     <div style={{ padding: "16px 14px", background: "#F5F8FA", minHeight: "100%", boxSizing: "border-box", maxWidth: "100%", overflowX: "hidden" }}>
        {/* Back to Dashboard — top-left, fixed position for every page */}
-      <div
-        onClick={() => onBack && onBack()}
-        style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 4px 16px", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #00BCD4)" }}
-      >
-        <i className="ti ti-arrow-left" style={{ fontSize: 16 }}></i> Back to Dashboard
-      </div>  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #00BCD4), #0891b2)", borderRadius: 16, padding: "16px 18px", marginBottom: 14, boxShadow: "0 6px 18px rgba(0,188,212,0.25)" }}>
+<div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, padding: "4px 4px 16px" }}>
+        <div
+          onClick={() => onBack && onBack()}
+          style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #00BCD4)" }}
+        >
+          <i className="ti ti-arrow-left" style={{ fontSize: 16 }}></i> Back to Dashboard
+        </div>
+        {onAddProposal && (
+          <button onClick={onAddProposal} style={{ display: "flex", alignItems: "center", gap: 4, background: "var(--app-accent, #00BCD4)", color: "#fff", border: "none", borderRadius: 20, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", boxShadow: "0 3px 10px rgba(0,188,212,0.35)", whiteSpace: "nowrap" }}>
+            <i className="ti ti-plus" style={{ fontSize: 13 }}></i> New Proposal
+          </button>
+        )}
+      </div> <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #00BCD4), #0891b2)", borderRadius: 16, padding: "16px 18px", marginBottom: 14, boxShadow: "0 6px 18px rgba(0,188,212,0.25)" }}>
 
         <div>
           <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.8)", letterSpacing: 0.5, textTransform: "uppercase" }}>Total Proposals</div>
@@ -3128,7 +3141,7 @@ function ProposalsListPage({ proposals, onViewProposal, onBack }) {
     </div>
   );
 }
-function QuotationsListPage({ quotations, onViewQuotation, onBack }) {
+function QuotationsListPage({ quotations, onViewQuotation, onBack, onAddQuotation }) {
   const [search, setSearch] = useState("");
   const [filterMode, setFilterMode] = useState("all");
   const all = quotations || [];
@@ -3895,12 +3908,19 @@ if (viewEmp) {
    return (
       <div style={{ padding: "16px 14px", background: "#F5F8FA", minHeight: "100%", boxSizing: "border-box", maxWidth: "100%", overflowX: "hidden" }}>
    {/* Back to Dashboard — top-left, fixed position for every page */}
-     <div
-onClick={() => setActive("dashboard")}
-  style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 4px 16px", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #00BCD4)" }}
->
-  <i className="ti ti-arrow-left" style={{ fontSize: 16 }}></i> Back to Dashboard
-</div>
+     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, padding: "4px 4px 16px" }}>
+       <div
+         onClick={() => setActive("dashboard")}
+         style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #00BCD4)" }}
+       >
+         <i className="ti ti-arrow-left" style={{ fontSize: 16 }}></i> Back to Dashboard
+       </div>
+       {onAddEmployeeClick && (
+         <button onClick={onAddEmployeeClick} style={{ display: "flex", alignItems: "center", gap: 4, background: "var(--app-accent, #00BCD4)", color: "#fff", border: "none", borderRadius: 20, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", boxShadow: "0 3px 10px rgba(0,188,212,0.35)", whiteSpace: "nowrap" }}>
+           <i className="ti ti-plus" style={{ fontSize: 13 }}></i> New Team Member
+         </button>
+       )}
+     </div>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #00BCD4), #0891b2)", borderRadius: 16, padding: "16px 18px", marginBottom: 14, boxShadow: "0 6px 18px rgba(0,188,212,0.25)" }}>
           <div>
             <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.8)", letterSpacing: 0.5, textTransform: "uppercase" }}>Total Team</div>
@@ -5434,11 +5454,18 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
 return (
       <div style={{ padding: "16px 14px", background: "#F5F8FA", minHeight: "100%", boxSizing: "border-box", maxWidth: "100%", overflowX: "hidden" }}>
    {/* Back to Dashboard — top-left, fixed position for every page */}
-      <div
-        onClick={() => setActive("dashboard")}
-        style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 4px 16px", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #00BCD4)" }}
-      >
-        <i className="ti ti-arrow-left" style={{ fontSize: 16 }}></i> Back to Dashboard
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, padding: "4px 4px 16px" }}>
+        <div
+          onClick={() => setActive("dashboard")}
+          style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #00BCD4)" }}
+        >
+          <i className="ti ti-arrow-left" style={{ fontSize: 16 }}></i> Back to Dashboard
+        </div>
+        {onCreateProject && (
+          <button onClick={onCreateProject} style={{ display: "flex", alignItems: "center", gap: 4, background: "var(--app-accent, #00BCD4)", color: "#fff", border: "none", borderRadius: 20, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", boxShadow: "0 3px 10px rgba(0,188,212,0.35)", whiteSpace: "nowrap" }}>
+            <i className="ti ti-plus" style={{ fontSize: 13 }}></i> New Project
+          </button>
+        )}
       </div>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #00BCD4), #0891b2)", borderRadius: 16, padding: "16px 18px", marginBottom: 16, boxShadow: "0 6px 18px rgba(0,188,212,0.25)" }}>
           <div>
@@ -14259,6 +14286,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
             {validActive === "unpaidInvoices" && (
   <UnpaidInvoicesListPage
+  onAddInvoice={() => setShowMobileInvoiceModal(true)}
     invoices={invoices}
     onViewInvoice={(inv) => { setJumpInvoice({ ...inv, _t: Date.now() }); setPrevActiveBeforeInvoice("unpaidInvoices"); setActive("invoices"); }}
     onBack={() => setActive("dashboard")}
@@ -14267,7 +14295,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
 
 
-            {validActive === "invoices" && typeof window !== "undefined" && window.innerWidth < 769 && <InvoicesListPage invoices={invoices} clients={clients} projects={projects} onViewInvoice={(inv) => { setJumpInvoice({ ...inv, _t: Date.now() }); }} onViewClient={(c) => { setActiveClientIdForReturn(c._id); setActive("clients"); }} onViewProject={(p) => { setJumpProject(p); setProjectDetailsReadOnly(false); setSidebarOverride("dashboard"); setActive("project-details"); }} onBack={() => setActive("dashboard")} />}
+            {validActive === "invoices" && typeof window !== "undefined" && window.innerWidth < 769 && <InvoicesListPage invoices={invoices} clients={clients} projects={projects} onViewInvoice={(inv) => { setJumpInvoice({ ...inv, _t: Date.now() }); }} onViewClient={(c) => { setActiveClientIdForReturn(c._id); setActive("clients"); }} onViewProject={(p) => { setJumpProject(p); setProjectDetailsReadOnly(false); setSidebarOverride("dashboard"); setActive("project-details"); }} onBack={() => setActive("dashboard")} onAddInvoice={() => setShowMobileInvoiceModal(true)}/>}
 
             {validActive === "invoices" && !(typeof window !== "undefined" && window.innerWidth < 769) && <InvoiceCreator key={`invoices-full-${sidebarNavClickId}`} forceListView={true} onConsumeForceListView={() => { }} user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={() => { setSidebarOverride(null); setActive("dashboard"); }} onSaveSuccess={() => { setActive("invoices"); }} jumpInvoice={null} newInvoicePrefill={invoicePrefill || jumpInvoicePrefill} newClientName={pendingInvoiceClientName} onNewClientConsumed={() => setPendingInvoiceClientName(null)} onAddClient={() => { }} onAddProject={() => { setJumpProject(null); setActive("create-project"); }} />}
 
@@ -14514,7 +14542,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                 onAddProject={() => { }}
               />
             )}
-            {validActive === "quotations" && !quotationViewEntry && typeof window !== "undefined" && window.innerWidth < 769 && <QuotationsListPage quotations={quotations} onViewQuotation={(q) => { setQuotationViewEntry(q); setSidebarOverride("dashboard"); }} onBack={() => setActive("dashboard")} />}
+            {validActive === "quotations" && !quotationViewEntry && typeof window !== "undefined" && window.innerWidth < 769 && <QuotationsListPage quotations={quotations} onViewQuotation={(q) => { setQuotationViewEntry(q); setSidebarOverride("dashboard"); }} onBack={() => setActive("dashboard")} onAddQuotation={() => { setQuotationViewEntry({}); setSidebarOverride("dashboard"); }}/>}
             {validActive === "quotations" && (quotationViewEntry || !(typeof window !== "undefined" && window.innerWidth < 769)) && <QuotationCreatorModern key={quotationViewEntry ? `view-${quotationViewEntry._id || quotationViewEntry.id}` : (quotationReturnProject ? `new-${quotationReturnProject._id}` : 'list')} user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} prefillProject={quotationPrefillProject} onPrefillConsumed={() => setQuotationPrefillProject(null)} initialViewEntry={quotationViewEntry} onBackOverride={() => {
   setQuotationViewEntry(null);
   setQuotationReturnProject(null);
@@ -14529,7 +14557,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
             }} onAddProject={() => { setPrevActiveBeforeInvoice(active); setActive("create-project"); }} newlyAddedClientName={quotationNewClientName} />}
 
-            {validActive === "proposals" && !proposalViewEntry && typeof window !== "undefined" && window.innerWidth < 769 && <ProposalsListPage proposals={proposalsList} onViewProposal={(p) => { setProposalViewEntry(p); setSidebarOverride("dashboard"); }} onBack={() => setActive("dashboard")} />}
+            {validActive === "proposals" && !proposalViewEntry && typeof window !== "undefined" && window.innerWidth < 769 && <ProposalsListPage proposals={proposalsList} onViewProposal={(p) => { setProposalViewEntry(p); setSidebarOverride("dashboard"); }} onBack={() => setActive("dashboard")} onAddProposal={() => { setProposalViewEntry({}); setSidebarOverride("dashboard"); }}/>}
             {validActive === "proposals" && (proposalViewEntry || !(typeof window !== "undefined" && window.innerWidth < 769)) && <ProjectProposalCreator key={proposalViewEntry ? `view-${proposalViewEntry._id || proposalViewEntry.id}` : 'list'} clients={clients} companyLogo={companyLogo} companyName={companyNameStr} prefillProject={proposalPrefillProject} onPrefillConsumed={() => setProposalPrefillProject(null)} initialViewProposal={proposalViewEntry} onBackOverride={proposalViewEntry ? () => {
               setProposalViewEntry(null);
               if (sidebarOverride === "dashboard") {

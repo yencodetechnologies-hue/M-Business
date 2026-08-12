@@ -7016,10 +7016,6 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
   setJumpProject(null);
   if (typeof setProjectDetailsReadOnly === "function") setProjectDetailsReadOnly(false);
 }
-if (sub.key === "clients") {
-  window.__fullClientsList = false;
-  setActiveClientIdForReturn(null);
-}
                           setActive(sub.key);
                           onClose();
                         }}

@@ -7852,7 +7852,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [accountAuthTab, setAccountAuthTab] = useState("register");
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
+const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoices", "proposals", "quotations", "accounts"];
   const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true);
 
   const [isDesktopWidth, setIsDesktopWidth] = useState(() => typeof window !== 'undefined' && window.innerWidth >= 769);
@@ -11526,7 +11526,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           <div className="content" style={validActive === "dashboard" && !isDesktopWidth ? { padding: 0 } : undefined}>
 
             {/* GLOBAL MOBILE BOTTOM NAV — always mounted regardless of active page, portaled to body */}
-            {!isDesktopWidth && !["team", "employees", "revenue", "income", "unpaidInvoices", "proposals", "quotations"].includes(validActive) && createPortal(
+            {!isDesktopWidth && !HIDE_NAV_PAGES.includes(validActive) && createPortal(
               <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "var(--app-accent, #00BCD4)", borderRadius: 0, display: "flex", justifyContent: "space-around", alignItems: "center", padding: "12px 6px calc(12px + env(safe-area-inset-bottom, 0px))", zIndex: 1000000, boxShadow: "0 -2px 12px rgba(0,0,0,0.15)" }}>
                 {[
                   { icon: "ti-home", label: "Home", key: "dashboard" },

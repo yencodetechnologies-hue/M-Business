@@ -2533,7 +2533,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
   minWidth: 0,
   background: "#fff"
 } : { flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minWidth: 0, background: "#fff", height: "auto", minHeight: "auto" }}>
-            <button onClick={() => { setActiveClientId(null); setViewClientModal(false); window.__fullClientsList = true; }} style={{ position: "sticky", top: 8, left: "100%", transform: "translateX(-8px)", width: 32, height: 32, borderRadius: "50%", background: "#F5FAFA", border: "1px solid #E0EEF0", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 16, color: "#607D86", zIndex: 10 }}><i className="ti ti-x"></i></button>            <button className="client-detail-modal-close" onClick={() => { setActiveClientId(null); setViewClientModal(false); window.__fullClientsList = true; }} style={{ display: "none" }}><i className="ti ti-x"></i></button>
+                        <button className="client-detail-modal-close" onClick={() => { setActiveClientId(null); setViewClientModal(false); window.__fullClientsList = true; }} style={{ display: "none" }}><i className="ti ti-x"></i></button>
 
 
 

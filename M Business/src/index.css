@@ -300,7 +300,11 @@ body {
 .client-detail-layout {
   overflow: visible !important;
 }
-
+@media (max-width: 768px) {
+  .sidebar {
+    padding-top: 8px !important;
+  }
+}
 @media (max-width: 768px) {
   .client-detail-modal {
     position: fixed !important;

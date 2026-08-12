@@ -11526,7 +11526,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
           <div className="content" style={validActive === "dashboard" && !isDesktopWidth ? { padding: 0 } : undefined}>
 
             {/* GLOBAL MOBILE BOTTOM NAV — always mounted regardless of active page, portaled to body */}
-            {!isDesktopWidth && !HIDE_NAV_PAGES.includes(validActive) && createPortal(
+            {!isDesktopWidth && !sidebarOpen && !HIDE_NAV_PAGES.includes(validActive) && createPortal(
               <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "var(--app-accent, #00BCD4)", borderRadius: 0, display: "flex", justifyContent: "space-around", alignItems: "center", padding: "12px 6px calc(12px + env(safe-area-inset-bottom, 0px))", zIndex: 1000000, boxShadow: "0 -2px 12px rgba(0,0,0,0.15)" }}>
                 {[
                   { icon: "ti-home", label: "Home", key: "dashboard" },

@@ -2376,7 +2376,11 @@ const [sortOrder, setSortOrder] = useState("desc");
             </span>
           )}
         </div>
-
+        {onBack && (
+          <button onClick={onBack} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 20, color: "#64748b", padding: 0, lineHeight: 1, display: "flex", alignItems: "center", justifyContent: "center", width: 28, height: 28 }}>
+            ✕
+          </button>
+        )}
       </div>
 
 

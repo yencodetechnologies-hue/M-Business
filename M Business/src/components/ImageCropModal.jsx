@@ -70,16 +70,19 @@ const ImageCropModal = ({ image, onCropComplete, onCancel, aspect: initialAspect
       justifyContent: 'center',
       zIndex: 999999,
       padding: '20px',
-      backdropFilter: 'blur(5px)'
+      backdropFilter: 'blur(5px)',
+      overflowY: 'auto',
+      boxSizing: 'border-box'
     }}>
       <div style={{
         position: 'relative',
         width: '100%',
         maxWidth: '500px',
-        height: '400px',
+        height: 'min(400px, 45vh)',
         backgroundColor: '#1e1e1e',
         borderRadius: '16px 16px 0 0',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        flexShrink: 0
       }}>
         {image && (
           <Cropper
@@ -99,18 +102,21 @@ const ImageCropModal = ({ image, onCropComplete, onCancel, aspect: initialAspect
       <div style={{
         width: '100%',
         maxWidth: '500px',
-        padding: '24px',
+        padding: 'clamp(14px, 4vw, 24px)',
         backgroundColor: '#fff',
         borderRadius: '0 0 16px 16px',
         display: 'flex',
         flexDirection: 'column',
-        gap: '20px',
-        boxShadow: '0 20px 50px rgba(0,0,0,0.3)'
+        gap: 'clamp(12px, 3vw, 20px)',
+        boxShadow: '0 20px 50px rgba(0,0,0,0.3)',
+        maxHeight: '50vh',
+        overflowY: 'auto',
+        boxSizing: 'border-box'
       }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '12px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Zoom</span>
-            <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--app-accent)' }}>
+            <span style={{ fontSize: 'clamp(10px, 3vw, 12px)', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Zoom</span>
+            <span style={{ fontSize: 'clamp(10px, 3vw, 12px)', fontWeight: 700, color: 'var(--app-accent)' }}>
               {Math.round(zoom * 100)}%
               {croppedAreaPixels ? ` · ${Math.round(croppedAreaPixels.width)}×${Math.round(croppedAreaPixels.height)}px` : ''}
             </span>
@@ -132,7 +138,7 @@ const ImageCropModal = ({ image, onCropComplete, onCancel, aspect: initialAspect
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          <span style={{ fontSize: '12px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Aspect Ratio</span>
+          <span style={{ fontSize: 'clamp(10px, 3vw, 12px)', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Aspect Ratio</span>
           <div style={{ display: 'flex', gap: '8px' }}>
             {[
               { label: '1:1', value: 1 },
@@ -145,12 +151,12 @@ const ImageCropModal = ({ image, onCropComplete, onCancel, aspect: initialAspect
                 onClick={() => setAspect(opt.value)}
                 style={{
                   flex: 1,
-                  padding: '8px',
+                  padding: 'clamp(6px, 2vw, 8px)',
                   borderRadius: '8px',
                   border: aspect === opt.value ? '2px solid var(--app-accent)' : '1px solid #e2e8f0',
                   background: aspect === opt.value ? 'var(--app-bg)' : '#fff',
                   color: aspect === opt.value ? 'var(--app-accent)' : '#64748b',
-                  fontSize: '12px',
+                  fontSize: 'clamp(10px, 3vw, 12px)',
                   fontWeight: 700,
                   cursor: 'pointer',
                   transition: 'all 0.2s'
@@ -162,18 +168,18 @@ const ImageCropModal = ({ image, onCropComplete, onCancel, aspect: initialAspect
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '12px', marginTop: '4px' }}>
+        <div style={{ display: 'flex', gap: 'clamp(8px, 2.5vw, 12px)', marginTop: '4px' }}>
           <button
             onClick={onCancel}
             style={{
               flex: 1,
-              padding: '12px',
+              padding: 'clamp(10px, 3vw, 12px)',
               backgroundColor: '#f8fafc',
               border: '1px solid #e2e8f0',
               borderRadius: '12px',
               color: '#64748b',
               fontWeight: '700',
-              fontSize: '14px',
+              fontSize: 'clamp(12px, 3.5vw, 14px)',
               cursor: 'pointer',
               transition: 'all 0.2s'
             }}
@@ -184,13 +190,13 @@ const ImageCropModal = ({ image, onCropComplete, onCancel, aspect: initialAspect
             onClick={handleSave}
             style={{
               flex: 2,
-              padding: '12px',
+              padding: 'clamp(10px, 3vw, 12px)',
               backgroundColor: 'var(--app-accent)',
               border: 'none',
               borderRadius: '12px',
               color: '#fff',
               fontWeight: '700',
-              fontSize: '14px',
+              fontSize: 'clamp(12px, 3.5vw, 14px)',
               cursor: 'pointer',
               boxShadow: '0 4px 12px rgba(124, 58, 237, 0.3)',
               transition: 'all 0.2s'

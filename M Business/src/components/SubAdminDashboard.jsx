@@ -2265,11 +2265,21 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
       <div className="clients-list-only-root" style={{ padding: "16px 14px", background: "#F5F8FA", minHeight: "100%", boxSizing: "border-box", maxWidth: "100%", overflowX: "hidden" }}>
 
         {/* Back to Dashboard — top-left, fixed position for every page */}
-        <div
-          onClick={() => onBack && onBack()}
-          style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 4px 16px", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #00BCD4)" }}
-        >
-          <i className="ti ti-arrow-left" style={{ fontSize: 16 }}></i> Back to Dashboard
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, padding: "4px 4px 16px" }}>
+          <div
+            onClick={() => onBack && onBack()}
+            style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #00BCD4)" }}
+          >
+            <i className="ti ti-arrow-left" style={{ fontSize: 16 }}></i> Back to Dashboard
+          </div>
+          {onAddClient && (
+            <button
+              onClick={onAddClient}
+              style={{ display: "flex", alignItems: "center", gap: 4, background: "var(--app-accent, #00BCD4)", color: "#fff", border: "none", borderRadius: 20, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", boxShadow: "0 3px 10px rgba(0,188,212,0.35)", whiteSpace: "nowrap" }}
+            >
+              <i className="ti ti-plus" style={{ fontSize: 13 }}></i> New Client
+            </button>
+          )}
         </div>
 
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #00BCD4), #0891b2)", borderRadius: 16, padding: "16px 18px", marginBottom: 14, boxShadow: "0 6px 18px rgba(0,188,212,0.25)" }}>
@@ -11570,7 +11580,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
             )}
 
             {trialToast && (
-              <div style={{ position: "fixed", top: 24, left: "50%", width: "max-content", marginLeft: "auto", marginRight: "auto", right: 0, zIndex: 9999, background: "#fff", border: "1.5px solid #00BCD4", borderRadius: 14, padding: "14px 26px", fontSize: 14, fontWeight: 800, color: "#00BCD4", boxShadow: "0 10px 32px rgba(0,188,212,0.25), 0 4px 12px rgba(0,0,0,0.1)", display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{ position: "fixed", top: 24, left: "50%", transform: "translateX(-50%)", width: "max-content", maxWidth: "90vw", zIndex: 9999, background: "#fff", border: "1.5px solid #00BCD4", borderRadius: 14, padding: "14px 26px", fontSize: 14, fontWeight: 800, color: "#00BCD4", boxShadow: "0 10px 32px rgba(0,188,212,0.25), 0 4px 12px rgba(0,0,0,0.1)", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, textAlign: "center" }}>
                 <i className="ti ti-circle-check" style={{ fontSize: 18, color: "#00BCD4" }}></i> Free Trial Activated
               </div>
             )}
@@ -11630,14 +11640,18 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                   {/* WHITE LOGO/MENU STRIP — sits below the teal name/bell strip, stays fixed while scrolling */}
                   <div style={{ background: "#fff", padding: "18px 20px", display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, zIndex: 200, boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
-                    <div style={{ width: 35, height: 35, borderRadius: 10, background: "#ffffff", boxShadow: "0 2px 8px rgba(0,0,0,0.12)", border: "1px solid rgba(0,0,0,0.06)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0 }}>
-                      {companyLogo ? (
-                        <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                      ) : (
-                        <i className="ti ti-building" style={{ fontSize: 16, color: "var(--app-accent, #00BCD4)" }}></i>
-                      )}
-                    </div>
-                    <div onClick={() => setSidebarOpen(true)} style={{ width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+                  <div
+  onClick={() => headerLogoRef.current?.click()}
+  title="Click to upload logo"
+  style={{ width: 35, height: 35, borderRadius: 10, background: "#ffffff", boxShadow: "0 2px 8px rgba(0,0,0,0.12)", border: "1px solid rgba(0,0,0,0.06)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0, cursor: "pointer" }}
+>
+  {companyLogo ? (
+    <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+  ) : (
+    <i className="ti ti-building" style={{ fontSize: 16, color: "var(--app-accent, #00BCD4)" }}></i>
+  )}
+</div>
+                    <div onClick={() => setSidebarOpen(true)} style={{ width: "clamp(26px, 8vw, 28px)", height: "clamp(26px, 8vw, 28px)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
                       <i className="ti ti-menu-2" style={{ fontSize: 20, color: "var(--app-accent, #00BCD4)" }}></i>
                     </div>
                   </div>

@@ -352,23 +352,36 @@ color: #00BCD4; font-weight: 700;
         }
 
         .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 18px; }
+@media (max-width: 640px) {
+  .auth-card {
+    flex-direction: column;
+    min-height: unset;
+    overflow: hidden !important;
+    border-radius: 22px !important;
+  }
+  .purple-panel,
+  .purple-panel::before,
+  .purple-panel::after {
+    border-radius: 0 !important;
+    clip-path: none !important;
+  }
+ .purple-panel {
+  position: relative !important;
+  left: auto !important;
+  width: 100% !important;
+  clip-path: none !important;
+  -webkit-clip-path: none !important;
+  border-radius: 0 !important;
+  min-height: 160px;
+  padding: 28px 24px !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+  .form-side, .form-side.reg-form { padding: 24px 20px !important; }
+  .grid2 { grid-template-columns: 1fr !important; }
+}
 
-        @media (max-width: 640px) {
-          .auth-card { flex-direction: column; min-height: unset; }
-          .purple-panel {
-            position: relative !important;
-            left: auto !important;
-            width: 100% !important;
-            clip-path: none !important;
-            border-radius: 18px 18px 0 0 !important;
-            min-height: 160px;
-            padding: 28px 24px !important;
-            transform: none !important;
-          }
-          .form-side, .form-side.reg-form { padding: 24px 20px !important; }
-          .grid2 { grid-template-columns: 1fr !important; }
-        }
-      `}</style>
+  `}</style>
 
       <div className="auth-card">
 

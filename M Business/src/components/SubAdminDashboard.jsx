@@ -2242,7 +2242,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
   const activeClientsCount = clients.filter(c => (c.status || "Active").toLowerCase() === "active").length;
   const inactiveClientsCount = clients.filter(c => (c.status || "").toLowerCase() === "inactive").length;
 
-  if (!activeClient && !window.__fullClientsList && typeof window !== "undefined" && window.innerWidth < 769) {
+  if (!activeClient && !window.__fullClientsList && typeof window !== "undefined" && window.innerWidth < 480) {
     const mListSearch = (typeof search === "string" ? search : "");
     const mListFiltered = clients.filter(c => {
       const nameMatch = (c.clientName || c.name || "").toLowerCase().includes(mListSearch.toLowerCase());
@@ -7012,10 +7012,14 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
                               localStorage.removeItem("invoiceCreatorInv_subadmin");
                               localStorage.removeItem("invoiceCreatorItems_subadmin");
                             } catch (e) { }
-                          } if (sub.key === "projects") {
-                            setJumpProject(null);
-                            if (typeof setProjectDetailsReadOnly === "function") setProjectDetailsReadOnly(false);
-                          }
+                          }if (sub.key === "projects") {
+  setJumpProject(null);
+  if (typeof setProjectDetailsReadOnly === "function") setProjectDetailsReadOnly(false);
+}
+if (sub.key === "clients") {
+  window.__fullClientsList = false;
+  setActiveClientIdForReturn(null);
+}
                           setActive(sub.key);
                           onClose();
                         }}
@@ -7818,6 +7822,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [quotationPrefillProject, setQuotationPrefillProject] = useState(null);
   const [proposalPrefillProject, setProposalPrefillProject] = useState(null);
   const [quotationViewEntry, setQuotationViewEntry] = useState(null);
+const [forceNewQuotation, setForceNewQuotation] = useState(false);
   const [proposalViewEntry, setProposalViewEntry] = useState(null);
 
   const [quotationReturnProject, setQuotationReturnProject] = useState(null);
@@ -14542,7 +14547,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                 onAddProject={() => { }}
               />
             )}
-            {validActive === "quotations" && !quotationViewEntry && typeof window !== "undefined" && window.innerWidth < 769 && <QuotationsListPage quotations={quotations} onViewQuotation={(q) => { setQuotationViewEntry(q); setSidebarOverride("dashboard"); }} onBack={() => setActive("dashboard")} onAddQuotation={() => { setQuotationViewEntry({}); setSidebarOverride("dashboard"); }}/>}
+            {validActive === "quotations" && !quotationViewEntry && !forceNewQuotation && typeof window !== "undefined" && window.innerWidth < 769 && <QuotationsListPage quotations={quotations} onViewQuotation={(q) => { setQuotationViewEntry(q); setSidebarOverride("dashboard"); }} onBack={() => setActive("dashboard")} onAddQuotation={() => { setForceNewQuotation(true); setSidebarOverride("dashboard"); }}/>}
             {validActive === "quotations" && (quotationViewEntry || !(typeof window !== "undefined" && window.innerWidth < 769)) && <QuotationCreatorModern key={quotationViewEntry ? `view-${quotationViewEntry._id || quotationViewEntry.id}` : (quotationReturnProject ? `new-${quotationReturnProject._id}` : 'list')} user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} prefillProject={quotationPrefillProject} onPrefillConsumed={() => setQuotationPrefillProject(null)} initialViewEntry={quotationViewEntry} onBackOverride={() => {
   setQuotationViewEntry(null);
   setQuotationReturnProject(null);

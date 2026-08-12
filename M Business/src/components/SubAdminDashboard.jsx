@@ -14501,6 +14501,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             {validActive === "quotations" && !quotationViewEntry && typeof window !== "undefined" && window.innerWidth < 769 && <QuotationsListPage quotations={quotations} onViewQuotation={(q) => { setQuotationViewEntry(q); setSidebarOverride("dashboard"); }} onBack={() => setActive("dashboard")} />}
             {validActive === "quotations" && (quotationViewEntry || !(typeof window !== "undefined" && window.innerWidth < 769)) && <QuotationCreatorModern key={quotationViewEntry ? `view-${quotationViewEntry._id || quotationViewEntry.id}` : (quotationReturnProject ? `new-${quotationReturnProject._id}` : 'list')} user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} prefillProject={quotationPrefillProject} onPrefillConsumed={() => setQuotationPrefillProject(null)} initialViewEntry={quotationViewEntry} onBackOverride={() => {
   setQuotationViewEntry(null);
+  setQuotationReturnProject(null);
   setSidebarOverride(null);
   setActive("quotations");
 }} onReturnToProject={quotationReturnProject ? () => { const p = quotationReturnProject; setQuotationReturnProject(null); setJumpProject(p); setSidebarOverride(null); setActive("project-details"); } : null} onAddClient={() => {

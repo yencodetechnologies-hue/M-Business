@@ -594,7 +594,7 @@ export default function AdminDashboard({ user, setUser }) {
           {active === "managers" && <ManagersPage THEME={THEME} managers={managers} setManagers={setManagers} />}
           {active === "projects" && (() => { fetchProjects(); return null; })()}
           {active === "projects" && <ProjectsPage THEME={THEME} projects={projects} tasks={tasks} setProjects={setProjects} clients={clients} employees={employees} fetchTasks={fetchTasks} fetchProjects={fetchProjects} />}
-          {active === "quotations" && <QuotationCreatorModern THEME={THEME} clients={clients} projects={projects} />}
+          {active === "quotations" && <QuotationCreatorModern key={quotationViewEntry ? `view-${quotationViewEntry._id || quotationViewEntry.id}` : 'list'} THEME={THEME} clients={clients} projects={projects} initialViewEntry={quotationViewEntry} onBackOverride={() => setQuotationViewEntry(null)} />}
           {active === "proposals" && <ProjectProposalCreator clients={clients} companyLogo={user?.logoUrl} companyName={user?.companyName || "M Business"} />}
 
           {active === "tasks" && <TaskPage projects={projects} employees={employees} onUpdate={() => fetchTasks()} />}

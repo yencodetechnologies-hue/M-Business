@@ -206,53 +206,68 @@ function Sidebar({ active, setActive, open, onClose, onLogout, user, navItems })
   const initials = (displayName || "E").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
   return (
     <>
-      {open && <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.35)", backdropFilter: "blur(3px)", zIndex: 998 }} />}
-      <div className="emp-sidebar" style={{ width: 252, background: T.sidebar, color: "#fff", display: "flex", flexDirection: "column", height: "100vh", position: "fixed", top: 0, left: 0, zIndex: 999, transform: open ? "translateX(0)" : "translateX(-100%)", transition: "transform 0.35s cubic-bezier(0.4,0,0.2,1)", borderRight: "1px solid rgba(255,255,255,0.06)" }}>
+      {open && <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", backdropFilter: "blur(3px)", zIndex: 998 }} />}
+      <style>{`
+        .emp-nav-item:hover:not(.emp-nav-active) { background: rgba(255,255,255,0.09) !important; }
+        .emp-logout-btn:hover { background: rgba(239,68,68,0.22) !important; transform: translateY(-1px); }
+        .emp-sidebar nav::-webkit-scrollbar { width: 4px; }
+        .emp-sidebar nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+      `}</style>
+      <div className="emp-sidebar" style={{ width: 252, background: T.sidebar, color: "#fff", display: "flex", flexDirection: "column", height: "100vh", position: "fixed", top: 0, left: 0, zIndex: 999, transform: open ? "translateX(0)" : "translateX(-100%)", transition: "transform 0.35s cubic-bezier(0.4,0,0.2,1)", borderRight: "1px solid rgba(255,255,255,0.06)", boxShadow: "6px 0 28px rgba(0,60,70,0.2)", overflow: "hidden" }}>
+
+        {/* ambient glow */}
+        <div style={{ position: "absolute", top: -70, right: -60, width: 190, height: 190, borderRadius: "50%", background: "radial-gradient(circle,rgba(255,255,255,0.16),transparent 70%)", pointerEvents: "none" }} />
 
         {/* Logo area */}
-        <div style={{ padding: "28px 22px 20px", borderBottom: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div style={{ padding: "26px 20px 18px", borderBottom: "1px solid rgba(255,255,255,0.12)", display: "flex", alignItems: "center", justifyContent: "space-between", position: "relative", zIndex: 1 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             {user?.logoUrl ? (
-              <div style={{ minWidth: 38, height: 38, background: "rgba(255,255,255,0.08)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", padding: "4px", border: "1px solid rgba(255,255,255,0.12)" }}>
+              <div style={{ minWidth: 42, height: 42, background: "rgba(255,255,255,0.14)", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", padding: "4px", border: "1px solid rgba(255,255,255,0.2)", boxShadow: "0 6px 16px rgba(0,0,0,0.15)" }}>
                 <img src={user.logoUrl} alt="logo" style={{ maxHeight: "100%", maxWidth: "100%", objectFit: "contain" }} />
               </div>
             ) : (
-              <div style={{ width: 38, height: 38, background: "rgba(255,255,255,0.12)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, fontWeight: 900, color: "#fff", border: "1px solid rgba(255,255,255,0.15)" }}>
+              <div style={{ width: 42, height: 42, background: "linear-gradient(135deg,#ffffff,#f1f5f9)", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 900, color: "var(--app-accent, #00BCD4)", boxShadow: "0 6px 16px rgba(0,0,0,0.18), 0 0 0 1px rgba(255,255,255,0.2)" }}>
                 {initials[0]}
               </div>
             )}
             <div>
               <div style={{ fontWeight: 800, fontSize: 14, color: "#fff", letterSpacing: "-0.3px" }}>{displayName}</div>
-              <div style={{ fontSize: 9, color: "#ffffff", letterSpacing: 1.5, fontWeight: 600, textTransform: "uppercase", marginTop: 2 }}>{user?.role || "EMPLOYEE"}</div>
+              <div style={{ fontSize: 9, color: "rgba(255,255,255,0.75)", letterSpacing: 1.5, fontWeight: 700, textTransform: "uppercase", marginTop: 2 }}>{user?.role || "EMPLOYEE"}</div>
             </div>
           </div>
-          <button onClick={onClose} className="emp-sb-close" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.4)", width: 26, height: 26, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 11 }}>✕</button>
+          <button onClick={onClose} className="emp-sb-close" style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.16)", color: "rgba(255,255,255,0.7)", width: 26, height: 26, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 11, flexShrink: 0 }}>✕</button>
         </div>
 
         {/* Nav */}
-        <nav style={{ flex: 1, padding: "12px 14px", marginTop: 6, overflowY: "auto" }}>
-          <div style={{ fontSize: 9, color: "#ffffff", fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", padding: "0 8px", marginBottom: 8 }}>Main Menu</div>
+        <nav style={{ flex: 1, padding: "14px 12px", marginTop: 4, overflowY: "auto", position: "relative", zIndex: 1 }}>
+          <div style={{ fontSize: 9, color: "rgba(255,255,255,0.55)", fontWeight: 800, letterSpacing: 1.5, textTransform: "uppercase", padding: "0 10px", marginBottom: 10 }}>Main Menu</div>
           {(navItems || NAV).map(n => {
             const on = active === n.key;
             return (
               <button key={n.key} onClick={() => { setActive(n.key); onClose(); }}
-                style={{ width: "100%", display: "flex", alignItems: "center", gap: 11, padding: "10px 12px", background: on ? "rgba(255,255,255,0.1)" : "transparent", border: on ? "1px solid rgba(255,255,255,0.12)" : "1px solid transparent", borderRadius: 10, color: "#ffffff", fontWeight: on ? 900 : 700, fontSize: 13, cursor: "pointer", marginBottom: 3, textAlign: "left", fontFamily: "inherit", transition: "all 0.18s" }}
-                onMouseEnter={e => { if (!on) { e.currentTarget.style.background = "rgba(255,255,255,0.05)"; e.currentTarget.style.color = "#ffffff"; } }}
-                onMouseLeave={e => { if (!on) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#ffffff"; } }}>
-                <span style={{ fontSize: 15, opacity: on ? 1 : 0.5, minWidth: 18, textAlign: "center" }}><i className={`ti ${n.icon}`}></i></span>
+                className={`emp-nav-item${on ? " emp-nav-active" : ""}`}
+                style={{
+                  position: "relative", width: "100%", display: "flex", alignItems: "center", gap: 11, padding: "9px 11px",
+                  background: on ? "linear-gradient(135deg,rgba(255,255,255,0.24),rgba(255,255,255,0.08))" : "transparent",
+                  border: "none", borderRadius: 11, color: "#ffffff", fontWeight: on ? 800 : 600, fontSize: 13, cursor: "pointer",
+                  marginBottom: 3, textAlign: "left", fontFamily: "inherit", transition: "background 0.18s ease",
+                  boxShadow: on ? "0 4px 14px rgba(0,0,0,0.12), inset 0 0 0 1px rgba(255,255,255,0.18)" : "none"
+                }}>
+                {on && <span style={{ position: "absolute", left: -8, top: "50%", transform: "translateY(-50%)", width: 4, height: 16, borderRadius: 4, background: "#fff", boxShadow: "0 0 8px rgba(255,255,255,0.8)" }} />}
+                <span style={{
+                  width: 28, height: 28, borderRadius: 8, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 14, background: on ? "rgba(255,255,255,0.22)" : "rgba(255,255,255,0.1)", opacity: on ? 1 : 0.85
+                }}><i className={`ti ${n.icon}`}></i></span>
                 <span style={{ flex: 1 }}>{n.label}</span>
-                {on && <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#fff", opacity: 0.7 }} />}
               </button>
             );
           })}
         </nav>
 
         {/* Bottom */}
-        <div style={{ padding: "14px", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
-          <button onClick={onLogout} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "11px", background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: T.radiusSm, color: "#fca5a5", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all 0.18s" }}
-            onMouseEnter={e => { e.currentTarget.style.background = "rgba(239,68,68,0.18)"; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "rgba(239,68,68,0.1)"; }}>
-            Logout
+        <div style={{ padding: "14px", borderTop: "1px solid rgba(255,255,255,0.12)", position: "relative", zIndex: 1 }}>
+          <button onClick={onLogout} className="emp-logout-btn" style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "11px", background: "rgba(239,68,68,0.16)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: T.radiusSm, color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all 0.18s" }}>
+            <i className="ti ti-logout" style={{ fontSize: 15 }}></i> Logout
           </button>
         </div>
       </div>

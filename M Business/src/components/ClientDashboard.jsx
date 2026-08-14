@@ -1818,20 +1818,22 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     .cp-root button, .cp-root input, .cp-root textarea { font-family: var(--font); }
 
     /* ── TOP NAV ── */
-    .cp-root .topnav { background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 12px rgba(0,0,0,.05); }
-    .cp-root .topnav-inner { max-width: 1200px; margin: 0 auto; padding: 0 24px; height: 62px; display: flex; align-items: center; gap: 16px; }
-    .cp-root .tn-brand { display: flex; align-items: center; gap: 10px; }
-    .cp-root .tn-logo { width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(135deg, var(--teal3), var(--teal)); display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 900; color: #fff; letter-spacing: -.5px; }
-    .cp-root .tn-company { font-size: 15px; font-weight: 800; color: var(--text); }
-    .cp-root .tn-powered { font-size: 10px; color: var(--text3); font-weight: 600; }
-    .cp-root .tn-nav { display: flex; gap: 2px; margin-left: 24px; }
-    .cp-root .tn-item { padding: 8px 14px; border-radius: 9px; font-size: 13px; font-weight: 600; color: var(--text2); cursor: pointer; transition: all .15s; border: none; background: none; }
-    .cp-root .tn-item:hover { background: var(--bg); color: var(--text); }
-    .cp-root .tn-item.active { background: var(--teal-light); color: var(--teal); }
+    .cp-root .topnav { background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 12px rgba(0,0,0,.05); backdrop-filter: blur(8px); }
+    .cp-root .topnav-inner { max-width: 1240px; margin: 0 auto; padding: 0 24px; height: 66px; display: flex; align-items: center; gap: 16px; }
+    .cp-root .tn-brand { display: flex; align-items: center; gap: 11px; }
+    .cp-root .tn-logo { width: 40px; height: 40px; border-radius: 11px; background: linear-gradient(135deg, var(--teal3), var(--teal)); display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 900; color: #fff; letter-spacing: -.5px; box-shadow: 0 6px 16px rgba(0,188,212,0.3); }
+    .cp-root .tn-company { font-size: 15px; font-weight: 800; color: var(--text); letter-spacing: -0.2px; }
+    .cp-root .tn-powered { font-size: 10px; color: var(--text3); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 1px; }
+    .cp-root .tn-nav { display: flex; gap: 3px; margin-left: 20px; background: var(--bg); padding: 4px; border-radius: 12px; border: 1px solid var(--border); }
+    .cp-root .tn-item { display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 9px; font-size: 12.5px; font-weight: 700; color: var(--text2); cursor: pointer; transition: all .15s; border: none; background: none; white-space: nowrap; }
+    .cp-root .tn-item i { font-size: 14px; opacity: 0.8; }
+    .cp-root .tn-item:hover { background: rgba(255,255,255,0.6); color: var(--text); }
+    .cp-root .tn-item.active { background: #fff; color: var(--teal); box-shadow: 0 2px 8px rgba(0,188,212,0.18); }
+    .cp-root .tn-item.active i { opacity: 1; }
     .cp-root .tn-right { margin-left: auto; display: flex; align-items: center; gap: 10px; position: relative; }
-    .cp-root .tn-notif { width: 36px; height: 36px; border-radius: 9px; background: var(--bg); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 17px; color: var(--text2); position: relative; transition: all 0.2s; }
-    .cp-root .tn-notif:hover { border-color: var(--teal); color: var(--teal); }
-    .cp-root .tn-notif-dot { position: absolute; top: 8px; right: 9px; width: 7px; height: 7px; border-radius: 50%; background: var(--red); border: 1.5px solid #fff; }
+    .cp-root .tn-notif { width: 38px; height: 38px; border-radius: 10px; background: var(--bg); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 17px; color: var(--text2); position: relative; transition: all 0.2s; }
+    .cp-root .tn-notif:hover { border-color: var(--teal); color: var(--teal); background: var(--teal-lighter); transform: translateY(-1px); }
+    .cp-root .tn-notif-dot { position: absolute; top: 8px; right: 9px; width: 7px; height: 7px; border-radius: 50%; background: var(--red); border: 1.5px solid #fff; box-shadow: 0 0 0 2px rgba(239,68,68,0.2); }
     .cp-root .tn-client-chip { display: flex; align-items: center; gap: 8px; padding: 6px 12px 6px 6px; background: var(--bg); border: 1px solid var(--border); border-radius: 9px; cursor: pointer; position: relative; }
     .cp-root .tn-client-chip:hover { border-color: var(--teal); }
     .cp-root .tn-avatar { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, var(--amber), #D97706); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: #fff; }
@@ -2159,21 +2161,16 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             </div>
           </div>
           <div className="tn-nav">
-            <button className={`tn-item ${active === "dashboard" ? "active" : ""}`} onClick={() => setActive("dashboard")}>Overview</button>
-            <button className={`tn-item ${active === "projects" ? "active" : ""}`} onClick={() => setActive("projects")}><i className="ti ti-layout-kanban" style={{ marginRight: 4 }}></i>My Projects</button>
-            <button className={`tn-item ${active === "timeline" ? "active" : ""}`} onClick={() => setActive("timeline")}>Timeline</button>
-            <button className={`tn-item ${active === "files" ? "active" : ""}`} onClick={() => setActive("files")}>Files</button>
-            <button className={`tn-item ${active === "proposals" ? "active" : ""}`} onClick={() => setActive("proposals")}>
-              Proposals
-            </button>
-            <button className={`tn-item ${active === "payments" ? "active" : ""}`} onClick={() => setActive("payments")}>Invoices</button>
-            <button className={`tn-item ${active === "quotations" ? "active" : ""}`} onClick={() => setActive("quotations")}>
-              Quotations
-            </button>
-
+            <button className={`tn-item ${active === "dashboard" ? "active" : ""}`} onClick={() => setActive("dashboard")}><i className="ti ti-layout-dashboard"></i>Overview</button>
+            <button className={`tn-item ${active === "projects" ? "active" : ""}`} onClick={() => setActive("projects")}><i className="ti ti-layout-kanban"></i>My Projects</button>
+            <button className={`tn-item ${active === "timeline" ? "active" : ""}`} onClick={() => setActive("timeline")}><i className="ti ti-clock-hour-4"></i>Timeline</button>
+            <button className={`tn-item ${active === "files" ? "active" : ""}`} onClick={() => setActive("files")}><i className="ti ti-folder"></i>Files</button>
+            <button className={`tn-item ${active === "proposals" ? "active" : ""}`} onClick={() => setActive("proposals")}><i className="ti ti-file-text"></i>Proposals</button>
+            <button className={`tn-item ${active === "payments" ? "active" : ""}`} onClick={() => setActive("payments")}><i className="ti ti-receipt"></i>Invoices</button>
+            <button className={`tn-item ${active === "quotations" ? "active" : ""}`} onClick={() => setActive("quotations")}><i className="ti ti-file-invoice"></i>Quotations</button>
 
             {portalSettings.allowMessages && (
-              <button className={`tn-item ${active === "messages" ? "active" : ""}`} onClick={() => setActive("messages")}>Messages</button>
+              <button className={`tn-item ${active === "messages" ? "active" : ""}`} onClick={() => setActive("messages")}><i className="ti ti-message-circle"></i>Messages</button>
             )}
           </div>
           <div className="tn-right">

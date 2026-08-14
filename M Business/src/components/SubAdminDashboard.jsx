@@ -12614,24 +12614,6 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                       }}>
                       🎨
                     </button>
-                    <button
-                      onClick={() => { const ph = (user?.phone || "").replace(/\D/g, ""); window.open(ph ? "https://wa.me/" + ph : "https://web.whatsapp.com/", "_blank"); }}
-                      title="Open WhatsApp"
-                      style={{
-                        width: 48, height: 48, borderRadius: "50%",
-                        background: "#25D366",
-                        border: "none", cursor: "pointer",
-                        boxShadow: "0 6px 20px rgba(37,211,102,0.6)",
-                        display: "flex", alignItems: "center", justifyContent: "center",
-                        transition: "all 0.2s", padding: 0,
-                        marginTop: 12
-                      }}>
-                      <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 32 32" fill="none">
-                        <path d="M16 1C7.7 1 1 7.7 1 16c0 2.7.7 5.2 2 7.4L1 31l7.9-2c2.1 1.1 4.5 1.8 7.1 1.8 8.3 0 15-6.7 15-15S24.3 1 16 1z" fill="#fff" />
-                        <path d="M16 3.5C9 3.5 3.5 9 3.5 16c0 2.5.7 4.8 1.9 6.8l.3.5-1.3 4.7 4.9-1.3.5.3C11.6 28.1 13.7 28.5 16 28.5c7 0 12.5-5.5 12.5-12.5S23 3.5 16 3.5z" fill="#25D366" />
-                        <path d="M11.5 9.5c-.3-.7-.6-.7-.9-.7h-.7c-.3 0-.7.1-1.1.5-.4.4-1.5 1.5-1.5 3.6s1.6 4.2 1.8 4.5c.2.3 3 4.7 7.4 6.4 3.7 1.4 4.4 1.1 5.2 1 .8 0 2.5-1 2.8-2 .4-1 .4-1.8.3-2-.1-.2-.4-.3-.8-.5-.4-.2-2.5-1.2-2.8-1.3-.4-.1-.6-.2-.9.2-.3.4-1 1.3-1.3 1.6-.2.3-.5.3-.8.1-.4-.2-1.6-.6-3-1.9-1.1-1-1.9-2.2-2.1-2.6-.2-.4 0-.6.2-.8.2-.2.4-.4.5-.7.2-.2.2-.4.4-.7.1-.2 0-.5-.1-.7-.2-.2-.9-2.2-1.2-3z" fill="#fff" />
-                      </svg>
-                    </button>
                   </div>
 
 

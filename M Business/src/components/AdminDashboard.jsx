@@ -12,6 +12,20 @@ import QuotationCreator from "./QuotationCreator";
 import ProjectProposalCreator from "./ProjectProposalCreator";
 import AdminProposalManagement from "./AdminProposalManagement";
 import ModernProjectsView from "./ModernProjectsView";
+import {
+  LayoutDashboard, ShieldCheck, FileSignature, BarChart3, CreditCard,
+  Package as PackageIcon, Wallet, LogOut, Moon, Sun
+} from "lucide-react";
+
+const NAV_ICONS = {
+  dashboard: LayoutDashboard,
+  subadmins: ShieldCheck,
+  proposals: FileSignature,
+  reports: BarChart3,
+  subscriptions: CreditCard,
+  packages: PackageIcon,
+  payments: Wallet
+};
 
 const THEME_MAP = {
   light: {
@@ -457,67 +471,82 @@ export default function AdminDashboard({ user, setUser }) {
         table th { background: ${THEME.surface} !important; color: ${THEME.muted} !important; border-bottom: 1.5px solid ${THEME.border} !important; }
         table td { border-bottom: 1px solid ${THEME.border} !important; color: ${THEME.text} !important; }
         input, select, textarea { background: ${THEME.card} !important; color: ${THEME.text} !important; border: 1.5px solid ${THEME.border} !important; }
+        .adm-nav-item:hover { background: ${darkMode ? "rgba(255,255,255,0.06)" : "rgba(124,58,237,0.06)"} !important; }
+        .adm-logout-btn:hover { background: rgba(239,68,68,0.18) !important; transform: translateY(-1px); }
+        .adm-theme-toggle:hover { background: ${darkMode ? "rgba(56,189,248,0.14)" : "rgba(0,0,0,0.05)"} !important; }
       `}</style>
 
       {/* SIDEBAR */}
-      <div style={{ width: 260, background: THEME.sidebar, color: darkMode ? "#fff" : THEME.text, display: "flex", flexDirection: "column", position: "relative", zIndex: 100, borderRight: `1.5px solid ${THEME.border}` }}>
-        <div style={{ padding: "32px 24px", display: "flex", alignItems: "center", gap: 12 }}>
-          <div style={{ width: 42, height: 42, background: darkMode ? "rgba(255,255,255,0.05)" : "#fff", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", padding: "4px", border: darkMode ? "1px solid rgba(255,255,255,0.1)" : "1px solid #e2e8f0" }}>
-            {user?.logoUrl ? <img src={user.logoUrl} alt="logo" style={{ maxHeight: "100%", maxWidth: "100%", objectFit: "contain" }} /> : <span style={{ color: darkMode ? "#fff" : "#1a3d4d", fontWeight: 900 }}>A</span>}
+      <div style={{ width: 264, background: THEME.sidebar, color: darkMode ? "#fff" : THEME.text, display: "flex", flexDirection: "column", position: "relative", zIndex: 100, borderRight: `1.5px solid ${THEME.border}`, boxShadow: darkMode ? "4px 0 24px rgba(0,0,0,0.3)" : "4px 0 24px rgba(124,58,237,0.05)" }}>
+        <div style={{ padding: "28px 22px 22px", display: "flex", alignItems: "center", gap: 12, borderBottom: `1px solid ${THEME.border}` }}>
+          <div style={{ width: 46, height: 46, background: THEME.gradient, borderRadius: 13, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", padding: 4, boxShadow: `0 8px 18px ${THEME.accent}40` }}>
+            {user?.logoUrl ? <img src={user.logoUrl} alt="logo" style={{ maxHeight: "100%", maxWidth: "100%", objectFit: "contain", borderRadius: 9 }} /> : <span style={{ color: "#fff", fontWeight: 900, fontSize: 18 }}>A</span>}
           </div>
           <div>
             <div style={{ fontWeight: 900, fontSize: 16, letterSpacing: "-0.5px", color: darkMode ? "#fff" : "#0f172a" }}>M Business</div>
+            <div style={{ fontSize: 10, color: THEME.muted, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", marginTop: 1 }}>Platform Admin</div>
           </div>
         </div>
 
-        <nav style={{ flex: 1, padding: "12px 16px", overflowY: "auto" }}>
-          <div style={{ fontSize: 10, color: darkMode ? "rgba(255,255,255,0.3)" : THEME.muted, fontWeight: 800, letterSpacing: 1.5, marginBottom: 20, paddingLeft: 12, textTransform: "uppercase" }}>Main Menu</div>
+        <nav style={{ flex: 1, padding: "18px 14px", overflowY: "auto" }}>
+          <div style={{ fontSize: 10, color: THEME.muted, fontWeight: 800, letterSpacing: 1.5, marginBottom: 14, paddingLeft: 10, textTransform: "uppercase" }}>Main Menu</div>
           {NAV.map(n => {
             const on = active === n.key;
+            const Icon = NAV_ICONS[n.key] || LayoutDashboard;
             return (
               <button key={n.key} onClick={() => { setJumpProject(null); setJumpInvoicePrefill(null); setActive(n.key); }}
+                className="adm-nav-item"
                 style={{
-                  width: "100%", display: "flex", alignItems: "center", gap: 14, padding: "12px 18px",
-                  background: on ? (darkMode ? "rgba(255,255,255,0.1)" : "rgba(59,130,246,0.1)") : "transparent",
-                  border: "none", borderRadius: 14, color: on ? (darkMode ? "#fff" : "#3b82f6") : (darkMode ? "rgba(255,255,255,0.5)" : "#64748b"),
-                  fontWeight: on ? 800 : 600, fontSize: 14, cursor: "pointer", marginBottom: 6, transition: "0.2s"
+                  width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "10px 12px",
+                  background: on ? (darkMode ? "linear-gradient(90deg,rgba(56,189,248,0.16),rgba(56,189,248,0.02))" : "linear-gradient(90deg,rgba(124,58,237,0.12),rgba(124,58,237,0.02))") : "transparent",
+                  border: "none", borderRadius: 12, color: on ? THEME.accent : (darkMode ? "rgba(255,255,255,0.55)" : "#64748b"),
+                  fontWeight: on ? 800 : 600, fontSize: 13.5, cursor: "pointer", marginBottom: 4, transition: "background 0.18s ease"
                 }}>
-                <span style={{ fontSize: 18 }}>{n.key === 'dashboard' ? 'Metrics' : n.key === 'subadmins' ? 'Security' : n.key === 'proposals' ? 'Document' : n.key === 'reports' ? 'Trends' : n.key === 'subscriptions' ? '' : n.key === 'packages' ? 'Package' : 'Payment'}</span>
+                <span style={{
+                  width: 30, height: 30, borderRadius: 9, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center",
+                  background: on ? `${THEME.accent}22` : (darkMode ? "rgba(255,255,255,0.05)" : "rgba(100,116,139,0.08)"),
+                  color: on ? THEME.accent : (darkMode ? "rgba(255,255,255,0.45)" : "#94a3b8"), transition: "background 0.18s ease, color 0.18s ease"
+                }}>
+                  <Icon size={15} strokeWidth={2.3} />
+                </span>
                 <span style={{ flex: 1, textAlign: "left" }}>{n.label}</span>
-                {on && <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981" }} />}
+                {on && <div style={{ width: 6, height: 6, borderRadius: "50%", background: THEME.accent, boxShadow: `0 0 8px ${THEME.accent}` }} />}
               </button>
             );
           })}
         </nav>
 
-        <div style={{ padding: "20px 16px", borderTop: `1px solid ${THEME.border}` }}>
+        <div style={{ padding: "16px 14px 20px", borderTop: `1px solid ${THEME.border}` }}>
           <div onClick={() => {
             setDarkMode(v => {
               localStorage.setItem("empDarkMode", !v);
               return !v;
             });
-          }} style={{
+          }} className="adm-theme-toggle" style={{
             display: "flex", alignItems: "center", justifyContent: "space-between",
-            padding: "10px 14px", borderRadius: T.radiusSm, cursor: "pointer",
+            padding: "10px 14px", borderRadius: 11, cursor: "pointer",
             background: darkMode ? "rgba(56,189,248,0.08)" : "rgba(0,0,0,0.03)",
-            marginBottom: 12
+            marginBottom: 10, transition: "background 0.18s ease"
           }}>
-            <span style={{ fontSize: 12, fontWeight: 700, color: T.textMuted }}>
+            <span style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, display: "flex", alignItems: "center", gap: 8 }}>
+              {darkMode ? <Moon size={14} /> : <Sun size={14} />}
               {darkMode ? "Dark Mode" : "Light Mode"}
             </span>
             <div style={{
               width: 36, height: 20,
-              background: darkMode ? "#38bdf8" : "#e2e8f0",
+              background: darkMode ? "#38bdf8" : "#cbd5e1",
               borderRadius: 20, position: "relative", transition: "0.3s"
             }}>
               <div style={{
                 width: 14, height: 14, background: "#fff", borderRadius: "50%",
                 position: "absolute", top: 3,
-                left: darkMode ? 19 : 3, transition: "0.3s"
+                left: darkMode ? 19 : 3, transition: "0.3s", boxShadow: "0 1px 3px rgba(0,0,0,0.3)"
               }} />
             </div>
           </div>
-          <button onClick={handleLogout} style={{ width: "100%", background: "rgba(239,68,68,0.1)", border: "none", borderRadius: 12, padding: "12px", color: "#f87171", fontSize: 13, fontWeight: 800, cursor: "pointer" }}> Logout</button>
+          <button onClick={handleLogout} className="adm-logout-btn" style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.22)", borderRadius: 11, padding: "11px", color: "#f87171", fontSize: 13, fontWeight: 800, cursor: "pointer", transition: "all 0.18s ease" }}>
+            <LogOut size={15} strokeWidth={2.3} /> Logout
+          </button>
         </div>
       </div>
 

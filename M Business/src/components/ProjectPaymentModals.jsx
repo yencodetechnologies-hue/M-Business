@@ -109,6 +109,18 @@ export default function ProjectPaymentModals({
           }
         }
       }
+      if (showExpense) {
+        const KNOWN_CATEGORIES = ['Software', 'Hardware', 'Contractor', 'Travel', 'Marketing'];
+        if (editData.category && !KNOWN_CATEGORIES.includes(editData.category)) {
+          enrichedEditData.customCategory = editData.category;
+          enrichedEditData.category = 'Other';
+        }
+        const KNOWN_PAYMENT_MODES = ['Bank Transfer', 'UPI', 'Credit Card', 'Cash', 'Cheque'];
+        if (editData.paymentMode && !KNOWN_PAYMENT_MODES.includes(editData.paymentMode)) {
+          enrichedEditData.customPaymentMode = editData.paymentMode;
+          enrichedEditData.paymentMode = 'Custom';
+        }
+      }
       setForm(enrichedEditData);
       const lineItems = editData.items || editData.lineItems;
       if (lineItems && lineItems.length > 0) {

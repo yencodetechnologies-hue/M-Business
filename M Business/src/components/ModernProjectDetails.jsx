@@ -2966,9 +2966,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                     });
 
                     const isActive = !isDone && idx === firstNotDone;
-                    const circleColor = isDone ? P.red : isActive ? '#EFF6FF' : '#FFFFFF';
-                    const circleBorder = isDone ? P.red : isActive ? P.primary : P.border;
-                    const textColor = isDone ? P.red : isActive ? P.primary : P.textLight;
+                    const circleColor = isDone ? P.green : isActive ? '#EFF6FF' : '#FFFFFF';
+                    const circleBorder = isDone ? P.green : isActive ? P.primary : P.border;
+                    const textColor = isDone ? P.green : isActive ? P.primary : P.textLight;
                     const statusLabel = isDone ? 'Done' : isActive ? 'Active' : 'Pending';
                     return (
                       <div key={idx} draggable="true" onDragStart={(e) => { e.stopPropagation(); setDragMilestoneIdx(idx); }} onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setDragOverMilestoneIdx(idx); }} onDrop={(e) => { e.preventDefault(); e.stopPropagation(); if (dragMilestoneIdx === null || dragMilestoneIdx === idx) { setDragMilestoneIdx(null); setDragOverMilestoneIdx(null); return; } const ms = [...(currProject.milestones || [])]; const dragged = ms.splice(dragMilestoneIdx, 1)[0]; ms.splice(idx, 0, dragged); setDragMilestoneIdx(null); setDragOverMilestoneIdx(null); setCurrProject(prev => ({ ...prev, milestones: ms })); axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { milestones: ms }).then(loadLatest); }} onDragEnd={(e) => { e.stopPropagation(); setDragMilestoneIdx(null); setDragOverMilestoneIdx(null); }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, flex: 1, position: 'relative', zIndex: 1, opacity: dragMilestoneIdx === idx ? 0.4 : 1, cursor: 'grab', outline: dragOverMilestoneIdx === idx && dragMilestoneIdx !== idx ? `2.5px dashed ${P.primary}` : 'none', borderRadius: 8, transition: 'opacity .2s' }}>
@@ -2978,8 +2978,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                               const taskDone = t.status === 'done' || t.status === 'completed';
                               return (
                                 <div key={t._id} title={t.title} style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                                  <div style={{ width: 10, height: 10, borderRadius: '50%', background: taskDone ? P.red : P.primary, border: '2px solid #FFFFFF', zIndex: 2 }}></div>
-                                  <div style={{ position: 'absolute', top: 14, fontSize: 9, color: taskDone ? P.red : P.textDark, whiteSpace: 'nowrap', fontWeight: 700, maxWidth: 60, overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'center' }}>
+                                  <div style={{ width: 10, height: 10, borderRadius: '50%', background: taskDone ? P.green : P.primary, border: '2px solid #FFFFFF', zIndex: 2 }}></div>
+                                  <div style={{ position: 'absolute', top: 14, fontSize: 9, color: taskDone ? P.green : P.textDark, whiteSpace: 'nowrap', fontWeight: 700, maxWidth: 60, overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'center' }}>
                                     {t.title}
                                   </div>
                                 </div>
@@ -4478,64 +4478,86 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
             </div>
           </div>
 
-          {/* BUDGET */}
+          {/* FINANCIAL OVERVIEW */}
           <div className="mpd-card" style={{ marginBottom: 0, paddingTop: 8, paddingLeft: 6, paddingRight: 6, display: 'flex', flexDirection: 'column', height: '100%' }}>
             <div className="mpd-card-header">
-              <div className="mpd-card-title"><i className="ti ti-wallet"></i> Budget</div>
+              <div className="mpd-card-title"><i className="ti ti-report-money"></i> Financial Overview</div>
               {!hideTopActions && (
                 <button className="mpd-btn mpd-btn-outline" onClick={() => setShowEditBudgetModal(true)} style={{ padding: '5px 10px', fontSize: 11 }}>
-                  <i className="ti ti-plus"></i> Add Budget
+                  <i className="ti ti-pencil"></i> Edit Budget
                 </button>
               )}
             </div>
+
             {budgetExceeded && (
-              <div style={{ background: '#E2E8F0', border: '1px solid #E2E8F0', borderRadius: 8, padding: '8px 12px', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 7 }}>
-                <i className="ti ti-alert-triangle" style={{ color: '#64748B', fontSize: 16 }}></i>
+              <div style={{ background: 'linear-gradient(135deg,#FEF2F2,#FFF7ED)', border: '1px solid #FCA5A5', borderRadius: 10, padding: '10px 14px', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 9 }}>
+                <i className="ti ti-alert-triangle" style={{ color: '#DC2626', fontSize: 18 }}></i>
                 <div>
-                  <div style={{ fontSize: 11, fontWeight: 800, color: '#64748B' }}>Budget Exceeded!</div>
-                  <div style={{ fontSize: 10, color: '#1E293B', fontWeight: 600 }}>Over by {currency}{overageAmt.toLocaleString()}</div>
+                  <div style={{ fontSize: 12, fontWeight: 900, color: '#DC2626' }}>Budget Exceeded</div>
+                  <div style={{ fontSize: 11, color: '#7C2D12', fontWeight: 600 }}>Over by {currency}{overageAmt.toLocaleString()}</div>
                 </div>
               </div>
             )}
-            <div className="mpd-brow" style={{ flexWrap: 'wrap', gap: 4 }}>
-              <span className="mpd-lbl">Total Budget <span style={{ fontSize: 9, color: '#64748B', fontWeight: 600, marginLeft: 4 }}></span></span>
-              <span className="mpd-val" style={{ wordBreak: 'break-word', maxWidth: '100%', textAlign: 'right' }}>{currency}{budgetAmt.toLocaleString()}</span>
-            </div>
-            {[['Advance Paid', 'advance', autoAdvanceTotal, 'mpd-p'], ['Received', 'received', received, 'mpd-g']].map(([lbl, key, val, cls]) => (
-              <div key={key} className="mpd-brow">
-                <span className="mpd-lbl">{lbl}</span>
-                <span className={`mpd-val ${cls}`}>{currency}{val.toLocaleString()}</span>
+
+            {/* Hero: total budget + remaining */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 10, background: `linear-gradient(135deg, ${P.primaryLight}, #FFFFFF)`, border: '1.5px solid rgba(37, 99, 235, .12)', borderRadius: 14, padding: '16px 18px', marginBottom: 16 }}>
+              <div>
+                <div style={{ fontSize: 10, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.6px', marginBottom: 4 }}>Total Budget</div>
+                <div style={{ fontSize: 26, fontWeight: 900, color: P.textDark, letterSpacing: '-.5px' }}>{currency}{budgetAmt.toLocaleString()}</div>
               </div>
-            ))}
-            <div className="mpd-brow" style={{ flexWrap: 'wrap', gap: 4 }}>
-              <span className="mpd-lbl">Pending</span>
-              <span className="mpd-val mpd-r" style={{ wordBreak: 'break-word', maxWidth: '100%', textAlign: 'right' }}>{currency}{pending.toLocaleString()}</span>
-            </div>
-            <div className="mpd-brow">
-              <span className="mpd-lbl">Expenses</span>
-              <span className="mpd-val">{currency}{expenseTotal.toLocaleString()}</span>
-            </div>
-            <div className="mpd-brow">
-              <span className="mpd-lbl">Commission</span>
-              <span className="mpd-val">{currency}{commissionTotal.toLocaleString()}</span>
-            </div>
-            <div className="mpd-brow">
-              <span className="mpd-lbl">Spent (Expenses + Commission)</span>
-              <span className="mpd-val" style={{ color: budgetExceeded ? '#64748B' : undefined, fontWeight: budgetExceeded ? 800 : 700 }}>{currency}{spent.toLocaleString()}</span>
-            </div>
-            <div className="mpd-brow">
-              <span className="mpd-lbl">Remaining Budget</span>
-              <span className="mpd-val" style={{ color: remaining < 0 ? '#64748B' : '#2563EB', fontWeight: 800 }}>
-                {remaining < 0 ? `-${currency}${Math.abs(remaining).toLocaleString()}` : `${currency}${remaining.toLocaleString()}`}
-              </span>
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontSize: 10, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.6px', marginBottom: 4 }}>Remaining</div>
+                <div style={{ fontSize: 20, fontWeight: 900, color: remaining < 0 ? '#DC2626' : '#16A34A' }}>
+                  {remaining < 0 ? `-${currency}${Math.abs(remaining).toLocaleString()}` : `${currency}${remaining.toLocaleString()}`}
+                </div>
+              </div>
             </div>
 
-            <div style={{ marginTop: 10 }}>
+            {/* Stat tiles */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 10, marginBottom: 16 }}>
+              {[
+                { lbl: 'Advance Paid', val: autoAdvanceTotal, icon: 'ti-cash-banknote', bg: '#EFF6FF', fg: '#2563EB' },
+                { lbl: 'Received', val: received, icon: 'ti-checkbox', bg: '#F0FDF4', fg: '#16A34A' },
+                { lbl: 'Pending', val: pending, icon: 'ti-clock-hour-4', bg: '#FFF7ED', fg: '#EA580C' },
+                { lbl: 'Expenses', val: expenseTotal, icon: 'ti-receipt-2', bg: '#FEF2F2', fg: '#DC2626' },
+                { lbl: 'Commission', val: commissionTotal, icon: 'ti-percentage', bg: '#F5F3FF', fg: '#7C3AED' },
+                { lbl: 'Total Spent', val: spent, icon: 'ti-arrow-up-right', bg: '#F8FAFC', fg: '#334155' },
+              ].map(t => (
+                <div key={t.lbl} style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: 12, padding: '10px 12px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <div style={{ width: 28, height: 28, borderRadius: 8, background: t.bg, color: t.fg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}>
+                    <i className={`ti ${t.icon}`}></i>
+                  </div>
+                  <div style={{ fontSize: 9, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.5px' }}>{t.lbl}</div>
+                  <div style={{ fontSize: 14, fontWeight: 900, color: P.textDark, wordBreak: 'break-word' }}>{currency}{t.val.toLocaleString()}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Progress: received vs budget */}
+            <div style={{ marginBottom: 12 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, fontWeight: 700, color: P.textDark, marginBottom: 5 }}>
+                <span>Collected</span>
+                <span>{budgetAmt > 0 ? Math.min(Math.round((received / budgetAmt) * 100), 100) : 0}%</span>
+              </div>
               <div className="mpd-progress-bg">
-                <div className="mpd-progress-fill mpd-purple" style={{ width: `${budgetAmt > 0 ? Math.min(Math.round((received / budgetAmt) * 100), 100) : 0}%` }}></div>
+                <div className="mpd-progress-fill mpd-green" style={{ width: `${budgetAmt > 0 ? Math.min(Math.round((received / budgetAmt) * 100), 100) : 0}%` }}></div>
               </div>
               <div style={{ fontSize: 11, color: P.textLight, marginTop: 4, fontWeight: 600 }}>
-                {budgetAmt > 0 ? Math.round((received / budgetAmt) * 100) : 0}% received · {currency}{received.toLocaleString()} of {currency}{budgetAmt.toLocaleString()}
+                {currency}{received.toLocaleString()} of {currency}{budgetAmt.toLocaleString()} received
+              </div>
+            </div>
+
+            {/* Progress: spent vs budget */}
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, fontWeight: 700, color: P.textDark, marginBottom: 5 }}>
+                <span>Utilized</span>
+                <span>{budgetAmt > 0 ? Math.min(Math.round((spent / budgetAmt) * 100), 100) : 0}%</span>
+              </div>
+              <div className="mpd-progress-bg">
+                <div className={`mpd-progress-fill ${budgetExceeded ? 'mpd-red' : 'mpd-purple'}`} style={{ width: `${budgetAmt > 0 ? Math.min(Math.round((spent / budgetAmt) * 100), 100) : 0}%` }}></div>
+              </div>
+              <div style={{ fontSize: 11, color: P.textLight, marginTop: 4, fontWeight: 600 }}>
+                {currency}{spent.toLocaleString()} of {currency}{budgetAmt.toLocaleString()} spent
               </div>
             </div>
 

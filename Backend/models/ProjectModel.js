@@ -106,9 +106,11 @@ const projectSchema = new mongoose.Schema({
   paymentsReceived: {
     type: [{
       paymentNo: { type: String, required: true },
+      title: { type: String, default: "" },
       linkedInvoice: { type: String, default: "" },
       description: { type: String, default: "" },
       amount: { type: Number, default: 0 },
+      dueDate: { type: String, default: "" },
       paymentDate: { type: String, default: "" },
       paymentMode: { type: String, default: "" },
       transactionRef: { type: String, default: "" },

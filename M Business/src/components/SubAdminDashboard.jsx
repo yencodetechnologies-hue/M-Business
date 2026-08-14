@@ -1384,18 +1384,12 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
 
 
-  const getAvatarColor = (c, idx = 0) => {
-
-    const colors = ["#64748B", "#16A34A", "#2563EB", "#2563EB", "#64748B", "var(--app-accent, #2563EB)", "#64748B"];
-
+  const getAvatarColor = (c) => {
+    const colors = ["#2563EB", "#0F172A", "#16A34A", "#64748B"];
     const key = c._id || c.email || "";
-
     let hash = 0;
-
     for (let i = 0; i < key.length; i++) hash = key.charCodeAt(i) + ((hash << 5) - hash);
-
     return colors[Math.abs(hash) % colors.length];
-
   };
 
 
@@ -1416,46 +1410,81 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
 
 
+  const clientProjectCount = (c) => projects.filter(p => {
+    const cName = (c.clientName || c.name || "").toLowerCase();
+    return (p.client || "").toLowerCase() === cName || p.clientId === c._id;
+  }).length;
+
   const renderClientItem = (c) => {
-
     const st = getStatusCfg(c.status);
-
     const isActive = c._id === activeClientId;
-
     const color = getAvatarColor(c);
-
-    const revenue = c.totalRevenue || c.revenue || 0;
-
+    const name = c.clientName || c.name || "—";
+    const company = c.companyName || c.company || "";
+    const projCount = clientProjectCount(c);
     return (
-
-      <div key={c._id} onClick={() => { setActiveClientId(c._id); setActiveTab("overview"); }} style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 16px", cursor: "pointer", transition: "all .15s", borderBottom: "1px solid rgba(226, 232, 240, .5)", position: "relative", background: isActive ? "var(--teal-lighter, #EFF6FF)" : "transparent", borderRight: isActive ? "3px solid  var(--app-accent, var(--app-accent, #2563EB))" : "3px solid transparent" }} onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = "var(--teal-lighter, #EFF6FF)"; }} onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = "transparent"; }}>
-
-        <div style={{ width: 40, height: 40, borderRadius: "50%", background: `linear-gradient(135deg,${color},${color}bb)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800, color: "#FFFFFF", flexShrink: 0, position: "relative" }}>
-
-          {c.logoUrl ? <img src={c.logoUrl} alt="" style={{ width: 40, height: 40, borderRadius: "50%", objectFit: "contain", background: "#FFFFFF" }} /> : getAvatar(c)}
-
-
-
+      <button
+        key={c._id}
+        type="button"
+        className="cl-card"
+        onClick={() => { setActiveClientId(c._id); setActiveTab("overview"); }}
+        style={{
+          display: "flex", flexDirection: "column", gap: 14, textAlign: "left",
+          padding: 18, borderRadius: 16, cursor: "pointer", fontFamily: "inherit",
+          background: "#FFFFFF", border: isActive ? "1.5px solid #2563EB" : "1.5px solid #E2E8F0",
+          boxShadow: isActive ? "0 10px 28px rgba(37, 99, 235, 0.16)" : "0 4px 16px rgba(15, 23, 42, 0.05)",
+          transition: "transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 10 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
+            <div style={{
+              width: 48, height: 48, borderRadius: 14, flexShrink: 0,
+              background: `linear-gradient(135deg, ${color}, #2563EB)`,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: 15, fontWeight: 800, color: "#FFFFFF",
+            }}>
+              {getAvatar(c)}
+            </div>
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontSize: 15, fontWeight: 800, color: "#0F172A", lineHeight: 1.3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{name}</div>
+              {company && company !== name && (
+                <div style={{ fontSize: 12, color: "#64748B", fontWeight: 600, marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{company}</div>
+              )}
+            </div>
+          </div>
+          <span style={{
+            flexShrink: 0, padding: "5px 10px", borderRadius: 999, fontSize: 11, fontWeight: 800,
+            background: st.bg, color: st.color, display: "inline-flex", alignItems: "center", gap: 6
+          }}>
+            <span style={{ width: 6, height: 6, borderRadius: "50%", background: st.dot }} />
+            {st.label}
+          </span>
         </div>
-
- <div style={{ flex: 1, minWidth: 0 }}>
-
-          <div style={{ fontSize: 13, fontWeight: 700, color: "#1E293B", lineHeight: 1.3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.clientName || c.name || "—"}</div>
-
-          <div style={{ fontSize: 11, color: "#64748B", marginTop: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.companyName || c.company || "—"}</div>
-
+        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+          {c.email && (
+            <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: "#64748B", fontWeight: 600, minWidth: 0 }}>
+              <i className="ti ti-mail" style={{ fontSize: 14, color: "#2563EB", flexShrink: 0 }} />
+              <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.email}</span>
+            </div>
+          )}
+          {(c.phone || c.contactPersonNo) && (
+            <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: "#64748B", fontWeight: 600 }}>
+              <i className="ti ti-phone" style={{ fontSize: 14, color: "#2563EB", flexShrink: 0 }} />
+              {c.phone || c.contactPersonNo}
+            </div>
+          )}
         </div>
-       
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
-
-
-
-
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: 4, borderTop: "1px solid #E2E8F0" }}>
+          <span style={{ fontSize: 12, fontWeight: 700, color: "#64748B" }}>
+            {projCount} {projCount === 1 ? "project" : "projects"}
+          </span>
+          <span style={{ fontSize: 12, fontWeight: 800, color: "#2563EB", display: "inline-flex", alignItems: "center", gap: 2 }}>
+            View <i className="ti ti-chevron-right" style={{ fontSize: 14 }} />
+          </span>
         </div>
-      </div>
-
+      </button>
     );
-
   };
 
 
@@ -2240,299 +2269,133 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
   const activeClientsCount = clients.filter(c => (c.status || "Active").toLowerCase() === "active").length;
   const inactiveClientsCount = clients.filter(c => (c.status || "").toLowerCase() === "inactive").length;
 
-  if (!activeClient && !window.__fullClientsList && typeof window !== "undefined" && window.innerWidth < 480) {
-    const mListSearch = (typeof search === "string" ? search : "");
-    const mListFiltered = clients.filter(c => {
-      const nameMatch = (c.clientName || c.name || "").toLowerCase().includes(mListSearch.toLowerCase());
-      const st = (c.status || "Active").toLowerCase();
-      const modeOk = !filterMode || filterMode === "all" ? true : st === filterMode;
-      return nameMatch && modeOk;
-    });
+  return (
+    <div className="clients-page-root" style={{ display: "flex", flexDirection: "column", minHeight: "100%", height: "auto", overflowY: "auto", overflowX: "hidden", background: "linear-gradient(135deg,var(--app-bg) 0%,var(--app-bg) 100%)", padding: "24px 28px" }}>
+      <style>{`.cl-card:hover{transform:translateY(-3px);box-shadow:0 14px 32px rgba(15,23,42,.1)!important;border-color:#2563EB!important}.cl-card:focus-visible{outline:3px solid rgba(37,99,235,.35);outline-offset:2px}@media (max-width:768px){.clients-page-root{padding:16px 14px!important}.cl-toolbar{flex-direction:column!important;align-items:stretch!important}.cl-stat-grid{grid-template-columns:1fr!important}}`}</style>
+      {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#FFFFFF", border: "1.5px solid #16A34A", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#16A34A", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
 
-    const badgeCfg = (status) => {
-      const s = (status || "Active").toLowerCase();
-      if (s === "active") return { bg: "#E2E8F0", fg: "#16A34A" };
-      if (s === "inactive") return { bg: "#F8FAFC", fg: "#64748B" };
-      if (s === "pending") return { bg: "#E2E8F0", fg: "#64748B" };
-      return { bg: "#EFF6FF", fg: "#64748B" };
-    };
+      {onBack && (
+        <div onClick={onBack} style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "#2563EB", fontWeight: 800, fontSize: 14, cursor: "pointer", marginBottom: 14 }}>
+          <i className="ti ti-chevron-left"></i> Back
+        </div>
+      )}
 
-    const initials = (name) => (name || "?").trim().split(/\s+/).slice(0, 2).map(w => w[0]).join("").toUpperCase();
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 20, flexWrap: "wrap", gap: 14 }}>
+        <div>
+          <div style={{ fontSize: 12, fontWeight: 800, color: "#2563EB", letterSpacing: 0.8, textTransform: "uppercase", marginBottom: 4 }}>Directory</div>
+          <h1 style={{ fontSize: 28, fontWeight: 900, color: "#0F172A", margin: 0, letterSpacing: "-0.4px" }}>Clients</h1>
+          <p style={{ margin: "6px 0 0", fontSize: 13, color: "#64748B", fontWeight: 600 }}>{totalClients} {totalClients === 1 ? "company" : "companies"} in your workspace</p>
+        </div>
+        <button className="create-btn compact-action-btn" onClick={onAddClient} style={{ display: "inline-flex", alignItems: "center", gap: 6, flexShrink: 0, minHeight: 44 }}>
+          <i className="ti ti-plus"></i> New Client
+        </button>
+      </div>
 
- return (
-      <div className="clients-list-only-root" style={{ padding: "16px 14px", background: "#F8FAFC", minHeight: "100%", boxSizing: "border-box", maxWidth: "100%", overflowX: "hidden" }}>
-
-        {/* Back to Dashboard — top-left, fixed position for every page */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, padding: "4px 4px 16px" }}>
-          <div
-            onClick={() => onBack && onBack()}
-            style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #2563EB)" }}
-          >
-            <i className="ti ti-arrow-left" style={{ fontSize: 16 }}></i> Back to Dashboard
-          </div>
-          {onAddClient && (
-            <button
-              onClick={onAddClient}
-              style={{ display: "flex", alignItems: "center", gap: 4, background: "var(--app-accent, #2563EB)", color: "#FFFFFF", border: "none", borderRadius: 20, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", boxShadow: "0 3px 10px rgba(37, 99, 235, 0.35)", whiteSpace: "nowrap" }}
-            >
-              <i className="ti ti-plus" style={{ fontSize: 13 }}></i> New Client
+      <div className="cl-stat-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 14, marginBottom: 18 }}>
+        {[
+          { key: "all", label: "All clients", val: totalClients, icon: "ti-users", tint: "#EFF6FF", ink: "#2563EB" },
+          { key: "active", label: "Active", val: activeClientsCount, icon: "ti-user-check", tint: "#EFF6FF", ink: "#16A34A" },
+          { key: "inactive", label: "Inactive", val: inactiveClientsCount, icon: "ti-user-off", tint: "#F8FAFC", ink: "#64748B" },
+        ].map((s) => {
+          const on = filterMode === s.key;
+          return (
+            <button key={s.key} type="button" onClick={() => setFilterMode(s.key)} style={{
+              cursor: "pointer", background: "#FFFFFF", textAlign: "left", fontFamily: "inherit",
+              border: on ? "1.5px solid #2563EB" : "1.5px solid #E2E8F0",
+              borderRadius: 16, padding: "16px 18px", display: "flex", alignItems: "center", gap: 12,
+              boxShadow: on ? "0 8px 22px rgba(37,99,235,0.12)" : "0 4px 14px rgba(15,23,42,0.04)",
+              minHeight: 80, transition: "border-color .2s, box-shadow .2s"
+            }}>
+              <div style={{ width: 42, height: 42, borderRadius: 12, background: s.tint, color: s.ink, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}><i className={`ti ${s.icon}`} /></div>
+              <div>
+                <div style={{ fontSize: 24, fontWeight: 800, color: "#0F172A", lineHeight: 1 }}>{s.val}</div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "#64748B", marginTop: 4 }}>{s.label}</div>
+              </div>
             </button>
-          )}
-        </div>
+          );
+        })}
+      </div>
 
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #2563EB), #2563EB)", borderRadius: 16, padding: "16px 18px", marginBottom: 14, boxShadow: "0 6px 18px rgba(37, 99, 235, 0.25)" }}>
-          <div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.8)", letterSpacing: 0.5, textTransform: "uppercase" }}>Total Clients</div>
-            <div style={{ fontSize: 26, fontWeight: 800, color: "#FFFFFF" }}>{clients.length}</div>
-          </div>
-          <div style={{ width: 46, height: 46, borderRadius: 13, background: "rgba(255,255,255,0.18)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <i className="ti ti-users" style={{ fontSize: 22, color: "#FFFFFF" }} />
-          </div>
-        </div>
-
-        <div style={{ position: "relative", marginBottom: 12 }}>
-          <i className="ti ti-search" style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", fontSize: 15, color: "#64748B" }} />
+      <div className="cl-toolbar" style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18, flexWrap: "wrap" }}>
+        <div style={{ position: "relative", flex: 1, minWidth: 220 }}>
+          <i className="ti ti-search" style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", fontSize: 16, color: "#64748B" }} />
           <input
             type="text"
-            placeholder="Search clients..."
+            placeholder="Search by name, company or email"
             value={search}
             onChange={e => setSearch(e.target.value)}
-            style={{ width: "100%", padding: "12px 12px 12px 38px", border: "none", borderRadius: 12, fontSize: 13, outline: "none", background: "#FFFFFF", color: "#1E293B", boxSizing: "border-box", boxShadow: "0 2px 10px rgba(15, 23, 42, 0.06)" }}
+            style={{ width: "100%", minHeight: 44, padding: "11px 14px 11px 42px", border: "1.5px solid #E2E8F0", borderRadius: 12, fontSize: 13, outline: "none", background: "#FFFFFF", color: "#1E293B", boxSizing: "border-box", fontFamily: "inherit" }}
           />
         </div>
-
-        <div style={{ display: "flex", gap: 8, marginBottom: 16, overflowX: "auto" }}>
+        <div style={{ display: "flex", gap: 6, background: "#FFFFFF", border: "1.5px solid #E2E8F0", borderRadius: 12, padding: 4 }}>
           {["all", "active", "inactive"].map(f => (
             <button
               key={f}
+              type="button"
               onClick={() => setFilterMode(f)}
               style={{
-                padding: "7px 16px",
-                borderRadius: 20,
-                border: filterMode === f ? "none" : "1.5px solid #E2E8F0",
-                fontSize: 12,
-                fontWeight: 700,
-                cursor: "pointer",
-                textTransform: "capitalize",
-                background: filterMode === f ? "var(--app-accent, #2563EB)" : "#FFFFFF",
-                color: filterMode === f ? "#FFFFFF" : "#64748B",
-                whiteSpace: "nowrap",
-                boxShadow: filterMode === f ? "0 3px 10px rgba(37, 99, 235, 0.35)" : "none",
-                transition: "all 0.15s ease"
+                minHeight: 36, padding: "8px 14px", borderRadius: 9, border: "none",
+                fontSize: 12, fontWeight: 800, cursor: "pointer", fontFamily: "inherit",
+                background: filterMode === f ? "#2563EB" : "transparent",
+                color: filterMode === f ? "#FFFFFF" : "#64748B", textTransform: "capitalize"
               }}
             >
               {f}
             </button>
           ))}
         </div>
-
-        {mListFiltered.length === 0 ? (
-          <div style={{ padding: "40px 16px", textAlign: "center", color: "#64748B", fontSize: 13, fontWeight: 600, background: "#FFFFFF", borderRadius: 16, boxShadow: "0 2px 10px rgba(15, 23, 42, 0.05)" }}>
-            No clients found.
-          </div>
-        ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 12 }}>
-            {mListFiltered.map((c, i) => {
-              const bc = badgeCfg(c.status);
-              const name = c.clientName || c.name || "—";
-              return (
-                <div
-                  key={c._id || i}
-                  onClick={() => { setActiveClientId(c._id); setActiveTab("overview"); }}
-                  style={{
-                    background: "#FFFFFF",
-                    borderRadius: 16,
-                    padding: "16px",
-                    boxShadow: "0 3px 14px rgba(15, 23, 42, 0.07)",
-                    cursor: "pointer",
-                    boxSizing: "border-box",
-                    borderLeft: `4px solid ${bc.fg}`
-                  }}
-                >
-                  <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 10, gap: 8 }}>
-                    <div style={{ display: "flex", alignItems: "flex-start", gap: 10, minWidth: 0, flex: 1 }}>
-                      <div style={{
-                        width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
-                        background: "linear-gradient(135deg, var(--app-accent, #2563EB), #2563EB)", color: "#FFFFFF",
-                        display: "flex", alignItems: "center", justifyContent: "center",
-                        fontSize: 14, fontWeight: 800
-                      }}>
-                        {initials(name)}
-                      </div>
-                      <div style={{ minWidth: 0, flex: 1 }}>
-                        <div style={{ fontWeight: 800, color: "#0F172A", fontSize: 14.5, wordBreak: "break-word" }}>{name}</div>
-                        {c.email && (
-                          <div style={{ display: "flex", alignItems: "flex-start", gap: 4, marginTop: 3, fontSize: 11.5, color: "#64748B", fontWeight: 600 }}>
-                            <i className="ti ti-mail" style={{ fontSize: 12, flexShrink: 0, marginTop: 1 }} />
-                            <span style={{ wordBreak: "break-word" }}>{c.email}</span>
-                          </div>
-                        )}
-                        {(c.phone || c.contactPersonNo) && (
-                          <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 2, fontSize: 11.5, color: "#64748B", fontWeight: 600 }}>
-                            <i className="ti ti-phone" style={{ fontSize: 12, flexShrink: 0 }} />
-                            {c.phone || c.contactPersonNo}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    <span style={{
-                      fontWeight: 700, fontSize: 10.5, padding: "5px 12px", borderRadius: 20,
-                      background: bc.bg, color: bc.fg, flexShrink: 0, whiteSpace: "nowrap"
-                    }}>
-                      {c.status || "Active"}
-                    </span>
-                  </div>
-                  <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 4, color: "var(--app-accent, #2563EB)", fontSize: 12, fontWeight: 700 }}>
-                    View details <i className="ti ti-chevron-right" style={{ fontSize: 13 }} />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
+        <select
+          value={sortMode}
+          onChange={e => setSortMode(e.target.value)}
+          style={{ minHeight: 44, padding: "0 12px", border: "1.5px solid #E2E8F0", borderRadius: 12, background: "#FFFFFF", color: "#1E293B", fontSize: 13, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }}
+        >
+          <option value="newest">Newest first</option>
+          <option value="oldest">Oldest first</option>
+        </select>
       </div>
-    );
-  }
-  return (
-    <div className="clients-page-root" style={{ display: "flex", flexDirection: "column", minHeight: "100%", height: "auto", overflowY: "auto", overflowX: "hidden", background: "linear-gradient(135deg,var(--app-bg) 0%,var(--app-bg) 100%)", padding: "24px 28px" }}>
-      {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#FFFFFF", border: "1.5px solid #16A34A", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#16A34A", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
 
-      {onBack && (
-        <div onClick={onBack} style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "var(--app-accent)", fontWeight: 800, fontSize: 14, cursor: "pointer", marginBottom: 14 }}>
-          <i className="ti ti-chevron-left"></i> Back
+      {filtered.length === 0 ? (
+        <div style={{ background: "#FFFFFF", border: "1.5px dashed #E2E8F0", borderRadius: 20, padding: "56px 24px", textAlign: "center" }}>
+          <div style={{ width: 64, height: 64, borderRadius: 18, background: "#EFF6FF", color: "#2563EB", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", fontSize: 28 }}>
+            <i className="ti ti-users" />
+          </div>
+          <div style={{ fontSize: 16, fontWeight: 800, color: "#0F172A", marginBottom: 6 }}>{clients.length === 0 ? "No clients yet" : "No matching clients"}</div>
+          <div style={{ fontSize: 13, color: "#64748B", fontWeight: 600, marginBottom: 18 }}>{clients.length === 0 ? "Add your first client to start managing projects and invoices." : "Try a different search or filter."}</div>
+          {clients.length === 0 && (
+            <button type="button" onClick={onAddClient} style={{ minHeight: 44, padding: "0 18px", borderRadius: 12, border: "none", background: "#2563EB", color: "#FFFFFF", fontWeight: 800, cursor: "pointer", fontFamily: "inherit" }}>
+              <i className="ti ti-plus" style={{ marginRight: 6 }} /> New Client
+            </button>
+          )}
+        </div>
+      ) : (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 16 }}>
+          {filtered.map(c => renderClientItem(c))}
         </div>
       )}
-      <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 10 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 900, color: "#1E293B", margin: 0 }}>Clients</h1>
-        <button className="create-btn compact-action-btn" onClick={onAddClient} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-          <i className="ti ti-plus"></i> New Client
-        </button>
-      </div>
-
-      {/* STAT PILLS — matches Projects page style */}
-      <div className="client-stat-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 20 }}>
-        <div style={{ cursor: "pointer", background: "#FFFFFF", border: "1.5px solid #E2E8F0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)", boxSizing: "border-box", height: 80, minWidth: 0 }}>
-          <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(37, 99, 235, 0.1)", color: "var(--app-accent)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}><i className="ti ti-users" /></div>
-          <div><div style={{ fontSize: 24, fontWeight: 800, color: "#1E293B" }}>{totalClients}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#64748B" }}>All Clients</div></div>
-        </div>
-        <div style={{ cursor: "pointer", background: "#FFFFFF", border: "1.5px solid #E2E8F0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)", boxSizing: "border-box", height: 80, minWidth: 0 }}>
-          <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(22, 163, 74, 0.1)", color: "#16A34A", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}><i className="ti ti-user-check" /></div>
-          <div><div style={{ fontSize: 24, fontWeight: 800, color: "#1E293B" }}>{activeClientsCount}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#64748B" }}>Active</div></div>
-        </div>
-        <div style={{ cursor: "pointer", background: "#FFFFFF", border: "1.5px solid #E2E8F0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)", boxSizing: "border-box", height: 80, minWidth: 0 }}>
-          <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(100, 116, 139, 0.1)", color: "#64748B", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}><i className="ti ti-user-off" /></div>
-          <div><div style={{ fontSize: 24, fontWeight: 800, color: "#1E293B" }}>{inactiveClientsCount}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#64748B" }}>Inactive</div></div>
-        </div>
-      </div>
-
-
-
-
-
-
-      {/* LEFT-PANEL + DETAIL VIEW (always visible, embedded below stat cards) */}
- <div className="client-detail-layout" style={{ display: "flex", position: "relative", flex: 1, minHeight: 0, maxHeight: isMobileWidth ? "none" : "60vh", background: "#FFFFFF", marginTop: 4, border: isMobileWidth ? "none" : "1.5px solid #E2E8F0", borderRadius: isMobileWidth ? 0 : 14, overflow: isMobileWidth ? "visible" : "hidden" }}>
-        <div className="client-list-panel" style={{ width: 260, minWidth: 260, borderRight: "1.5px solid #E2E8F0", display: "flex", flexDirection: "column", background: "#FFFFFF", overflow: "hidden" }}>
-
-          {/* Search + Add */}
-          <div style={{ padding: "14px 12px 8px", borderBottom: "1px solid #E2E8F0", flexShrink: 0 }}>
-            <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
-              <div style={{ position: "relative", flex: 1 }}>
-                <i className="ti ti-search" style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 13, color: "#64748B" }} />
-                <input
-                  type="text"
-                  placeholder="Search clients..."
-                  value={search}
-                  onChange={e => setSearch(e.target.value)}
-                  style={{ width: "100%", padding: "8px 10px 8px 30px", border: "1.5px solid #E2E8F0", borderRadius: 9, fontSize: 12, outline: "none", background: "#F8FAFC", color: "#1E293B", boxSizing: "border-box" }}
-                />
-              </div>
-
-            </div>
-
-            {/* Filter tabs */}
-            <div style={{ display: "flex", gap: 4 }}>
-              {["all", "active", "inactive"].map(f => (
-                <button
-                  key={f}
-                  onClick={() => setFilterMode(f)}
-                  style={{
-                    flex: 1,
-                    padding: "5px 4px",
-                    borderRadius: 7,
-                    border: filterMode === f ? "1.5px solid var(--app-accent, #2563EB)" : "1.5px solid transparent",
-                    fontSize: 10,
-                    fontWeight: 700,
-                    cursor: "pointer",
-                    background: filterMode === f ? "var(--app-accent, #2563EB)" : "var(--teal-lighter, #EFF6FF)",
-                    color: filterMode === f ? "#FFFFFF" : "#64748B",
-                    textTransform: "capitalize",
-                    transition: "all 0.15s ease"
-                  }}
-                >
-                  {f === "all" ? `All (${clients.length})` : f === "active" ? `Active (${clients.filter(c => (c.status || "Active").toLowerCase() === "active").length})` : `Inactive (${clients.filter(c => (c.status || "").toLowerCase() === "inactive").length})`}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Client List */}
-          <div style={{ flex: 1, overflowY: "auto" }}>
-            {filtered.length === 0 ? (
-              <div style={{ padding: 30, textAlign: "center" }}>
-                <div style={{ fontSize: 28, marginBottom: 8 }}>👥</div>
-                <div style={{ fontSize: 12, color: "#64748B", fontWeight: 600 }}>No clients found</div>
-
-              </div>
-            ) : (
-              <>
-                {activeSection.length > 0 && (
-                  <>
-                    <div style={{ padding: "8px 14px 4px", fontSize: 9, fontWeight: 800, color: "#64748B", letterSpacing: 1, textTransform: "uppercase" }}>Active ({activeSection.length})</div>
-                    {activeSection.map(c => renderClientItem(c))}
-                  </>
-                )}
-                {otherSection.length > 0 && (
-                  <>
-                    <div style={{ padding: "8px 14px 4px", fontSize: 9, fontWeight: 800, color: "#64748B", letterSpacing: 1, textTransform: "uppercase" }}>Others ({otherSection.length})</div>
-                    {otherSection.map(c => renderClientItem(c))}
-                  </>
-                )}
-              </>
-            )}
-          </div>
-        </div>
-
-
-
-
-
 
         {/* ── DETAIL PANEL ── */}
 
 {activeClient ? (
-
-<div className={`client-detail-panel ${isMobileWidth ? "client-detail-modal" : ""}`} style={isMobileWidth ? {
+<>
+<div onClick={() => { setActiveClientId(null); setViewClientModal(false); }} style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.45)", zIndex: 2990 }} />
+<div className="client-detail-panel client-detail-modal" style={{
   position: "fixed",
-  top: "5vh",
-  left: "3vw",
-  right: "3vw",
-  bottom: "auto",
-  width: "94vw",
-  height: "85vh",
-  maxHeight: "85vh",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: isMobileWidth ? "94vw" : "min(880px, 92vw)",
+  height: isMobileWidth ? "88vh" : "min(820px, 88vh)",
+  maxHeight: "88vh",
   margin: 0,
   zIndex: 3000,
   borderRadius: 20,
-  boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
+  boxShadow: "0 24px 64px rgba(15, 23, 42, 0.28)",
   overflow: "hidden",
   display: "flex",
   flexDirection: "column",
   minWidth: 0,
   background: "#FFFFFF"
-} : { flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minWidth: 0, background: "#FFFFFF", height: "auto", minHeight: "auto" }}>
-                        <button className="client-detail-modal-close" onClick={() => { setActiveClientId(null); setViewClientModal(false); window.__fullClientsList = true; }} style={{ display: "none" }}><i className="ti ti-x"></i></button>
-
+}}>
 
 
             {/* HERO */}
@@ -2615,6 +2478,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
                   <button onClick={() => openEdit(activeClient)} title="Edit" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 5, padding: isMobileWidth ? "7px" : "7px 14px", width: isMobileWidth ? 30 : "auto", height: isMobileWidth ? 30 : "auto", borderRadius: 9, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all .15s", border: "1.5px solid #E2E8F0", background: "#F8FAFC", color: "#64748B" }} onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--app-accent, #2563EB)"; e.currentTarget.style.color = "var(--app-accent, #2563EB)"; }} onMouseLeave={e => { e.currentTarget.style.borderColor = "#E2E8F0"; e.currentTarget.style.color = "#64748B"; }}><i className="ti ti-edit" style={{ fontSize: 13 }} />{!isMobileWidth && "Edit"}</button>
 
                   <button onClick={() => setDeleteTarget(activeClient)} title="Delete" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 5, padding: isMobileWidth ? "7px" : "7px 14px", width: isMobileWidth ? 30 : "auto", height: isMobileWidth ? 30 : "auto", borderRadius: 9, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all .15s", border: "1.5px solid #E2E8F0", background: "#F8FAFC", color: "#64748B" }} onMouseEnter={e => { e.currentTarget.style.borderColor = "#64748B"; e.currentTarget.style.color = "#64748B"; }} onMouseLeave={e => { e.currentTarget.style.borderColor = "#E2E8F0"; e.currentTarget.style.color = "#64748B"; }}><i className="ti ti-trash" style={{ fontSize: 13 }} />{!isMobileWidth && "Delete"}</button>
+                  <button onClick={() => { setActiveClientId(null); setViewClientModal(false); }} title="Close" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 36, height: 36, borderRadius: 9, border: "1.5px solid #E2E8F0", background: "#FFFFFF", color: "#64748B", cursor: "pointer" }}><i className="ti ti-x" style={{ fontSize: 16 }} /></button>
 
                 </div>
 
@@ -2692,19 +2556,8 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
             </div>
 
           </div>
-      ) : clients.length === 0 ? (
-          <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "var(--app-bg)", minWidth: 0 }}>
-            <div style={{ textAlign: "center", padding: 40 }}>
-              <div style={{ width: 72, height: 72, borderRadius: "50%", background: "rgba(var(--app-accent-rgb), 0.1)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 18px" }}>
-                <i className="ti ti-users" style={{ color: "var(--app-accent)", fontSize: 32 }} />
-              </div>
-              <div style={{ fontSize: 16, fontWeight: 800, color: "var(--app-text)", marginBottom: 8 }}>No clients found</div>
-            </div>
-          </div>
-        ) : null}
-
-
-      </div>
+</>
+      ) : null}
 
       {/* Edit Modal */}
 
@@ -2751,9 +2604,6 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
                 <div style={{ fontSize: 16, fontWeight: 800, color: "#0F172A", wordBreak: "break-word" }}>{activeClient.clientName || activeClient.name || "—"}</div>
                 <div style={{ fontSize: 12, color: "#64748B", fontWeight: 600, marginTop: 2 }}>{activeClient.companyName || activeClient.company || "—"}</div>
                 <div style={{ display: "flex", gap: 6, marginTop: 8, flexWrap: "wrap" }}>
-                  <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "#EFF6FF", color: "var(--app-accent, #2563EB)" }}>
-                    {activeClient.clientType === "b2b" ? "B2B" : activeClient.clientType === "b2c" ? "B2C" : "Freelancer"}
-                  </span>
                   <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "#F8FAFC", color: "#16A34A" }}>{activeClient.status || "Active"}</span>
                 </div>
               </div>
@@ -14816,204 +14666,6 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
               ) : (
 
                 <>
-
-                  <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
-
-                    <div
-
-                      onClick={() => {
-
-                        const input = document.createElement('input');
-
-                        input.type = 'file';
-
-                        input.accept = 'image/*';
-
-                        input.onchange = (e) => triggerCrop(e, (croppedImage) => setNc(p => ({ ...p, logoUrl: croppedImage })), 1);
-
-                        input.click();
-
-                      }}
-
-                      style={{
-
-                        position: "relative",
-
-                        cursor: "pointer",
-
-                        width: "auto",
-
-                        height: "auto",
-
-                        maxWidth: "100%",
-
-                        display: "flex",
-
-                        flexDirection: "column",
-
-                        alignItems: "center"
-
-                      }}
-
-                    >
-
-                      <div style={{
-
-                        padding: nc.logoUrl ? 4 : 24,
-
-                        borderRadius: 20,
-
-                        background: "#FFFFFF",
-
-                        border: "2.5px dashed var(--app-border)",
-
-                        display: "flex",
-
-                        alignItems: "center",
-
-                        justifyContent: "center",
-
-                        minWidth: 100,
-
-                        minHeight: 100,
-
-                        overflow: "hidden",
-
-                        boxShadow: "0 8px 20px rgba(0,0,0,0.05)",
-
-                        transition: "all 0.3s ease"
-
-                      }}>
-
-                        {nc.logoUrl ? (
-
-                          <img
-
-                            src={nc.logoUrl}
-
-                            alt="Logo"
-
-                            style={{
-
-                              width: "auto",
-
-                              height: "auto",
-
-                              maxWidth: "240px",
-
-                              maxHeight: "120px",
-
-                              objectFit: "contain",
-
-                              display: "block",
-
-                              borderRadius: 12
-
-                            }}
-
-                          />
-
-                        ) : (
-                          <div style={{
-                            padding: nc.logoUrl ? 4 : 24,
-                            borderRadius: 20,
-                            background: "#FFFFFF",
-                            border: "2.5px dashed var(--app-border)",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            minWidth: 100,
-                            minHeight: 100,
-                            overflow: "hidden",
-                            boxShadow: "0 8px 20px rgba(0,0,0,0.05)",
-                            transition: "all 0.3s ease"
-                          }}>
-                            {nc.logoUrl ? (
-                              <img
-                                src={nc.logoUrl}
-                                alt="Logo"
-                                style={{
-                                  width: "auto",
-                                  height: "auto",
-                                  maxWidth: "240px",
-                                  maxHeight: "120px",
-                                  objectFit: "contain",
-                                  display: "block",
-                                  borderRadius: 12
-                                }}
-                              />
-                            ) : (
-                              <div style={{ textAlign: "center" }}>
-                                <div style={{
-                                  width: 60,
-                                  height: 60,
-                                  borderRadius: 14,
-                                  background: "var(--app-accent, #2563EB)",
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                  margin: "0 auto 10px"
-                                }}>
-                                  📷
-                                </div>
-                                <div style={{ fontSize: 10, fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: 1 }}>Upload Logo</div>
-                              </div>)}
-                          </div>
-
-                        )}
-
-                      </div>
-
-                      <div style={{
-
-                        position: "absolute", bottom: -10, right: -10,
-
-                        width: 36, height: 36, borderRadius: "50%",
-
-                        background: "var(--app-accent)", color: "#FFFFFF",
-
-                        display: "flex", alignItems: "center", justifyContent: "center",
-
-                        fontSize: 16, boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.4)",
-
-                        border: "3px solid #FFFFFF"
-
-                      }}>📷</div>
-
-                    </div>
-
-                  </div>
-
-                  {/* ── CLIENT TYPE ── */}
-
-                  <div style={{ marginBottom: 16 }}>
-
-                    <div style={{ fontSize: 11, fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 8 }}>Client Type <span style={{ color: '#64748B' }}>*</span></div>
-
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
-
-                      {[{ val: 'b2b', icon: '🏢', label: 'B2B', sub: 'Company / Business' }, { val: 'b2c', icon: '👤', label: 'B2C', sub: 'Individual person' }, { val: 'freelancer', icon: '💼', label: 'Freelancer', sub: 'Consultant / Solo' }].map(t => (
-
-                        <div key={t.val} onClick={() => setNc(p => ({ ...p, clientType: t.val }))}
-
-                          style={{ border: `2px solid ${nc.clientType === t.val ? ' var(--app-accent, var(--app-accent, #2563EB))' : '#E2E8F0'}`, borderRadius: 10, padding: '12px 8px', textAlign: 'center', cursor: 'pointer', background: nc.clientType === t.val ? 'var(--teal-light, var(--teal-light, #EFF6FF))' : '#F8FAFC', transition: 'all .15s', position: 'relative' }}>
-
-                          {nc.clientType === t.val && <span style={{ position: 'absolute', top: 6, right: 6, width: 14, height: 14, borderRadius: '50%', background: ' var(--app-accent, var(--app-accent, #2563EB))', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}></span>}
-
-                          <div style={{ fontSize: 22, marginBottom: 4 }}>{t.icon}</div>
-
-                          <div style={{ fontSize: 12, fontWeight: 700, color: nc.clientType === t.val ? '#16A34A' : '#1E293B' }}>{t.label}</div>
-
-                          <div style={{ fontSize: 10, color: '#64748B', marginTop: 2 }}>{t.sub}</div>
-
-                        </div>
-                      ))}
-
-                    </div>
-
-                  </div>
-
-
 
                   {/* ── BASIC INFO ── */}
 

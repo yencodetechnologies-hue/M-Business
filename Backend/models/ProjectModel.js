@@ -184,33 +184,10 @@ const projectSchema = new mongoose.Schema({
     }],
     default: []
   },
-  proposalPdf: {
-    type: {
-      name: { type: String, default: "" },
-      url: { type: String, default: "" },
-      size: { type: Number, default: 0 },
-      type: { type: String, default: "" }
-    },
-    default: null
-  },
-  quotationPdf: {
-    type: {
-      name: { type: String, default: "" },
-      url: { type: String, default: "" },
-      size: { type: Number, default: 0 },
-      type: { type: String, default: "" }
-    },
-    default: null
-  },
-  invoicePdf: {
-    type: {
-      name: { type: String, default: "" },
-      url: { type: String, default: "" },
-      size: { type: Number, default: 0 },
-      type: { type: String, default: "" }
-    },
-    default: null
-  },
+  // Mixed: Mongoose 9 rejects `default: null` on nested subdocuments
+  proposalPdf: { type: mongoose.Schema.Types.Mixed, default: null },
+  quotationPdf: { type: mongoose.Schema.Types.Mixed, default: null },
+  invoicePdf: { type: mongoose.Schema.Types.Mixed, default: null },
   portalSettings: {
     type: mongoose.Schema.Types.Mixed,
     default: {

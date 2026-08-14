@@ -9,6 +9,8 @@ import axios from "axios";
 
 import { BASE_URL } from "../config";
 
+import { uploadToCloudinary } from "../utils/cloudinaryUpload";
+
 import InvoiceCreator from "./InvoiceCreator";
 
 import TaskPage from "./TaskPage";
@@ -15808,57 +15810,55 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                   <button disabled={!uploadTargetUser || uploadIsSending} onClick={async () => {
                     setUploadIsSending(true);
                     try {
-                      const reader = new FileReader();
-                      reader.readAsDataURL(uploadFileTarget);
-                      reader.onload = async () => {
-                        const base64Data = reader.result;
-                        const companyId = user?.companyId || user?.company || user?._id || user?.id || "";
+                      const uploaded = await uploadToCloudinary(uploadFileTarget, { folder: "M-Business/Documents" });
+                      const companyId = user?.companyId || user?.company || user?._id || user?.id || "";
 
-                        let resolvedClientId = "";
-                        let resolvedEmployeeId = "";
-                        if (uploadTargetRole === "client") {
-                          const match = clients.find(c => (c.clientName || c.name) === uploadTargetUser);
-                          resolvedClientId = match?._id || match?.id || "";
-                        } else if (uploadTargetRole === "employee") {
-                          const match = employees.find(e => e.name === uploadTargetUser);
-                          resolvedEmployeeId = match?._id || match?.id || "";
+                      let resolvedClientId = "";
+                      let resolvedEmployeeId = "";
+                      if (uploadTargetRole === "client") {
+                        const match = clients.find(c => (c.clientName || c.name) === uploadTargetUser);
+                        resolvedClientId = match?._id || match?.id || "";
+                      } else if (uploadTargetRole === "employee") {
+                        const match = employees.find(e => e.name === uploadTargetUser);
+                        resolvedEmployeeId = match?._id || match?.id || "";
+                      }
+
+                      const htmlContent = `<div style="padding:20px"><h3>${uploaded.name}</h3><a href="${uploaded.url}" target="_blank" style="color:#64748B;font-weight:700">Open / Download File</a></div>`;
+
+                      await axios.post(`${BASE_URL}/api/documents`, {
+                        docType: "upload",
+                        sendTo: uploadTargetRole,
+                        client: uploadTargetUser,
+                        clientId: resolvedClientId,
+                        employeeId: resolvedEmployeeId,
+                        recipientEmail: "",
+                        htmlContent,
+                        senderCompany: companyNameStr,
+                        companyId
+                      });
+
+                      if (uploadTargetRole === "employee" && resolvedEmployeeId) {
+                        try {
+                          await axios.post(`${BASE_URL}/api/notifications`, {
+                            userId: resolvedEmployeeId,
+                            type: "document",
+                            icon: "ti-files",
+                            text: `A new document has been shared with you`,
+                          });
+                        } catch (notifErr) {
+                          console.error("Failed to notify employee:", notifErr);
                         }
+                      }
 
-                        await axios.post(`${BASE_URL}/api/documents`, {
-                          docType: "upload",
-                          sendTo: uploadTargetRole,
-                          client: uploadTargetUser,
-                          clientId: resolvedClientId,
-                          employeeId: resolvedEmployeeId,
-                          recipientEmail: "",
-                          htmlContent: base64Data,
-                          senderCompany: companyNameStr,
-                          companyId
-                        });
-
-                        if (uploadTargetRole === "employee" && resolvedEmployeeId) {
-                          try {
-                            await axios.post(`${BASE_URL}/api/notifications`, {
-                              userId: resolvedEmployeeId,
-                              type: "document",
-                              icon: "ti-files",
-                              text: `A new document has been shared with you`,
-                            });
-                          } catch (notifErr) {
-                            console.error("Failed to notify employee:", notifErr);
-                          }
-                        }
-
-                        toast.success("File uploaded successfully!");
-                        setUploadFileTarget(null);
-                        setUploadTargetUser("");
-                      };
+                      toast.success("File uploaded successfully!");
+                      setUploadFileTarget(null);
+                      setUploadTargetUser("");
 
                     } catch (err) {
 
                       console.error(err);
 
-                      toast.error("Upload failed.");
+                      toast.error(err?.message || "Upload failed.");
 
                     } finally {
 

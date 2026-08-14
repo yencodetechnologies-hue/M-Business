@@ -530,7 +530,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const [sendDocTarget, setSendDocTarget] = useState(null); // { type: 'quotation'|'proposal', doc: {...} }
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
   const [targetPortalClient, setTargetPortalClient] = useState('');
-  const [bizExpense, setBizExpense] = useState({ category: 'Miscellaneous', description: '', amount: '', date: new Date().toISOString().split('T')[0] });
+  const [bizExpense, setBizExpense] = useState({ category: 'Miscellaneous', customCategory: '', description: '', amount: '', date: new Date().toISOString().split('T')[0] });
   const [bizCommission, setBizCommission] = useState({ name: '', type: 'percent', value: '', notes: '' });
   const [savingBiz, setSavingBiz] = useState(false);
   const [uploadingPdfKind, setUploadingPdfKind] = useState('');
@@ -1982,16 +1982,21 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       alert('Enter an expense amount.');
       return;
     }
+    const category = bizExpense.category === 'Custom' ? bizExpense.customCategory.trim() : bizExpense.category;
+    if (!category) {
+      alert('Enter a custom category.');
+      return;
+    }
     setSavingBiz(true);
     try {
       const res = await axios.post(`${BASE_URL}/api/projects/${currProject._id}/expenses`, {
-        category: bizExpense.category,
+        category,
         description: bizExpense.description,
         amount: bizParseAmt(bizExpense.amount),
         date: bizExpense.date,
       }, { headers: companyHeaders() });
       if (res.data?.project) setCurrProject(prev => ({ ...prev, ...res.data.project }));
-      setBizExpense({ category: 'Miscellaneous', description: '', amount: '', date: new Date().toISOString().split('T')[0] });
+      setBizExpense({ category: 'Miscellaneous', customCategory: '', description: '', amount: '', date: new Date().toISOString().split('T')[0] });
       if (loadLatest) loadLatest();
     } catch (err) {
       alert(err.response?.data?.msg || 'Failed to add expense.');
@@ -2146,9 +2151,12 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               ))}
               <form onSubmit={addBizExpense} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 10 }}>
                 <select value={bizExpense.category} onChange={e => setBizExpense(f => ({ ...f, category: e.target.value }))} style={{ padding: 8, borderRadius: 8, border: `1.5px solid ${P.border}` }}>
-                  {['Travel', 'Office', 'Utilities', 'Marketing', 'Salary', 'Miscellaneous'].map(c => <option key={c}>{c}</option>)}
+                  {['Travel', 'Office', 'Utilities', 'Marketing', 'Salary', 'Miscellaneous', 'Custom'].map(c => <option key={c}>{c}</option>)}
                 </select>
                 <input type="number" min="0" placeholder="Amount" value={bizExpense.amount} onChange={e => setBizExpense(f => ({ ...f, amount: e.target.value }))} style={{ padding: 8, borderRadius: 8, border: `1.5px solid ${P.border}` }} />
+                {bizExpense.category === 'Custom' && (
+                  <input placeholder="Custom category" value={bizExpense.customCategory} onChange={e => setBizExpense(f => ({ ...f, customCategory: e.target.value }))} style={{ padding: 8, borderRadius: 8, border: `1.5px solid ${P.border}`, gridColumn: '1 / -1' }} />
+                )}
                 <input placeholder="Description" value={bizExpense.description} onChange={e => setBizExpense(f => ({ ...f, description: e.target.value }))} style={{ padding: 8, borderRadius: 8, border: `1.5px solid ${P.border}`, gridColumn: '1 / -1' }} />
                 <button type="submit" disabled={savingBiz} className="mpd-btn mpd-btn-primary" style={{ gridColumn: '1 / -1' }}>Add expense</button>
               </form>

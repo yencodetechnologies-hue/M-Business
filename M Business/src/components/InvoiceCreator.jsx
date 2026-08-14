@@ -1722,6 +1722,30 @@ const [sortOrder, setSortOrder] = useState("desc");
     const unpaidCnt = enriched.filter(e => ["unpaid", "sent", "pending"].includes(e.status)).length;
     const draftCnt = enriched.filter(e => e.status === "draft").length;
 
+    const filteredSorted = enriched.filter(e => {
+      if (filterTab === "paid" && e.status !== "paid") return false;
+      if (filterTab === "part_paid" && e.status !== "part_paid") return false;
+      if (filterTab === "pending" && e.status !== "unpaid" && e.status !== "sent" && e.status !== "pending") return false;
+      if (filterTab === "overdue" && e.status !== "overdue") return false;
+      if (filterTab === "draft" && e.status !== "draft") return false;
+      if (clientFilter !== "all" && e.client !== clientFilter) return false;
+      const term = listSearch.toLowerCase();
+      return (e.invoiceNo || "").toLowerCase().includes(term) || (e.client || "").toLowerCase().includes(term) || (e.inv?.project || e.project || "").toLowerCase().includes(term);
+    }).sort((a, b) => {
+      const dateA = new Date(a.inv?.date || a.date || 0).getTime();
+      const dateB = new Date(b.inv?.date || b.date || 0).getTime();
+      return sortOrder === "desc" ? dateB - dateA : dateA - dateB;
+    });
+
+    const invStatusMeta = (status) => {
+      if (status === "paid") return { label: "Paid", bg: "var(--app-accent-light)", fg: "var(--green)" };
+      if (status === "part_paid") return { label: "Part Paid", bg: "var(--app-accent-light)", fg: "var(--teal)" };
+      if (status === "overdue") return { label: "Overdue", bg: "#FEF2F2", fg: "#DC2626" };
+      if (status === "draft") return { label: "Draft", bg: "var(--surface2)", fg: "var(--text3)" };
+      if (status === "sent") return { label: "Sent", bg: "var(--app-accent-light)", fg: "var(--app-accent)" };
+      return { label: "Pending", bg: "var(--app-accent-light)", fg: "var(--app-muted)" };
+    };
+
     return (
       <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", maxWidth: "100%", padding: "20px" }}>
 
@@ -1954,7 +1978,7 @@ const [sortOrder, setSortOrder] = useState("desc");
   </button>
 </div>
 
-        {/* INVOICE TABLE */}
+        {/* INVOICE TABLE / MOBILE CARDS */}
         <div className="table-panel">
           <div className="table-toolbar">
             <div className="toolbar-left">
@@ -1993,6 +2017,75 @@ const [sortOrder, setSortOrder] = useState("desc");
             }}><i className="ti ti-download" style={{ fontSize: 13 }}></i> Export CSV</button>
           </div>
 
+          {isMobileWidth ? (
+            <div style={{ display: "flex", flexDirection: "column", gap: 12, padding: 14 }}>
+              {listLoading ? (
+                <div style={{ textAlign: "center", padding: 40, color: "var(--text3)", fontSize: 13, fontWeight: 600 }}>Loading invoices…</div>
+              ) : filteredSorted.length === 0 ? (
+                <div style={{ textAlign: "center", padding: 40, color: "var(--text3)", fontSize: 13, fontWeight: 600 }}>No invoices found.</div>
+              ) : filteredSorted.map((entry, idx) => {
+                const isPaid = entry.status === "paid";
+                const isPartPaid = entry.status === "part_paid";
+                const meta = invStatusMeta(entry.status);
+                return (
+                  <div
+                    key={entry.id || idx}
+                    onClick={() => { setViewAsModal(true); loadEntry(entry, "preview"); window.scrollTo(0, 0); }}
+                    style={{
+                      background: "var(--app-card)", border: "1.5px solid var(--app-border)", borderRadius: 16,
+                      padding: 16, cursor: "pointer", boxShadow: "0 3px 14px rgba(15, 23, 42, 0.06)",
+                      borderLeft: `4px solid ${meta.fg}`
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 10, marginBottom: 10 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0, flex: 1 }}>
+                        <div className="client-av" style={{ width: 40, height: 40, fontSize: 14, background: "var(--app-accent)", flexShrink: 0 }}>
+                          {(entry.client || "?")[0].toUpperCase()}
+                        </div>
+                        <div style={{ minWidth: 0 }}>
+                          <div style={{ fontSize: 14.5, fontWeight: 800, color: "var(--app-text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{entry.client || "—"}</div>
+                          <div style={{ fontSize: 11.5, fontWeight: 700, color: "var(--teal)", marginTop: 1 }}>{entry.invoiceNo || "—"}</div>
+                        </div>
+                      </div>
+                      <span style={{ flexShrink: 0, padding: "5px 11px", borderRadius: 999, fontSize: 10.5, fontWeight: 800, background: meta.bg, color: meta.fg, whiteSpace: "nowrap" }}>{meta.label}</span>
+                    </div>
+
+                    <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 10 }}>
+                      {(entry.inv?.project || entry.project) && (
+                        <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: "var(--text2)", fontWeight: 600, minWidth: 0 }}>
+                          <i className="ti ti-folder" style={{ fontSize: 13, color: "var(--app-accent)", flexShrink: 0 }} />
+                          <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{entry.inv?.project || entry.project}</span>
+                        </div>
+                      )}
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--text2)", fontWeight: 600 }}>
+                          <i className="ti ti-calendar-event" style={{ fontSize: 13, color: "var(--app-accent)" }} />
+                          Due {formatDate(entry.inv?.dueDate || entry.dueDate)}
+                        </div>
+                        <div style={{ fontSize: 15, fontWeight: 800, color: isPaid || isPartPaid ? "var(--green)" : "var(--app-text)" }}>
+                          {formatCurrency(entry.total, entry.inv?.currency || inv.currency)}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="row-actions" style={{ justifyContent: "flex-end", paddingTop: 10, borderTop: "1px solid var(--app-border)" }} onClick={e => e.stopPropagation()}>
+                      <button className="row-btn" title="View" onClick={(e) => { e.stopPropagation(); setViewAsModal(true); loadEntry(entry, "preview"); window.scrollTo(0, 0); }}><i className="ti ti-eye"></i></button>
+                      <button className="row-btn" title="Edit" onClick={(e) => { e.stopPropagation(); loadEntry(entry, "form"); window.scrollTo(0, 0); }}><i className="ti ti-edit"></i></button>
+                      {(isPaid || isPartPaid) ? (
+                        <button className="row-btn" title="Receipt" onClick={() => {
+                          setReceiptEntry({ ...entry, paymentData: { amountPaid: entry.amountPaid || entry.total, paymentMode: entry.paymentMode || "Other", paymentDate: entry.paymentDate || new Date().toISOString(), transactionId: entry.transactionId } });
+                          setStep("receipt");
+                        }}><i className="ti ti-download"></i></button>
+                      ) : (
+                        <button className="row-btn" title="Send" onClick={(e) => { e.stopPropagation(); shareInvoice({ id: entry.id, invoiceNo: entry.invoiceNo || entry.inv?.invoiceNo, total: entry.total }); }}><i className="ti ti-send"></i></button>
+                      )}
+                      <button className="row-btn danger" title="Delete" onClick={(e) => { e.stopPropagation(); setDeleteTarget(entry); }}><i className="ti ti-trash"></i></button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
           <div style={{ overflowX: "auto", maxHeight: "600px", overflowY: "auto" }}>
             <table>
               <thead>
@@ -2107,6 +2200,7 @@ const [sortOrder, setSortOrder] = useState("desc");
               </tbody>
             </table>
           </div>
+          )}
 
         </div>
 

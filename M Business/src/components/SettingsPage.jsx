@@ -448,38 +448,38 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
             <div className="settings-section">
               <div className="ss-header">
                 <div className="ss-header-icon" style={{ background: '#EFF6FF', color: '#2563EB' }}><i className="ti ti-palette" /></div>
-                <div><div className="ss-title">Appearance</div><div className="ss-sub">Customise the look and feel of your dashboard</div></div>
+                <div><div className="ss-title">Appearance</div><div className="ss-sub">Professional palette is locked across the dashboard</div></div>
               </div>
               <div className="ss-body">
                 <div className="form-group">
-                  <label className="form-label">Accent Color</label>
+                  <label className="form-label">Professional Palette</label>
                   <div className="color-picker-row">
-                    {themes && Object.entries(themes).map(([key, t]) => (
+                    {[
+                      { hex: '#0F172A', label: 'Navy' },
+                      { hex: '#2563EB', label: 'Blue' },
+                      { hex: '#EFF6FF', label: 'Light Blue' },
+                      { hex: '#F8FAFC', label: 'Background' },
+                      { hex: '#FFFFFF', label: 'Card' },
+                      { hex: '#1E293B', label: 'Text' },
+                      { hex: '#64748B', label: 'Muted' },
+                      { hex: '#E2E8F0', label: 'Border' },
+                      { hex: '#16A34A', label: 'Success' },
+                    ].map((c) => (
                       <div
-                        key={key}
-                        className={`color-swatch ${appTheme === key ? 'sw-selected' : ''}`}
-                        style={{ background: t.accent }}
-                        title={t.label}
-                        onClick={() => setAppTheme(key)}
+                        key={c.hex}
+                        className="color-swatch sw-selected"
+                        style={{ background: c.hex, border: c.hex === '#FFFFFF' ? '1px solid #E2E8F0' : undefined, cursor: 'default' }}
+                        title={c.label}
                       />
                     ))}
-                    <div style={{ position: 'relative' }}>
-                      <div
-                        className={`color-swatch ${appTheme === 'custom' ? 'sw-selected' : ''}`}
-                        style={{ background: customColor || '#64748B', border: '2px dashed #64748B' }}
-                        title="Custom color"
-                        onClick={() => document.getElementById('customColorPicker')?.click()}
-                      />
-                      <input id="customColorPicker" type="color" value={customColor || ' var(--app-accent, var(--app-accent, #2563EB))'} onChange={e => { setCustomColor(e.target.value); setAppTheme('custom'); }} style={{ position: 'absolute', opacity: 0, width: 0, height: 0 }} />
-                    </div>
                   </div>
-                  <div className="form-hint">Current: {themes?.[appTheme]?.label || 'Custom'} ({appTheme === 'custom' ? customColor : themes?.[appTheme]?.accent})</div>
+                  <div className="form-hint">These colors are used everywhere. Accent and custom themes are disabled.</div>
                 </div>
                 <div className="form-group" style={{ marginTop: 8 }}>
                   <label className="form-label">Theme Mode</label>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginTop: 6 }}>
                     {[{ icon: 'ti-sun', label: 'Light' }, { icon: 'ti-moon', label: 'Dark' }, { icon: 'ti-device-desktop', label: 'System' }].map((m, i) => (
-                      <div key={m.label} style={{ padding: 12, background: 'var(--app-bg)', border: i === 0 ? `2px solid ${accent}` : '1.5px solid var(--app-border)', borderRadius: 10, cursor: 'pointer', textAlign: 'center' }}>
+                      <div key={m.label} style={{ padding: 12, background: 'var(--app-bg)', border: i === 0 ? `2px solid ${accent}` : '1.5px solid var(--app-border)', borderRadius: 10, textAlign: 'center', opacity: i === 0 ? 1 : 0.5 }}>
                         <i className={`ti ${m.icon}`} style={{ fontSize: 20, color: i === 0 ? accent : 'var(--app-muted)', display: 'block', marginBottom: 5 }} />
                         <div style={{ fontSize: 12, fontWeight: 700, color: i === 0 ? accent : 'var(--app-muted)' }}>{m.label}</div>
                       </div>
@@ -493,10 +493,6 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
                 <div className="toggle-row">
                   <div><div className="toggle-label">Animations</div><div className="toggle-desc">Enable smooth transitions and hover effects</div></div>
                   <Toggle on={true} onChange={() => { }} />
-                </div>
-                <div className="section-save">
-                  <button className="sec-cancel-btn" onClick={() => setAppTheme('teal')}>Reset to Default</button>
-                  <button className="sec-save-btn"><i className="ti ti-device-floppy" style={{ fontSize: 14 }} /> Save Appearance</button>
                 </div>
               </div>
             </div>

@@ -8676,87 +8676,48 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
 
 
-  // Apply theme whenever appTheme or customColor changes
-
+  // Apply locked professional palette
   useEffect(() => {
+    const t = THEMES.professional;
+    localStorage.setItem("appTheme", "professional");
 
-
-    const t = appTheme === "custom" ? generateThemeFromColor(customColor) : (THEMES[appTheme] || THEMES.teal);
-    if (!t) return;
-    localStorage.setItem("appTheme", appTheme);
-    if (appTheme === "custom") localStorage.setItem("appCustomColor", customColor);
-
+    document.documentElement.style.setProperty("--app-primary", t.primary);
     document.documentElement.style.setProperty("--app-sidebar", t.sidebar);
-
     document.documentElement.style.setProperty("--app-accent", t.accent);
-
-    document.documentElement.style.setProperty("--app-accent-rgb", hexToRgb(t.accent));
-
-    document.documentElement.style.setProperty("--app-accent-gradient", `linear-gradient(135deg, ${t.accent}, ${t.dot})`);
-
+    document.documentElement.style.setProperty("--app-accent-rgb", "37, 99, 235");
+    document.documentElement.style.setProperty("--app-accent2", t.primary);
+    document.documentElement.style.setProperty("--app-accent-light", t.accentLight);
+    document.documentElement.style.setProperty("--app-accent-gradient", `linear-gradient(135deg, ${t.primary}, ${t.accent})`);
     document.documentElement.style.setProperty("--app-bg", t.bg);
-
+    document.documentElement.style.setProperty("--app-card", t.card);
+    document.documentElement.style.setProperty("--app-text", t.text);
     document.documentElement.style.setProperty("--app-muted", t.muted);
-
     document.documentElement.style.setProperty("--app-border", t.border);
-
-
-
-    // Override template hardcoded colors to match theme
-
+    document.documentElement.style.setProperty("--app-success", t.success);
     document.documentElement.style.setProperty("--teal", t.accent);
-
-    document.documentElement.style.setProperty("--teal2", t.dot);
-
-    document.documentElement.style.setProperty("--teal", t.accent);
-    document.documentElement.style.setProperty("--teal-light", `rgba(${hexToRgb(t.accent)}, 0.1)`);
-
-    document.documentElement.style.setProperty("--teal-lighter", `rgba(${hexToRgb(t.accent)}, 0.04)`);
-
-
-
-    // Broadcast theme to any open iframes (Template Designer)
+    document.documentElement.style.setProperty("--teal2", t.primary);
+    document.documentElement.style.setProperty("--teal-light", t.accentLight);
+    document.documentElement.style.setProperty("--teal-lighter", t.accentLight);
 
     const frames = document.querySelectorAll('iframe');
-
     frames.forEach(f => {
-
       if (f.contentWindow) {
-
         try {
-
           f.contentWindow.postMessage({ type: 'SET_THEME', color: t.accent }, '*');
-
         } catch (e) { }
-
       }
-
     });
 
-
-
-
-    localStorage.setItem("appTheme", appTheme);
-
-    // Persist theme to backend so pages outside the dashboard (like the
-    // public Employee Onboarding link) can also pick up the current theme.
     if (companyId) {
       axios.post(`${BASE_URL}/api/config/${companyId}`, {
-        appTheme,
-        customColor: appTheme === "custom" ? customColor : undefined,
+        appTheme: "professional",
       }).catch(() => { });
     }
-
-
-
-    if (appTheme === "custom") localStorage.setItem("appCustomColor", customColor);
-
-  }, [appTheme, customColor]);
+  }, [companyId]);
 
 
 
   const currentTheme = THEMES.professional;
-
 
   const headerLogoRef = useRef();
 
@@ -12379,221 +12340,6 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                 </div>
 
                 <div className="desktop-dashboard-view">
-
-                  {/* Theme Picker - Dashboard Page */}
-
-                  <div style={{ position: "fixed", bottom: 28, right: 28, zIndex: 5000 }}>
-
-                    {showThemePicker && (
-
-                      <div style={{
-
-                        position: "absolute", bottom: 56, right: 0,
-
-                        background: "#FFFFFF", borderRadius: 18, padding: 20,
-
-                        boxShadow: "0 20px 60px rgba(0,0,0,0.18)", border: "1.5px solid var(--app-border)",
-
-                        width: 300, maxHeight: "70vh", overflowY: "auto"
-
-                      }}>
-
-                        <div style={{ fontSize: 13, fontWeight: 800, color: "var(--app-sidebar)", marginBottom: 14 }}>
-
-                          Choose Theme
-
-                        </div>
-
-                        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10 }}>
-
-                          {Object.entries(THEMES).map(([key, t]) => (
-
-                            <button key={key} onClick={() => { setAppTheme(key); setShowThemePicker(false); }}
-
-                              style={{
-
-                                border: appTheme === key ? `2.5px solid ${t.dot}` : "2px solid var(--app-border)",
-
-                                borderRadius: 12, padding: "10px 6px", background: appTheme === key ? `${t.dot}15` : "#F8FAFC",
-
-                                cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 6,
-
-                                fontFamily: "inherit", transition: "all 0.15s"
-
-                              }}>
-
-                              <div style={{ width: 28, height: 28, borderRadius: "50%", background: t.dot, boxShadow: `0 3px 8px ${t.dot}50` }} />
-
-                              <span style={{ fontSize: 10, fontWeight: 700, color: appTheme === key ? t.dot : "#64748B" }}>
-
-                                {t.label}
-
-                              </span>
-
-                            </button>
-
-                          ))}
-
-                        </div>
-
-
-
-                        {/* Custom Color Picker Section */}
-
-                        <div style={{ marginTop: 16, borderTop: "1.5px solid var(--app-border)", paddingTop: 14 }}>
-
-                          <div style={{ fontSize: 12, fontWeight: 700, color: "#64748B", marginBottom: 10, textTransform: "uppercase", letterSpacing: 0.5 }}>
-
-                            🎯 Custom Color
-
-                          </div>
-
-                          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-
-                            <div style={{ position: "relative", flexShrink: 0 }}>
-
-                              <div style={{
-
-                                width: 42, height: 42, borderRadius: 12,
-
-                                background: customColor,
-
-                                border: appTheme === "custom" ? `2.5px solid ${customColor}` : "2px solid var(--app-border)",
-
-                                boxShadow: `0 4px 12px ${customColor}40`,
-
-                                cursor: "pointer", transition: "all 0.2s",
-
-                                display: "flex", alignItems: "center", justifyContent: "center"
-
-                              }}
-
-                                onClick={() => document.getElementById("customColorInput")?.click()}
-
-                              >
-
-                                <span style={{ fontSize: 16 }}></span>
-
-                              </div>
-
-                              <input
-
-                                id="customColorInput"
-
-                                type="color"
-
-                                value={customColor}
-
-                                onChange={(e) => {
-
-                                  setCustomColor(e.target.value);
-
-                                  setAppTheme("custom");
-
-                                }}
-
-                                style={{
-
-                                  position: "absolute", top: 0, left: 0, width: 42, height: 42,
-
-                                  opacity: 0, cursor: "pointer", border: "none"
-
-                                }}
-
-                              />
-
-                            </div>
-
-                            <div style={{ flex: 1 }}>
-
-                              <div style={{ fontSize: 12, fontWeight: 700, color: appTheme === "custom" ? customColor : "#64748B" }}>
-
-                                {appTheme === "custom" ? "Custom Active" : "Pick any color"}
-
-                              </div>
-
-                              <div style={{ fontSize: 10, color: "#64748B", marginTop: 2 }}>
-
-                                {customColor.toUpperCase()}
-
-                              </div>
-
-                            </div>
-
-                            {appTheme === "custom" && (
-
-                              <div style={{
-
-                                width: 20, height: 20, borderRadius: "50%",
-                                background: "#16A34A", boxShadow: "0 0 6px #16A34A80",
-                                display: "flex", alignItems: "center", justifyContent: "center",
-                                color: "#FFFFFF", fontSize: 12, fontWeight: 900, flexShrink: 0
-
-                              }}>✓</div>
-
-                            )}
-
-                          </div>
-
-
-
-                          {/* Quick custom color presets */}
-
-                          <div style={{ display: "flex", gap: 6, marginTop: 10, flexWrap: "wrap" }}>
-
-                            {["#2563EB", "#2563EB", "#16A34A", "#64748B", "#64748B", "#64748B", "#1E293B", "#2563EB", "#16A34A", "#1E293B"].map(c => (
-
-                              <div key={c} onClick={() => { setCustomColor(c); setAppTheme("custom"); setShowThemePicker(false); }}
-
-                                style={{
-
-                                  width: 22, height: 22, borderRadius: 6, background: c, cursor: "pointer",
-
-                                  border: customColor === c && appTheme === "custom" ? "2px solid #FFFFFF" : "2px solid transparent",
-
-                                  boxShadow: customColor === c && appTheme === "custom" ? `0 0 0 2px ${c}, 0 2px 8px ${c}50` : `0 1px 4px ${c}30`,
-
-                                  transition: "all 0.15s"
-
-                                }}
-
-                              />
-
-                            ))}
-
-                          </div>
-
-                        </div>
-
-                      </div>
-
-                    )}
-
-                    <button onClick={() => setShowThemePicker(v => !v)}
-                      style={{
-                        width: 48, height: 48, borderRadius: "50%",
-                        background: appTheme === "custom"
-                          ? `linear-gradient(135deg, ${customColor}, ${customColor}dd)`
-                          : `linear-gradient(135deg, ${THEMES[appTheme]?.accent}, ${THEMES[appTheme]?.dot})`,
-                        border: "none", color: "#FFFFFF", fontSize: 20, cursor: "pointer",
-                        boxShadow: `0 6px 20px ${appTheme === "custom" ? customColor : (THEMES[appTheme]?.dot || "var(--app-accent)")}60`,
-                        display: "flex", alignItems: "center", justifyContent: "center",
-                        transition: "all 0.2s"
-                      }}>
-                      🎨
-                    </button>
-                  </div>
-
-
-
-
-
-
-
-
-
-
-
 
                   {dashTasksProj ? (
 

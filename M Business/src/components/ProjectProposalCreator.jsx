@@ -12,14 +12,9 @@ const pid = () => `PROP-${new Date().getFullYear()}-${String(Math.floor(Math.ran
 
 // ─── THEMES -------------------------------------------------------------------
 const THEMES = [
-  { name: "Violet", p: "var(--app-accent)", g: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", l: "var(--app-border)", t: "var(--app-accent)1d95" },
-  { name: "Cobalt", p: "#2563EB", g: "linear-gradient(135deg,#2563EB,#2563EB)", l: "var(--app-border)", t: "#1E293B" },
-  { name: "Emerald", p: "#16A34A", g: "linear-gradient(135deg,#1E293B,#16A34A)", l: "var(--app-border)", t: "#1E293B" },
-  { name: "Rose", p: "#64748B", g: "linear-gradient(135deg,#1E293B,#64748B)", l: "var(--app-border)", t: "#1E293B" },
-  { name: "Amber", p: "#64748B", g: "linear-gradient(135deg,#1E293B,#64748B)", l: "var(--app-border)", t: "#1E293B" },
-  { name: "Slate", p: "#1E293B", g: "linear-gradient(135deg,#0F172A,#64748B)", l: "var(--app-border)", t: "#0F172A" },
-  { name: "Teal", p: "#2563EB", g: "linear-gradient(135deg,#1E293B,#2563EB)", l: "var(--app-border)", t: "#1E293B" },
-  { name: "Fuchsia", p: "var(--app-accent)", g: "linear-gradient(135deg,#64748B,#E2E8F0)", l: "var(--app-border)", t: "#1E293B" },
+  { name: "Professional", p: "#2563EB", g: "linear-gradient(135deg,#0F172A,#2563EB)", l: "#EFF6FF", t: "#0F172A" },
+  { name: "Navy", p: "#0F172A", g: "linear-gradient(135deg,#0F172A,#1E293B)", l: "#F8FAFC", t: "#0F172A" },
+  { name: "Success", p: "#16A34A", g: "linear-gradient(135deg,#0F172A,#16A34A)", l: "#EFF6FF", t: "#0F172A" },
 ];
 // ─── COVERS -------------------------------------------------------------------
 const COVERS = [

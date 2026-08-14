@@ -149,14 +149,9 @@ const PRINT_BASE_CSS = `
 `;
 
 const THEMES = [
-  { name: "Violet", p: "#2563EB", g: "linear-gradient(135deg,#2563EB,#2563EB)" },
-  { name: "Cobalt", p: "#2563EB", g: "linear-gradient(135deg,#2563EB,#2563EB)" },
-  { name: "Emerald", p: "#16A34A", g: "linear-gradient(135deg,#1E293B,#16A34A)" },
-  { name: "Rose", p: "#64748B", g: "linear-gradient(135deg,#1E293B,#64748B)" },
-  { name: "Amber", p: "#64748B", g: "linear-gradient(135deg,#1E293B,#64748B)" },
-  { name: "Slate", p: "#1E293B", g: "linear-gradient(135deg,#0F172A,#64748B)" },
-  { name: "Teal", p: "#2563EB", g: "linear-gradient(135deg,#1E293B,#2563EB)" },
-  { name: "Fuchsia", p: "#64748B", g: "linear-gradient(135deg,#64748B,#E2E8F0)" },
+  { name: "Professional", p: "#2563EB", g: "linear-gradient(135deg,#0F172A,#2563EB)" },
+  { name: "Navy", p: "#0F172A", g: "linear-gradient(135deg,#0F172A,#1E293B)" },
+  { name: "Success", p: "#16A34A", g: "linear-gradient(135deg,#0F172A,#16A34A)" },
 ];
 
 function getTheme(name) {

@@ -67,6 +67,8 @@ import ModernProjectDetails from "./ModernProjectDetails";
 
 import ProjectPaymentModals from "./ProjectPaymentModals";
 
+import BusinessDashboardHome from "./BusinessDashboardHome";
+
 
 
 
@@ -5271,7 +5273,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 
 // •••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
 
-function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpProject, setJumpProject, config, onViewTasks, onViewProject, user, fetchTasks, onAddEmployee, onBack, onCreateProject, onEditProject, setActive, setInvoicePrefill, setJumpInvoice, fetchProjects, setPrevActiveBeforeInvoice, active }) {
+function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpProject, setJumpProject, config, onViewTasks, onViewProject, user, fetchTasks, onAddEmployee, onBack, onCreateProject, onEditProject, setActive, setInvoicePrefill, setJumpInvoice, fetchProjects, setPrevActiveBeforeInvoice, active, quotations, proposals, invoices }) {
   const [search, setSearch] = useState("");
 
 
@@ -5579,6 +5581,9 @@ return (
         onViewInvoice={(entry) => {
           setJumpInvoice({ ...entry, _t: Date.now() });
         }}
+        quotations={quotations}
+        proposals={proposals}
+        invoices={invoices}
       />
 
 
@@ -8899,33 +8904,8 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
 
 
-  const [clients, setClients] = useState(() => {
-    try {
-      const u = JSON.parse(localStorage.getItem("user") || "{}");
-      const cid = String(u?.companyId || u?._id || u?.id || u?.userId || u?.company || "").trim();
-      if (cid) {
-        const c = localStorage.getItem("cached_clients_" + cid);
-        if (c) return JSON.parse(c);
-      }
-      // Fallback: user object wasn't ready yet on this render — grab the
-      // most recently written cached_clients_* entry instead of showing empty.
-      const keys = Object.keys(localStorage).filter(k => k.startsWith("cached_clients_"));
-      if (keys.length === 1) {
-        const c = localStorage.getItem(keys[0]);
-        return c ? JSON.parse(c) : [];
-      }
-      return [];
-    } catch { return []; }
-  });
-  const [clientsLoaded, setClientsLoaded] = useState(() => {
-    try {
-      const u = JSON.parse(localStorage.getItem("user") || "{}");
-      const cid = String(u?.companyId || u?._id || u?.id || u?.userId || u?.company || "").trim();
-      if (cid && localStorage.getItem("cached_clients_" + cid)) return true;
-      const keys = Object.keys(localStorage).filter(k => k.startsWith("cached_clients_"));
-      return keys.length === 1;
-    } catch { return false; }
-  });
+  const [clients, setClients] = useState([]);
+  const [clientsLoaded, setClientsLoaded] = useState(false);
 
 
   const todayStr = new Date().toISOString().split("T")[0];
@@ -8956,15 +8936,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
 
 
-  const [employees, setEmployees] = useState(() => {
-    try {
-      const u = JSON.parse(localStorage.getItem("user") || "{}");
-      const cid = String(u?._id || u?.id || u?.userId || u?.companyId || u?.company || "").trim();
-      if (!cid) return [];
-      const c = localStorage.getItem("cached_employees_" + cid);
-      return c ? JSON.parse(c) : [];
-    } catch { return []; }
-  });
+  const [employees, setEmployees] = useState([]);
 
   // Active-only lists — used everywhere EXCEPT the Clients/Employees management pages themselves,
   // so Inactive clients/employees are never selectable/assignable/visible app-wide, while still
@@ -8989,12 +8961,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
 
 
-  const [projects, setProjects] = useState(() => {
-    try {
-      const c = localStorage.getItem("cached_projects");
-      return c ? JSON.parse(c) : [];
-    } catch { return []; }
-  });
+  const [projects, setProjects] = useState([]);
 
   // Once the real projects list has loaded, swap the lightweight
   // placeholder set above (in jumpProject's initializer) for the actual
@@ -9165,19 +9132,9 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
 
 
-  const [invoices, setInvoices] = useState(() => {
-    try {
-      const c = localStorage.getItem("cached_invoices");
-      return c ? JSON.parse(c) : [];
-    } catch { return []; }
-  });
+  const [invoices, setInvoices] = useState([]);
 
-  const [income, setIncome] = useState(() => {
-    try {
-      const c = localStorage.getItem("cached_income");
-      return c ? JSON.parse(c) : [];
-    } catch { return []; }
-  });
+  const [income, setIncome] = useState([]);
 
   const [expenses, setExpenses] = useState([]);
 
@@ -9491,49 +9448,15 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
           await axios.post(`${BASE_URL}/api/quotations`, { qt, items, status: "draft" });
 
+          toast.success("Quotation saved successfully!");
+
+          fetchQuotations();
+
         } catch (err) {
 
           console.error("API Save Error", err);
 
-        }
-
-
-
-        // 2. Save to local drafts to update the UI
-
-        try {
-
-          const LOCAL_KEY = "quotation_drafts";
-
-          const all = localStorage.getItem(LOCAL_KEY) ? JSON.parse(localStorage.getItem(LOCAL_KEY)) : [];
-
-          const id = qt.quoteNo;
-
-          const idx = all.findIndex((d) => d.id === id || (d.qt && d.qt.quoteNo === id));
-
-          const subtotal = items.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity) || 0), 0);
-
-          const total = subtotal * (1 + (qt.gstRate || 0) / 100);
-
-          const entry = { id, quoteNo: qt.quoteNo, client: qt.client || "—", total, savedAt: Date.now(), qt, items, status: "draft" };
-
-
-
-          if (idx >= 0) all[idx] = entry;
-
-          else all.unshift(entry);
-
-
-
-          localStorage.setItem(LOCAL_KEY, JSON.stringify(all.slice(0, 30)));
-
-          toast.success("Quotation saved successfully!");
-
-          fetchQuotations(); // Refresh list to update the Template Designer dropdown
-
-        } catch (err) {
-
-          toast.error("Failed to save quotation locally.");
+          toast.error("Failed to save quotation.");
 
         }
 
@@ -9709,8 +9632,6 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
       const list = res.data.invoices || [];
 
       setInvoices(list);
-
-      try { localStorage.setItem("cached_invoices", JSON.stringify(list)); } catch { }
 
     } catch (e) {
 
@@ -10028,15 +9949,9 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
     setAccountAuthOpen(false);
     setProfileDropdownOpen(false);
     setShowProfile(false);
-    try {
-      const cid = String(userData?.companyId || userData?._id || userData?.id || userData?.userId || userData?.company || "").trim();
-      if (cid) {
-        const cachedClients = localStorage.getItem("cached_clients_" + cid);
-        if (cachedClients) { setClients(JSON.parse(cachedClients)); setClientsLoaded(true); }
-        const cachedEmployees = localStorage.getItem("cached_employees_" + cid);
-        if (cachedEmployees) setEmployees(JSON.parse(cachedEmployees));
-      }
-    } catch { }
+    setClients([]);
+    setClientsLoaded(false);
+    setEmployees([]);
     setUser(userData);
   };
   const onLogoChange = (logo) => {
@@ -10051,47 +9966,32 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
     const cid = resolveSubadminId();
     if (!cid) return;
     try {
-      const cached = localStorage.getItem("cached_clients_" + cid);
-      if (cached) { try { setClients(JSON.parse(cached)); setClientsLoaded(true); } catch { } }
-    } catch { }
-    try {
       const res = await axios.get(BASE_URL + "/api/clients", {
         headers: { 'x-company-id': cid },
         timeout: 8000
       });
       setClients(res.data);
       setClientsLoaded(true);
-      try { localStorage.setItem("cached_clients_" + cid, JSON.stringify(res.data)); } catch { }
     } catch (e) { console.log(e); setClientsLoaded(true); }
   };
 
   const fetchEmployees = async () => {
     const cid = resolveSubadminId();
     try {
-      const cached = localStorage.getItem("cached_employees_" + cid);
-      if (cached) { try { setEmployees(JSON.parse(cached)); } catch { } }
-    } catch { }
-    try {
       const res = await axios.get(BASE_URL + "/api/employees", {
         headers: { 'x-company-id': cid }
       });
       setEmployees(res.data);
-      try { localStorage.setItem("cached_employees_" + cid, JSON.stringify(res.data)); } catch { }
     } catch (e) { console.log(e); }
   };
 
   const fetchProjects = async () => {
     const cid = user?.companyId || user?.company || user?._id || user?.id || "";
     try {
-      const cached = localStorage.getItem("cached_projects_" + cid);
-      if (cached) { try { setProjects(JSON.parse(cached)); } catch { } }
-    } catch { }
-    try {
       const res = await axios.get(BASE_URL + "/api/projects", {
         headers: { 'x-company-id': cid }
       });
       setProjects(res.data);
-      try { localStorage.setItem("cached_projects_" + cid, JSON.stringify(res.data)); } catch { }
     } catch (e) { console.log(e); }
   };
 
@@ -10254,27 +10154,13 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
       if (!Array.isArray(apiDocs)) apiDocs = [];
 
-      let localDocs = [];
-
-      try { const d = localStorage.getItem("quotation_drafts"); localDocs = d ? JSON.parse(d) : []; } catch (e) { }
-
-      // Combine avoiding duplicates by quoteNo
-
-      const combined = [...apiDocs];
-
-      localDocs.forEach(ld => {
-
-        if (!combined.some(c => (c.quoteNo || c.qt?.quoteNo) === (ld.quoteNo || ld.qt?.quoteNo))) combined.push(ld);
-
-      });
-
-      setQuotations(combined);
+      setQuotations(apiDocs);
 
     } catch (e) {
 
       console.log(e);
 
-      try { const d = localStorage.getItem("quotation_drafts"); setQuotations(d ? JSON.parse(d) : []); } catch (e) { }
+      setQuotations([]);
 
     }
 
@@ -10464,10 +10350,6 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
       setClients(prev => {
         const updated = [res.data.client, ...prev];
-        try {
-          const cid = resolveSubadminId();
-          if (cid) localStorage.setItem("cached_clients_" + cid, JSON.stringify(updated));
-        } catch { }
         return updated;
       });
 
@@ -11684,6 +11566,18 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                     </div>
                   </div>
 
+                  <BusinessDashboardHome
+                    isDesktop={false}
+                    projects={projects}
+                    clients={clients}
+                    quotations={quotations}
+                    proposals={proposalsList}
+                    invoices={invoices}
+                    onOpenProject={(p) => { setJumpProject(p); setProjectDetailsReadOnly(false); setSidebarOverride("dashboard"); setActive("project-details"); }}
+                    onProjectsUpdated={fetchProjects}
+                  />
+
+                  {false && (<div>
                   {/* HERO HEADER — glass + gradient mesh */}    <div style={{
                     position: "relative",
                     zIndex: 1,
@@ -12482,10 +12376,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                     </div>
                   </MobilePopup>
 
-
-
-
-                  
+                  </div>)}
 
                   {showMobileAddMenu && (
                     <div
@@ -12785,6 +12676,20 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                     </div>
 
                   ) : (
+
+                    <BusinessDashboardHome
+                      isDesktop={true}
+                      projects={projects}
+                      clients={clients}
+                      quotations={quotations}
+                      proposals={proposalsList}
+                      invoices={invoices}
+                      onOpenProject={(p) => { setJumpProject(p); setProjectDetailsReadOnly(false); setSidebarOverride("dashboard"); setActive("project-details"); }}
+                      onProjectsUpdated={fetchProjects}
+                    />
+
+                  )}
+                  {false && dashTasksProj ? null : false && (
 
                     <>
 
@@ -13884,6 +13789,12 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                 employees={employees}
 
+                quotations={quotations}
+
+                proposals={proposalsList}
+
+                invoices={invoices}
+
                 user={user}
 
                 clients={clients}
@@ -14067,10 +13978,6 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                   // the final client directly — append only if it isn't already present.
                   updated = [...prev, client];
                 }
-                try {
-                  const cid = resolveSubadminId();
-                  if (cid) localStorage.setItem("cached_clients_" + cid, JSON.stringify(updated));
-                } catch { }
                 return updated;
               });
               if (returnToCalendar) {
@@ -14198,6 +14105,12 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
               setProjects={setProjects}
 
               clients={clients}
+
+              quotations={quotations}
+
+              proposals={proposalsList}
+
+              invoices={invoices}
 
               employees={employees}
 

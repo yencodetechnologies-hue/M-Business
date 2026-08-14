@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import ProjectPdfButtons from './ProjectPdfButtons';
 
 // ── Colour palette (matches M Business design system) ----------
 const P = {
@@ -40,11 +41,11 @@ function getInitials2(name) {
 // Normalise backend status  display label + badge class
 function normaliseStatus(raw) {
   const s = (raw || '').toLowerCase().replace(/[\s_-]/g, '');
-  if (['active', 'inprogress', 'inreview', 'started'].includes(s)) return { label: 'Active', cls: 'active' };
-  if (['onhold', 'hold', 'paused', 'suspended'].includes(s)) return { label: 'On Hold', cls: 'hold' };
   if (['completed', 'done', 'delivered', 'closed'].includes(s)) return { label: 'Completed', cls: 'completed' };
-  if (['overdue', 'late'].includes(s)) return { label: 'Overdue', cls: 'overdue' };
-  return { label: raw || 'Pending', cls: 'hold' };
+  if (['onhold', 'hold', 'paused', 'suspended'].includes(s)) return { label: 'On Hold', cls: 'hold' };
+  if (['pending'].includes(s)) return { label: 'Pending', cls: 'hold' };
+  if (['overdue', 'late'].includes(s)) return { label: 'Ongoing', cls: 'active' };
+  return { label: 'Ongoing', cls: 'active' };
 }
 
 // Progress bar colour
@@ -296,6 +297,9 @@ export default function ModernProjectsView({
   onNewInvoice,
   onAddProject,
   searchQuery = '',
+  quotations = [],
+  proposals = [],
+  invoices = [],
 }) {
   const [search, setSearch] = useState(searchQuery);
   const [statusFilter, setStatus] = useState('all');
@@ -331,18 +335,17 @@ export default function ModernProjectsView({
   // KPI counts
   const counts = useMemo(() => {
     const all = projects.length;
-    let active = 0, hold = 0, completed = 0, overdue = 0;
+    let active = 0, hold = 0, completed = 0;
     const budgetByCurrency = {};
     projects.forEach(p => {
       const { cls } = normaliseStatus(p.status);
       if (cls === 'active') active++;
       else if (cls === 'hold') hold++;
       else if (cls === 'completed') completed++;
-      else if (cls === 'overdue') overdue++;
       const curr = p.currency || '₹';
       budgetByCurrency[curr] = (budgetByCurrency[curr] || 0) + (Number(p.budget) || 0);
     });
-    return { all, active, hold, completed, overdue, budgetByCurrency };
+    return { all, active, hold, completed, budgetByCurrency };
   }, [projects]);
 
   // Filter + Sort
@@ -379,10 +382,9 @@ export default function ModernProjectsView({
 
   const KPI_ITEMS = [
     { key: 'all', label: 'All Projects', count: counts.all, icon: 'ti-layout-kanban', iconBg: P.primaryLight, iconColor: P.primary },
-    { key: 'active', label: 'Active', count: counts.active, icon: 'ti-player-play', iconBg: P.greenLight, iconColor: P.green },
+    { key: 'active', label: 'Ongoing', count: counts.active, icon: 'ti-player-play', iconBg: P.greenLight, iconColor: P.green },
     { key: 'hold', label: 'On Hold', count: counts.hold, icon: 'ti-player-pause', iconBg: P.orangeLight, iconColor: P.orange },
     { key: 'completed', label: 'Completed', count: counts.completed, icon: 'ti-circle-check', iconBg: '#DBEAFE', iconColor: '#2563EB' },
-    { key: 'overdue', label: 'Overdue', count: counts.overdue, icon: 'ti-alert-triangle', iconBg: P.redLight, iconColor: P.red },
     { key: 'budget', label: 'Overall Value', budgetByCurrency: counts.budgetByCurrency, icon: 'ti-currency-rupee', iconBg: P.purpleLight, iconColor: P.purple, isCurrency: true },
   ];
 
@@ -440,10 +442,9 @@ export default function ModernProjectsView({
 
         <select className="mpv-sel" key="status-filter-select" value={dropdownStatus} onChange={e => setDropdownStatus(e.target.value)}>
           <option value="all">All Status</option>
-          <option value="active">Active</option>
+          <option value="active">Ongoing</option>
           <option value="hold">On Hold</option>
           <option value="completed">Completed</option>
-          <option value="overdue">Overdue</option>
         </select>
 
         <select className="mpv-sel" value={sortBy} onChange={e => setSort(e.target.value)}>
@@ -741,9 +742,18 @@ export default function ModernProjectsView({
                         {p.budget ? (
                           <div className="mpv-card-meta-row mpv-card-budget">
                             <i className="ti ti-currency-rupee" />
-                            Budget: {p.currency || '₹'}{Number(p.budget).toLocaleString('en-IN')}
+                            Value: {p.currency || '₹'}{Number(p.budget).toLocaleString('en-IN')}
                           </div>
                         ) : null}
+                        <div style={{ marginTop: 8 }}>
+                          <ProjectPdfButtons
+                            project={p}
+                            quotations={quotations}
+                            proposals={proposals}
+                            invoices={invoices}
+                            size="sm"
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>

@@ -4,6 +4,81 @@ const router = express.Router();
 const Notification = require("../models/NotificationModel");
 const Invoice = require("../models/InvoiceModels");
 const Income = require("../models/IncomeModel");
+const Project = require("../models/ProjectModel");
+const multer = require("multer");
+const cloudinary = require("cloudinary").v2;
+const streamifier = require("streamifier");
+const uploadMem = multer({ storage: multer.memoryStorage(), limits: { fileSize: 25 * 1024 * 1024 } });
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+// ── POST upload an invoice PDF and attach it to the project ──────────────────
+router.post("/upload", uploadMem.single("file"), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ msg: "No file uploaded" });
+    const { projectId, client, project } = req.body;
+    const companyId = req.companyId || req.headers["x-company-id"] || "";
+    const path = require("path");
+    const ext = path.extname(req.file.originalname || "");
+    const baseName = path.basename(req.file.originalname || "file", ext).replace(/[^a-zA-Z0-9_-]/g, "_");
+    const uniqueName = `${baseName}-${Date.now()}${ext}`;
+
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        folder: "mbusiness/invoices",
+        resource_type: req.file.mimetype.startsWith("image/") ? "image" : "raw",
+        public_id: uniqueName,
+        use_filename: true,
+        unique_filename: false,
+      },
+      async (error, result) => {
+        if (error) {
+          console.error("❌ Invoice upload error:", error);
+          return res.status(500).json({ msg: "Upload failed", error: error.message || error });
+        }
+        try {
+          const attachedFile = {
+            name: req.file.originalname,
+            url: result.secure_url,
+            size: req.file.size,
+            type: req.file.mimetype,
+          };
+          const invoiceNo = "INV-" + new Date().getFullYear() + "-" + String(Math.floor(Math.random() * 9000) + 1000);
+          const newInvoice = new Invoice({
+            invoiceNo,
+            client: client || "—",
+            project: project || "",
+            projectId: projectId || "",
+            companyId,
+            status: "draft",
+            items: [],
+            attachedFile,
+          });
+          await newInvoice.save();
+          if (projectId) {
+            try {
+              const q = { _id: projectId };
+              if (companyId) q.companyId = companyId;
+              await Project.findOneAndUpdate(q, { $set: { invoicePdf: attachedFile } });
+            } catch (projErr) {
+              console.error("Failed to attach invoice PDF to project:", projErr.message);
+            }
+          }
+          res.json(newInvoice);
+        } catch (err) {
+          res.status(500).json({ msg: "Error saving invoice", error: err.message || err });
+        }
+      }
+    );
+    streamifier.createReadStream(req.file.buffer).pipe(uploadStream);
+  } catch (err) {
+    res.status(500).json({ msg: "Upload failed", error: err.message || err });
+  }
+});
 
 
 // ── GET all invoices ─────────────────────────────────────────────────────────
@@ -43,6 +118,7 @@ router.get("/", async (req, res) => {
         dueDateType: doc.dueDateType || "30",
         client: doc.client || "",
         project: doc.project || "",
+        projectId: doc.projectId || "",
         gstRate: doc.gstRate ?? 0,
         notes: doc.notes || "",
         terms: doc.terms || "",
@@ -74,6 +150,7 @@ router.get("/", async (req, res) => {
         invoiceNo: doc.invoiceNo || "—",
         client: doc.client || "—",
         project: doc.project || "",
+        projectId: doc.projectId || "",
         fromGST: doc.fromGST || "",
         placeOfSupply: doc.placeOfSupply || "",
         date: doc.date || null,
@@ -86,6 +163,7 @@ router.get("/", async (req, res) => {
         inv,
         items: doc.items || [],
         paymentHistory: history,
+        attachedFile: doc.attachedFile || null,
       };
     }));
 
@@ -105,7 +183,10 @@ router.get("/project/:projectName", async (req, res) => {
 
     const invoices = await Invoice.find({
       companyId,
-      project: { $regex: new RegExp(`^\\s*${projectName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*$`, "i") }
+      $or: [
+        ...(req.query.projectId ? [{ projectId: String(req.query.projectId).trim() }] : []),
+        { project: { $regex: new RegExp(`^\\s*${projectName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*$`, "i") } }
+      ]
     }).sort({ createdAt: -1 }).lean();
 
     const result = invoices.map(doc => {

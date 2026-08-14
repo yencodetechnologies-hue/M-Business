@@ -18,7 +18,7 @@ const projectSchema = new mongoose.Schema({
   pending: { type: Number, default: 0 },
   spent: { type: Number, default: 0 },
   team: { type: String, default: "" },
-  status: { type: String, enum: ["Active", "On Hold", "Completed", "Overdue"], default: "Active" },
+  status: { type: String, enum: ["Active", "On Hold", "Completed", "Overdue", "Pending", "Ongoing"], default: "Ongoing" },
   progress: { type: Number, default: 0 },
   tasks: { type: Number, default: 0 },
   completedTasks: { type: Number, default: 0 },
@@ -174,6 +174,42 @@ const projectSchema = new mongoose.Schema({
       createdAt: { type: Date, default: Date.now }
     }],
     default: []
+  },
+  commissions: {
+    type: [{
+      name: { type: String, default: "" },
+      type: { type: String, enum: ["percent", "amount"], default: "percent" },
+      value: { type: Number, default: 0 },
+      notes: { type: String, default: "" }
+    }],
+    default: []
+  },
+  proposalPdf: {
+    type: {
+      name: { type: String, default: "" },
+      url: { type: String, default: "" },
+      size: { type: Number, default: 0 },
+      type: { type: String, default: "" }
+    },
+    default: null
+  },
+  quotationPdf: {
+    type: {
+      name: { type: String, default: "" },
+      url: { type: String, default: "" },
+      size: { type: Number, default: 0 },
+      type: { type: String, default: "" }
+    },
+    default: null
+  },
+  invoicePdf: {
+    type: {
+      name: { type: String, default: "" },
+      url: { type: String, default: "" },
+      size: { type: Number, default: 0 },
+      type: { type: String, default: "" }
+    },
+    default: null
   },
   portalSettings: {
     type: mongoose.Schema.Types.Mixed,

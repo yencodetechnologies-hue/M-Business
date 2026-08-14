@@ -54,6 +54,7 @@ const invoiceSchema = new mongoose.Schema({
   customDiscountType: { type: String, default: "" },
   discountAmt: { type: Number, default: 0 },
   template: { type: String, default: "Classic" },
+  attachedFile: { type: Object, default: null },
 }, { timestamps: true });
 
 module.exports = mongoose.model("Invoice", invoiceSchema);

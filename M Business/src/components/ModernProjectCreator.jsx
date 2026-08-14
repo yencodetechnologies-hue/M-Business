@@ -159,7 +159,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
     return !!editProject?.category && !preset.includes(editProject.category);
   });
   const [priority, setPriority] = useState(editProject?.priority || 'medium');
-  const [status, setStatus] = useState(editProject?.status || 'Active');
+  const [status, setStatus] = useState(editProject?.status === 'Active' ? 'Ongoing' : (editProject?.status || 'Ongoing'));
   const [progress, setProgress] = useState(editProject?.progress || 0);
 
   const safeDate = (d) => { try { return d ? new Date(d).toISOString().split('T')[0] : ''; } catch { return ''; } };
@@ -192,6 +192,9 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
   const [received, setReceived] = useState(editProject?.received || '');
   const [pending, setPending] = useState(editProject?.pending || '');
   const [spent, setSpent] = useState(editProject?.spent || '');
+  const [proposalFile, setProposalFile] = useState(null);
+  const [quotationFile, setQuotationFile] = useState(null);
+  const [invoiceFile, setInvoiceFile] = useState(null);
 
   const defaultPortalOpts = {
     enablePortal: true,
@@ -538,7 +541,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
         category,
         purpose: description,
         priority,
-        status,
+        status: (status === 'Completed' && (Number(pending) || Number(budget) || 0) > (Number(received) || 0) ? 'Pending' : status),
         progress,
         start,
         end,
@@ -570,9 +573,40 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
         res = await axios.post(`${BASE_URL}/api/projects/add`, payload, { headers });
       }
 
+      let savedProject = { ...(res.data?.project || res.data), budget: Number(budget) || 0, billed: Number(billed) || 0, received: Number(received) || 0, pending: Number(pending) || 0 };
+      const pid = savedProject._id || savedProject.id;
+      const uploadPdf = async (kind, file) => {
+        if (!file || !pid) return null;
+        const endpoints = { proposal: '/api/proposals/upload', quotation: '/api/quotations/upload', invoice: '/api/invoices/upload' };
+        const form = new FormData();
+        form.append('file', file);
+        form.append('projectId', pid);
+        form.append('client', client || '');
+        form.append('project', name || '');
+        form.append('title', name || file.name);
+        const up = await axios.post(`${BASE_URL}${endpoints[kind]}`, form, { headers });
+        return up.data?.attachedFile || null;
+      };
+      try {
+        if (proposalFile) {
+          const attached = await uploadPdf('proposal', proposalFile);
+          if (attached) savedProject = { ...savedProject, proposalPdf: attached };
+        }
+        if (quotationFile) {
+          const attached = await uploadPdf('quotation', quotationFile);
+          if (attached) savedProject = { ...savedProject, quotationPdf: attached };
+        }
+        if (invoiceFile) {
+          const attached = await uploadPdf('invoice', invoiceFile);
+          if (attached) savedProject = { ...savedProject, invoicePdf: attached };
+        }
+      } catch (upErr) {
+        console.error('PDF upload failed', upErr);
+        toast.error(upErr.response?.data?.msg || 'Project saved, but a PDF upload failed.');
+      }
+
       setLoading(false); // ← reset loading BEFORE onSuccess so button is not stuck
 
-      const savedProject = { ...(res.data?.project || res.data), budget: Number(budget) || 0, billed: Number(billed) || 0, received: Number(received) || 0, pending: Number(pending) || 0 };
       if (onSuccess) await onSuccess(savedProject);
 
       // Fire-and-forget notifications (don't block on these)
@@ -750,7 +784,10 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
               <div className="mpc-form-group">
                 <label>Status</label>
                 <select value={status} onChange={e => setStatus(e.target.value)}>
-                  <option>Active</option><option>On Hold</option><option>Completed</option><option>Overdue</option>
+                  <option value="Ongoing">Ongoing</option>
+                  <option value="On Hold">On Hold</option>
+                  <option value="Pending">Pending</option>
+                  <option value="Completed">Completed</option>
                 </select>
               </div>
               <div className="mpc-form-group">
@@ -1092,8 +1129,32 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
             </button>
           </div>
 
-
-
+          <div className="mpc-section-card">
+            <div className="mpc-section-heading"><i className="ti ti-file-type-pdf" /> Documents (PDF)</div>
+            <div className="mpc-form-2col">
+              <div className="mpc-form-group">
+                <label>Proposal PDF</label>
+                <input type="file" accept="application/pdf,.pdf" onChange={e => setProposalFile(e.target.files?.[0] || null)} />
+                {(proposalFile?.name || editProject?.proposalPdf?.name) && (
+                  <div style={{ fontSize: 12, color: P.textMid, marginTop: 6 }}>{proposalFile?.name || editProject?.proposalPdf?.name}</div>
+                )}
+              </div>
+              <div className="mpc-form-group">
+                <label>Quotation PDF</label>
+                <input type="file" accept="application/pdf,.pdf" onChange={e => setQuotationFile(e.target.files?.[0] || null)} />
+                {(quotationFile?.name || editProject?.quotationPdf?.name) && (
+                  <div style={{ fontSize: 12, color: P.textMid, marginTop: 6 }}>{quotationFile?.name || editProject?.quotationPdf?.name}</div>
+                )}
+              </div>
+            </div>
+            <div className="mpc-form-group">
+              <label>Invoice PDF</label>
+              <input type="file" accept="application/pdf,.pdf" onChange={e => setInvoiceFile(e.target.files?.[0] || null)} />
+              {(invoiceFile?.name || editProject?.invoicePdf?.name) && (
+                <div style={{ fontSize: 12, color: P.textMid, marginTop: 6 }}>{invoiceFile?.name || editProject?.invoicePdf?.name}</div>
+              )}
+            </div>
+          </div>
 
           {/* SECTION 6: CLIENT PORTAL */}
           <div className="mpc-section-card" id="sec4">

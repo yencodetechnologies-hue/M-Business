@@ -1,10 +1,17 @@
 const express = require("express");
 const router = express.Router();
 const Proposal = require("../models/ProposalModel");
+const Project = require("../models/ProjectModel");
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
 const streamifier = require("streamifier");
 const uploadMem = multer({ storage: multer.memoryStorage(), limits: { fileSize: 25 * 1024 * 1024 } });
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 // ── POST upload a proposal file directly (creates a minimal Proposal entry
 // with the file attached, so it appears ONLY in the Project Proposal list) ───
@@ -32,21 +39,33 @@ router.post("/upload", uploadMem.single("file"), async (req, res) => {
           return res.status(500).json({ msg: "Upload failed", error: error.message || error });
         }
         try {
+          const companyId = req.companyId || req.headers["x-company-id"] || "";
+          const attachedFile = {
+            name: req.file.originalname,
+            url: result.secure_url,
+            size: req.file.size,
+            type: req.file.mimetype,
+          };
           const newProposal = new Proposal({
             id: "PROP-" + Date.now(),
             title: title || req.file.originalname,
             client: client || "",
             clientName: client || "",
             projectId: projectId || "",
+            companyId,
             status: "draft",
-            attachedFile: {
-              name: req.file.originalname,
-              url: result.secure_url,
-              size: req.file.size,
-              type: req.file.mimetype,
-            },
+            attachedFile,
           });
           await newProposal.save();
+          if (projectId) {
+            try {
+              const q = { _id: projectId };
+              if (companyId) q.companyId = companyId;
+              await Project.findOneAndUpdate(q, { $set: { proposalPdf: attachedFile } });
+            } catch (projErr) {
+              console.error("Failed to attach proposal PDF to project:", projErr.message);
+            }
+          }
           res.json(newProposal);
         } catch (err) {
           res.status(500).json({ msg: "Error saving proposal", error: err.message || err });

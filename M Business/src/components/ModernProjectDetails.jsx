@@ -4,6 +4,8 @@ import { BASE_URL } from '../config';
 import ModernEmployeeProjectDetails from './ModernEmployeeProjectDetails';
 import ProjectPaymentModals from './ProjectPaymentModals';
 import { printProposal, shareProposalAsPDF } from './proposalPrintUtils';
+import { openPdf } from '../utils/openPdf';
+import { commissionAmount, formatMoney, parseAmt as bizParseAmt, resolveProjectPdfs, statusLabel } from '../utils/projectBusiness';
 
 const MILESTONE_OPTIONS = [
   "Custom",
@@ -68,6 +70,8 @@ const CSS = `
   .mpd-prog-divider { display: none; }
   .mpd-card-header { flex-wrap: wrap; gap: 10px; }
   .mpd-header-portal-grid { grid-template-columns: 1fr !important; }
+  .biz-overview { padding: 14px !important; }
+  .biz-overview > div[style*="grid-template-columns"] { grid-template-columns: 1fr !important; }
   .mpd-milestones-card { padding: 20px 16px !important; }
   .mpd-milestones-card .mpd-card-header { gap: 8px !important; margin-bottom: 4px !important; }
   .mpd-milestones-card button { font-size: 10px !important; padding: 5px 8px !important; }
@@ -331,7 +335,7 @@ function DetailField({ label, value, fullWidth }) {
   );
 }
 
-export default function ModernProjectDetails({ project, onBack, tasks = [], employees = [], user, clients = [], onEdit, onDelete, onLogTime, onUpdate, fetchProjects, fetchTasks, onMessageTeam, hideTopActions = false, onNext, onNewInvoice, onViewInvoice, onNewProposal, onNewQuotation, onViewProposal, onViewQuotation, autoOpenInvoice, onAutoOpenInvoiceDone, fromClientContext = false, onAddEmployeeClick, showBackLabel = false, autoOpenAddTask, onAutoOpenAddTaskDone, onCancelReturnToDashboard }) {
+export default function ModernProjectDetails({ project, onBack, tasks = [], employees = [], user, clients = [], onEdit, onDelete, onLogTime, onUpdate, fetchProjects, fetchTasks, onMessageTeam, hideTopActions = false, onNext, onNewInvoice, onViewInvoice, onNewProposal, onNewQuotation, onViewProposal, onViewQuotation, autoOpenInvoice, onAutoOpenInvoiceDone, fromClientContext = false, onAddEmployeeClick, showBackLabel = false, autoOpenAddTask, onAutoOpenAddTaskDone, onCancelReturnToDashboard, quotations = [], proposals = [], invoices = [] }) {
   const [activeTab, setActiveTab] = useState(() => {
     try {
       const saved = localStorage.getItem('project_tabs_order');
@@ -524,24 +528,15 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const [showAddExpense, setShowAddExpense] = useState(false);
   const [expenseAmt, setExpenseAmt] = useState('');
   const [addingExpense, setAddingExpense] = useState(false);
-  const [projectInvoices, setProjectInvoices] = useState(() => {
-    try {
-      const cached = localStorage.getItem("cached_invoices");
-      if (!cached) return [];
-      const all = JSON.parse(cached);
-      const pName = currProject?.name || "";
-      const cName = currProject?.client || currProject?.clientName || "";
-      return (Array.isArray(all) ? all : []).filter(e => {
-        const eProj = e.inv?.project || e.project;
-        const eClient = e.inv?.clientName || e.inv?.client || e.client;
-        return (eProj && eProj === pName) || (!eProj && eClient === cName);
-      });
-    } catch { return []; }
-  });
+  const [projectInvoices, setProjectInvoices] = useState([]);
   const [showSendPopup, setShowSendPopup] = useState(false);
   const [sendDocTarget, setSendDocTarget] = useState(null); // { type: 'quotation'|'proposal', doc: {...} }
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
   const [targetPortalClient, setTargetPortalClient] = useState('');
+  const [bizExpense, setBizExpense] = useState({ category: 'Miscellaneous', description: '', amount: '', date: new Date().toISOString().split('T')[0] });
+  const [bizCommission, setBizCommission] = useState({ name: '', type: 'percent', value: '', notes: '' });
+  const [savingBiz, setSavingBiz] = useState(false);
+  const [uploadingPdfKind, setUploadingPdfKind] = useState('');
 
   const [paymentModalsState, setPaymentModalsState] = useState({
     showNewInvoice: false,
@@ -891,21 +886,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   }, [autoOpenAddTask]);
 
   // Auto-fetch invoices for this project to calculate Billed/Received/Pending
-  const [projectInvoicesLoading, setProjectInvoicesLoading] = useState(() => {
-    try {
-      const cached = localStorage.getItem("cached_invoices");
-      if (!cached) return true;
-      const all = JSON.parse(cached);
-      const pName = currProject?.name || "";
-      const cName = currProject?.client || currProject?.clientName || "";
-      const hasMatch = (Array.isArray(all) ? all : []).some(e => {
-        const eProj = e.inv?.project || e.project;
-        const eClient = e.inv?.clientName || e.inv?.client || e.client;
-        return (eProj && eProj === pName) || (!eProj && eClient === cName);
-      });
-      return !hasMatch;
-    } catch { return true; }
-  });
+  const [projectInvoicesLoading, setProjectInvoicesLoading] = useState(true);
   // ── Fetch project-linked Quotations & Proposals (matched by project name,
   // same pattern already used for invoices) so the Accounts section can show
   // their PDFs without duplicating data — the source of truth stays in the
@@ -944,16 +925,21 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const fetchProjectInvoices = useCallback(() => {
     if (!currProject || !currProject._id) { setProjectInvoicesLoading(false); return; }
     const reqId = ++fetchInvoicesReqId.current;
-    setProjectInvoicesLoading(prev => prev); const pName = currProject.name || "";
+    const pid = String(currProject._id || currProject.id || "");
+    const pName = currProject.name || "";
     const cName = currProject.client || currProject.clientName || "";
     axios.get(`${BASE_URL}/api/invoices`)
       .then(res => {
         if (reqId !== fetchInvoicesReqId.current) return;
         const all = res.data?.invoices || res.data || [];
         const matched = (Array.isArray(all) ? all : []).filter(e => {
-          const eProj = e.inv?.project || e.project;
-          const eClient = e.inv?.clientName || e.inv?.client || e.client;
-          return (eProj && eProj === pName) || (!eProj && eClient === cName);
+          const ePid = String(e.projectId || e.inv?.projectId || "");
+          const eProj = e.inv?.project || e.project || "";
+          const eClient = e.inv?.clientName || e.inv?.client || e.client || "";
+          if (pid && ePid && ePid === pid) return true;
+          if (pName && eProj && String(eProj).trim() === String(pName).trim()) return true;
+          if (!eProj && !ePid && cName && eClient === cName) return true;
+          return false;
         });
         setProjectInvoices(matched);
       })
@@ -962,23 +948,6 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   }, [currProject?._id, currProject?.name, currProject?.client]);
 
   useEffect(() => {
-    try {
-      const cached = localStorage.getItem("cached_invoices");
-      if (cached) {
-        const all = JSON.parse(cached);
-        const pName = currProject?.name || "";
-        const cName = currProject?.client || currProject?.clientName || "";
-        const matched = (Array.isArray(all) ? all : []).filter(e => {
-          const eProj = e.inv?.project || e.project;
-          const eClient = e.inv?.clientName || e.inv?.client || e.client;
-          return (eProj && eProj === pName) || (!eProj && eClient === cName);
-        });
-        if (matched.length > 0) {
-          setProjectInvoices(matched);
-          setProjectInvoicesLoading(false);
-        }
-      }
-    } catch { }
     fetchProjectInvoices();
   }, [currProject?._id, fetchProjectInvoices]);
 
@@ -1229,7 +1198,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const manualReceived = parseAmt(currProject.received);
   const received = receivedFromPayments > 0 ? receivedFromPayments : manualReceived;
 
-  const pending = Math.max(0, billed - received);
+  const pending = Math.max(0, budgetAmt - received - autoAdvanceTotal);
   // Always calculate spent from expenses array (source of truth)
   const spent = (currProject.expenses || []).reduce((sum, exp) => sum + parseAmt(exp.amount), 0);
   const remaining = budgetAmt > 0 ? (budgetAmt - received) : 0;
@@ -1971,6 +1940,138 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
     window.open(`mailto:?subject=${encodeURIComponent('Your Client Portal Link')}&body=${encodeURIComponent(`Here's your client portal link: ${link}`)}`, '_blank');
   };
 
+  const companyHeaders = () => ({
+    'x-company-id': currProject?.companyId || user?.companyId || JSON.parse(localStorage.getItem('user') || '{}').companyId || ''
+  });
+
+  const linkedClient = (clients || []).find(c =>
+    String(c._id) === String(currProject.clientId) ||
+    (c.clientName || c.name) === currProject.client
+  ) || {};
+
+  const changeProjectStatus = async (nextStatus) => {
+    let statusToSave = nextStatus;
+    if (nextStatus === 'Completed' && pending > 0) {
+      alert('Payment must be finished before marking this project Completed. It will stay Pending until the pending amount is ₹0.');
+      statusToSave = 'Pending';
+    }
+    setSavingBiz(true);
+    try {
+      const res = await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { status: statusToSave }, { headers: companyHeaders() });
+      const saved = res.data?.project || { ...currProject, status: statusToSave };
+      setCurrProject(prev => ({ ...prev, ...saved }));
+      if (loadLatest) loadLatest();
+    } catch (err) {
+      const suggested = err.response?.data?.suggestedStatus;
+      if (err.response?.status === 400 && suggested) {
+        alert(err.response.data.msg || 'Payment must be finished first.');
+        try {
+          const res = await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { status: suggested }, { headers: companyHeaders() });
+          setCurrProject(prev => ({ ...prev, ...(res.data?.project || { status: suggested }) }));
+        } catch (e2) { /* ignore */ }
+      } else {
+        alert(err.response?.data?.msg || 'Failed to update status.');
+      }
+    } finally {
+      setSavingBiz(false);
+    }
+  };
+
+  const uploadProjectPdf = async (kind, file) => {
+    if (!file) return;
+    const endpoints = {
+      proposal: '/api/proposals/upload',
+      quotation: '/api/quotations/upload',
+      invoice: '/api/invoices/upload',
+    };
+    setUploadingPdfKind(kind);
+    try {
+      const form = new FormData();
+      form.append('file', file);
+      form.append('projectId', currProject._id);
+      form.append('client', currProject.client || linkedClient.clientName || '');
+      form.append('project', currProject.name || '');
+      form.append('title', currProject.name || file.name);
+      const res = await axios.post(`${BASE_URL}${endpoints[kind]}`, form, { headers: companyHeaders() });
+      const attached = res.data?.attachedFile;
+      if (attached?.url) {
+        const field = kind === 'proposal' ? 'proposalPdf' : kind === 'quotation' ? 'quotationPdf' : 'invoicePdf';
+        setCurrProject(prev => ({ ...prev, [field]: attached }));
+      }
+      if (loadLatest) loadLatest();
+    } catch (err) {
+      alert(err.response?.data?.msg || `Failed to upload ${kind} PDF.`);
+    } finally {
+      setUploadingPdfKind('');
+    }
+  };
+
+  const addBizExpense = async (e) => {
+    e.preventDefault();
+    if (!bizParseAmt(bizExpense.amount)) {
+      alert('Enter an expense amount.');
+      return;
+    }
+    setSavingBiz(true);
+    try {
+      const res = await axios.post(`${BASE_URL}/api/projects/${currProject._id}/expenses`, {
+        category: bizExpense.category,
+        description: bizExpense.description,
+        amount: bizParseAmt(bizExpense.amount),
+        date: bizExpense.date,
+      }, { headers: companyHeaders() });
+      if (res.data?.project) setCurrProject(prev => ({ ...prev, ...res.data.project }));
+      setBizExpense({ category: 'Miscellaneous', description: '', amount: '', date: new Date().toISOString().split('T')[0] });
+      if (loadLatest) loadLatest();
+    } catch (err) {
+      alert(err.response?.data?.msg || 'Failed to add expense.');
+    } finally {
+      setSavingBiz(false);
+    }
+  };
+
+  const addBizCommission = async (e) => {
+    e.preventDefault();
+    if (!bizCommission.name.trim()) {
+      alert('Enter a name for the commission.');
+      return;
+    }
+    setSavingBiz(true);
+    try {
+      const list = [...(currProject.commissions || []), {
+        name: bizCommission.name.trim(),
+        type: bizCommission.type,
+        value: bizParseAmt(bizCommission.value),
+        notes: bizCommission.notes || '',
+      }];
+      const res = await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { commissions: list }, { headers: companyHeaders() });
+      setCurrProject(prev => ({ ...prev, ...(res.data?.project || { commissions: list }) }));
+      setBizCommission({ name: '', type: 'percent', value: '', notes: '' });
+      if (loadLatest) loadLatest();
+    } catch (err) {
+      alert(err.response?.data?.msg || 'Failed to save commission.');
+    } finally {
+      setSavingBiz(false);
+    }
+  };
+
+  const paymentTimeline = [
+    ...(currProject.advances || []).map(a => ({
+      kind: 'Advance',
+      date: a.dateReceived || a.createdAt || '',
+      amount: bizParseAmt(a.amount),
+      note: a.description || a.advanceNo || '',
+    })),
+    ...(currProject.paymentsReceived || []).map(p => ({
+      kind: 'Payment',
+      date: p.paymentDate || p.createdAt || '',
+      amount: bizParseAmt(p.amount),
+      note: p.description || p.paymentNo || '',
+    })),
+  ].sort((a, b) => new Date(a.date || 0) - new Date(b.date || 0));
+
+  const resolvedPdfs = resolveProjectPdfs(currProject, { quotations, proposals, invoices });
+
   return (
     <>
       <div className="mpd-root">
@@ -1989,13 +2090,131 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
         </div>
 
+        <div className="biz-overview" style={{ background: '#fff', border: `1.5px solid ${P.border}`, borderRadius: 16, padding: 20, marginBottom: 24 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 16 }}>
+            <div style={{ fontSize: 15, fontWeight: 800, color: P.textDark }}>Business overview</div>
+            <label style={{ fontSize: 12, fontWeight: 700, color: P.textMid, display: 'flex', alignItems: 'center', gap: 8 }}>
+              Status
+              <select
+                value={['Ongoing', 'On Hold', 'Completed', 'Pending'].includes(currProject.status) ? currProject.status : (statusLabel(currProject.status) === 'Ongoing' ? 'Ongoing' : statusLabel(currProject.status))}
+                onChange={(e) => changeProjectStatus(e.target.value)}
+                disabled={savingBiz}
+                style={{ padding: '8px 10px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontFamily: 'inherit', fontWeight: 700 }}
+              >
+                <option value="Ongoing">Ongoing</option>
+                <option value="On Hold">On Hold</option>
+                <option value="Pending">Pending</option>
+                <option value="Completed">Completed</option>
+              </select>
+            </label>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+            <div>
+              <div style={{ fontSize: 12, fontWeight: 800, color: P.textDark, marginBottom: 8 }}>Client details</div>
+              <div style={{ fontSize: 13, color: P.textMid, lineHeight: 1.7 }}>
+                <div><strong>Name:</strong> {linkedClient.clientName || linkedClient.name || currProject.client || '—'}</div>
+                <div><strong>Contact:</strong> {linkedClient.phone || linkedClient.contactPersonNo || currProject.contactPersonNo || '—'}</div>
+                <div><strong>Email:</strong> {linkedClient.email || currProject.contactEmail || '—'}</div>
+                <div><strong>Address:</strong> {linkedClient.address || currProject.address || '—'}</div>
+              </div>
+            </div>
+            <div>
+              <div style={{ fontSize: 12, fontWeight: 800, color: P.textDark, marginBottom: 8 }}>Project</div>
+              <div style={{ fontSize: 13, color: P.textMid, lineHeight: 1.7 }}>
+                <div><strong>Name:</strong> {projName}</div>
+                <div><strong>Value:</strong> {formatMoney(budgetAmt, currency)}</div>
+                <div><strong>Advance taken:</strong> {autoAdvanceTotal > 0 ? formatMoney(autoAdvanceTotal, currency) : 'No'}</div>
+                <div><strong>Pending:</strong> {formatMoney(pending, currency)}</div>
+              </div>
+            </div>
+          </div>
+          <div style={{ fontSize: 13, color: P.textMid, marginBottom: 16, whiteSpace: 'pre-wrap' }}>
+            <strong>Description:</strong> {currProject.description || currProject.purpose || 'No description.'}
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 18 }}>
+            {[['proposal', 'Proposal', resolvedPdfs.proposal || currProject.proposalPdf], ['quotation', 'Quotation', resolvedPdfs.quotation || currProject.quotationPdf], ['invoice', 'Invoice', resolvedPdfs.invoice || currProject.invoicePdf]].map(([kind, label, file]) => (
+              <div key={kind} style={{ border: `1.5px solid ${P.border}`, borderRadius: 12, padding: 12 }}>
+                <div style={{ fontSize: 12, fontWeight: 800, marginBottom: 8 }}>{label} PDF</div>
+                {file?.url ? (
+                  <button type="button" className="mpd-btn mpd-btn-outline" onClick={() => openPdf(file.url)} style={{ marginBottom: 8 }}>
+                    <i className="ti ti-eye" /> View PDF
+                  </button>
+                ) : (
+                  <div style={{ fontSize: 12, color: P.textLight, marginBottom: 8 }}>Not uploaded</div>
+                )}
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.primary, cursor: 'pointer' }}>
+                  {uploadingPdfKind === kind ? 'Uploading…' : (file?.url ? 'Replace PDF' : 'Upload PDF')}
+                  <input type="file" accept="application/pdf,.pdf" style={{ display: 'none' }} onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ''; if (f) uploadProjectPdf(kind, f); }} />
+                </label>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <div>
+              <div style={{ fontSize: 12, fontWeight: 800, marginBottom: 8 }}>Expenses</div>
+              {(currProject.expenses || []).length === 0 && <div style={{ fontSize: 12, color: P.textLight, marginBottom: 8 }}>No expenses yet.</div>}
+              {(currProject.expenses || []).slice().reverse().slice(0, 8).map((exp, i) => (
+                <div key={exp.expenseNo || i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, padding: '6px 0', borderBottom: `1px solid ${P.border}` }}>
+                  <span>{exp.description || exp.category || exp.expenseNo}</span>
+                  <strong>{formatMoney(exp.amount, currency)}</strong>
+                </div>
+              ))}
+              <form onSubmit={addBizExpense} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 10 }}>
+                <select value={bizExpense.category} onChange={e => setBizExpense(f => ({ ...f, category: e.target.value }))} style={{ padding: 8, borderRadius: 8, border: `1.5px solid ${P.border}` }}>
+                  {['Travel', 'Office', 'Utilities', 'Marketing', 'Salary', 'Miscellaneous'].map(c => <option key={c}>{c}</option>)}
+                </select>
+                <input type="number" min="0" placeholder="Amount" value={bizExpense.amount} onChange={e => setBizExpense(f => ({ ...f, amount: e.target.value }))} style={{ padding: 8, borderRadius: 8, border: `1.5px solid ${P.border}` }} />
+                <input placeholder="Description" value={bizExpense.description} onChange={e => setBizExpense(f => ({ ...f, description: e.target.value }))} style={{ padding: 8, borderRadius: 8, border: `1.5px solid ${P.border}`, gridColumn: '1 / -1' }} />
+                <button type="submit" disabled={savingBiz} className="mpd-btn mpd-btn-primary" style={{ gridColumn: '1 / -1' }}>Add expense</button>
+              </form>
+            </div>
+            <div>
+              <div style={{ fontSize: 12, fontWeight: 800, marginBottom: 8 }}>Commissions / profit sharing</div>
+              {(currProject.commissions || []).length === 0 && <div style={{ fontSize: 12, color: P.textLight, marginBottom: 8 }}>No commissions.</div>}
+              {(currProject.commissions || []).map((c, i) => (
+                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, padding: '6px 0', borderBottom: `1px solid ${P.border}` }}>
+                  <span>{c.name} {c.type === 'percent' ? `(${c.value}%)` : ''}</span>
+                  <strong>{formatMoney(commissionAmount(c, budgetAmt), currency)}</strong>
+                </div>
+              ))}
+              <form onSubmit={addBizCommission} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 10 }}>
+                <input placeholder="Name" value={bizCommission.name} onChange={e => setBizCommission(f => ({ ...f, name: e.target.value }))} style={{ padding: 8, borderRadius: 8, border: `1.5px solid ${P.border}` }} />
+                <select value={bizCommission.type} onChange={e => setBizCommission(f => ({ ...f, type: e.target.value }))} style={{ padding: 8, borderRadius: 8, border: `1.5px solid ${P.border}` }}>
+                  <option value="percent">Percent</option>
+                  <option value="amount">Amount</option>
+                </select>
+                <input type="number" min="0" placeholder={bizCommission.type === 'percent' ? '%' : 'Amount'} value={bizCommission.value} onChange={e => setBizCommission(f => ({ ...f, value: e.target.value }))} style={{ padding: 8, borderRadius: 8, border: `1.5px solid ${P.border}` }} />
+                <input placeholder="Notes" value={bizCommission.notes} onChange={e => setBizCommission(f => ({ ...f, notes: e.target.value }))} style={{ padding: 8, borderRadius: 8, border: `1.5px solid ${P.border}` }} />
+                <button type="submit" disabled={savingBiz} className="mpd-btn mpd-btn-primary" style={{ gridColumn: '1 / -1' }}>Add commission</button>
+              </form>
+            </div>
+          </div>
+
+          <div style={{ marginTop: 18 }}>
+            <div style={{ fontSize: 12, fontWeight: 800, marginBottom: 8 }}>Payments timeline</div>
+            {paymentTimeline.length === 0 ? (
+              <div style={{ fontSize: 12, color: P.textLight }}>No advances or payments recorded yet.</div>
+            ) : (
+              paymentTimeline.map((row, i) => (
+                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', gap: 10, fontSize: 12, padding: '7px 0', borderBottom: `1px solid ${P.border}` }}>
+                  <span><strong>{row.kind}</strong> · {row.date ? new Date(row.date).toLocaleDateString('en-IN') : '—'} {row.note ? `· ${row.note}` : ''}</span>
+                  <strong>{formatMoney(row.amount, currency)}</strong>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
         {/* HEADER + CLIENT PORTAL — side by side, 50/50 on desktop, stacked on mobile */}
         <div className="mpd-header-portal-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'stretch', marginBottom: 24 }}>
           <div className="mpd-proj-header" style={{ flex: '1 1 50%', minWidth: 0, height: '100%', boxSizing: 'border-box', flexWrap: 'nowrap', padding: '22px 28px' }}>
             <div className="mpd-ph-left">
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8, minWidth: 0, maxWidth: '100%', flexWrap: 'wrap' }}>
                 <div className="mpd-proj-name" title={projName} style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", minWidth: 0, maxWidth: "100%", flex: "1 1 auto" }}>{projName}</div>
-                <span className={`mpd-status-badge ${badgeClass}`}>{currProject.status || 'Active'}</span>
+                <span className={`mpd-status-badge ${badgeClass}`}>{statusLabel(currProject.status)}</span>
                 <span className={`mpd-prio ${prioClass}`}>{priority.charAt(0).toUpperCase() + priority.slice(1)}</span>
               </div>
               <div className="mpd-proj-desc" style={{ wordBreak: 'break-word', overflowWrap: 'break-word', whiteSpace: 'pre-wrap' }}>{currProject.description || "No description provided for this project."}</div>

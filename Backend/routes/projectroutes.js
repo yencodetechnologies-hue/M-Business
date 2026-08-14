@@ -5,6 +5,30 @@ const jwt = require("jsonwebtoken");
 const Project = require("../models/ProjectModel");
 const Client = require("../models/ClientModel");
 
+function parseAmt(val) {
+  if (val === undefined || val === null) return 0;
+  if (typeof val === "number") return Number.isFinite(val) ? val : 0;
+  const num = Number(String(val).replace(/[^0-9.-]+/g, ""));
+  return Number.isFinite(num) ? num : 0;
+}
+
+function applyProjectFinance(project) {
+  const receivedFromPayments = (project.paymentsReceived || []).reduce((sum, p) => sum + parseAmt(p.amount), 0);
+  const received = receivedFromPayments > 0 ? receivedFromPayments : parseAmt(project.received);
+  const advanceTotal = (project.advances || []).reduce((sum, a) => sum + parseAmt(a.amount), 0);
+  const budget = parseAmt(project.budget);
+  const spent = (project.expenses || []).reduce((sum, exp) => sum + parseAmt(exp.amount), 0);
+  project.received = received;
+  project.spent = spent;
+  project.pending = Math.max(0, budget - received - advanceTotal);
+  return project.pending;
+}
+
+function nextExpenseNo(expenses) {
+  const n = (expenses || []).length + 1;
+  return `EXP-${String(n).padStart(3, "0")}`;
+}
+
 // GET all projects
 router.get("/", async (req, res) => {
   try {
@@ -21,28 +45,13 @@ router.get("/", async (req, res) => {
 // IMPORTANT: this must come before "/:employeeName" — otherwise Express
 // matches a project's Mongo _id against that route instead, and the
 // real single-project handler is never reached.
-router.get("/:id", async (req, res) => {
+router.get("/:id", async (req, res, next) => {
+  if (!/^[a-fA-F0-9]{24}$/.test(req.params.id)) return next();
   try {
     const companyId = req.companyId || req.headers['x-company-id'] || "";
-    const project = await Project.findOne({ _id: req.params.id, companyId });
-    if (!project) return res.status(404).json({ msg: "Project not found" });
-    res.json(project);
-  } catch (err) {
-    console.error("GET project by ID error:", err.message);
-    res.status(500).json({ msg: "Server error", error: err.message });
-  }
-});
-
-// GET single project by ID
-// MUST be registered before "/:employeeName" — otherwise Express matches
-// a project's Mongo _id against that route instead of this one, so
-// GET /api/projects/:id (used to load the Project Details page and its
-// Updates/Payments/Activity Logs tabs) never reaches the real handler
-// and returns an empty/wrong array instead of the project document.
-router.get("/:id", async (req, res) => {
-  try {
-    const companyId = req.companyId || req.headers['x-company-id'] || "";
-    const project = await Project.findOne({ _id: req.params.id, companyId });
+    const query = { _id: req.params.id };
+    if (companyId) query.companyId = companyId;
+    const project = await Project.findOne(query);
     if (!project) return res.status(404).json({ msg: "Project not found" });
     res.json(project);
   } catch (err) {
@@ -188,7 +197,7 @@ router.post("/add", async (req, res) => {
       pending: Number(pending) || 0,
       spent: Number(spent) || 0,
       team: team || "",
-      status: status || "Pending",
+      status: status || "Ongoing",
       progress: Number(progress) || 0,
       tasks: Number(tasks) || 0,
       completedTasks: Number(completedTasks) || 0,
@@ -201,8 +210,13 @@ router.post("/add", async (req, res) => {
       loggedHours: Number(req.body.loggedHours) || 0,
       companyId: req.companyId || "",
       clientId: req.body.clientId || "",
+      commissions: Array.isArray(req.body.commissions) ? req.body.commissions : [],
+      proposalPdf: req.body.proposalPdf || null,
+      quotationPdf: req.body.quotationPdf || null,
+      invoicePdf: req.body.invoicePdf || null,
     });
 
+    applyProjectFinance(project);
     console.log("Attempting to save project...");
     const saved = await project.save();
 
@@ -382,6 +396,14 @@ router.put("/:id", async (req, res) => {
         }
       });
       existingProject.markModified('portalSettings');
+      const pendingAmt = applyProjectFinance(existingProject);
+      if (String(existingProject.status || "").toLowerCase() === "completed" && pendingAmt > 0) {
+        return res.status(400).json({
+          msg: "Payment must be finished before marking this project Completed. Pending amount must be ₹0.",
+          pending: pendingAmt,
+          suggestedStatus: "Pending"
+        });
+      }
       project = await existingProject.save();
       console.log('Saved project portalSettings:', project.portalSettings);
     } catch (saveErr) {
@@ -492,7 +514,7 @@ router.patch("/:id/recalc-budget", async (req, res) => {
     if (!project) return res.status(404).json({ msg: "Project not found" });
 
     const spent = (project.expenses || []).reduce((sum, exp) => sum + (Number(exp.amount) || 0), 0);
-    project.spent = spent;
+    applyProjectFinance(project);
     await project.save();
 
     const budgetAmt = Number(project.budget) || 0;
@@ -500,11 +522,52 @@ router.patch("/:id/recalc-budget", async (req, res) => {
     const usedPct = budgetAmt > 0 ? Math.round((spent / budgetAmt) * 100) : 0;
     const exceeded = budgetAmt > 0 && spent > budgetAmt;
 
-    res.json({ msg: "Budget recalculated", spent, remaining, usedPct, exceeded });
+    res.json({ msg: "Budget recalculated", spent: project.spent, pending: project.pending, remaining, usedPct, exceeded });
   } catch (err) {
     console.error("recalc-budget error:", err.message);
     res.status(500).json({ msg: "Server error", error: err.message });
   }
 });
 
-module.exports = router; module.exports = router;
+// POST — add a single expense without sending the whole project
+router.post("/:id/expenses", async (req, res) => {
+  try {
+    const rawId = req.params.id;
+    if (!rawId || !mongoose.Types.ObjectId.isValid(rawId)) {
+      return res.status(400).json({ msg: "Invalid project ID" });
+    }
+    const companyId = req.companyId || req.headers["x-company-id"] || "";
+    if (!companyId) return res.status(400).json({ msg: "Missing company context (x-company-id header)" });
+
+    const project = await Project.findOne({ _id: rawId, companyId });
+    if (!project) return res.status(404).json({ msg: "Project not found or unauthorized" });
+
+    const amount = parseAmt(req.body.amount);
+    if (!amount) return res.status(400).json({ msg: "Expense amount is required" });
+
+    const expenses = Array.isArray(project.expenses) ? project.expenses : [];
+    const expense = {
+      expenseNo: req.body.expenseNo || nextExpenseNo(expenses),
+      category: req.body.category || "Miscellaneous",
+      description: req.body.description || "",
+      amount,
+      date: req.body.date || new Date().toISOString().split("T")[0],
+      paymentMode: req.body.paymentMode || "",
+      status: req.body.status || "Paid",
+      notes: req.body.notes || "",
+      notifyClient: !!req.body.notifyClient,
+      createdAt: new Date()
+    };
+    expenses.push(expense);
+    project.expenses = expenses;
+    project.markModified("expenses");
+    applyProjectFinance(project);
+    await project.save();
+    res.status(201).json({ msg: "Expense added", expense, project });
+  } catch (err) {
+    console.error("POST project expense error:", err.message);
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+});
+
+module.exports = router;

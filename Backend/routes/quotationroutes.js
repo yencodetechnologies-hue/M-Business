@@ -5,10 +5,17 @@ const Quotation = require("../models/QuotationModel");
 const Invoice = require("../models/InvoiceModels");
 const Notification = require("../models/NotificationModel");
 const Client = require("../models/ClientModel");
+const Project = require("../models/ProjectModel");
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
 const streamifier = require("streamifier");
 const uploadMem = multer({ storage: multer.memoryStorage(), limits: { fileSize: 25 * 1024 * 1024 } });
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 // ── POST upload a quotation file directly (creates a minimal Quotation entry
 // with the file attached, so it appears ONLY in the Quotation list) ──────────
@@ -36,20 +43,32 @@ router.post("/upload", uploadMem.single("file"), async (req, res) => {
           return res.status(500).json({ msg: "Upload failed", error: error.message || error });
         }
         try {
+          const companyId = req.companyId || req.headers["x-company-id"] || "";
+          const attachedFile = {
+            name: req.file.originalname,
+            url: result.secure_url,
+            size: req.file.size,
+            type: req.file.mimetype,
+          };
           const quoteNo = "QUO-" + new Date().getFullYear() + "-" + String(Math.floor(Math.random() * 9000) + 1000);
           const newQuotation = new Quotation({
             qt: { quoteNo, client: client || "", project: project || "", date: new Date().toISOString() },
             items: [],
             status: "draft",
             projectId: projectId || "",
-            attachedFile: {
-              name: req.file.originalname,
-              url: result.secure_url,
-              size: req.file.size,
-              type: req.file.mimetype,
-            },
+            companyId,
+            attachedFile,
           });
           await newQuotation.save();
+          if (projectId) {
+            try {
+              const q = { _id: projectId };
+              if (companyId) q.companyId = companyId;
+              await Project.findOneAndUpdate(q, { $set: { quotationPdf: attachedFile } });
+            } catch (projErr) {
+              console.error("Failed to attach quotation PDF to project:", projErr.message);
+            }
+          }
           res.json(newQuotation);
         } catch (err) {
           res.status(500).json({ msg: "Error saving quotation", error: err.message || err });
@@ -84,6 +103,8 @@ router.get("/", async (req, res) => {
         savedAt: doc.createdAt || Date.now(),
         qt,
         items,
+        projectId: doc.projectId || "",
+        attachedFile: doc.attachedFile || null,
       };
     });
     return res.json({ success: true, quotations });
@@ -117,6 +138,8 @@ router.get("/project/:projectId", async (req, res) => {
         savedAt: doc.createdAt || Date.now(),
         qt,
         items,
+        projectId: doc.projectId || "",
+        attachedFile: doc.attachedFile || null,
       };
     });
     return res.json({ success: true, quotations });

@@ -1750,11 +1750,31 @@ const [sortOrder, setSortOrder] = useState("desc");
       <div className="inv-list-root" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", maxWidth: "100%", padding: "20px" }}>
         <style>{`
           .inv-hero-badge { width: 44px; height: 44px; border-radius: 13px; background: linear-gradient(135deg, var(--app-accent), var(--app-accent) 60%, var(--teal, var(--app-accent))); display: flex; align-items: center; justify-content: center; color: #FFFFFF; font-size: 20px; flex-shrink: 0; box-shadow: 0 6px 16px rgba(var(--app-accent-rgb), 0.28); }
+
+          .inv-stats-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-bottom: 22px; }
+          .inv-stat-card { position: relative; background: var(--app-card, #FFFFFF); border: 1.5px solid var(--app-border, #E2E8F0); border-radius: 16px; padding: 16px 18px 14px; cursor: pointer; overflow: hidden; transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+          .inv-stat-card:hover { transform: translateY(-3px); border-color: transparent; box-shadow: 0 14px 30px rgba(15,23,42,.12); }
+          .inv-stat-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+          .inv-stat-icon { width: 42px; height: 42px; min-width: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 19px; color: #FFFFFF; flex-shrink: 0; box-shadow: 0 6px 14px rgba(15,23,42,.14); }
+          .inv-stat-num { font-size: 26px; font-weight: 900; color: var(--app-text, #0F172A); line-height: 1; letter-spacing: -0.5px; }
+          .inv-stat-label { font-size: 11.5px; color: var(--app-muted, #64748B); font-weight: 700; margin-top: 4px; }
+          .inv-stat-amount { font-size: 11px; font-weight: 800; margin-top: 6px; }
+          .inv-stat-bar-wrap { height: 5px; border-radius: 3px; background: var(--app-bg, #F1F5F9); overflow: hidden; margin-top: 12px; }
+          .inv-stat-bar-fill { height: 100%; border-radius: 3px; transition: width .4s ease; }
+
+          @media (max-width: 900px) {
+            .inv-stats-row { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+            .inv-stat-card { padding: 14px 14px 12px; }
+            .inv-stat-icon { width: 36px; height: 36px; min-width: 36px; font-size: 16px; border-radius: 10px; }
+            .inv-stat-num { font-size: 21px; }
+          }
           @media (max-width: 640px) {
             .inv-list-root { padding: 14px !important; }
             .inv-hero-badge { width: 38px; height: 38px; border-radius: 11px; font-size: 17px; }
             .page-title { font-size: 18px !important; }
             .page-sub { display: none; }
+            .inv-stat-top { gap: 9px; margin-bottom: 9px; }
+            .inv-stat-amount { font-size: 10px; }
           }
         `}</style>
 
@@ -1916,51 +1936,42 @@ const [sortOrder, setSortOrder] = useState("desc");
         </div>
 
         {/* STATS */}
-        <div className="stats-row">
-          <div className="stat-card" onClick={() => { if (onOpenNewInvoiceModal) { onOpenNewInvoiceModal(); return; } clearForm(); setStep("form"); setInternalNav(true); }}>
-            <div className="stat-card-inner">
-              <div className="stat-icon" style={{ background: "var(--teal-light)", color: "var(--teal)" }}><i className="ti ti-receipt-2"></i></div>
-              <div>
-                <div className="stat-num">{enriched.length}</div>
-                <div className="stat-label">Total Invoices</div>
-                <div className="stat-amount" style={{ color: "var(--teal)" }}>{formatCurrency(totalAmt, inv.currency)} total</div>
+        <div className="inv-stats-row">
+          {[
+            {
+              icon: "ti-receipt-2", grad: "linear-gradient(135deg,#6366F1,#4F46E5)", accent: "#4F46E5",
+              num: enriched.length, label: "Total Invoices", amount: `${formatCurrency(totalAmt, inv.currency)} total`,
+              barPct: 100,
+              onClick: () => { if (onOpenNewInvoiceModal) { onOpenNewInvoiceModal(); return; } clearForm(); setStep("form"); setInternalNav(true); },
+            },
+            {
+              icon: "ti-circle-check", grad: "linear-gradient(135deg,#22C55E,#16A34A)", accent: "#16A34A",
+              num: enriched.filter(e => e.status === "paid" || e.status === "part_paid").length, label: "Paid", amount: `${formatCurrency(paidAmt, inv.currency)} received`,
+              barPct: totalAmt > 0 ? (paidAmt / totalAmt) * 100 : 0,
+            },
+            {
+              icon: "ti-clock", grad: "linear-gradient(135deg,#F59E0B,#D97706)", accent: "#D97706",
+              num: unpaidCnt, label: "Pending", amount: `${formatCurrency(Math.max(0, totalAmt - paidAmt), inv.currency)} due`,
+              barPct: totalAmt > 0 ? (Math.max(0, totalAmt - paidAmt) / totalAmt) * 100 : 0,
+            },
+            {
+              icon: "ti-alert-circle", grad: "linear-gradient(135deg,#F87171,#DC2626)", accent: "#DC2626",
+              num: enriched.filter(e => e.status === "overdue").length, label: "Overdue", amount: "Action needed",
+              barPct: 11,
+            },
+          ].map((s, i) => (
+            <div key={i} className="inv-stat-card" onClick={s.onClick} style={{ cursor: s.onClick ? "pointer" : "default" }}>
+              <div className="inv-stat-top">
+                <div className="inv-stat-icon" style={{ background: s.grad }}><i className={`ti ${s.icon}`}></i></div>
+                <div style={{ minWidth: 0 }}>
+                  <div className="inv-stat-num">{s.num}</div>
+                  <div className="inv-stat-label">{s.label}</div>
+                </div>
               </div>
+              <div className="inv-stat-amount" style={{ color: s.accent }}>{s.amount}</div>
+              <div className="inv-stat-bar-wrap"><div className="inv-stat-bar-fill" style={{ width: `${s.barPct}%`, background: s.grad }}></div></div>
             </div>
-            <div className="stat-bar-wrap"><div className="stat-bar-fill" style={{ width: "100%", background: "var(--teal)" }}></div></div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-card-inner">
-              <div className="stat-icon" style={{ background: "var(--app-accent-light)", color: "var(--green)" }}><i className="ti ti-circle-check"></i></div>
-              <div>
-                <div className="stat-num">{enriched.filter(e => e.status === "paid" || e.status === "part_paid").length}</div>
-                <div className="stat-label">Paid</div>
-                <div className="stat-amount" style={{ color: "var(--green)" }}>{formatCurrency(paidAmt, inv.currency)} received</div>
-              </div>
-            </div>
-            <div className="stat-bar-wrap"><div className="stat-bar-fill" style={{ width: (totalAmt > 0 ? (paidAmt / totalAmt) * 100 : 0) + "%", background: "var(--green)" }}></div></div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-card-inner">
-              <div className="stat-icon" style={{ background: "var(--app-accent-light)", color: "var(--app-muted)" }}><i className="ti ti-clock"></i></div>
-              <div>
-                <div className="stat-num">{unpaidCnt}</div>
-                <div className="stat-label">Pending</div>
-                <div className="stat-amount" style={{ color: "var(--app-muted)" }}>{formatCurrency(Math.max(0, totalAmt - paidAmt), inv.currency)} due</div>
-              </div>
-            </div>
-            <div className="stat-bar-wrap"><div className="stat-bar-fill" style={{ width: (totalAmt > 0 ? (Math.max(0, totalAmt - paidAmt) / totalAmt) * 100 : 0) + "%", background: "var(--app-muted)" }}></div></div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-card-inner">
-              <div className="stat-icon" style={{ background: "var(--app-accent-light)", color: "var(--app-text)" }}><i className="ti ti-alert-circle"></i></div>
-              <div>
-                <div className="stat-num">{enriched.filter(e => e.status === "overdue").length}</div>
-                <div className="stat-label">Overdue</div>
-                <div className="stat-amount" style={{ color: "var(--app-text)" }}>Action needed</div>
-              </div>
-            </div>
-            <div className="stat-bar-wrap"><div className="stat-bar-fill" style={{ width: "11%", background: "var(--app-text)" }}></div></div>
-          </div>
+          ))}
         </div>
 {/* TABS */}
 <div className="tabs-row-mobile-fix" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20, gap: 10 }}>

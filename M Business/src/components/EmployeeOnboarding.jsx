@@ -38,8 +38,7 @@ function buildSections(accent) {
 }
 
 const THEME_PRESETS = {
-  purple: "#2563EB", ocean: "#2563EB", forest: "#16A34A", sunset: "#64748B",
-  rose: "#64748B", slate: "#64748B", mint: "#2563EB", candy: "#64748B", teal: "#2563EB",
+  professional: "#2563EB", teal: "#2563EB",
 };
 
 function hexToRgbStr(hex) {
@@ -94,9 +93,7 @@ export default function EmployeeOnboarding() {
     axios.get(`${BASE_URL}/api/config/${companyId}`)
       .then(res => {
         const cfg = res.data || {};
-        const resolved = cfg.appTheme === "custom"
-          ? (cfg.customColor || "#2563EB")
-          : (THEME_PRESETS[cfg.appTheme] || "#2563EB");
+        const resolved = "#2563EB";
         setAccentColor(resolved);
       })
       .catch(() => { /* keep default teal on failure */ });

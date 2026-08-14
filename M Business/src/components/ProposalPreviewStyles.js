@@ -5,16 +5,13 @@
 // so every place that shows a saved proposal renders it identically.
 export const PROPOSAL_PREVIEW_CSS = `
 :root{
-  --teal: var(--app-accent, var(--app-accent, #2563EB));--teal2:var(--app-accent2, #2563EB);--teal3:#2563EB;--teal4:#16A34A;
-  --teal-light:var(--teal-light, #EFF6FF);--teal-lighter:var(--teal-lighter, #EFF6FF);
+  --teal: var(--app-accent, #2563EB);--teal2:var(--app-primary, #0F172A);--teal3:#2563EB;--teal4:#0F172A;
+  --teal-light:var(--app-accent-light, #EFF6FF);--teal-lighter:var(--app-accent-light, #EFF6FF);
   --bg:#F8FAFC;--surface:#FFFFFF;--surface2:#F8FAFC;--border:#E2E8F0;--border2:#E2E8F0;
   --text:#1E293B;--text2:#64748B;--text3:#64748B;
-  --green:#16A34A;--green-bg:#EFF6FF;
-  --amber:#64748B;--amber-bg:#F8FAFC;
-  --red:#64748B;--red-bg:#F8FAFC;
-  --purple:#2563EB;--purple-bg:#EFF6FF;
+  --green:#16A34A;
   --blue:#2563EB;--blue-bg:#EFF6FF;
-  --sidebar-grad:linear-gradient(180deg,#2563EB 0%, var(--app-accent, var(--app-accent, #2563EB)) 35%,var(--app-accent2, #2563EB) 65%,#16A34A 100%);
+  --sidebar-grad:linear-gradient(180deg,#0F172A 0%, #2563EB 100%);
   --font:'Nunito',sans-serif;--radius:14px;
 }
 
@@ -22,7 +19,7 @@ export const PROPOSAL_PREVIEW_CSS = `
 .prop-doc{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;font-family:var(--font);font-size:12px;color:#1E293B;min-height:0}
 
 /* COVER */
-.p-cover{background:linear-gradient(135deg,#1E293B 0%,#16A34A 35%,#2563EB 70%,#2563EB 100%);padding:26px 22px;position:relative;overflow:hidden;flex-shrink:0}
+.p-cover{background:linear-gradient(135deg,#0F172A 0%,#2563EB 100%);padding:26px 22px;position:relative;overflow:hidden;flex-shrink:0}
 .p-cover::after{content:'';position:absolute;right:-50px;top:-50px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.06)}
 .p-cover::before{content:'';position:absolute;left:-20px;bottom:-60px;width:140px;height:140px;border-radius:50%;background:rgba(0,0,0,.1)}
 .p-logo{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#FFFFFF;margin-bottom:14px;position:relative;z-index:1}

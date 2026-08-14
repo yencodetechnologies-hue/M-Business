@@ -38,16 +38,16 @@
       --text2: #64748B;
       --text3: #64748B;
       --green: #16A34A;
-      --green-bg: #EFF6FF;
-      --amber: #64748B;
-      --amber-bg: #F8FAFC;
-      --red: #64748B;
-      --red-bg: #F8FAFC;
-      --purple: #2563EB;
-      --purple-bg: #EFF6FF;
+      
+      
+      
+      
+      
+      
+      
       --blue: #2563EB;
       --blue-bg: #EFF6FF;
-      --sidebar-grad: linear-gradient(180deg, #2563EB 0%, var(--teal) 35%, var(--app-accent2, #2563EB) 65%, #16A34A 100%);
+      --sidebar-grad: linear-gradient(180deg, #0F172A 0%, #2563EB 100%);
       --lh-color: var(--teal);
       --font: 'Nunito', sans-serif;
     }
@@ -2559,22 +2559,15 @@
               <div class="fg">
                 <label class="fl">Brand Color</label>
                 <div class="cswatches" id="cswatches">
-                  <div class="csw sel" style="background:#2563EB" data-c="#2563EB" onclick="pickColor(this)"></div>
-                  <div class="csw" style="background:#16A34A" data-c="#16A34A" onclick="pickColor(this)"></div>
-                  <div class="csw" style="background:#16A34A" data-c="#16A34A" onclick="pickColor(this)"></div>
+                  <div class="csw sel" style="background:#0F172A" data-c="#0F172A" onclick="pickColor(this)"></div>
                   <div class="csw" style="background:#2563EB" data-c="#2563EB" onclick="pickColor(this)"></div>
-                  <div class="csw" style="background:#2563EB" data-c="#2563EB" onclick="pickColor(this)"></div>
-                  <div class="csw" style="background:#64748B" data-c="#64748B" onclick="pickColor(this)"></div>
-                  <div class="csw" style="background:#64748B" data-c="#64748B" onclick="pickColor(this)"></div>
-                  <div class="csw" style="background:#64748B" data-c="#64748B" onclick="pickColor(this)"></div>
+                  <div class="csw" style="background:#EFF6FF" data-c="#EFF6FF" onclick="pickColor(this)"></div>
+                  <div class="csw" style="background:#F8FAFC" data-c="#F8FAFC" onclick="pickColor(this)"></div>
+                  <div class="csw" style="background:#FFFFFF;border:1px solid #E2E8F0" data-c="#FFFFFF" onclick="pickColor(this)"></div>
                   <div class="csw" style="background:#1E293B" data-c="#1E293B" onclick="pickColor(this)"></div>
                   <div class="csw" style="background:#64748B" data-c="#64748B" onclick="pickColor(this)"></div>
-                </div>
-                <div style="display:flex;gap:7px;align-items:center">
-                  <input type="color" id="cpicker" value=" var(--teal)" oninput="setCustomColor(this.value)"
-                    style="width:32px;height:28px;border:1.5px solid var(--border);border-radius:6px;padding:2px;cursor:pointer;background:var(--bg)">
-                  <input class="fi" id="colorHex" value=" var(--teal)" placeholder="#RRGGBB" style="flex:1"
-                    oninput="setCustomColor(this.value)">
+                  <div class="csw" style="background:#E2E8F0" data-c="#E2E8F0" onclick="pickColor(this)"></div>
+                  <div class="csw" style="background:#16A34A" data-c="#16A34A" onclick="pickColor(this)"></div>
                 </div>
               </div>
               <div class="fg"><label class="fl">Font</label>
@@ -3846,21 +3839,13 @@
       document.querySelectorAll('.csw').forEach(s => s.classList.remove('sel'));
       el.classList.add('sel');
       color = el.dataset.c;
-      document.getElementById('cpicker').value = color;
-      document.getElementById('colorHex').value = color;
       document.documentElement.style.setProperty('--lh-color', color);
       render();
     }
     function setCustomColor(v) {
-      if (/^#[0-9a-fA-F]{6}$/.test(v)) {
-        color = v;
-        document.getElementById('cpicker').value = v;
-        document.getElementById('colorHex').value = v;
+      if (/^#(0F172A|2563EB|EFF6FF|F8FAFC|FFFFFF|1E293B|64748B|E2E8F0|16A34A)$/i.test(v)) {
+        color = v.toUpperCase();
         document.documentElement.style.setProperty('--lh-color', color);
-        document.documentElement.style.setProperty('--teal', color);
-        document.documentElement.style.setProperty('--teal4', color); // Simplified for now
-        document.documentElement.style.setProperty('--teal-light', h2r(color, 0.15));
-        document.documentElement.style.setProperty('--teal-lighter', h2r(color, 0.05));
         render();
       }
     }

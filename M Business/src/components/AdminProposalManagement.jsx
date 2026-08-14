@@ -778,7 +778,7 @@ export default function AdminProposalManagement() {
         client: selectedClient,
         assignedEmployee: selectedEmployee,
         status: "draft",
-        theme: "Violet",
+        theme: "Professional",
         format: "ppt",
         slides: []
       };

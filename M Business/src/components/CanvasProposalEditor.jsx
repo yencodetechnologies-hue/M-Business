@@ -363,7 +363,7 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose, isPr
   const [isAddingLine, setIsAddingLine] = useState(false);
   const [isAddingRectangle, setIsAddingRectangle] = useState(false);
   const [isAddingCircle, setIsAddingCircle] = useState(false);
-  const [selectedColor, setSelectedColor] = useState(P.accent);
+  const [selectedColor, setSelectedColor] = useState("#2563EB");
   const [selectedFontSize, setSelectedFontSize] = useState(16);
   const [selectedFontFamily, setSelectedFontFamily] = useState("'Plus Jakarta Sans', sans-serif");
   const [proposalData, setProposalData] = useState(null);
@@ -536,7 +536,7 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose, isPr
           title: proposalTitle.trim(),
           client: selectedClient,
           status: "draft",
-          theme: "Violet",
+          theme: "Professional",
           format: "canvas",
           canvasElements: elements,
           canvasSize: canvasSize,
@@ -744,18 +744,23 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose, isPr
               <div style={{ fontSize: 11, color: P.muted, marginBottom: 6, fontWeight: 600, letterSpacing: 0.3 }}>STYLING</div>
               <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 8 }}>
                 <label style={{ fontSize: 11, color: P.muted, fontWeight: 600 }}>Color:</label>
-                <input
-                  type="color"
-                  value={selectedColor}
-                  onChange={e => setSelectedColor(e.target.value)}
-                  style={{
-                    width: 40,
-                    height: 30,
-                    border: `1px solid ${P.border}`,
-                    borderRadius: 4,
-                    cursor: 'pointer'
-                  }}
-                />
+                {["#0F172A", "#2563EB", "#EFF6FF", "#F8FAFC", "#FFFFFF", "#1E293B", "#64748B", "#E2E8F0", "#16A34A"].map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => setSelectedColor(c)}
+                    title={c}
+                    style={{
+                      width: 22,
+                      height: 22,
+                      borderRadius: 4,
+                      background: c,
+                      border: selectedColor === c ? "2px solid #2563EB" : "1px solid #E2E8F0",
+                      cursor: "pointer",
+                      padding: 0,
+                    }}
+                  />
+                ))}
               </div>
               <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 8 }}>
                 <label style={{ fontSize: 11, color: P.muted, fontWeight: 600 }}>Font:</label>

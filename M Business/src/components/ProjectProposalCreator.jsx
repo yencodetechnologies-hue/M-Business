@@ -46,7 +46,7 @@ const SLIDE_TYPES = [
   { id: "blank", label: "Blank Page", icon: "Document", desc: "Add custom content" },
 ];
 
-function makeSlide(type, themeName = "Violet", companyName = "") {
+function makeSlide(type, themeName = "Professional", companyName = "") {
   console.log("makeSlide called with type:", type);
   const b = { id: uid(), type, theme: themeName, elements: [] };
   switch (type) {
@@ -85,7 +85,7 @@ function makeSlide(type, themeName = "Violet", companyName = "") {
     default: return { ...b, heading: "Slide", body: "" };
   }
 }
-function makeInitialProposal(theme = "Violet", companyName = "") {
+function makeInitialProposal(theme = "Professional", companyName = "") {
   return {
     id: pid(),
     title: "New Proposal",
@@ -1930,15 +1930,15 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
           .prop-list-wrap .pf-btn:hover{border-color:var(--teal, var(--app-accent, var(--app-accent, #2563EB)));color:var(--teal, var(--app-accent, var(--app-accent, #2563EB)));background:var(--teal-light,var(--teal-light, var(--teal-light, #EFF6FF)));}
           .prop-list-wrap .pf-btn.primary{background:var(--teal, var(--app-accent, var(--app-accent, #2563EB)));color:#FFFFFF;border-color:var(--teal, var(--app-accent, var(--app-accent, #2563EB)));}
           .prop-list-wrap .pf-btn.primary:hover{background:var(--teal2,var(--app-accent2, #2563EB));}
-          .prop-list-wrap .pf-btn.danger{color:var(--red,#64748B);border-color:var(--red-bg,#F8FAFC);}
+          .prop-list-wrap .pf-btn.danger{color:var(--app-text);border-color:var(--app-accent-light);}
           .prop-list-wrap .badge-pill{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:700;}
           .prop-list-wrap .badge-pill::before{content:'';width:5px;height:5px;border-radius:50%;}
-          .prop-list-wrap .badge-won{background:var(--green-bg,#EFF6FF);color:var(--green,#16A34A);} .prop-list-wrap .badge-won::before{background:var(--green,#16A34A);}
+          .prop-list-wrap .badge-won{background:var(--app-accent-light);color:var(--green,#16A34A);} .prop-list-wrap .badge-won::before{background:var(--green,#16A34A);}
           .prop-list-wrap .badge-sent{background:var(--blue-bg,#EFF6FF);color:var(--blue,#2563EB);} .prop-list-wrap .badge-sent::before{background:var(--blue,#2563EB);}
-          .prop-list-wrap .badge-review{background:var(--amber-bg,#F8FAFC);color:var(--amber,#64748B);} .prop-list-wrap .badge-review::before{background:var(--amber,#64748B);}
+          .prop-list-wrap .badge-review{background:var(--app-accent-light);color:var(--app-muted);} .prop-list-wrap .badge-review::before{background:var(--app-muted);}
           .prop-list-wrap .badge-draft{background:var(--surface2,#F8FAFC);color:var(--text3,#64748B);border:1px solid var(--border,#E2E8F0);} .prop-list-wrap .badge-draft::before{background:var(--text3,#64748B);}
-          .prop-list-wrap .badge-lost{background:var(--red-bg,#F8FAFC);color:var(--red,#64748B);} .prop-list-wrap .badge-lost::before{background:var(--red,#64748B);}
-          .prop-list-wrap .badge-negotiation{background:var(--purple-bg,#EFF6FF);color:var(--purple,#2563EB);} .prop-list-wrap .badge-negotiation::before{background:var(--purple,#2563EB);}
+          .prop-list-wrap .badge-lost{background:var(--app-accent-light);color:var(--app-text);} .prop-list-wrap .badge-lost::before{background:var(--app-text);}
+          .prop-list-wrap .badge-negotiation{background:var(--app-accent-light);color:var(--app-accent);} .prop-list-wrap .badge-negotiation::before{background:var(--app-accent);}
           .prop-list-wrap .scope-tag{padding:4px 10px;background:var(--bg,#F8FAFC);border:1.5px solid var(--border,#E2E8F0);border-radius:20px;font-size:10px;font-weight:700;color:var(--text2,#64748B);}
           .prop-list-wrap .add-card{background:var(--teal-lighter,var(--teal-lighter, #EFF6FF));border:2px dashed var(--teal, var(--app-accent, var(--app-accent, #2563EB)));border-radius:16px;padding:28px;cursor:pointer;display:flex;align-items:center;gap:18px;transition:all .2s;}
           .prop-list-wrap .add-card:hover{background:var(--teal-light,var(--teal-light, var(--teal-light, #EFF6FF)));}
@@ -2007,7 +2007,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
               </div>
             </div>
             <div className="stat-card" style={{ border: "1.5px solid var(--border,#E2E8F0)", cursor: "default" }}>
-              <div style={{ width: 44, height: 44, borderRadius: 12, background: "var(--green-bg,#EFF6FF)", color: "var(--green,#16A34A)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}><i className="ti ti-trophy"></i></div>
+              <div style={{ width: 44, height: 44, borderRadius: 12, background: "var(--app-accent-light)", color: "var(--green,#16A34A)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}><i className="ti ti-trophy"></i></div>
               <div>
                 <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1E293B)", lineHeight: 1 }}>{wonCount}</div>
                 <div style={{ fontSize: 11, color: "var(--text3,#64748B)", fontWeight: 600, marginTop: 3 }}>Won</div>
@@ -2015,19 +2015,19 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
               </div>
             </div>
             <div className="stat-card" style={{ border: "1.5px solid var(--border,#E2E8F0)", cursor: "default" }}>
-              <div style={{ width: 44, height: 44, borderRadius: 12, background: "var(--purple-bg,#EFF6FF)", color: "var(--purple,#2563EB)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}><i className="ti ti-arrows-exchange"></i></div>
+              <div style={{ width: 44, height: 44, borderRadius: 12, background: "var(--app-accent-light)", color: "var(--app-accent)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}><i className="ti ti-arrows-exchange"></i></div>
               <div>
                 <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1E293B)", lineHeight: 1 }}>{activeCount}</div>
                 <div style={{ fontSize: 11, color: "var(--text3,#64748B)", fontWeight: 600, marginTop: 3 }}>In Progress</div>
-                <div style={{ fontSize: 10, fontWeight: 700, marginTop: 4, color: "var(--purple,#2563EB)" }}>Active pipeline</div>
+                <div style={{ fontSize: 10, fontWeight: 700, marginTop: 4, color: "var(--app-accent)" }}>Active pipeline</div>
               </div>
             </div>
             <div className="stat-card" style={{ border: "1.5px solid var(--border,#E2E8F0)", cursor: "default" }}>
-              <div style={{ width: 44, height: 44, borderRadius: 12, background: "var(--amber-bg,#F8FAFC)", color: "var(--amber,#64748B)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}><i className="ti ti-percentage"></i></div>
+              <div style={{ width: 44, height: 44, borderRadius: 12, background: "var(--app-accent-light)", color: "var(--app-muted)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}><i className="ti ti-percentage"></i></div>
               <div>
                 <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1E293B)", lineHeight: 1 }}>{successRate}%</div>
                 <div style={{ fontSize: 11, color: "var(--text3,#64748B)", fontWeight: 600, marginTop: 3 }}>Success Rate</div>
-                <div style={{ fontSize: 10, fontWeight: 700, marginTop: 4, color: "var(--amber,#64748B)" }}>{wonCount} of {decided} decided</div>
+                <div style={{ fontSize: 10, fontWeight: 700, marginTop: 4, color: "var(--app-muted)" }}>{wonCount} of {decided} decided</div>
               </div>
             </div>
           </div>
@@ -2154,7 +2154,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                             <span style={{ fontSize: 10, color: "var(--text3,#64748B)", fontWeight: 600 }}>{badge.label}</span>
                           </div>
                           <div className="prog-bar">
-                            <div className="prog-fill" style={{ width: badge.cls === "draft" ? "10%" : badge.cls === "sent" ? "30%" : badge.cls === "review" ? "50%" : badge.cls === "negotiation" ? "75%" : badge.cls === "won" ? "100%" : "5%", background: badge.cls === "won" ? "linear-gradient(90deg,var(--green,#16A34A),#64748B)" : badge.cls === "negotiation" ? "linear-gradient(90deg,var(--purple,#2563EB),#E2E8F0)" : badge.cls === "sent" ? "linear-gradient(90deg,var(--blue,#2563EB),#E2E8F0)" : "linear-gradient(90deg,var(--teal, var(--app-accent, var(--app-accent, #2563EB))),#2563EB)" }}></div>
+                            <div className="prog-fill" style={{ width: badge.cls === "draft" ? "10%" : badge.cls === "sent" ? "30%" : badge.cls === "review" ? "50%" : badge.cls === "negotiation" ? "75%" : badge.cls === "won" ? "100%" : "5%", background: badge.cls === "won" ? "linear-gradient(90deg,var(--green,#16A34A),#64748B)" : badge.cls === "negotiation" ? "linear-gradient(90deg,var(--app-accent),#E2E8F0)" : badge.cls === "sent" ? "linear-gradient(90deg,var(--blue,#2563EB),#E2E8F0)" : "linear-gradient(90deg,var(--teal, var(--app-accent, var(--app-accent, #2563EB))),#2563EB)" }}></div>
                           </div>
                         </div>
 
@@ -2227,8 +2227,8 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                   {[
                     { val: wonCount, label: "Won", color: "var(--green,#16A34A)" },
-                    { val: proposals.filter(p => p.status === "rejected" || p.status === "lost").length, label: "Lost", color: "var(--red,#64748B)" },
-                    { val: activeCount, label: "Active", color: "var(--amber,#64748B)" },
+                    { val: proposals.filter(p => p.status === "rejected" || p.status === "lost").length, label: "Lost", color: "var(--app-text)" },
+                    { val: activeCount, label: "Active", color: "var(--app-muted)" },
                     { val: proposals.filter(p => !p.status || p.status === "draft").length, label: "Draft", color: "var(--text3,#64748B)" },
                   ].map((s, i) => (
                     <div key={i} style={{ padding: 10, background: "var(--bg,#F8FAFC)", borderRadius: 9, border: "1px solid var(--border,#E2E8F0)", textAlign: "center" }}>
@@ -2244,8 +2244,8 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                 <div style={{ fontSize: 13, fontWeight: 800, color: "var(--text,#1E293B)", marginBottom: 12 }}>Quick Start Templates</div>
                 {[
                   { icon: "ti-world", label: "Web Development", meta: "Full-stack project template", bg: "var(--teal-light,var(--teal-light, var(--teal-light, #EFF6FF)))", color: "var(--teal, var(--app-accent, var(--app-accent, #2563EB)))" },
-                  { icon: "ti-device-mobile", label: "Mobile App", meta: "iOS / Android template", bg: "var(--purple-bg,#EFF6FF)", color: "var(--purple,#2563EB)" },
-                  { icon: "ti-chart-bar", label: "Digital Marketing", meta: "SEO, ads & content", bg: "var(--amber-bg,#F8FAFC)", color: "var(--amber,#64748B)" },
+                  { icon: "ti-device-mobile", label: "Mobile App", meta: "iOS / Android template", bg: "var(--app-accent-light)", color: "var(--app-accent)" },
+                  { icon: "ti-chart-bar", label: "Digital Marketing", meta: "SEO, ads & content", bg: "var(--app-accent-light)", color: "var(--app-muted)" },
                   { icon: "ti-cpu", label: "Custom Software", meta: "Enterprise solution", bg: "var(--blue-bg,#EFF6FF)", color: "var(--blue,#2563EB)" },
                 ].map((tmpl, i) => (
                   <div key={i} className="tmpl-item" onClick={openNewModal}>

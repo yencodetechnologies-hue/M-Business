@@ -2,19 +2,16 @@
 
 const PROPOSAL_PREVIEW_CSS = `
 :root{
-  --teal: var(--app-accent, var(--app-accent, #2563EB));--teal2:var(--app-accent2, #2563EB);--teal3:#2563EB;--teal4:#16A34A;
-  --teal-light:var(--teal-light, var(--teal-light, #EFF6FF));--teal-lighter:var(--teal-lighter, #EFF6FF);
+  --teal: var(--app-accent, #2563EB);--teal2:var(--app-primary, #0F172A);--teal3:#2563EB;--teal4:#0F172A;
+  --teal-light:var(--app-accent-light, #EFF6FF);--teal-lighter:var(--app-accent-light, #EFF6FF);
   --bg:#F8FAFC;--surface:#FFFFFF;--surface2:#F8FAFC;--border:#E2E8F0;--border2:#E2E8F0;
   --text:#1E293B;--text2:#64748B;--text3:#64748B;
-  --green:#16A34A;--green-bg:#EFF6FF;
-  --amber:#64748B;--amber-bg:#F8FAFC;
-  --red:#64748B;--red-bg:#F8FAFC;
-  --purple:#2563EB;--purple-bg:#EFF6FF;
+  --green:#16A34A;
   --blue:#2563EB;--blue-bg:#EFF6FF;
   --font:'Nunito',sans-serif;
 }
 .prop-doc{font-family:'Nunito',sans-serif;font-size:12px;color:#1E293B;}
-.p-cover{background:linear-gradient(135deg,#1E293B 0%,#16A34A 35%,#2563EB 70%,#2563EB 100%);padding:26px 22px;position:relative;overflow:hidden;}
+.p-cover{background:linear-gradient(135deg,#0F172A 0%,#2563EB 100%);padding:26px 22px;position:relative;overflow:hidden;}
 .p-logo{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#FFFFFF;margin-bottom:14px;position:relative;z-index:1}
 .p-label{font-size:9px;font-weight:700;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;position:relative;z-index:1}
 .p-title{font-size:17px;font-weight:900;color:#FFFFFF;letter-spacing:-.3px;line-height:1.25;margin-bottom:5px;position:relative;z-index:1}
@@ -94,17 +91,16 @@ const PROPOSAL_PREVIEW_CSS = `
 `;
 
 const HARDCODED_VARS = `
-  --teal: var(--app-accent, var(--app-accent, #2563EB)); --teal2:var(--app-accent2, #2563EB); --teal3:#2563EB; --teal4:#16A34A;
-  --teal-light:var(--teal-light, var(--teal-light, #EFF6FF)); --teal-lighter:var(--teal-lighter, #EFF6FF);
+  --teal: #2563EB; --teal2:#0F172A; --teal3:#2563EB; --teal4:#0F172A;
+  --teal-light:#EFF6FF; --teal-lighter:#EFF6FF;
   --bg:#F8FAFC; --surface:#FFFFFF; --surface2:#F8FAFC;
   --border:#E2E8F0; --border2:#E2E8F0;
   --text:#1E293B; --text2:#64748B; --text3:#64748B;
-  --green:#16A34A; --green-bg:#EFF6FF;
-  --amber:#64748B; --amber-bg:#F8FAFC;
-  --red:#64748B; --red-bg:#F8FAFC;
-  --purple:#2563EB; --purple-bg:#EFF6FF;
+  --green:#16A34A;
   --blue:#2563EB; --blue-bg:#EFF6FF;
-  --app-accent: var(--app-accent, var(--app-accent, #2563EB));
+  --app-accent: #2563EB;
+  --app-primary: #0F172A;
+  --app-accent-light: #EFF6FF;
   --font:'Nunito',sans-serif;
 `;
 
@@ -346,8 +342,7 @@ export async function printProposal(proposal, mode = 'view', preOpenedWin = null
     const cs = getComputedStyle(document.documentElement);
     const varNames = ["--teal", "--teal2", "--teal3", "--teal4", "--teal-light", "--teal-lighter",
       "--bg", "--surface", "--surface2", "--border", "--border2", "--text", "--text2", "--text3",
-      "--green", "--green-bg", "--amber", "--amber-bg", "--red", "--red-bg", "--purple", "--purple-bg",
-      "--blue", "--blue-bg", "--app-accent"];
+      "--green", "--blue", "--blue-bg", "--app-accent", "--app-primary", "--app-accent-light", "--app-success"];
     const live = varNames
       .map(v => { const val = cs.getPropertyValue(v).trim(); return val ? `${v}:${val};` : ""; })
       .filter(Boolean).join("\n");

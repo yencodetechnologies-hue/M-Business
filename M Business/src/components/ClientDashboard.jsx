@@ -1793,13 +1793,13 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
       --text2: #64748B;
       --text3: #64748B;
       --green: #16A34A;
-      --green-bg: #E2E8F0;
-      --amber: #64748B;
-      --amber-bg: #E2E8F0;
-      --red: #64748B;
-      --red-bg: #F8FAFC;
-      --purple: #2563EB;
-      --purple-bg: #EFF6FF;
+      
+      
+      
+      
+      
+      
+      
       --blue: #2563EB;
       --blue-bg: #EFF6FF;
       --radius: 16px;

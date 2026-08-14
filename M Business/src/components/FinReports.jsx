@@ -25,11 +25,11 @@ export default function FinReports() {
 :root {
   --primary: var(--app-accent, var(--app-accent, #2563EB)); --primary-dark:#2563EB; --primary-light:var(--teal-light, var(--teal-light, #EFF6FF)); --primary-mid:#E2E8F0;
   --text-dark:#1E293B; --text-mid:#64748B; --text-light:#64748B;
-  --bg:#EFF6FF; --white:#FFFFFF; --border:#E2E8F0;
+  --bg: #F8FAFC; --white:#FFFFFF; --border:#E2E8F0;
   --green:#16A34A; --green-light:#E2E8F0; --green-dark:#1E293B;
-  --orange:#64748B; --orange-light:#E2E8F0; --orange-dark:#1E293B;
-  --red:#64748B; --red-dark:#64748B; --red-light:#E2E8F0;
-  --purple:#2563EB; --purple-light:#EFF6FF;
+    
+    
+   
   --blue:#2563EB; --blue-light:#E2E8F0;
   --radius:14px; --shadow:0 2px 12px rgba(37, 99, 235, .08); --shadow-lg:0 8px 32px rgba(37, 99, 235, .14);
 }

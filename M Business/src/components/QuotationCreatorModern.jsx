@@ -513,14 +513,11 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
   const CSS = `
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
     :root{
-      --teal: var(--app-accent, var(--app-accent, #2563EB));--teal2:var(--app-accent2, #2563EB);--teal3:#2563EB;--teal4:#16A34A;
-      --teal-light:var(--teal-light, var(--teal-light, #EFF6FF));--teal-lighter:var(--teal-lighter, #EFF6FF);
+      --teal: var(--app-accent, #2563EB);--teal2:var(--app-primary, #0F172A);--teal3:#2563EB;--teal4:#0F172A;
+      --teal-light:var(--app-accent-light, #EFF6FF);--teal-lighter:var(--app-accent-light, #EFF6FF);
       --bg:#F8FAFC;--surface:#FFFFFF;--surface2:#F8FAFC;--border:#E2E8F0;--border2:#E2E8F0;
       --text:#1E293B;--text2:#64748B;--text3:#64748B;
-      --green:#16A34A;--green-bg:#EFF6FF;
-      --amber:#64748B;--amber-bg:#F8FAFC;
-      --red:#64748B;--red-bg:#F8FAFC;
-      --purple:#2563EB;--purple-bg:#EFF6FF;
+      --green:#16A34A;
       --blue:#2563EB;--blue-bg:#EFF6FF;
       --font:'Nunito',sans-serif;--radius:14px;
     }

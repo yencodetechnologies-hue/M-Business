@@ -170,12 +170,15 @@
 @media (max-width: 768px) {
 
     .mob-topbar,
-    .emp-mob-bar,
-    .emp-desktop-header {
+    .emp-mob-bar {
         display: flex !important;
         align-items: center !important;
         padding: 10px 14px !important;
         gap: 10px !important;
+    }
+
+    .emp-desktop-header {
+        display: none !important;
     }
 }
 

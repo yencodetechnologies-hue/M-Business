@@ -14,8 +14,11 @@ import AdminProposalManagement from "./AdminProposalManagement";
 import ModernProjectsView from "./ModernProjectsView";
 import {
   LayoutDashboard, ShieldCheck, FileSignature, BarChart3, CreditCard,
-  Package as PackageIcon, Wallet, LogOut, Moon, Sun
+  Package as PackageIcon, Wallet, LogOut, Moon, Sun, Menu, X,
+  Building2, Users, FileText
 } from "lucide-react";
+
+const STAT_ICONS = { Company: Building2, Team: Users, Document: FileText, Security: ShieldCheck };
 
 const NAV_ICONS = {
   dashboard: LayoutDashboard,
@@ -150,6 +153,7 @@ export default function AdminDashboard({ user, setUser }) {
   const [darkMode, setDarkMode] = useState(
     () => localStorage.getItem("empDarkMode") === "true"
   );
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const T = darkMode ? {
     bg: "#0F172A",
     surface: "#1E293B",
@@ -474,18 +478,47 @@ export default function AdminDashboard({ user, setUser }) {
         .adm-nav-item:hover { background: ${darkMode ? "rgba(255,255,255,0.06)" : "rgba(37, 99, 235, 0.06)"} !important; }
         .adm-logout-btn:hover { background: rgba(100, 116, 139, 0.18) !important; transform: translateY(-1px); }
         .adm-theme-toggle:hover { background: ${darkMode ? "rgba(37, 99, 235, 0.14)" : "rgba(0,0,0,0.05)"} !important; }
+        .adm-hamburger-btn, .adm-sidebar-close { display: none; }
+        .adm-sidebar-overlay { display: none; }
+        @media (max-width: 900px) {
+          .adm-sidebar {
+            position: fixed !important;
+            top: 0; left: 0; bottom: 0;
+            transform: translateX(-100%);
+            transition: transform 0.25s ease;
+            z-index: 1000;
+            box-shadow: 8px 0 32px rgba(0,0,0,0.25) !important;
+          }
+          .adm-sidebar.adm-sidebar-open { transform: translateX(0); }
+          .adm-hamburger-btn { display: flex !important; }
+          .adm-sidebar-close { display: flex !important; }
+          .adm-sidebar-overlay.adm-sidebar-open {
+            display: block;
+            position: fixed; inset: 0;
+            background: rgba(15,23,42,0.5);
+            z-index: 999;
+          }
+          .adm-content-header { padding: 16px !important; }
+          .adm-content-header h2 { font-size: 18px !important; }
+          .adm-content-body { padding: 16px !important; }
+          .adm-two-col { grid-template-columns: 1fr !important; }
+        }
       `}</style>
 
       {/* SIDEBAR */}
-      <div style={{ width: 264, background: THEME.sidebar, color: darkMode ? "#FFFFFF" : THEME.text, display: "flex", flexDirection: "column", position: "relative", zIndex: 100, borderRight: `1.5px solid ${THEME.border}`, boxShadow: darkMode ? "4px 0 24px rgba(0,0,0,0.3)" : "4px 0 24px rgba(37, 99, 235, 0.05)" }}>
+      <div className={`adm-sidebar${sidebarOpen ? " adm-sidebar-open" : ""}`} style={{ width: 264, background: THEME.sidebar, color: darkMode ? "#FFFFFF" : THEME.text, display: "flex", flexDirection: "column", position: "relative", zIndex: 100, borderRight: `1.5px solid ${THEME.border}`, boxShadow: darkMode ? "4px 0 24px rgba(0,0,0,0.3)" : "4px 0 24px rgba(37, 99, 235, 0.05)" }}>
         <div style={{ padding: "28px 22px 22px", display: "flex", alignItems: "center", gap: 12, borderBottom: `1px solid ${THEME.border}` }}>
           <div style={{ width: 46, height: 46, background: THEME.gradient, borderRadius: 13, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", padding: 4, boxShadow: `0 8px 18px ${THEME.accent}40` }}>
             {user?.logoUrl ? <img src={user.logoUrl} alt="logo" style={{ maxHeight: "100%", maxWidth: "100%", objectFit: "contain", borderRadius: 9 }} /> : <span style={{ color: "#FFFFFF", fontWeight: 900, fontSize: 18 }}>A</span>}
           </div>
-          <div>
+          <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontWeight: 900, fontSize: 16, letterSpacing: "-0.5px", color: darkMode ? "#FFFFFF" : "#0F172A" }}>M Business</div>
             <div style={{ fontSize: 10, color: THEME.muted, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", marginTop: 1 }}>Platform Admin</div>
           </div>
+          <button onClick={() => setSidebarOpen(false)} className="adm-sidebar-close" aria-label="Close menu"
+            style={{ background: "none", border: "none", color: THEME.muted, cursor: "pointer", alignItems: "center", justifyContent: "center", width: 30, height: 30, flexShrink: 0 }}>
+            <X size={18} />
+          </button>
         </div>
 
         <nav style={{ flex: 1, padding: "18px 14px", overflowY: "auto" }}>
@@ -494,7 +527,7 @@ export default function AdminDashboard({ user, setUser }) {
             const on = active === n.key;
             const Icon = NAV_ICONS[n.key] || LayoutDashboard;
             return (
-              <button key={n.key} onClick={() => { setJumpProject(null); setJumpInvoicePrefill(null); setActive(n.key); }}
+              <button key={n.key} onClick={() => { setJumpProject(null); setJumpInvoicePrefill(null); setActive(n.key); setSidebarOpen(false); }}
                 className="adm-nav-item"
                 style={{
                   width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "10px 12px",
@@ -550,10 +583,19 @@ export default function AdminDashboard({ user, setUser }) {
         </div>
       </div>
 
+      {/* Overlay behind the sidebar when it's open as a mobile drawer */}
+      <div className={`adm-sidebar-overlay${sidebarOpen ? " adm-sidebar-open" : ""}`} onClick={() => setSidebarOpen(false)} />
+
       {/* CONTENT */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-        <div style={{ padding: "24px 32px", background: THEME.card, borderBottom: `1.5px solid ${THEME.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", zIndex: 10 }}>
-          <h2 style={{ margin: 0, fontSize: 24, fontWeight: 900, color: THEME.text, letterSpacing: "-0.5px" }}>{NAV.find(n => n.key === active)?.label}</h2>
+        <div className="adm-content-header" style={{ padding: "24px 32px", background: THEME.card, borderBottom: `1.5px solid ${THEME.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", zIndex: 10, gap: 12 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
+            <button onClick={() => setSidebarOpen(true)} className="adm-hamburger-btn" aria-label="Open menu"
+              style={{ background: THEME.bg, border: `1px solid ${THEME.border}`, borderRadius: 10, width: 38, height: 38, alignItems: "center", justifyContent: "center", color: THEME.text, cursor: "pointer", flexShrink: 0 }}>
+              <Menu size={18} />
+            </button>
+            <h2 style={{ margin: 0, fontSize: 24, fontWeight: 900, color: THEME.text, letterSpacing: "-0.5px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{NAV.find(n => n.key === active)?.label}</h2>
+          </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
             {active === "packages" && (
@@ -565,7 +607,7 @@ export default function AdminDashboard({ user, setUser }) {
           </div>
         </div>
 
-        <div style={{ flex: 1, padding: 32, overflowY: "auto" }}>
+        <div className="adm-content-body" style={{ flex: 1, padding: 32, overflowY: "auto" }}>
           {active === "dashboard" && <OverviewPage THEME={THEME} subadmins={subadmins} clients={clients} employees={employees} managers={managers} projects={projects} packages={packages} invoices={invoices} />}
           {active === "subadmins" && <SubadminsList THEME={THEME} subadmins={subadmins} refresh={fetchSubadmins} packages={packages} subscriptions={subscriptions} fetchSubscriptions={fetchSubscriptions} />}
           {active === "clients" && <ClientsPage THEME={THEME} clients={clients} setClients={setClients} loading={clientsLoading} onViewProject={(p) => { setJumpProject(p); setActive("project-details"); }} />}
@@ -996,7 +1038,9 @@ function OverviewPage({ THEME, subadmins, clients, employees, managers, projects
           { label: "Total Employees", value: employees.length, icon: "Team", iconBg: "#F8FAFC", iconColor: "#16A34A" },
           { label: "Recent Projects", value: projects.length, icon: "Document", iconBg: "#F8FAFC", iconColor: "#64748B" },
           { label: "Active Subadmins", value: subadmins.length, icon: "Security", iconBg: "#F8FAFC", iconColor: "#64748B" },
-        ].map((s, idx) => (
+        ].map((s, idx) => {
+          const Icon = STAT_ICONS[s.icon] || Building2;
+          return (
           <div key={idx} className="premium-card" style={{
             background: THEME.card,
             borderRadius: 24,
@@ -1010,19 +1054,20 @@ function OverviewPage({ THEME, subadmins, clients, employees, managers, projects
             cursor: "pointer"
           }}>
             <div style={{
-              width: 54, height: 54, borderRadius: 16, background: s.iconBg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, color: s.iconColor, flexShrink: 0
+              width: 54, height: 54, borderRadius: 16, background: s.iconBg, display: "flex", alignItems: "center", justifyContent: "center", color: s.iconColor, flexShrink: 0
             }}>
-              {s.icon}
+              <Icon size={24} strokeWidth={2} />
             </div>
             <div>
               <div style={{ fontSize: 28, fontWeight: 900, color: THEME.text, lineHeight: 1, letterSpacing: "-1px" }}>{s.value}</div>
               <div style={{ fontSize: 13, fontWeight: 700, color: THEME.muted, marginTop: 4 }}>{s.label}</div>
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
+      <div className="adm-two-col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
         <div style={{ background: THEME.card, borderRadius: 28, padding: 32, boxShadow: THEME.shadow, border: `1.5px solid ${THEME.border}` }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
             <h3 style={{ margin: 0, fontSize: 18, fontWeight: 900, color: THEME.text }}>Project Progress</h3>

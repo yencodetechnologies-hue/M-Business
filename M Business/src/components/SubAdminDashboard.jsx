@@ -1505,11 +1505,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
               { icon: "ti-user", label: "Contact Person Name", val: activeClient.contactPersonName || "—", bg: "var(--teal-light, var(--teal-light, #EFF6FF))", col: "var(--app-accent, #2563EB)" },
 
-              { icon: "ti-user", label: "Contact Person No", val: activeClient.contactPersonNo || "—", bg: "var(--teal-light, var(--teal-light, #EFF6FF))", col: "var(--app-accent, #2563EB)" },
-
-              { icon: "ti-briefcase", label: "Category", val: activeClient.category || activeClient.industry || "—", bg: "#EFF6FF", col: "#2563EB" },
-
-              { icon: "ti-phone", label: "Office Phone", val: activeClient.phone || "—", bg: "var(--teal-light, var(--teal-light, #EFF6FF))", col: "var(--app-accent, #2563EB)" },
+              { icon: "ti-phone", label: "Phone", val: activeClient.phone || activeClient.contactPersonNo || "—", bg: "var(--teal-light, var(--teal-light, #EFF6FF))", col: "var(--app-accent, #2563EB)" },
 
               { icon: "ti-building-bank", label: "Company Tax / GST", val: activeClient.gstNumber || "—", bg: "#EFF6FF", col: "#2563EB" },
 
@@ -2371,10 +2367,10 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
                             <span style={{ wordBreak: "break-word" }}>{c.email}</span>
                           </div>
                         )}
-                        {c.contactPersonNo && (
+                        {(c.phone || c.contactPersonNo) && (
                           <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 2, fontSize: 11.5, color: "#64748B", fontWeight: 600 }}>
                             <i className="ti ti-phone" style={{ fontSize: 12, flexShrink: 0 }} />
-                            {c.contactPersonNo}
+                            {c.phone || c.contactPersonNo}
                           </div>
                         )}
                       </div>
@@ -2739,106 +2735,82 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
       {deleteTarget && <ConfirmModal title="Delete Client" message={`Are you sure you want to delete "${deleteTarget.clientName || deleteTarget.name}"?`} onConfirm={doDelete} onCancel={() => setDeleteTarget(null)} />}
 
    {viewClientModal && activeClient && (
-<Mdl title="Client Details" onClose={() => { setViewClientModal(false); setActiveClientId(null); }} maxWidth={isMobileWidth ? "calc(100vw - 32px)" : 500} fullScreenMobile={false} zIndex={5000}>
-  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            <div style={{ display: "flex", justifyContent: "center", marginBottom: 10 }}>
+<Mdl title="Client Details" onClose={() => { setViewClientModal(false); setActiveClientId(null); }} maxWidth={isMobileWidth ? "calc(100vw - 32px)" : 560} fullScreenMobile={false} zIndex={5000}>
+  <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
 
+            {/* Hero */}
+            <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "16px", background: "linear-gradient(120deg, var(--teal-light, #EFF6FF) 0%, #FFFFFF 100%)", border: "1px solid #E2E8F0", borderRadius: 14 }}>
               {activeClient.logoUrl ? (
-
-                <img src={activeClient.logoUrl} alt="logo" style={{ width: 80, height: 80, borderRadius: 16, objectFit: "contain", background: "#FFFFFF", border: "2px solid #E2E8F0" }} />
-
+                <img src={activeClient.logoUrl} alt="logo" style={{ width: 64, height: 64, borderRadius: 14, objectFit: "contain", background: "#FFFFFF", border: "2px solid #E2E8F0", flexShrink: 0 }} />
               ) : (
-
-                <div style={{ width: 80, height: 80, borderRadius: 16, background: `linear-gradient(135deg,${getAvatarColor(activeClient)},${getAvatarColor(activeClient)}bb)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, fontWeight: 900, color: "#FFFFFF" }}>
-
+                <div style={{ width: 64, height: 64, borderRadius: 14, background: `linear-gradient(135deg,${getAvatarColor(activeClient)},${getAvatarColor(activeClient)}bb)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, fontWeight: 900, color: "#FFFFFF", flexShrink: 0 }}>
                   {getAvatar(activeClient)}
-
                 </div>
-
               )}
-
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 16, fontWeight: 800, color: "#0F172A", wordBreak: "break-word" }}>{activeClient.clientName || activeClient.name || "—"}</div>
+                <div style={{ fontSize: 12, color: "#64748B", fontWeight: 600, marginTop: 2 }}>{activeClient.companyName || activeClient.company || "—"}</div>
+                <div style={{ display: "flex", gap: 6, marginTop: 8, flexWrap: "wrap" }}>
+                  <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "#EFF6FF", color: "var(--app-accent, #2563EB)" }}>
+                    {activeClient.clientType === "b2b" ? "B2B" : activeClient.clientType === "b2c" ? "B2C" : "Freelancer"}
+                  </span>
+                  <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "#F8FAFC", color: "#16A34A" }}>{activeClient.status || "Active"}</span>
+                </div>
+              </div>
             </div>
 
             {[
-
-              { icon: "ti-user", label: "Client Name", val: activeClient.clientName || activeClient.name || "—" },
-
-              { icon: "ti-category", label: "Client Type", val: activeClient.clientType ? (activeClient.clientType === "b2b" ? "B2B — Company / Business" : activeClient.clientType === "b2c" ? "B2C — Individual Person" : "Freelancer — Consultant / Solo") : "—" },
-
-              { icon: "ti-building", label: "Company Name", val: activeClient.companyName || activeClient.company || "—" },
-
-              { icon: "ti-tag", label: "Category", val: activeClient.category || "—" },
-
-              { icon: "ti-building-bank", label: "GST Number", val: activeClient.gstNumber || "—" },
-
-              { icon: "ti-source", label: "Client Source", val: activeClient.source || "—" },
-
-              { icon: "ti-calendar-event", label: "Onboarded On", val: activeClient.onboardedOn ? new Date(activeClient.onboardedOn).toLocaleDateString("en-IN") : "—" },
-
-              { icon: "ti-toggle-right", label: "Status", val: activeClient.status || "Active" },
-
-              { icon: "ti-user-circle", label: "Contact Person", val: activeClient.contactPersonName || "—" },
-
-              { icon: "ti-briefcase", label: "Designation", val: activeClient.designation || "—" },
-
-              { icon: "ti-mail", label: "Email", val: activeClient.email || "—" },
-
-              { icon: "ti-mail-forward", label: "Alt. Email", val: activeClient.altEmail || "—" },
-
-              { icon: "ti-phone-call", label: "Contact Person Mobile", val: activeClient.contactPersonNo || "—" },
-
-              { icon: "ti-phone", label: "Office Phone", val: activeClient.phone || "—" },
-
-              { icon: "ti-map-pin", label: "Street / Building Address", val: activeClient.address || "—" },
-
-              { icon: "ti-map", label: "City", val: activeClient.city || "—" },
-
-              { icon: "ti-map-2", label: "State", val: activeClient.state || "—" },
-
-              { icon: "ti-hash", label: "Pincode", val: activeClient.pincode || "—" },
-
-              { icon: "ti-world", label: "Country", val: activeClient.country || "—" },
-
-              { icon: "ti-globe", label: "Website", val: activeClient.website || "—" },
-
-              { icon: "ti-brand-linkedin", label: "LinkedIn", val: activeClient.linkedin || "—" },
-
-              { icon: "ti-coin", label: "Billing Currency", val: activeClient.billingCurrency || "—" },
-
-              { icon: "ti-credit-card", label: "Payment Terms", val: activeClient.paymentTerms || "—" },
-
-              { icon: "ti-wallet", label: "Credit Limit", val: activeClient.creditLimit || "—" },
-
-              { icon: "ti-cash", label: "Preferred Payment Mode", val: activeClient.preferredPaymentMode || "—" },
-
-              { icon: "ti-calendar", label: "Joined", val: activeClient.createdAt ? new Date(activeClient.createdAt).toLocaleDateString("en-IN") : "—" },
-
-              { icon: "ti-notes", label: "Internal Notes", val: activeClient.notes || "—" },
-
-            ].map((row, i) => (
-
-          <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8, padding: "7px 10px", background: "#F8FAFC", borderRadius: 8, border: "1px solid #E2E8F0" }}>
-
-  <div style={{ width: 24, height: 24, borderRadius: 6, background: "var(--teal-light, var(--teal-light, #EFF6FF))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "var(--app-accent, #2563EB)", flexShrink: 0 }}>
-
-    <i className={`ti ${row.icon}`} />
+              {
+                title: "Contact", icon: "ti-user-circle", rows: [
+                  { icon: "ti-user-circle", label: "Contact Person", val: activeClient.contactPersonName || "—" },
+                  { icon: "ti-briefcase", label: "Designation", val: activeClient.designation || "—" },
+                  { icon: "ti-mail", label: "Email", val: activeClient.email || "—" },
+                  { icon: "ti-phone", label: "Phone", val: activeClient.phone || activeClient.contactPersonNo || "—" },
+                ]
+              },
+              {
+                title: "Company", icon: "ti-building", rows: [
+                  { icon: "ti-building-bank", label: "GST Number", val: activeClient.gstNumber || "—" },
+                  { icon: "ti-calendar-event", label: "Onboarded On", val: activeClient.onboardedOn ? new Date(activeClient.onboardedOn).toLocaleDateString("en-IN") : "—" },
+                  { icon: "ti-globe", label: "Website", val: activeClient.website || "—" },
+                  { icon: "ti-credit-card", label: "Payment Terms", val: activeClient.paymentTerms || "—" },
+                ]
+              },
+              {
+                title: "Address", icon: "ti-map-pin", rows: [
+                  { icon: "ti-map-pin", label: "Street / Building Address", val: activeClient.address || "—" },
+                  { icon: "ti-map", label: "City", val: activeClient.city || "—" },
+                  { icon: "ti-map-2", label: "State", val: activeClient.state || "—" },
+                  { icon: "ti-hash", label: "Pincode", val: activeClient.pincode || "—" },
+                  { icon: "ti-world", label: "Country", val: activeClient.country || "—" },
+                ]
+              },
+            ].map((group, gi) => (
+              <div key={gi} style={{ border: "1px solid #E2E8F0", borderRadius: 14, overflow: "hidden" }}>
+                <div style={{ padding: "10px 14px", background: "#F8FAFC", borderBottom: "1px solid #E2E8F0", fontSize: 11, fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: 0.5, display: "flex", alignItems: "center", gap: 6 }}>
+                  <i className={`ti ${group.icon}`} style={{ color: "var(--app-accent, #2563EB)" }} /> {group.title}
                 </div>
-
-                <div style={{ flex: 1, minWidth: 0 }}>
-
-                  <div style={{ fontSize: 10, color: "#64748B", fontWeight: 600 }}>{row.label}</div>
-
-                  <div style={{ fontSize: 13, fontWeight: 700, color: "#1E293B", marginTop: 1, wordBreak: "break-word" }}>{row.val}</div>
-
+                <div style={{ padding: "12px 14px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                  {group.rows.map((row, i) => (
+                    <div key={i} style={{ gridColumn: row.label.includes("Address") ? "1 / -1" : "auto" }}>
+                      <div style={{ fontSize: 10, color: "#64748B", fontWeight: 600, display: "flex", alignItems: "center", gap: 4 }}><i className={`ti ${row.icon}`} style={{ fontSize: 11 }} />{row.label}</div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: "#1E293B", marginTop: 2, wordBreak: "break-word" }}>{row.val}</div>
+                    </div>
+                  ))}
                 </div>
-
               </div>
-
             ))}
 
-          </div>
+            {activeClient.notes && (
+              <div style={{ border: "1px solid #E2E8F0", borderRadius: 14, padding: "12px 14px", background: "#F8FAFC" }}>
+                <div style={{ fontSize: 11, fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 6 }}>Internal Notes</div>
+                <div style={{ fontSize: 13, color: "#1E293B", lineHeight: 1.5, wordBreak: "break-word" }}>{activeClient.notes}</div>
+              </div>
+            )}
 
-          <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 16 }}>
+            <div style={{ textAlign: "center", fontSize: 11, color: "#94A3B8", fontWeight: 600 }}>
+              Joined {activeClient.createdAt ? new Date(activeClient.createdAt).toLocaleDateString("en-IN") : "—"}
+            </div>
 
           </div>
 
@@ -8649,12 +8621,6 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
 
 
-  // Generate full theme from a single hex color
-
-  const generateThemeFromColor = () => PROFESSIONAL_THEME;
-
-
-
   const PROFESSIONAL_THEME = {
     label: "Professional",
     sidebar: "#0F172A",
@@ -8674,6 +8640,8 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
     professional: PROFESSIONAL_THEME,
     teal: PROFESSIONAL_THEME,
   };
+
+  const generateThemeFromColor = () => PROFESSIONAL_THEME;
 
 
 
@@ -8840,7 +8808,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
   const todayStr = new Date().toISOString().split("T")[0];
 
-  const [nc, setNc] = useState({ name: "", company: "", email: "", phone: "", address: "", project: "", password: "", status: "Active", role: "client", contactPersonName: "", contactPersonNo: "", gstNumber: "", logoUrl: "", category: "", onboardedOn: todayStr, clientType: "b2b", source: "", city: "", state: "", pincode: "", country: "India", website: "", linkedin: "", billingCurrency: "INR — Indian Rupee", paymentTerms: "", creditLimit: "", preferredPaymentMode: "", notes: "", designation: "", altEmail: "" });
+  const [nc, setNc] = useState({ name: "", company: "", email: "", phone: "", address: "", project: "", password: "", status: "Active", role: "client", contactPersonName: "", gstNumber: "", logoUrl: "", onboardedOn: todayStr, clientType: "b2b", city: "", state: "", pincode: "", country: "India", website: "", paymentTerms: "", notes: "", designation: "" });
 
   const [ncError, setNcError] = useState({});
 
@@ -9497,7 +9465,12 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
       const id = resolveSubadminId();
 
-      if (!id) return null;
+      if (!id) {
+        setSubscription(null);
+        setSubLoading(false);
+        setSubscriptionChecked(true);
+        return null;
+      }
 
 
 
@@ -10230,17 +10203,11 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
         contactPersonName: nc.contactPersonName,
 
-        contactPersonNo: nc.contactPersonNo,
-
         gstNumber: nc.gstNumber,
 
         logoUrl: nc.logoUrl,
 
         clientType: nc.clientType,
-
-        category: nc.category || "",
-
-        source: nc.source,
 
         onboardedOn: nc.onboardedOn,
 
@@ -10254,21 +10221,11 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
         website: nc.website,
 
-        linkedin: nc.linkedin,
-
-        billingCurrency: nc.billingCurrency,
-
         paymentTerms: nc.paymentTerms,
-
-        creditLimit: nc.creditLimit,
-
-        preferredPaymentMode: nc.preferredPaymentMode,
 
         notes: nc.notes,
 
         designation: nc.designation,
-
-        altEmail: nc.altEmail,
 
         companyId: resolveSubadminId()
 
@@ -10291,7 +10248,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
       setClientSuccessData({ email: nc.email, password: nc.password, name: nc.name }); const todayStr = new Date().toISOString().split("T")[0];
 
-      setNc({ name: "", company: "", email: "", phone: "", address: "", project: "", password: "", status: "Active", role: "client", logoUrl: "", gstNumber: "", contactPersonName: "", contactPersonNo: "", category: "", clientType: "b2b", source: "", onboardedOn: todayStr, city: "", state: "", pincode: "", country: "India", website: "", linkedin: "", billingCurrency: "INR — Indian Rupee", paymentTerms: "", creditLimit: "", preferredPaymentMode: "", notes: "", designation: "", altEmail: "" });
+      setNc({ name: "", company: "", email: "", phone: "", address: "", project: "", password: "", status: "Active", role: "client", logoUrl: "", gstNumber: "", contactPersonName: "", clientType: "b2b", onboardedOn: todayStr, city: "", state: "", pincode: "", country: "India", website: "", paymentTerms: "", notes: "", designation: "" });
 
       setNcError({});
 
@@ -15070,11 +15027,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                       <Fld label="Company Name" value={nc.company} onChange={v => setNc({ ...nc, company: v })} />
 
-                      <Fld label="Category / Industry" value={nc.category} onChange={v => { setNc({ ...nc, category: v }); saveCustomCategory(v); }} options={['', 'Web Development', 'Mobile App Development', 'UI/UX Design', 'Digital Marketing', 'IT Consulting', 'E-commerce', 'Healthcare', 'Education', 'Finance', 'Real Estate', 'Manufacturing', 'Retail', 'Logistics', 'Media & Entertainment', ...customCategories]} allowCustom={true} />
-
                       <Fld label="Company Tax / GST No." value={nc.gstNumber} onChange={v => setNc({ ...nc, gstNumber: v })} />
-
-                      <Fld label="Client Source" value={nc.source} onChange={v => setNc({ ...nc, source: v })} options={['', 'Referral', 'Website / Organic', 'Social Media', 'Cold Outreach', 'LinkedIn', 'Event / Conference', 'Google Ads', 'Word of Mouth']} allowCustom={true} />
 
                       <Fld label="Onboarded On" value={nc.onboardedOn} onChange={v => setNc({ ...nc, onboardedOn: v })} type="date" disabled={true} />
 
@@ -15100,11 +15053,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                       <Fld label="Email *" value={nc.email} onChange={v => { setNc({ ...nc, email: v }); setNcError(p => ({ ...p, email: '' })); }} type="email" error={ncError.email} />
 
-                      <Fld label="Alt. Email" value={nc.altEmail || ''} onChange={v => setNc({ ...nc, altEmail: v })} type="email" />
-
-                      <Fld label="Contact Person Mobile" value={nc.contactPersonNo} onChange={v => setNc({ ...nc, contactPersonNo: v })} />
-
-                      <Fld label="Office Phone" value={nc.phone} onChange={v => setNc({ ...nc, phone: v })} />
+                      <Fld label="Phone" value={nc.phone} onChange={v => setNc({ ...nc, phone: v })} />
 
                     </div>
 
@@ -15135,42 +15084,18 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                   </div>
 
 
-                  {/* ── ONLINE PRESENCE ── */}
-
-                  {/* ── ONLINE PRESENCE ── */}
+                  {/* ── WEBSITE & BILLING ── */}
                   <div style={{ background: '#F8FAFC', borderRadius: 12, border: '1px solid #E2E8F0', padding: '14px 16px', marginBottom: 14 }}>
                     <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
                       <span style={{ background: ' var(--app-accent, var(--app-accent, #2563EB))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <i className="ti ti-link" style={{ color: '#FFFFFF', fontSize: 16 }}></i>
+                        <i className="ti ti-credit-card" style={{ color: '#FFFFFF', fontSize: 16 }}></i>
                       </span>
-                      Online Presence
+                      Website & Billing
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
                       <Fld label="Website URL" value={nc.website} onChange={v => setNc({ ...nc, website: v })} />
-                      <Fld label="LinkedIn Profile" value={nc.linkedin} onChange={v => setNc({ ...nc, linkedin: v })} />
-                    </div>
-                  </div>
-
-
-
-                  {/* ── BILLING & TERMS ── */}
-
-                  <div style={{ background: '#F8FAFC', borderRadius: 12, border: '1px solid #E2E8F0', padding: '14px 16px', marginBottom: 14 }}>
-
-                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, var(--app-accent, #2563EB))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-credit-card" style={{ color: '#FFFFFF', fontSize: 16 }}></i></span> Billing & Terms</div>
-
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
-
-                      <Fld label="Billing Currency" value={nc.billingCurrency} onChange={v => { setNc({ ...nc, billingCurrency: v }); saveCustomCurrency(v); }} options={['INR — Indian Rupee', 'USD — US Dollar', 'GBP — British Pound', 'EUR — Euro', 'AED — UAE Dirham', 'SGD — Singapore Dollar', 'AUD — Australian Dollar', ...customCurrencies]} allowCustom={true} />
-
                       <Fld label="Payment Terms" value={nc.paymentTerms} onChange={v => setNc({ ...nc, paymentTerms: v })} options={['', 'Due on receipt', 'Net 7', 'Net 15', 'Net 30', 'Net 45', 'Net 60', '50% Advance + 50% on delivery']} allowCustom={true} />
-
-                      <Fld label="Credit Limit" value={nc.creditLimit} onChange={v => setNc({ ...nc, creditLimit: v })} type="number" />
-
-                      <Fld label="Preferred Payment Mode" value={nc.preferredPaymentMode} onChange={v => setNc({ ...nc, preferredPaymentMode: v })} options={['', 'Bank Transfer / NEFT', 'UPI', 'Cheque', 'Credit Card', 'Cash', 'PayPal', 'Stripe']} allowCustom={true} />
-
                     </div>
-
                   </div>
 
 

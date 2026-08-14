@@ -915,7 +915,7 @@
 .bdh-kpi--green .bdh-kpi-icon { background: #EFF6FF; color: #16A34A; }
 .bdh-kpi--blue::before { background: #2563EB; }
 .bdh-kpi--blue .bdh-kpi-icon { background: #EFF6FF; color: #2563EB; }
-.bdh-kpi }
+.bdh-kpi--amber::before { background: #64748B; }
 .bdh-kpi--amber .bdh-kpi-icon { background: #F8FAFC; color: #64748B; }
 
 .bdh-expense {

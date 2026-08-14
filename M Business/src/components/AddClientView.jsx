@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import { BASE_URL } from '../config';
 import {
   X, ImagePlus, Building2, Phone, MapPin, Globe2, CreditCard, Lock,
-  StickyNote, Check, Eye, EyeOff, User, Users, Briefcase, Loader2,
+  StickyNote, Check, Eye, EyeOff, User, Briefcase, Loader2,
   UserPlus, CheckCircle2
 } from 'lucide-react';
 
@@ -12,8 +12,8 @@ const STY = {
   label: { fontSize: 12, fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.05em' },
   field: { display: 'flex', flexDirection: 'column', gap: 6 },
   input: { width: '100%', height: 44, padding: '0 14px', border: '1.5px solid #E2E8F0', borderRadius: 10, fontSize: 14, background: '#F8FAFC', outline: 'none', transition: 'border-color 0.15s, box-shadow 0.15s, background 0.15s' },
-  errText: { fontSize: 11, color: '#64748B', marginTop: 2, fontWeight: 600 },
-  required: { color: '#64748B' }
+  errText: { fontSize: 11, color: '#DC2626', marginTop: 2, fontWeight: 600 },
+  required: { color: '#DC2626' }
 };
 
 function SectionCard({ icon: Icon, title, sub, tc, tcLight, children, id }) {
@@ -49,7 +49,7 @@ function TextField({ label, required, error, tc, ...props }) {
       <input
         {...props}
         className="acv-input"
-        style={{ ...STY.input, borderColor: error ? '#64748B' : '#E2E8F0' }}
+        style={{ ...STY.input, borderColor: error ? '#DC2626' : '#E2E8F0' }}
       />
     </Field>
   );
@@ -61,51 +61,31 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
   const isEdit = !!editData;
   const today = new Date().toISOString().split('T')[0];
 
-  const [customCats, setCustomCats] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('mb_customCategories') || '[]'); } catch { return []; }
-  });
-  const [customSources, setCustomSources] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('mb_customSources') || '[]'); } catch { return []; }
-  });
   const [customCountries, setCustomCountries] = useState(() => {
     try { return JSON.parse(localStorage.getItem('mb_customCountries') || '[]'); } catch { return []; }
   });
   const [customPaymentTerms, setCustomPaymentTerms] = useState(() => {
     try { return JSON.parse(localStorage.getItem('mb_customPaymentTerms') || '[]'); } catch { return []; }
   });
-  const [customPaymentModes, setCustomPaymentModes] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('mb_customPaymentModes') || '[]'); } catch { return []; }
-  });
-  const [customCurrencies, setCustomCurrencies] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('mb_customCurrencies') || '[]'); } catch { return []; }
-  });
 
   const [formData, setFormData] = useState({
     clientType: editData?.clientType || 'b2b',
     name: editData?.clientName || editData?.name || '',
     company: editData?.companyName || editData?.company || '',
-    category: editData?.category || '',
     gstNumber: editData?.gstNumber || '',
-    source: editData?.clientSource || editData?.source || '',
     onboardedOn: editData?.onboardedOn ? editData.onboardedOn.substring(0, 10) : today,
     status: editData?.status || 'Active',
     contactPersonName: editData?.contactPersonName || '',
     designation: editData?.designation || '',
     email: editData?.email || '',
-    altEmail: editData?.altEmail || '',
-    contactPersonNo: editData?.contactPersonNo || '',
-    phone: editData?.officePhone || editData?.phone || '',
+    phone: editData?.phone || editData?.officePhone || editData?.contactPersonNo || '',
     address: editData?.address || '',
     city: editData?.city || '',
     state: editData?.state || '',
     pincode: editData?.pincode || '',
     country: editData?.country || '',
     website: editData?.websiteUrl || editData?.website || '',
-    linkedin: editData?.linkedinUrl || editData?.linkedin || '',
-    billingCurrency: editData?.billingCurrency || '',
     paymentTerms: editData?.paymentTerms || '',
-    creditLimit: editData?.creditLimit || '',
-    PaymentMode: editData?.PaymentMode || '',
     password: '',
     notes: editData?.internalNotes || editData?.notes || '',
     logoUrl: editData?.logoUrl || '',
@@ -118,33 +98,22 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
   const [errors, setErrors] = useState({});
   const [saving, setSaving] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [activeSection, setActiveSection] = useState('logo');
 
   const [customInputMode, setCustomInputMode] = useState({
-    category: false,
-    source: false,
     country: false,
-    paymentTerms: false,
-    PaymentMode: false,
-    billingCurrency: false
+    paymentTerms: false
   });
 
   const fileInputRef = useRef(null);
 
   useEffect(() => {
     if (isEdit) {
-      const predefinedCats = ['', 'Web Development', 'Mobile App Development', 'UI/UX Design', 'Digital Marketing', 'IT Consulting', 'E-commerce', 'Healthcare', 'Education', 'Finance', 'Real Estate', 'Manufacturing', 'Retail', 'Logistics', 'Media & Entertainment'];
-      const predefinedSources = ['', 'Referral', 'Website / Organic', 'Social Media', 'Cold Outreach', 'LinkedIn', 'Event / Conference', 'Google Ads', 'Word of Mouth'];
       const predefinedCountries = ['India', 'United States', 'United Kingdom', 'United Arab Emirates', 'Singapore', 'Australia', 'Canada', 'Germany', 'France'];
       const predefinedTerms = ['', 'Due on receipt', 'Net 7', 'Net 15', 'Net 30', 'Net 45', 'Net 60', '50% Advance + 50% on delivery'];
-      const predefinedModes = ['', 'Bank Transfer / NEFT', 'UPI', 'Cheque', 'Credit Card', 'Cash', 'PayPal', 'Stripe'];
 
       setCustomInputMode({
-        category: editData.category && !predefinedCats.includes(editData.category),
-        source: (editData.clientSource || editData.source) && !predefinedSources.includes(editData.clientSource || editData.source),
         country: editData.country && !predefinedCountries.includes(editData.country),
-        paymentTerms: editData.paymentTerms && !predefinedTerms.includes(editData.paymentTerms),
-        PaymentMode: editData.PaymentMode && !predefinedModes.includes(editData.PaymentMode)
+        paymentTerms: editData.paymentTerms && !predefinedTerms.includes(editData.paymentTerms)
       });
     }
   }, [isEdit, editData]);
@@ -152,7 +121,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
   useEffect(() => {
     // calculate progress
     const fields = Object.values(formData).filter(v => typeof v === 'string' && v.trim() !== '');
-    const pct = Math.round((fields.length / 28) * 100);
+    const pct = Math.round((fields.length / 18) * 100);
     setProgress(pct > 100 ? 100 : pct);
   }, [formData]);
 
@@ -188,6 +157,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
     if (!formData.company.trim()) newErrors.company = 'Company name is required';
     if (!formData.email.trim()) newErrors.email = 'Email address is required';
     if (!formData.contactPersonName.trim()) newErrors.contactPersonName = 'Contact person name is required';
+    if (!formData.phone.trim()) newErrors.phone = 'Phone number is required';
 
     if (!formData.address.trim()) newErrors.address = 'Address is required';
     if (!formData.password || !formData.password.trim()) {
@@ -225,26 +195,18 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
         password: formData.password || "123456",
         status: formData.status,
         contactPersonName: formData.contactPersonName,
-        contactPersonNo: formData.contactPersonNo,
         gstNumber: formData.gstNumber,
         logoUrl: formData.logoUrl,
         clientType: formData.clientType,
-        category: formData.category,
-        clientSource: formData.source,
         onboardedOn: formData.onboardedOn,
         designation: formData.designation,
-        altEmail: formData.altEmail,
         officePhone: formData.phone,
         city: formData.city,
         state: formData.state,
         pincode: formData.pincode,
         country: formData.country,
         websiteUrl: formData.website,
-        linkedinUrl: formData.linkedin,
-        billingCurrency: formData.billingCurrency,
         paymentTerms: formData.paymentTerms,
-        creditLimit: formData.creditLimit,
-        PaymentMode: formData.PaymentMode,
         internalNotes: formData.notes,
         sendCredentials: !isEdit && !!formData.sendCredentials,
         companyId: user?.companyId || user?.company || user?._id || user?.id || ""
@@ -304,16 +266,22 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
         .acv-modal::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 6px; }
         .acv-input:focus, .acv-select:focus, .acv-textarea:focus { border-color: ${TC} !important; background: #FFFFFF !important; box-shadow: 0 0 0 4px ${TC_LIGHT}; }
         .acv-section { transition: box-shadow 0.2s ease, transform 0.2s ease; }
+        .acv-section:hover { box-shadow: 0 6px 20px rgba(15, 23, 42, 0.08); }
         .acv-type-card { transition: all 0.15s ease; }
         .acv-type-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08); }
         .acv-submit-btn:hover:not(:disabled) { filter: brightness(1.06); transform: translateY(-1px); box-shadow: 0 8px 20px ${TC}55; }
         .acv-cancel-btn:hover { background: #EFF6FF !important; }
         .acv-logo-drop:hover { border-color: ${TC} !important; background: ${TC_LIGHT} !important; }
         .acv-eye-btn:hover { color: ${TC} !important; }
+        .acv-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        @media (max-width: 640px) {
+          .acv-grid-2 { grid-template-columns: 1fr; }
+          .acv-modal { max-width: 100% !important; border-radius: 16px !important; }
+        }
       `}</style>
 
       <div className="acv-modal" style={{
-        background: '#F8FAFC', width: '100%', maxWidth: 840, maxHeight: '92vh', overflowY: 'auto',
+        background: '#F8FAFC', width: '100%', maxWidth: 780, maxHeight: '92vh', overflowY: 'auto',
         borderRadius: 22, fontFamily: "'Nunito', sans-serif", color: '#1E293B', display: 'flex',
         flexDirection: 'column', position: 'relative', boxShadow: '0 30px 80px rgba(0,0,0,0.35)',
         animation: 'acv-pop 0.22s cubic-bezier(0.16,1,0.3,1)'
@@ -331,7 +299,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
               </div>
               <div>
                 <h2 style={{ margin: 0, fontSize: 19, fontWeight: 800 }}>{isEdit ? 'Edit Client' : 'Add New Client'}</h2>
-                <p style={{ margin: '3px 0 0', fontSize: 12.5, color: 'rgba(255,255,255,0.85)' }}>{isEdit ? 'Update this client’s profile & portal details' : 'Fill in the details to onboard a new client'}</p>
+                <p style={{ margin: '3px 0 0', fontSize: 12.5, color: 'rgba(255,255,255,0.85)' }}>{isEdit ? 'Update this client’s profile & portal details' : 'Fill in the essentials to onboard a new client'}</p>
               </div>
             </div>
             <button onClick={onBack} style={{ background: 'rgba(255,255,255,0.18)', border: '1px solid rgba(255,255,255,0.28)', width: 34, height: 34, borderRadius: 10, cursor: 'pointer', color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -366,7 +334,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
           </SectionCard>
 
           {/* Basic Info */}
-          <SectionCard id="basic" icon={Building2} title="Basic Info" sub="Core client identity and classification" tc={TC} tcLight={TC_LIGHT}>
+          <SectionCard id="basic" icon={Building2} title="Basic Info" sub="Core client identity" tc={TC} tcLight={TC_LIGHT}>
             <div style={{ marginBottom: 20 }}>
               <label style={{ ...STY.label, marginBottom: 8, display: 'block' }}>Client type <span style={STY.required}>*</span></label>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
@@ -389,50 +357,10 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <div className="acv-grid-2">
               <TextField label="Client / display name" required name="name" value={formData.name} onChange={handleChange} placeholder="e.g. Acme Corp or Raj Kumar" error={errors.name} />
               <TextField label="Company name" required name="company" value={formData.company} onChange={handleChange} placeholder="Registered company name" error={errors.company} />
-
-              <Field label="Category / industry">
-                {customInputMode.category ? (
-                  <div style={{ display: 'flex', gap: 8 }}>
-                    <input name="category" value={formData.category} onChange={handleChange} placeholder="Type custom category..." className="acv-input" style={{ ...STY.input, flex: 1 }} autoFocus onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); if (formData.category) { setCustomCats(prev => { const next = Array.from(new Set([...prev, formData.category])); try { localStorage.setItem('mb_customCategories', JSON.stringify(next)); } catch (err) { } return next; }); } setCustomInputMode(prev => ({ ...prev, category: false })); } }} />
-                    <button type="button" onClick={() => { if (formData.category) { setCustomCats(prev => { const next = Array.from(new Set([...prev, formData.category])); try { localStorage.setItem('mb_customCategories', JSON.stringify(next)); } catch (err) { } return next; }); } setCustomInputMode(prev => ({ ...prev, category: false })); }} style={{ width: 44, height: 44, background: '#F8FAFC', border: '1.5px solid #E2E8F0', borderRadius: 10, cursor: 'pointer', color: '#64748B', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Check size={16} /></button>
-                  </div>
-                ) : (
-                  <select name="category" value={formData.category} onChange={handleSelectChange} className="acv-select" style={STY.input}>
-                    <option value="">Select a category</option>
-                    <option value="__custom__">+ Custom</option>
-                    <option value="Web Development">Web Development</option><option value="Mobile App Development">Mobile App Development</option><option value="UI/UX Design">UI/UX Design</option><option value="Digital Marketing">Digital Marketing</option><option value="IT Consulting">IT Consulting</option><option value="E-commerce">E-commerce</option><option value="Healthcare">Healthcare</option><option value="Education">Education</option><option value="Finance">Finance</option><option value="Real Estate">Real Estate</option><option value="Manufacturing">Manufacturing</option><option value="Retail">Retail</option><option value="Logistics">Logistics</option><option value="Media & Entertainment">Media & Entertainment</option>
-                    {customCats.map(c => <option key={c} value={c}>{c}</option>)}
-                    {formData.category && !['Web Development', 'Mobile App Development', 'UI/UX Design', 'Digital Marketing', 'IT Consulting', 'E-commerce', 'Healthcare', 'Education', 'Finance', 'Real Estate', 'Manufacturing', 'Retail', 'Logistics', 'Media & Entertainment'].includes(formData.category) && !customCats.includes(formData.category) && (
-                      <option value={formData.category}>{formData.category}</option>
-                    )}
-                  </select>
-                )}
-              </Field>
-
               <TextField label="Company tax / GST no." name="gstNumber" value={formData.gstNumber} onChange={handleChange} placeholder="e.g. 22AAAAA0000A1Z5" />
-
-              <Field label="Client source">
-                {customInputMode.source ? (
-                  <div style={{ display: 'flex', gap: 8 }}>
-                    <input name="source" value={formData.source} onChange={handleChange} placeholder="Type custom source..." className="acv-input" style={{ ...STY.input, flex: 1 }} autoFocus onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); if (formData.source) { setCustomSources(prev => { const next = Array.from(new Set([...prev, formData.source])); try { localStorage.setItem('mb_customSources', JSON.stringify(next)); } catch (err) { } return next; }); } setCustomInputMode(prev => ({ ...prev, source: false })); } }} />
-                    <button type="button" onClick={() => { if (formData.source) { setCustomSources(prev => { const next = Array.from(new Set([...prev, formData.source])); try { localStorage.setItem('mb_customSources', JSON.stringify(next)); } catch (err) { } return next; }); } setCustomInputMode(prev => ({ ...prev, source: false })); }} style={{ width: 44, height: 44, background: '#F8FAFC', border: '1.5px solid #E2E8F0', borderRadius: 10, cursor: 'pointer', color: '#64748B', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Check size={16} /></button>
-                  </div>
-                ) : (
-                  <select name="source" value={formData.source} onChange={handleSelectChange} className="acv-select" style={STY.input}>
-                    <option value="">Select Client Source</option>
-                    <option value="__custom__">+ Custom</option>
-                    <option value="Referral">Referral</option><option value="Website / Organic">Website / Organic</option><option value="Social Media">Social Media</option><option value="Cold Outreach">Cold Outreach</option><option value="LinkedIn">LinkedIn</option><option value="Event / Conference">Event / Conference</option><option value="Google Ads">Google Ads</option><option value="Word of Mouth">Word of Mouth</option>
-                    {customSources.map(s => <option key={s} value={s}>{s}</option>)}
-                    {formData.source && !['Referral', 'Website / Organic', 'Social Media', 'Cold Outreach', 'LinkedIn', 'Event / Conference', 'Google Ads', 'Word of Mouth'].includes(formData.source) && !customSources.includes(formData.source) && (
-                      <option value={formData.source}>{formData.source}</option>
-                    )}
-                  </select>
-                )}
-              </Field>
-
               <Field label="Onboarded on">
                 <input type="date" disabled name="onboardedOn" value={formData.onboardedOn} onChange={handleChange} style={{ ...STY.input, opacity: 0.7, cursor: 'not-allowed' }} />
               </Field>
@@ -441,19 +369,17 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
 
           {/* Primary Contact */}
           <SectionCard id="contact" icon={Phone} title="Primary Contact" sub="Main point of contact at this client" tc={TC} tcLight={TC_LIGHT}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <div className="acv-grid-2">
               <TextField label="Contact person name" required name="contactPersonName" value={formData.contactPersonName} onChange={handleChange} placeholder="Full name" error={errors.contactPersonName} />
               <TextField label="Designation" name="designation" value={formData.designation} onChange={handleChange} placeholder="e.g. CEO, Project Manager" />
               <TextField label="Email address" required type="email" name="email" value={formData.email} onChange={handleChange} placeholder="contact@company.com" error={errors.email} />
-              <TextField label="Alt. email" type="email" name="altEmail" value={formData.altEmail} onChange={handleChange} placeholder="Secondary email" />
-              <TextField label="Contact person mobile" name="contactPersonNo" value={formData.contactPersonNo} onChange={handleChange} placeholder="+91 98765 43210" />
-              <TextField label="Office phone" required name="phone" value={formData.phone} onChange={handleChange} placeholder="+91 44 1234 5678" error={errors.phone} />
+              <TextField label="Phone number" required name="phone" value={formData.phone} onChange={handleChange} placeholder="+91 98765 43210" error={errors.phone} />
             </div>
           </SectionCard>
 
           {/* Address */}
           <SectionCard id="address" icon={MapPin} title="Address" sub="Billing and office location" tc={TC} tcLight={TC_LIGHT}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <div className="acv-grid-2">
               <div style={{ gridColumn: '1 / -1' }}>
                 <TextField label="Street / building address" required name="address" value={formData.address} onChange={handleChange} placeholder="Flat no, building name, street" error={errors.address} />
               </div>
@@ -481,35 +407,10 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
             </div>
           </SectionCard>
 
-          {/* Online Presence */}
-          <SectionCard id="online" icon={Globe2} title="Online Presence" tc={TC} tcLight={TC_LIGHT}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+          {/* Website & Billing */}
+          <SectionCard id="billing" icon={CreditCard} title="Website & Billing" sub="Optional online and payment details" tc={TC} tcLight={TC_LIGHT}>
+            <div className="acv-grid-2">
               <TextField label="Website URL" type="url" name="website" value={formData.website} onChange={handleChange} placeholder="https://www.company.com" />
-              <TextField label="LinkedIn profile" type="url" name="linkedin" value={formData.linkedin} onChange={handleChange} placeholder="https://linkedin.com/company/..." />
-            </div>
-          </SectionCard>
-
-          {/* Billing & Terms */}
-          <SectionCard id="billing" icon={CreditCard} title="Billing & Terms" tc={TC} tcLight={TC_LIGHT}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-              <Field label="Billing currency">
-                {customInputMode.billingCurrency ? (
-                  <div style={{ display: 'flex', gap: 8 }}>
-                    <input name="billingCurrency" value={formData.billingCurrency} onChange={handleChange} placeholder="Type custom currency..." className="acv-input" style={{ ...STY.input, flex: 1 }} autoFocus onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); if (formData.billingCurrency) { setCustomCurrencies(prev => { const next = Array.from(new Set([...prev, formData.billingCurrency])); try { localStorage.setItem('mb_customCurrencies', JSON.stringify(next)); } catch (err) { } return next; }); } setCustomInputMode(prev => ({ ...prev, billingCurrency: false })); } }} />
-                    <button type="button" onClick={() => { if (formData.billingCurrency) { setCustomCurrencies(prev => { const next = Array.from(new Set([...prev, formData.billingCurrency])); try { localStorage.setItem('mb_customCurrencies', JSON.stringify(next)); } catch (err) { } return next; }); } setCustomInputMode(prev => ({ ...prev, billingCurrency: false })); }} style={{ width: 44, height: 44, background: '#F8FAFC', border: '1.5px solid #E2E8F0', borderRadius: 10, cursor: 'pointer', color: '#64748B', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Check size={16} /></button>
-                  </div>
-                ) : (
-                  <select name="billingCurrency" value={formData.billingCurrency} onChange={handleSelectChange} className="acv-select" style={STY.input}>
-                    <option value="">Select Billing Currency</option>
-                    <option value="__custom__">+ Custom</option>
-                    <option value="INR — Indian Rupee">INR — Indian Rupee</option><option value="USD — US Dollar">USD — US Dollar</option><option value="GBP — British Pound">GBP — British Pound</option><option value="EUR — Euro">EUR — Euro</option><option value="AED — UAE Dirham">AED — UAE Dirham</option><option value="SGD — Singapore Dollar">SGD — Singapore Dollar</option><option value="AUD — Australian Dollar">AUD — Australian Dollar</option>
-                    {customCurrencies.map(c => <option key={c} value={c}>{c}</option>)}
-                    {formData.billingCurrency && !['INR — Indian Rupee', 'USD — US Dollar', 'GBP — British Pound', 'EUR — Euro', 'AED — UAE Dirham', 'SGD — Singapore Dollar', 'AUD — Australian Dollar'].includes(formData.billingCurrency) && !customCurrencies.includes(formData.billingCurrency) && (
-                      <option value={formData.billingCurrency}>{formData.billingCurrency}</option>
-                    )}
-                  </select>
-                )}
-              </Field>
               <Field label="Payment terms">
                 {customInputMode.paymentTerms ? (
                   <div style={{ display: 'flex', gap: 8 }}>
@@ -528,40 +429,21 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
                   </select>
                 )}
               </Field>
-              <TextField label="Credit limit" type="number" name="creditLimit" value={formData.creditLimit} onChange={handleChange} placeholder="e.g. 50000" />
-              <Field label="Payment mode">
-                {customInputMode.PaymentMode ? (
-                  <div style={{ display: 'flex', gap: 8 }}>
-                    <input name="PaymentMode" value={formData.PaymentMode} onChange={handleChange} placeholder="Type custom mode..." className="acv-input" style={{ ...STY.input, flex: 1 }} autoFocus onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); if (formData.PaymentMode) { setCustomPaymentModes(prev => { const next = Array.from(new Set([...prev, formData.PaymentMode])); try { localStorage.setItem('mb_customPaymentModes', JSON.stringify(next)); } catch (err) { } return next; }); } setCustomInputMode(prev => ({ ...prev, PaymentMode: false })); } }} />
-                    <button type="button" onClick={() => { if (formData.PaymentMode) { setCustomPaymentModes(prev => { const next = Array.from(new Set([...prev, formData.PaymentMode])); try { localStorage.setItem('mb_customPaymentModes', JSON.stringify(next)); } catch (err) { } return next; }); } setCustomInputMode(prev => ({ ...prev, PaymentMode: false })); }} style={{ width: 44, height: 44, background: '#F8FAFC', border: '1.5px solid #E2E8F0', borderRadius: 10, cursor: 'pointer', color: '#64748B', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Check size={16} /></button>
-                  </div>
-                ) : (
-                  <select name="PaymentMode" value={formData.PaymentMode} onChange={handleSelectChange} className="acv-select" style={STY.input}>
-                    <option value="">Select Payment Mode</option>
-                    <option value="__custom__">+ Custom</option>
-                    <option value="Bank Transfer / NEFT">Bank Transfer / NEFT</option><option value="UPI">UPI</option><option value="Cheque">Cheque</option><option value="Credit Card">Credit Card</option><option value="Cash">Cash</option><option value="PayPal">PayPal</option><option value="Stripe">Stripe</option>
-                    {customPaymentModes.map(m => <option key={m} value={m}>{m}</option>)}
-                    {formData.PaymentMode && !['Bank Transfer / NEFT', 'UPI', 'Cheque', 'Credit Card', 'Cash', 'PayPal', 'Stripe'].includes(formData.PaymentMode) && !customPaymentModes.includes(formData.PaymentMode) && (
-                      <option value={formData.PaymentMode}>{formData.PaymentMode}</option>
-                    )}
-                  </select>
-                )}
-              </Field>
             </div>
           </SectionCard>
 
           {/* Portal Access */}
           <SectionCard id="portal" icon={Lock} title="Portal Access" tc={TC} tcLight={TC_LIGHT}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <div className="acv-grid-2">
               <Field label="Portal password" required error={errors.password}>
                 <div style={{ position: 'relative' }}>
-                  <input type={showPass ? 'text' : 'password'} name="password" value={formData.password} onChange={e => { handleChange(e); setErrors({ ...errors, password: '' }); }} placeholder="Set client portal password" className="acv-input" style={{ ...STY.input, padding: '0 46px 0 14px', borderColor: errors.password ? '#64748B' : '#E2E8F0' }} />
+                  <input type={showPass ? 'text' : 'password'} name="password" value={formData.password} onChange={e => { handleChange(e); setErrors({ ...errors, password: '' }); }} placeholder="Set client portal password" className="acv-input" style={{ ...STY.input, padding: '0 46px 0 14px', borderColor: errors.password ? '#DC2626' : '#E2E8F0' }} />
                   <button onClick={() => setShowPass(!showPass)} className="acv-eye-btn" style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#64748B', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>{showPass ? <EyeOff size={16} /> : <Eye size={16} />}</button>
                 </div>
               </Field>
               <Field label="Confirm password" error={errors.confirmPassword}>
                 <div style={{ position: 'relative' }}>
-                  <input type={showConfirmPass ? 'text' : 'password'} value={confirmPassword} onChange={e => { setConfirmPassword(e.target.value); setErrors({ ...errors, confirmPassword: '' }) }} placeholder="Re-enter password" className="acv-input" style={{ ...STY.input, padding: '0 46px 0 14px', borderColor: errors.confirmPassword ? '#64748B' : '#E2E8F0' }} />
+                  <input type={showConfirmPass ? 'text' : 'password'} value={confirmPassword} onChange={e => { setConfirmPassword(e.target.value); setErrors({ ...errors, confirmPassword: '' }) }} placeholder="Re-enter password" className="acv-input" style={{ ...STY.input, padding: '0 46px 0 14px', borderColor: errors.confirmPassword ? '#DC2626' : '#E2E8F0' }} />
                   <button onClick={() => setShowConfirmPass(!showConfirmPass)} className="acv-eye-btn" style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#64748B', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>{showConfirmPass ? <EyeOff size={16} /> : <Eye size={16} />}</button>
                 </div>
               </Field>

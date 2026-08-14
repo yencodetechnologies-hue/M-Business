@@ -417,10 +417,6 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currProject?._id, currProject?.clientId]);
 
-  useEffect(() => {
-    if (project) setCurrProject(project);
-  }, [project]);
-
   // Whenever a different project is opened (or this project is reopened),
   // fetch the current server data so edits made in a previous session —
   // like a saved custom milestone — are reflected immediately instead of
@@ -1198,7 +1194,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const pending = Math.max(0, budgetAmt - received - autoAdvanceTotal);
   // Always calculate spent from expenses array (source of truth)
   const spent = (currProject.expenses || []).reduce((sum, exp) => sum + parseAmt(exp.amount), 0);
-  const remaining = budgetAmt > 0 ? (budgetAmt - received) : 0;
+  const remaining = budgetAmt > 0 ? (budgetAmt - spent) : 0;
   const budgetUsedPct = budgetAmt > 0 ? Math.min(Math.round((spent / budgetAmt) * 100), 100) : 0;
   const budgetExceeded = budgetAmt > 0 && spent > budgetAmt;
   const overageAmt = budgetExceeded ? (spent - budgetAmt) : 0;

@@ -112,6 +112,10 @@ export default function ModernProjectsPage({ user }) {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleting, setDeleting] = useState(false);
 
+  // ── Mobile sidebar --------------------------------------------
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  useEffect(() => { setSidebarOpen(false); }, [selectedProject]);
+
   // ── Fetch -----------------------------------------------------
   const fetchAll = useCallback(async () => {
     setLoading(true);
@@ -336,8 +340,12 @@ function openCreate() {
   if (selectedProject) {
     return (
       <div className="modern-app">
-        <aside className="m-sidebar">
-          <div className="m-logo"><span className="m-logo-mark">MBusiness</span><span className="m-logo-badge">+</span></div>
+        {sidebarOpen && <div className="m-sidebar-overlay" onClick={() => setSidebarOpen(false)} />}
+        <aside className={`m-sidebar${sidebarOpen ? ' open' : ''}`}>
+          <div className="m-logo">
+            <span className="m-logo-mark">MBusiness</span><span className="m-logo-badge">+</span>
+            <button className="m-sidebar-close" onClick={() => setSidebarOpen(false)}><i className="ti ti-x"></i></button>
+          </div>
           <div className="m-profile-area">
             <div className="m-profile-avatar">{initials(user?.name || 'P')}</div>
             <div>
@@ -363,6 +371,7 @@ function openCreate() {
         </aside>
         <div className="m-main">
           <div className="m-topbar">
+            <button className="m-hamburger" onClick={() => setSidebarOpen(true)}><i className="ti ti-menu-2"></i></button>
             <div className="m-search-wrap"><i className="ti ti-search"></i><input type="text" placeholder="Search projects…" /></div>
             <div className="m-topbar-right">
               <div className="m-topbar-icon"><i className="ti ti-bell"></i><span className="m-notif-dot"></span></div>
@@ -456,8 +465,12 @@ function openCreate() {
   return (
     <div className="modern-app">
       {/* SIDEBAR */}
-      <aside className="m-sidebar">
-        <div className="m-logo"><span className="m-logo-mark">MBusiness</span><span className="m-logo-badge">+</span></div>
+      {sidebarOpen && <div className="m-sidebar-overlay" onClick={() => setSidebarOpen(false)} />}
+      <aside className={`m-sidebar${sidebarOpen ? ' open' : ''}`}>
+        <div className="m-logo">
+          <span className="m-logo-mark">MBusiness</span><span className="m-logo-badge">+</span>
+          <button className="m-sidebar-close" onClick={() => setSidebarOpen(false)}><i className="ti ti-x"></i></button>
+        </div>
         <div className="m-profile-area">
           <div className="m-profile-avatar">{initials(user?.name || 'P')}</div>
           <div>
@@ -483,6 +496,7 @@ function openCreate() {
       {/* MAIN */}
       <div className="m-main">
         <div className="m-topbar">
+          <button className="m-hamburger" onClick={() => setSidebarOpen(true)}><i className="ti ti-menu-2"></i></button>
           <div className="m-search-wrap">
             <i className="ti ti-search"></i>
             <input type="text" placeholder="Search projects…" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />

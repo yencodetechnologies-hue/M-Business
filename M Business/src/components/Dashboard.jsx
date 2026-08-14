@@ -422,7 +422,7 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
       {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#FFFFFF", border: "1.5px solid #16A34A", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#16A34A", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>
+      <div className="dash-stats" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>
         {[{ t: "Total Clients", v: clients.length, i: "Team", c: "var(--app-accent)" }, { t: "Active", v: clients.filter(c => c.status === "Active").length, i: "Success", c: "#16A34A" }, { t: "Inactive", v: clients.filter(c => c.status === "Inactive").length, i: "Stop", c: "#64748B" }].map(({ t, v, i, c }) => (
           <div key={t} style={{ background: "#FFFFFF", borderRadius: 14, padding: "18px 20px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", display: "flex", alignItems: "center", gap: 12 }}>
             <div style={{ width: 40, height: 40, borderRadius: 11, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{i}</div>
@@ -433,7 +433,9 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
 
       <SC title={`All Clients (${filtered.length})`}>
         <Search value={search} onChange={setSearch} placeholder="Search by name, email, company..." />
-        <div style={{ overflowX: "auto" }}>
+
+        {/* Desktop / tablet table */}
+        <div className="clients-table-wrap" style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 700 }}>
             <thead><tr style={{ background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))" }}>
               {["#", "Company Name", "Contact Person", "Email", "Phone", "Status", "Joined", "Actions"].map(c => (
@@ -468,6 +470,38 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
             </tbody>
           </table>
         </div>
+
+        {/* Mobile card list */}
+        <div className="clients-card-list">
+          {paginated.length === 0 ? (
+            <div style={{ padding: "30px 10px", textAlign: "center", color: "var(--app-muted)", fontSize: 13 }}>No clients found</div>
+          ) : paginated.map((c, i) => (
+            <div key={c._id || i} className="client-card" onClick={() => setViewClient(c)}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <div style={{ width: 44, height: 44, borderRadius: "50%", background: c.logoUrl ? "#FFFFFF" : "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 16, fontWeight: 800, flexShrink: 0, overflow: "hidden", border: c.logoUrl ? "1px solid var(--app-border)" : "none" }}>
+                  {c.logoUrl ? <img src={c.logoUrl} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} /> : ((c.clientName || c.name || "?")[0].toUpperCase())}
+                </div>
+                <div style={{ minWidth: 0, flex: 1 }}>
+                  <div style={{ fontWeight: 800, color: T.text, fontSize: 14, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.clientName || c.name || "—"}</div>
+                  <div style={{ fontSize: 11.5, color: "var(--app-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.companyName || c.company || "—"}</div>
+                </div>
+                <Badge label={c.status || "Active"} />
+              </div>
+              <div className="client-card-meta">
+                <div className="client-card-meta-row"><i className="ti ti-mail" style={{ fontSize: 13 }}></i><span>{c.email || "—"}</span></div>
+                <div className="client-card-meta-row"><i className="ti ti-phone" style={{ fontSize: 13 }}></i><span>{c.phone || "—"}</span></div>
+              </div>
+              <div className="client-card-actions" onClick={e => e.stopPropagation()}>
+                <ActionBtns
+                  onView={() => setViewClient(c)}
+                  onEdit={() => openEdit(c)}
+                  onDelete={() => setDeleteTarget(c)}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+
         <Pagination totalItems={filtered.length} itemsPerPage={itemsPerPage} currentPage={currentPage} onPageChange={setCurrentPage} onItemsPerPageChange={setItemsPerPage} />
       </SC>
 
@@ -2341,6 +2375,17 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         @media(min-width:769px){.sidebar{transform:translateX(0)!important;position:sticky!important;top:0!important;}.sidebar-close{display:none!important;}.mob-overlay{display:none!important;}.mob-topbar{display:none!important;}.sidebar-spacer{display:none!important;}}
       @media(min-width:769px){.app-bottom-nav{display:none!important;}}
       @media(max-width:768px){.sidebar-spacer{display:none!important;}.mob-topbar-hide{display:none!important;}.main-content{padding:12px!important;padding-bottom:96px!important;}.dash-stats{grid-template-columns:repeat(2,1fr)!important;gap:10px!important;}.dash-2col{grid-template-columns:1fr!important;}.modal-2col{grid-template-columns:1fr!important;}.page-header{flex-wrap:wrap;gap:8px;}.header-actions{flex-wrap:wrap;gap:8px;}.app-bottom-nav{display:flex!important;position:fixed!important;bottom:0!important;left:0!important;right:0!important;}}
+      .clients-card-list{display:none;}
+      @media(max-width:768px){
+        .clients-table-wrap{display:none!important;}
+        .clients-card-list{display:flex!important;flex-direction:column;gap:10px;margin-top:12px;}
+        .client-card{background:#FFFFFF;border:1.5px solid var(--app-border);border-radius:14px;padding:14px;cursor:pointer;transition:box-shadow .15s,border-color .15s;}
+        .client-card:active{box-shadow:0 4px 14px rgba(var(--app-accent-rgb,124,58,237),0.12);border-color:var(--app-accent);}
+        .client-card-meta{display:flex;flex-direction:column;gap:5px;margin:12px 0 10px;padding-top:10px;border-top:1px solid var(--app-border);}
+        .client-card-meta-row{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--app-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+        .client-card-meta-row i{color:var(--app-accent);flex-shrink:0;}
+        .client-card-actions{display:flex;justify-content:flex-end;gap:8px;padding-top:2px;}
+      }
       `}</style>
 
       <Sidebar active={validActive} setActive={setActive} onLogout={handleLogout} open={sidebarOpen} onClose={() => setSidebarOpen(false)} navItems={navItems} initials={initials} companyName={companyNameStr} companyLogo={companyLogo} setSidebarInvoiceClick={setSidebarInvoiceClick} />

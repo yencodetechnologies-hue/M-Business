@@ -911,6 +911,160 @@
   background: linear-gradient(90deg, var(--app-text), #E2E8F0);
 }
 
+/* ── MOBILE NAV: hamburger + off-canvas sidebar ─────────────── */
+.modern-app .m-hamburger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  color: var(--text);
+  font-size: 18px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.modern-app .m-sidebar-close {
+  display: none;
+  margin-left: auto;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: none;
+  background: rgba(255, 255, 255, 0.12);
+  color: #FFFFFF;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.m-sidebar-overlay {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .modern-app .m-sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    box-shadow: none;
+  }
+
+  .modern-app .m-sidebar.open {
+    transform: translateX(0);
+    box-shadow: 8px 0 32px rgba(0, 0, 0, 0.18);
+  }
+
+  .modern-app .m-sidebar-close {
+    display: flex;
+  }
+
+  .m-sidebar-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.5);
+    z-index: 99;
+    animation: mSidebarFadeIn 0.2s ease;
+  }
+
+  @keyframes mSidebarFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .modern-app .m-hamburger {
+    display: flex;
+  }
+
+  .modern-app .m-main {
+    margin-left: 0;
+  }
+
+  .modern-app .m-topbar {
+    padding: 16px 16px 0;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .modern-app .m-search-wrap {
+    max-width: none;
+    order: 3;
+    flex-basis: 100%;
+  }
+
+  .modern-app .m-topbar-right {
+    margin-left: 0;
+  }
+
+  .modern-app .m-content {
+    padding: 16px 16px 28px;
+    gap: 16px;
+  }
+
+  .modern-app .m-page-header {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .modern-app .m-header-actions {
+    width: 100%;
+  }
+
+  .modern-app .m-header-actions .m-filter-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .modern-app .m-stats-row {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  .modern-app .m-tabs {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .modern-app .m-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .modern-app .m-tab {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .modern-app .m-create-btn span,
+  .modern-app .m-create-btn {
+    font-size: 12px;
+    padding: 10px 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .modern-app .m-stats-row {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .modern-app .m-page-title {
+    font-size: 17px;
+  }
+
+  .modern-app .m-content {
+    padding: 12px 12px 24px;
+  }
+
+  .m-project-card .m-pc-top {
+    flex-wrap: wrap;
+  }
+}
+
 /* ADD PROJECT CARD */
 .modern-app .m-add-project-card {
   background: var(--theme-lighter, var(--teal-lighter));

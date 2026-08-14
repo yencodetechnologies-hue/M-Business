@@ -142,6 +142,12 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
   const [fieldErrors, setFieldErrors] = useState({}); // { name: true, client: true }
   const nameRef = useRef(null);
   const clientRef = useRef(null);
+  const categoryRef = useRef(null);
+  const priorityRef = useRef(null);
+  const statusRef = useRef(null);
+  const startRef = useRef(null);
+  const endRef = useRef(null);
+  const budgetRef = useRef(null);
   const pendingReopenAddEmployee = useRef(false);
 
   // Form State
@@ -186,9 +192,6 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
   const [contactPersonName, setContactPersonName] = useState(editProject?.contactPersonName || prefillClient?.contactPersonName || '');
   const [contactPersonNo, setContactPersonNo] = useState(editProject?.contactPersonNo || prefillClient?.contactPersonNo || prefillClient?.phone || '');
   const [contactEmail, setContactEmail] = useState(editProject?.contactEmail || editProject?.clientEmail || prefillClient?.email || '');
-  const [companyName, setCompanyName] = useState(editProject?.companyName || prefillClient?.companyName || prefillClient?.company || '');
-  const [clientPhone, setClientPhone] = useState(editProject?.phone || prefillClient?.phone || '');
-  const [clientAddress, setClientAddress] = useState(editProject?.address || prefillClient?.address || '');
   const [billed, setBilled] = useState(editProject?.billed || '');
   const [received, setReceived] = useState(editProject?.received || '');
   const [pending, setPending] = useState(editProject?.pending || '');
@@ -513,17 +516,36 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
     const errors = {};
     if (!name.trim()) errors.name = true;
     if (!client) errors.client = true;
+    if (!category || !category.trim()) errors.category = true;
+    if (!priority) errors.priority = true;
+    if (!status) errors.status = true;
+    if (!start) errors.start = true;
+    if (!end) errors.end = true;
+    if (budget === '' || budget === null || budget === undefined || Number(budget) <= 0) errors.budget = true;
+    if (!currency) errors.currency = true;
 
     if (Object.keys(errors).length > 0) {
       setFieldErrors(errors);
-      const refMap = { name: nameRef, client: clientRef };
-      const firstKey = Object.keys(errors)[0];
+      const refMap = { name: nameRef, client: clientRef, category: categoryRef, priority: priorityRef, status: statusRef, start: startRef, end: endRef, budget: budgetRef, currency: budgetRef };
+      const order = ['name', 'client', 'category', 'priority', 'status', 'start', 'end', 'budget', 'currency'];
+      const firstKey = order.find(k => errors[k]);
       const firstRef = refMap[firstKey];
       if (firstRef?.current) {
         firstRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
         firstRef.current.focus();
       }
-      toast.error(firstKey === 'name' ? "Project Name is required." : "Client is required.");
+      const messages = {
+        name: 'Project Name is required.',
+        client: 'Client is required.',
+        category: 'Project Category is required.',
+        priority: 'Priority is required.',
+        status: 'Status is required.',
+        start: 'Start Date is required.',
+        end: 'Deadline is required.',
+        budget: 'A valid Budget is required.',
+        currency: 'Currency is required.',
+      };
+      toast.error(messages[firstKey] || 'Please fill all required fields.');
       return;
     }
     setFieldErrors({});
@@ -726,9 +748,6 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                           setContactPersonName(sel.contactPersonName || '');
                           setContactPersonNo(sel.contactPersonNo || sel.phone || '');
                           setContactEmail(sel.email || '');
-                          setCompanyName(sel.companyName || sel.company || '');
-                          setClientPhone(sel.phone || '');
-                          setClientAddress(sel.address || '');
                         } else {
                           setClientId('');
                         }
@@ -758,9 +777,6 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                         setContactPersonName(newClient.contactPersonName || '');
                         setContactPersonNo(newClient.contactPersonNo || newClient.phone || '');
                         setContactEmail(newClient.email || '');
-                        setCompanyName(newClient.companyName || newClient.company || '');
-                        setClientPhone(newClient.phone || '');
-                        setClientAddress(newClient.address || '');
                         // Add to local clients list so it appears in dropdown
                         clients.push(newClient);
                       }
@@ -772,22 +788,38 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
               </div>
 
               <div className="mpc-form-group">
-                <label>Priority</label>
-                <select value={priority} onChange={e => setPriority(e.target.value)}>
+                <label>Priority *</label>
+                <select
+                  ref={priorityRef}
+                  value={priority}
+                  onChange={e => { setPriority(e.target.value); if (fieldErrors.priority) setFieldErrors(f => ({ ...f, priority: false })); }}
+                  style={fieldErrors.priority ? { border: '1.5px solid #64748B' } : undefined}
+                >
                   <option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option>
                 </select>
+                {fieldErrors.priority && (
+                  <div style={{ color: '#64748B', fontSize: 12, fontWeight: 700, marginTop: 4 }}>Required</div>
+                )}
               </div>
             </div>
 
             <div className="mpc-form-2col">
               <div className="mpc-form-group">
-                <label>Status</label>
-                <select value={status} onChange={e => setStatus(e.target.value)}>
+                <label>Status *</label>
+                <select
+                  ref={statusRef}
+                  value={status}
+                  onChange={e => { setStatus(e.target.value); if (fieldErrors.status) setFieldErrors(f => ({ ...f, status: false })); }}
+                  style={fieldErrors.status ? { border: '1.5px solid #64748B' } : undefined}
+                >
                   <option value="Ongoing">Ongoing</option>
                   <option value="On Hold">On Hold</option>
                   <option value="Pending">Pending</option>
                   <option value="Completed">Completed</option>
                 </select>
+                {fieldErrors.status && (
+                  <div style={{ color: '#64748B', fontSize: 12, fontWeight: 700, marginTop: 4 }}>Required</div>
+                )}
               </div>
               <div className="mpc-form-group">
                 <label>Project Name *</label>
@@ -807,20 +839,24 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
 
             <div className="mpc-form-2col">
               <div className="mpc-form-group">
-                <label>Project Category</label>
+                <label>Project Category *</label>
                 {categoryIsCustom ? (
                   <input
+                    ref={categoryRef}
                     type="text"
                     value={category}
                     autoFocus
                     placeholder="Enter custom category"
-                    onChange={e => setCategory(e.target.value)}
+                    onChange={e => { setCategory(e.target.value); if (fieldErrors.category) setFieldErrors(f => ({ ...f, category: false })); }}
                     onBlur={() => { if (!category.trim()) setCategoryIsCustom(false); }}
+                    style={fieldErrors.category ? { border: '1.5px solid #64748B' } : undefined}
                   />
                 ) : (
                   <select
+                    ref={categoryRef}
                     value={['Web Development', 'Mobile App Development', 'UI/UX Design', 'Digital Marketing', 'IT Consulting', 'E-commerce'].includes(category) ? category : (category ? 'Other' : '')}
                     onChange={e => {
+                      if (fieldErrors.category) setFieldErrors(f => ({ ...f, category: false }));
                       if (e.target.value === 'Other') {
                         setCategory('');
                         setCategoryIsCustom(true);
@@ -828,6 +864,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                         setCategory(e.target.value);
                       }
                     }}
+                    style={fieldErrors.category ? { border: '1.5px solid #64748B' } : undefined}
                   >
                     <option>Custom</option>
                     <option>Web Development</option>
@@ -837,6 +874,9 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                     <option>IT Consulting</option>
                     <option>E-commerce</option>
                   </select>
+                )}
+                {fieldErrors.category && (
+                  <div style={{ color: '#64748B', fontSize: 12, fontWeight: 700, marginTop: 4 }}>Required</div>
                 )}
               </div>
               <div className="mpc-form-group">
@@ -852,9 +892,32 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
           <div className="mpc-section-card" id="sec2">
             <div className="mpc-section-heading"><i className="ti ti-calendar" /> Project Timeline</div>
             <div className="mpc-form-2col">
-              <div className="mpc-form-group"><label>Start Date</label><input type="date" value={start} onChange={e => setStart(e.target.value)} /></div>
-              <div className="mpc-form-group"><label>Deadline</label><input type="date" value={end} onChange={e => setEnd(e.target.value)} /></div>
-
+              <div className="mpc-form-group">
+                <label>Start Date *</label>
+                <input
+                  ref={startRef}
+                  type="date"
+                  value={start}
+                  onChange={e => { setStart(e.target.value); if (fieldErrors.start) setFieldErrors(f => ({ ...f, start: false })); }}
+                  style={fieldErrors.start ? { border: '1.5px solid #64748B' } : undefined}
+                />
+                {fieldErrors.start && (
+                  <div style={{ color: '#64748B', fontSize: 12, fontWeight: 700, marginTop: 4 }}>Required</div>
+                )}
+              </div>
+              <div className="mpc-form-group">
+                <label>Deadline *</label>
+                <input
+                  ref={endRef}
+                  type="date"
+                  value={end}
+                  onChange={e => { setEnd(e.target.value); if (fieldErrors.end) setFieldErrors(f => ({ ...f, end: false })); }}
+                  style={fieldErrors.end ? { border: '1.5px solid #64748B' } : undefined}
+                />
+                {fieldErrors.end && (
+                  <div style={{ color: '#64748B', fontSize: 12, fontWeight: 700, marginTop: 4 }}>Required</div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -1029,13 +1092,29 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
           <div className="mpc-section-card" id="sec3">
             <div className="mpc-section-heading"><i className="ti ti-wallet" /> Budget</div>
             <div className="mpc-form-group">
-              <label>Total Project Budget ({currency})</label>
+              <label>Total Project Budget ({currency}) *</label>
               <div style={{ display: 'flex', gap: 10 }}>
-                <select value={currency} onChange={e => setCurrency(e.target.value)} style={{ width: 80 }}>
+                <select
+                  value={currency}
+                  onChange={e => { setCurrency(e.target.value); if (fieldErrors.currency) setFieldErrors(f => ({ ...f, currency: false })); }}
+                  style={{ width: 80, ...(fieldErrors.currency ? { border: '1.5px solid #64748B' } : {}) }}
+                >
                   {["₹", "$", "€", "£", "AED", "SAR", "AUD"].map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
-                <input type="number" value={budget} onChange={e => setBudget(e.target.value)} placeholder="e.g. 850000" />
+                <input
+                  ref={budgetRef}
+                  type="number"
+                  value={budget}
+                  onChange={e => { setBudget(e.target.value); if (fieldErrors.budget) setFieldErrors(f => ({ ...f, budget: false })); }}
+                  placeholder="e.g. 850000"
+                  style={fieldErrors.budget ? { border: '1.5px solid #64748B' } : undefined}
+                />
               </div>
+              {(fieldErrors.budget || fieldErrors.currency) && (
+                <div style={{ color: '#64748B', fontSize: 12, fontWeight: 700, marginTop: 4 }}>
+                  {fieldErrors.budget ? 'A valid budget amount is required.' : 'Currency is required.'}
+                </div>
+              )}
             </div>
 
           </div>

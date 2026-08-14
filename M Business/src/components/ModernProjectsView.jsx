@@ -163,19 +163,24 @@ const CSS = `
 .mpv-tasks { font-size:11px; color:${P.textLight}; display:flex; align-items:center; gap:4px; margin-top:5px; }
 .mpv-tasks i { color:${P.primary}; font-size:13px; }
 
-/* Status badges */
-.mpv-badge { display:inline-flex; align-items:center; gap:5px; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:700; }
-.mpv-badge::before { content:''; width:6px; height:6px; border-radius:50%; background:currentColor; }
-.mpv-badge.active { background:${P.greenLight}; color:#1E293B; }
-.mpv-badge.hold { background:${P.orangeLight}; color:#1E293B; }
-.mpv-badge.completed { background:#E2E8F0; color:#2563EB; }
-.mpv-badge.overdue { background:${P.redLight}; color:#1E293B; }
+/* Status badges — colour-coded so status reads at a glance */
+.mpv-badge { display:inline-flex; align-items:center; gap:6px; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:800; letter-spacing:.2px; }
+.mpv-badge::before { content:''; width:6px; height:6px; border-radius:50%; background:currentColor; flex-shrink:0; }
+.mpv-badge.active { background:#DBEAFE; color:#1D4ED8; }
+.mpv-badge.hold { background:#FEF3C7; color:#B45309; }
+.mpv-badge.completed { background:#DCFCE7; color:#15803D; }
+.mpv-badge.overdue { background:#FEE2E2; color:#B91C1C; }
 
-/* Priority badges */
-.mpv-prio { padding:3px 10px; border-radius:20px; font-size:11px; font-weight:700; }
-.mpv-prio.high { background:${P.redLight}; color:#64748B; }
-.mpv-prio.medium { background:${P.orangeLight}; color:#64748B; }
-.mpv-prio.low { background:${P.greenLight}; color:#16A34A; }
+/* Priority badges — colour-coded by severity */
+.mpv-prio { display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:800; }
+.mpv-prio::before { content:''; width:5px; height:5px; border-radius:50%; background:currentColor; flex-shrink:0; }
+.mpv-prio.high { background:#FEE2E2; color:#B91C1C; }
+.mpv-prio.medium { background:#FEF3C7; color:#B45309; }
+.mpv-prio.low { background:#DCFCE7; color:#15803D; }
+
+/* Budget pill — required field, kept visually prominent in the table */
+.mpv-budget-pill { display:inline-flex; align-items:center; gap:5px; font-weight:800; color:#15803D; font-size:13px; }
+.mpv-budget-pill i { font-size:14px; }
 
 /* Avatar */
 .mpv-av { width:26px; height:26px; border-radius:50%; display:flex; align-items:center;
@@ -486,14 +491,14 @@ export default function ModernProjectsView({
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 0, fontFamily: "'Nunito',sans-serif" }}>
             <thead>
               <tr style={{ background: "#F8FAFC" }}>
-                {["Project", "Client", "Status", "Priority", "Progress", "Deadline", ""].map(h => (
-                  <th key={h} style={{ padding: "10px 14px", textAlign: "left", color: "var(--app-muted)", fontWeight: 700, fontSize: 11, fontFamily: "'Nunito',sans-serif", borderBottom: "2px solid var(--app-border)", whiteSpace: "nowrap", width: h === "" ? "5%" : "15.8%" }}>{h.toUpperCase()}</th>
+                {["Project", "Client", "Status", "Priority", "Progress", "Budget", "Deadline", ""].map(h => (
+                  <th key={h} style={{ padding: "12px 14px", textAlign: "left", color: "var(--app-muted)", fontWeight: 800, fontSize: 11, letterSpacing: ".4px", fontFamily: "'Nunito',sans-serif", borderBottom: "2px solid var(--app-border)", whiteSpace: "nowrap", width: h === "" ? "4%" : "13.7%" }}>{h.toUpperCase()}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {displayed.length === 0 ? (
-                <tr><td colSpan={7} style={{ padding: 30, textAlign: "center", color: "var(--app-muted)", fontSize: 13, fontWeight: 400, fontFamily: "'Nunito',sans-serif" }}>No projects found</td></tr>
+                <tr><td colSpan={8} style={{ padding: 30, textAlign: "center", color: "var(--app-muted)", fontSize: 13, fontWeight: 400, fontFamily: "'Nunito',sans-serif" }}>No projects found</td></tr>
               ) : paginated.map(p => {
                 const { label: statusLabel, cls: statusCls } = normaliseStatus(p.status);
                 const pct = Math.min(100, Math.max(0, p.progress || 0));
@@ -524,6 +529,14 @@ export default function ModernProjectsView({
                         </div>
                         <span style={{ fontWeight: 700, fontSize: 12, color: "#1E293B" }}>{pct}%</span>
                       </div>
+                    </td>
+                    <td style={{ padding: "16px 18px" }}>
+                      {p.budget ? (
+                        <span className="mpv-budget-pill">
+                          <i className="ti ti-currency-rupee" />
+                          {p.currency || '₹'}{Number(p.budget).toLocaleString('en-IN')}
+                        </span>
+                      ) : <span style={{ color: "#94A3B8" }}>—</span>}
                     </td>
                     <td style={{ padding: "16px 18px", fontWeight: 700, color: dlColor }}>
                       {deadline ? new Date(deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : "—"}
@@ -557,8 +570,8 @@ export default function ModernProjectsView({
         displayed.length === 0 ? (
           <div style={{ background: "#FFFFFF", borderRadius: 14, border: "1px solid #EFF6FF", overflow: "hidden", fontFamily: "'Nunito',sans-serif" }}>
             <div style={{ display: "flex", background: "#F8FAFC" }}>
-              {["Project", "Client", "Status", "Priority", "Progress", "Deadline", ""].map(h => (
-                <div key={h} style={{ flex: h === "" ? "0 0 5%" : "1", padding: "10px 14px", color: "var(--app-muted)", fontWeight: 700, fontSize: 11, fontFamily: "'Nunito',sans-serif", borderBottom: "2px solid var(--app-border)", whiteSpace: "nowrap" }}>{h.toUpperCase()}</div>
+              {["Project", "Client", "Status", "Priority", "Progress", "Budget", "Deadline", ""].map(h => (
+                <div key={h} style={{ flex: h === "" ? "0 0 4%" : "1", padding: "12px 14px", color: "var(--app-muted)", fontWeight: 800, fontSize: 11, letterSpacing: ".4px", fontFamily: "'Nunito',sans-serif", borderBottom: "2px solid var(--app-border)", whiteSpace: "nowrap" }}>{h.toUpperCase()}</div>
               ))}
             </div>
             <div style={{ padding: 30, textAlign: "center", color: "var(--app-muted)", fontSize: 13, fontWeight: 400, fontFamily: "'Nunito',sans-serif" }}>No projects found</div>
@@ -740,9 +753,11 @@ export default function ModernProjectsView({
                           </div>
                         </div>
                         {p.budget ? (
-                          <div className="mpv-card-meta-row mpv-card-budget">
-                            <i className="ti ti-currency-rupee" />
-                            Value: {p.currency || '₹'}{Number(p.budget).toLocaleString('en-IN')}
+                          <div className="mpv-card-meta-row">
+                            <span className="mpv-budget-pill">
+                              <i className="ti ti-currency-rupee" />
+                              {p.currency || '₹'}{Number(p.budget).toLocaleString('en-IN')}
+                            </span>
                           </div>
                         ) : null}
                         <div style={{ marginTop: 8 }}>

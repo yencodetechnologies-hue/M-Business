@@ -2,30 +2,33 @@ const mongoose = require("mongoose");
 
 const projectSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  client: { type: String, default: "" },
+  client: { type: String, required: true, default: "" },
 
-  category: { type: String, default: "Web Development" },
-  priority: { type: String, default: "medium" },
+  category: { type: String, required: true, default: "Web Development" },
+  priority: { type: String, required: true, default: "medium" },
   purpose: { type: String, default: "" },
   description: { type: String, default: "" },
-  start: { type: String, default: "" },
+  contactPersonName: { type: String, default: "" },
+  contactPersonNo: { type: String, default: "" },
+  contactEmail: { type: String, default: "" },
+  start: { type: String, required: true, default: "" },
   end: { type: String, default: "" },
-  deadline: { type: String, default: "" },
-  budget: { type: Number, default: 0 },
-  currency: { type: String, default: "₹" },
+  deadline: { type: String, required: true, default: "" },
+  budget: { type: Number, required: true, default: 0 },
+  currency: { type: String, required: true, default: "₹" },
   billed: { type: Number, default: 0 },
   received: { type: Number, default: 0 },
   pending: { type: Number, default: 0 },
   spent: { type: Number, default: 0 },
   team: { type: String, default: "" },
-  status: { type: String, enum: ["Active", "On Hold", "Completed", "Overdue", "Pending", "Ongoing"], default: "Ongoing" },
+  status: { type: String, required: true, enum: ["Active", "On Hold", "Completed", "Overdue", "Pending", "Ongoing"], default: "Ongoing" },
   progress: { type: Number, default: 0 },
   tasks: { type: Number, default: 0 },
   completedTasks: { type: Number, default: 0 },
   assignedTo: { type: [String], default: [] },  // ✅ Fixed
 
   companyId: { type: String, default: "" },
-  clientId: { type: String, default: "" },
+  clientId: { type: String, required: true, default: "" },
   loggedHours: { type: Number, default: 0 },
   milestones: {
     type: [{

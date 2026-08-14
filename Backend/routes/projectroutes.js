@@ -158,7 +158,7 @@ router.post("/add", async (req, res) => {
     console.log("Body received:", JSON.stringify(req.body));
 
     const {
-      name, client, contactPersonName, contactPersonNo,
+      name, client, contactPersonName, contactPersonNo, contactEmail,
       category, priority, purpose, description,
       start, end, deadline, budget, currency,
       billed, received, pending, spent,
@@ -167,8 +167,28 @@ router.post("/add", async (req, res) => {
       updates, milestones, files, portalSettings, portalOpts
     } = req.body;
 
-    if (!name) return res.status(400).json({ msg: "Project name required" });
-    if (!client) return res.status(400).json({ msg: "Client required" });
+    // Enforce the required-field set on the server, mirroring the frontend
+    // validation in ModernProjectCreator.jsx: name, client(+clientId),
+    // category, priority, status, start, deadline/end, budget(+currency).
+    const requiredFieldChecks = {
+      name: !!(name && String(name).trim()),
+      client: !!(client && String(client).trim()),
+      clientId: !!(req.body.clientId && String(req.body.clientId).trim()),
+      category: !!(category && String(category).trim()),
+      priority: !!(priority && String(priority).trim()),
+      status: !!(status && String(status).trim()),
+      start: !!(start && String(start).trim()),
+      deadline: !!((deadline || end) && String(deadline || end).trim()),
+      budget: budget !== undefined && budget !== null && budget !== "" && Number(budget) > 0,
+      currency: !!(currency && String(currency).trim()),
+    };
+    const missingFields = Object.keys(requiredFieldChecks).filter(k => !requiredFieldChecks[k]);
+    if (missingFields.length > 0) {
+      return res.status(400).json({
+        msg: `Missing required field(s): ${missingFields.join(", ")}`,
+        missingFields,
+      });
+    }
 
     console.log("Creating new Project instance...");
     const portal = portalSettings || portalOpts || {
@@ -183,6 +203,7 @@ router.post("/add", async (req, res) => {
       client,
       contactPersonName: contactPersonName || "",
       contactPersonNo: contactPersonNo || "",
+      contactEmail: contactEmail || "",
       category: category || "Web Development",
       priority: priority || "medium",
       purpose: purpose || "",
@@ -361,6 +382,32 @@ router.put("/:id", async (req, res) => {
 
     // Save properly if assignedTo is passed as an array
     const updateData = { ...req.body };
+
+    // Partial-update validation: this is a full-document merge below (every
+    // key in updateData overwrites the corresponding field), so a required
+    // field must only be validated when the caller actually sent it —
+    // otherwise every unrelated PATCH-style save (e.g. posting a project
+    // update/comment) would be forced to resend the entire required set.
+    const REQUIRED_PROJECT_FIELDS = ["name", "client", "clientId", "category", "priority", "status", "start", "budget", "currency"];
+    const invalidRequiredFields = REQUIRED_PROJECT_FIELDS.filter(field => {
+      if (!Object.prototype.hasOwnProperty.call(updateData, field)) return false;
+      const val = updateData[field];
+      if (field === "budget") return !(val !== undefined && val !== null && val !== "" && Number(val) > 0);
+      return !(val !== undefined && val !== null && String(val).trim() !== "");
+    });
+    // "deadline" may be sent as either `deadline` or `end` — only flag it
+    // missing if the caller touched one of those keys and left both empty.
+    if ((Object.prototype.hasOwnProperty.call(updateData, "deadline") || Object.prototype.hasOwnProperty.call(updateData, "end"))) {
+      const deadlineVal = updateData.deadline || updateData.end;
+      if (!deadlineVal || !String(deadlineVal).trim()) invalidRequiredFields.push("deadline");
+    }
+    if (invalidRequiredFields.length > 0) {
+      return res.status(400).json({
+        msg: `Required field(s) cannot be cleared: ${invalidRequiredFields.join(", ")}`,
+        invalidRequiredFields,
+      });
+    }
+
     if (updateData.assignedTo && !Array.isArray(updateData.assignedTo)) {
       updateData.assignedTo = [updateData.assignedTo];
     }

@@ -8,7 +8,7 @@ import { BASE_URL } from '../config';
 function QuoToast({ msg }) {
   if (!msg) return null;
   return (
-    <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 9999, background: 'var(--surface)', border: '2px solid #22c55e', borderRadius: 16, padding: '14px 24px', fontSize: 14, fontWeight: 800, color: '#22c55e', boxShadow: '0 8px 24px rgba(0,0,0,.15)', display: 'flex', alignItems: 'center', gap: 10, animation: 'fadeInUp 0.3s ease-out' }}>
+    <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 9999, background: 'var(--surface)', border: '2px solid #16A34A', borderRadius: 16, padding: '14px 24px', fontSize: 14, fontWeight: 800, color: '#16A34A', boxShadow: '0 8px 24px rgba(0,0,0,.15)', display: 'flex', alignItems: 'center', gap: 10, animation: 'fadeInUp 0.3s ease-out' }}>
       ✅ {msg}
     </div>
   );
@@ -513,19 +513,19 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
   const CSS = `
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
     :root{
-      --teal: var(--app-accent, var(--app-accent, #2563EB));--teal2:var(--app-accent2, #2563EB);--teal3:#26D0CE;--teal4:#006E7F;
+      --teal: var(--app-accent, var(--app-accent, #2563EB));--teal2:var(--app-accent2, #2563EB);--teal3:#2563EB;--teal4:#16A34A;
       --teal-light:var(--teal-light, var(--teal-light, #EFF6FF));--teal-lighter:var(--teal-lighter, #EFF6FF);
-      --bg:#F8FAFC;--surface:#FFFFFF;--surface2:#F8FAFB;--border:#E2E8F0;--border2:#E2E8F0;
+      --bg:#F8FAFC;--surface:#FFFFFF;--surface2:#F8FAFC;--border:#E2E8F0;--border2:#E2E8F0;
       --text:#1E293B;--text2:#64748B;--text3:#64748B;
-      --green:#16A34A;--green-bg:#E8FAF3;
-      --amber:#F5A623;--amber-bg:#FEF5E6;
-      --red:#F05C5C;--red-bg:#FEF2F2;
-      --purple:#7C5CFC;--purple-bg:#EEE9FF;
-      --blue:#2563EB;--blue-bg:#EFF4FF;
+      --green:#16A34A;--green-bg:#EFF6FF;
+      --amber:#64748B;--amber-bg:#F8FAFC;
+      --red:#64748B;--red-bg:#F8FAFC;
+      --purple:#2563EB;--purple-bg:#EFF6FF;
+      --blue:#2563EB;--blue-bg:#EFF6FF;
       --font:'Nunito',sans-serif;--radius:14px;
     }
     .mqc-wrap{font-family:var(--font);font-size:14px;background:var(--bg);color:var(--text);min-height:100vh}
-    .mqc-topbar{background:var(--surface);border-bottom:1.5px solid var(--border);padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:0 1px 8px rgba(37, 99, 235,.06)}
+    .mqc-topbar{background:var(--surface);border-bottom:1.5px solid var(--border);padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:0 1px 8px rgba(37, 99, 235, .06)}
     .mqc-topbar-left{display:flex;align-items:center;gap:10px}
     .mqc-back{display:flex;align-items:center;gap:5px;padding:7px 13px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;font-size:12px;font-weight:700;color:var(--text2);cursor:pointer;font-family:var(--font);transition:all .15s}
     .mqc-back:hover{border-color:var(--teal);color:var(--teal)}
@@ -533,30 +533,30 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
     .mqc-actions{display:flex;align-items:center;gap:8px}
     .mqc-btn-outline{display:flex;align-items:center;gap:5px;padding:8px 14px;background:var(--surface);border:1.5px solid var(--border);border-radius:9px;font-size:12px;font-weight:700;color:var(--text2);cursor:pointer;font-family:var(--font);transition:all .15s}
     .mqc-btn-outline:hover{border-color:var(--teal);color:var(--teal)}
-    .mqc-btn-teal{display:flex;align-items:center;gap:6px;padding:8px 16px;background:var(--teal);color:#fff;border:none;border-radius:9px;font-size:12px;font-weight:700;font-family:var(--font);cursor:pointer;transition:all .15s;box-shadow:0 3px 10px rgba(37, 99, 235,.25)}
+    .mqc-btn-teal{display:flex;align-items:center;gap:6px;padding:8px 16px;background:var(--teal);color:#FFFFFF;border:none;border-radius:9px;font-size:12px;font-weight:700;font-family:var(--font);cursor:pointer;transition:all .15s;box-shadow:0 3px 10px rgba(37, 99, 235, .25)}
     .mqc-btn-teal:hover{background:var(--teal2)}
-    .mqc-btn-amber{background:var(--amber)!important;box-shadow:0 3px 10px rgba(245,166,35,.2)!important}
-    .mqc-btn-green{background:var(--green)!important;box-shadow:0 3px 10px rgba(38,194,129,.25)!important}
+    .mqc-btn-amber{background:var(--app-muted)!important;box-shadow:0 3px 10px rgba(100, 116, 139, .2)!important}
+    .mqc-btn-green{background:var(--green)!important;box-shadow:0 3px 10px rgba(22, 163, 74, .25)!important}
     .mqc-content{padding:20px 28px 40px;display:grid;grid-template-columns:1fr 420px;gap:20px;align-items:start}
     .mqc-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:16px}
     .mqc-card:last-child{margin-bottom:0}
     .mqc-card-header{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--border)}
     .mqc-card-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
     .mqc-card-title{font-size:13px;font-weight:800;color:var(--text)}
-    .mqc-card-badge{margin-left:auto;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;background:var(--amber-bg);color:var(--amber)}
+    .mqc-card-badge{margin-left:auto;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;background:var(--app-accent-light);color:var(--app-muted)}
     .mqc-card-body{padding:18px}
     .mqc-form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
     .mqc-form-group{margin-bottom:14px}
     .mqc-form-group:last-child{margin-bottom:0}
     .mqc-label{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;display:block}
     .mqc-input{width:100%;padding:10px 13px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;font-size:13px;color:var(--text);font-family:var(--font);outline:none;transition:all .15s}
-    .mqc-input:focus{border-color:var(--teal);background:var(--surface);box-shadow:0 0 0 3px rgba(37, 99, 235,.08)}
+    .mqc-input:focus{border-color:var(--teal);background:var(--surface);box-shadow:0 0 0 3px rgba(37, 99, 235, .08)}
     .mqc-input::placeholder{color:var(--text3)}
     .mqc-input:read-only{background:var(--surface2);color:var(--text3)}
     .mqc-select{width:100%;padding:10px 13px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;font-size:13px;color:var(--text);font-family:var(--font);outline:none;cursor:pointer;appearance:none;transition:all .15s;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23A0B8BE' stroke-width='2'%3E%3Cpolyline points='6,9 12,15 18,9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
-    .mqc-select:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(37, 99, 235,.08)}
+    .mqc-select:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(37, 99, 235, .08)}
     .mqc-textarea{width:100%;padding:10px 13px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;font-size:13px;color:var(--text);font-family:var(--font);outline:none;resize:vertical;min-height:80px;transition:all .15s;line-height:1.6}
-    .mqc-textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(37, 99, 235,.08)}
+    .mqc-textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(37, 99, 235, .08)}
     .mqc-textarea::placeholder{color:var(--text3)}
     .mqc-status-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:14px}
     .mqc-status-chip{padding:9px 6px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;text-align:center;transition:all .15s;font-family:var(--font)}
@@ -568,13 +568,13 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
     .mqc-scope-tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:6px}
     .mqc-scope-tag{display:flex;align-items:center;gap:5px;padding:5px 10px;background:var(--teal-lighter);border:1.5px solid var(--teal-light);border-radius:20px;font-size:11px;font-weight:700;color:var(--teal)}
     .mqc-tag-x{cursor:pointer;font-size:12px;line-height:1;border:none;background:none;color:var(--teal);padding:0}
-    .mqc-tag-x:hover{color:var(--red)}
+    .mqc-tag-x:hover{color:var(--app-text)}
     .mqc-add-tag-row{display:flex;gap:8px;margin-top:8px}
     .mqc-tag-input{flex:1;padding:8px 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;font-size:12px;color:var(--text);font-family:var(--font);outline:none;transition:all .15s}
     .mqc-tag-input:focus{border-color:var(--teal)}
     .mqc-tag-input::placeholder{color:var(--text3)}
     .mqc-tag-btn{padding:8px 14px;background:var(--teal-light);border:1.5px solid var(--teal);border-radius:9px;font-size:11px;font-weight:700;color:var(--teal);cursor:pointer;font-family:var(--font);transition:all .15s;white-space:nowrap}
-    .mqc-tag-btn:hover{background:var(--teal);color:#fff}
+    .mqc-tag-btn:hover{background:var(--teal);color:#FFFFFF}
     .mqc-items-table{width:100%;border-collapse:collapse;margin-bottom:12px}
     .mqc-items-table thead tr th{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;padding:8px;text-align:left;background:var(--surface2);border-bottom:1px solid var(--border)}
     .mqc-items-table tbody tr td{padding:5px;border-bottom:1px solid var(--border);vertical-align:middle}
@@ -585,7 +585,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
     .mqc-item-num{width:70px;text-align:right}
     .mqc-item-total{font-size:12px;font-weight:700;color:var(--text);padding:0 8px;text-align:right;min-width:80px}
     .mqc-del-btn{width:25px;height:25px;border-radius:6px;background:none;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;color:var(--text3);transition:all .15s}
-    .mqc-del-btn:hover{border-color:var(--red);color:var(--red);background:var(--red-bg)}
+    .mqc-del-btn:hover{border-color:var(--app-text);color:var(--app-text);background:var(--app-accent-light)}
     .mqc-add-item-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:6px;padding:8px;background:var(--teal-lighter);border:1.5px dashed var(--teal);border-radius:9px;font-size:12px;font-weight:700;color:var(--teal);cursor:pointer;font-family:var(--font);transition:all .15s}
     .mqc-add-item-btn:hover{background:var(--teal-light)}
     .mqc-totals{border-top:1px solid var(--border);padding-top:14px;margin-top:4px}
@@ -612,7 +612,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
     .mqc-phase-toggle{width:26px;height:26px;border-radius:7px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;color:var(--text3);transition:all .15s;flex-shrink:0}
     .mqc-phase-toggle:hover{border-color:var(--teal);color:var(--teal)}
     .mqc-phase-del{width:26px;height:26px;border-radius:7px;background:none;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;color:var(--text3);transition:all .15s;flex-shrink:0}
-    .mqc-phase-del:hover{border-color:var(--red);color:var(--red);background:var(--red-bg)}
+    .mqc-phase-del:hover{border-color:var(--app-text);color:var(--app-text);background:var(--app-accent-light)}
     .mqc-phase-body{padding:14px}
     .mqc-feat-label{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px}
     .mqc-feat-row{display:flex;align-items:center;gap:7px;margin-bottom:6px}
@@ -620,7 +620,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
     .mqc-feat-input{flex:1;padding:7px 10px;background:var(--surface);border:1.5px solid var(--border);border-radius:8px;font-size:12px;color:var(--text);font-family:var(--font);outline:none;transition:all .15s}
     .mqc-feat-input:focus{border-color:var(--teal)}
     .mqc-feat-del{width:22px;height:22px;border-radius:5px;background:none;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;color:var(--text3);transition:color .15s;flex-shrink:0}
-    .mqc-feat-del:hover{color:var(--red)}
+    .mqc-feat-del:hover{color:var(--app-text)}
     .mqc-add-feat-btn{display:flex;align-items:center;gap:5px;padding:6px 12px;background:var(--teal-lighter);border:1.5px dashed var(--teal);border-radius:8px;font-size:11px;font-weight:700;color:var(--teal);cursor:pointer;font-family:var(--font);transition:all .15s}
     .mqc-add-feat-btn:hover{background:var(--teal-light)}
     .mqc-incl-row{display:flex;align-items:center;gap:7px;margin-bottom:6px}
@@ -628,16 +628,16 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
     .mqc-incl-input{flex:1;padding:7px 10px;background:var(--surface);border:1.5px solid var(--border);border-radius:8px;font-size:12px;color:var(--text);font-family:var(--font);outline:none;transition:all .15s}
     .mqc-incl-input:focus{border-color:var(--teal)}
     .mqc-incl-del{width:20px;height:20px;border-radius:5px;background:none;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;color:var(--text3);flex-shrink:0;transition:color .15s}
-    .mqc-incl-del:hover{color:var(--red)}
+    .mqc-incl-del:hover{color:var(--app-text)}
     .mqc-preview-side{position:sticky;top:78px}
     .mqc-preview-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.06)}
     .mqc-preview-toolbar{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;border-bottom:1px solid var(--border);background:var(--surface2)}
     .mqc-pt-title{font-size:12px;font-weight:800;color:var(--text)}
     .mqc-pt-btn{display:flex;align-items:center;gap:4px;padding:5px 10px;background:var(--surface);border:1.5px solid var(--border);border-radius:7px;font-size:10px;font-weight:700;color:var(--text2);cursor:pointer;font-family:var(--font);transition:all .15s}
     .mqc-pt-btn:hover{border-color:var(--teal);color:var(--teal)}
-    .quo-preview{padding:22px;font-family:var(--font);font-size:12px;color:#1E293B;background:#fff;min-height:600px;border-radius:0 0 14px 14px}
+    .quo-preview{padding:22px;font-family:var(--font);font-size:12px;color:#1E293B;background:#FFFFFF;min-height:600px;border-radius:0 0 14px 14px}
     .quo-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;padding-bottom:14px;border-bottom:3px solid var(--teal)}
-    .quo-logo-box{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--teal),var(--teal4));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#fff;margin-bottom:7px}
+    .quo-logo-box{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--teal),var(--app-primary));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#FFFFFF;margin-bottom:7px}
     .quo-company{font-size:13px;font-weight:800;color:var(--text)}
     .quo-company-sub{font-size:10px;color:var(--text3);line-height:1.7;margin-top:2px}
     .quo-title-area{text-align:right}
@@ -647,8 +647,8 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
     .quo-badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;margin-top:5px}
     .quo-badge.draft{background:var(--surface2);color:var(--text3);border:1px solid var(--border)}
     .quo-badge.sent{background:var(--blue-bg);color:var(--blue)}
-    .quo-badge.accepted{background:var(--green-bg);color:var(--green)}
-    .quo-badge.negotiation{background:var(--purple-bg);color:var(--purple)}
+    .quo-badge.accepted{background:var(--app-accent-light);color:var(--green)}
+    .quo-badge.negotiation{background:var(--app-accent-light);color:var(--app-accent)}
     
     .quo-parties{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
     .quo-party-lbl{font-size:9px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px}
@@ -661,8 +661,8 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
     .quo-scope-tag{padding:2px 8px;background:var(--teal-light);border-radius:20px;font-size:10px;font-weight:700;color:var(--teal)}
     
     .quo-items-table{width:100%;border-collapse:collapse;margin-bottom:14px}
-    .quo-items-table thead tr{background:linear-gradient(135deg,var(--teal),var(--teal4))}
-    .quo-items-table thead th{padding:7px 9px;font-size:10px;font-weight:700;color:#fff;text-align:left;letter-spacing:.3px}
+    .quo-items-table thead tr{background:linear-gradient(135deg,var(--teal),var(--app-primary))}
+    .quo-items-table thead th{padding:7px 9px;font-size:10px;font-weight:700;color:#FFFFFF;text-align:left;letter-spacing:.3px}
     .quo-items-table thead th:last-child{text-align:right}
     .quo-items-table tbody tr{border-bottom:1px solid var(--border)}
     .quo-items-table tbody tr:nth-child(even){background:var(--surface2)}
@@ -674,12 +674,12 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
     .quo-tot-row:last-child{border-bottom:none}
     .quo-tot-row .lbl{color:var(--text2)}
     .quo-tot-row .val{font-weight:700;color:var(--text)}
-    .quo-grand-row{display:flex;justify-content:space-between;padding:7px 10px;background:linear-gradient(135deg,var(--teal),var(--teal4));border-radius:7px;margin-top:5px}
-    .quo-grand-row .lbl{font-size:11px;font-weight:800;color:#fff}
-    .quo-grand-row .val{font-size:13px;font-weight:900;color:#fff}
+    .quo-grand-row{display:flex;justify-content:space-between;padding:7px 10px;background:linear-gradient(135deg,var(--teal),var(--app-primary));border-radius:7px;margin-top:5px}
+    .quo-grand-row .lbl{font-size:11px;font-weight:800;color:#FFFFFF}
+    .quo-grand-row .val{font-size:13px;font-weight:900;color:#FFFFFF}
     
-    .quo-validity{padding:8px 10px;background:var(--amber-bg);border-radius:8px;border-left:3px solid var(--amber);margin-bottom:12px}
-    .quo-validity-text{font-size:10px;color:var(--amber);font-weight:700}
+    .quo-validity{padding:8px 10px;background:var(--app-accent-light);border-radius:8px;border-left:3px solid var(--app-muted);margin-bottom:12px}
+    .quo-validity-text{font-size:10px;color:var(--app-muted);font-weight:700}
     
     .quo-footer{display:flex;justify-content:space-between;align-items:flex-end;padding-top:12px;border-top:1px solid var(--border)}
     .quo-notes-lbl{font-size:9px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
@@ -692,8 +692,8 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
     .quo-cta-text{font-size:10px;color:var(--text2);margin-bottom:6px;font-weight:600}
     .quo-cta-btns{display:flex;gap:8px;justify-content:center}
     .quo-cta-btn{padding:5px 14px;border-radius:20px;font-size:10px;font-weight:800;cursor:pointer;font-family:var(--font)}
-    .quo-cta-btn.accept{background:var(--green);color:#fff;border:none}
-    .quo-cta-btn.negotiate{background:none;border:1.5px solid var(--purple);color:var(--purple)}
+    .quo-cta-btn.accept{background:var(--green);color:#FFFFFF;border:none}
+    .quo-cta-btn.negotiate{background:none;border:1.5px solid var(--app-accent);color:var(--app-accent)}
     
     .pv-phase-block{margin-bottom:12px;border:1px solid var(--border);border-radius:10px;overflow:hidden}
     .pvpb-header{display:flex;align-items:center;gap:8px;padding:7px 10px;background:linear-gradient(90deg,var(--teal-lighter),var(--surface))}
@@ -714,7 +714,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
     <div className="mqc-wrap" style={autoSharing ? { position: 'relative' } : undefined}>
       <style>{CSS}</style>
       {autoSharing && (
-        <div style={{ position: 'fixed', inset: 0, background: '#fff', zIndex: 999, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
+        <div style={{ position: 'fixed', inset: 0, background: '#FFFFFF', zIndex: 999, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
           <i className="ti ti-loader-2" style={{ fontSize: 32, color: 'var(--app-accent, #2563EB)', animation: 'spin 1s linear infinite' }}></i>
           <div style={{ fontSize: 13, fontWeight: 700, color: '#64748B' }}>{prefillProject?._autoView ? 'Opening quotation PDF…' : 'Preparing quotation to share…'}</div>
         </div>
@@ -849,7 +849,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
           {/* Prepared For */}
           <div className="mqc-card">
             <div className="mqc-card-header">
-              <div className="mqc-card-icon" style={{ background: 'var(--amber-bg)', color: 'var(--amber)' }}><i className="ti ti-user-circle"></i></div>
+              <div className="mqc-card-icon" style={{ background: 'var(--app-accent-light)', color: 'var(--app-muted)' }}><i className="ti ti-user-circle"></i></div>
               <div className="mqc-card-title">Prepared For Client</div>
             </div>
             <div className="mqc-card-body">
@@ -864,16 +864,16 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
                   onClick={() => { setClientDropOpen(o => !o); setClientSearch(''); if (clientFieldError) setClientFieldError(''); }}
                   style={{
                     width: '100%', padding: '10px 36px 10px 13px', background: 'var(--bg)',
-                    border: `1.5px solid ${clientFieldError ? '#EF4444' : clientDropOpen ? 'var(--teal)' : 'var(--border)'}`,
+                    border: `1.5px solid ${clientFieldError ? '#64748B' : clientDropOpen ? 'var(--teal)' : 'var(--border)'}`,
                     borderRadius: 10, fontSize: 13, color: qt.toName ? 'var(--text)' : 'var(--text3)',
                     cursor: 'pointer', userSelect: 'none', boxSizing: 'border-box',
                     display: 'flex', alignItems: 'center', gap: 8, minHeight: 42,
-                    boxShadow: clientDropOpen ? '0 0 0 3px rgba(37, 99, 235,.08)' : 'none',
+                    boxShadow: clientDropOpen ? '0 0 0 3px rgba(37, 99, 235, .08)' : 'none',
                     transition: 'all .15s'
                   }}>
                   {qt.toName ? (
                     <>
-                      <div style={{ width: 22, height: 22, borderRadius: '50%', background: 'var(--teal)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 10, fontWeight: 700, flexShrink: 0 }}>
+                      <div style={{ width: 22, height: 22, borderRadius: '50%', background: 'var(--teal)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FFFFFF', fontSize: 10, fontWeight: 700, flexShrink: 0 }}>
                         {qt.toName[0].toUpperCase()}
                       </div>
                       <span style={{ fontWeight: 700 }}>{qt.toName}</span>
@@ -883,7 +883,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
                   )}
                   <span style={{ position: 'absolute', right: 12, top: '50%', transform: `translateY(-50%) rotate(${clientDropOpen ? 180 : 0}deg)`, fontSize: 10, color: 'var(--text3)', transition: 'transform .2s' }}>▼</span>
                 </div>
-                {clientFieldError && <div style={{ fontSize: 11, color: '#EF4444', marginTop: 4 }}>{clientFieldError}</div>}
+                {clientFieldError && <div style={{ fontSize: 11, color: '#64748B', marginTop: 4 }}>{clientFieldError}</div>}
 
                 {/* Dropdown panel — no fixed backdrop, no scroll freeze */}
                 {clientDropOpen && (
@@ -928,7 +928,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
                           onMouseEnter={e => e.currentTarget.style.background = 'var(--surface2)'}
                           onMouseLeave={e => e.currentTarget.style.background = 'var(--surface)'}
                         >
-                          <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--teal)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 14, fontWeight: 700, flexShrink: 0 }}>+</div>
+                          <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--teal)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FFFFFF', fontSize: 14, fontWeight: 700, flexShrink: 0 }}>+</div>
                           <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--teal)' }}>+ New Client</div>
                         </div>
                       )}
@@ -948,7 +948,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
                             onMouseEnter={e => e.currentTarget.style.background = 'var(--teal-light)'}
                             onMouseLeave={e => e.currentTarget.style.background = 'var(--teal-lighter)'}
                           >
-                            <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--teal)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 14, fontWeight: 700, flexShrink: 0 }}>+</div>
+                            <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--teal)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FFFFFF', fontSize: 14, fontWeight: 700, flexShrink: 0 }}>+</div>
                             <div>
                               <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--teal)' }}>Use "{clientSearch.trim()}"</div>
                               <div style={{ fontSize: 10, color: 'var(--text3)' }}>Enter manually — not from client list</div>
@@ -989,7 +989,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
                                 onMouseEnter={e => { if (!isSel) e.currentTarget.style.background = 'var(--surface2)'; }}
                                 onMouseLeave={e => { if (!isSel) e.currentTarget.style.background = 'transparent'; }}
                               >
-                                <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'linear-gradient(135deg,var(--teal),var(--teal4))', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 11, fontWeight: 700, flexShrink: 0 }}>
+                                <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'linear-gradient(135deg,var(--teal),var(--app-primary))', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FFFFFF', fontSize: 11, fontWeight: 700, flexShrink: 0 }}>
                                   {name[0]?.toUpperCase() || '?'}
                                 </div>
                                 <div style={{ flex: 1, minWidth: 0 }}>
@@ -1023,8 +1023,8 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
                             upd('toEmail', ''); upd('toPhone', ''); upd('toAddress', '');
                             setClientDropOpen(false); setClientSearch('');
                           }}
-                          style={{ padding: '8px 14px', borderTop: '1px solid var(--border)', fontSize: 11, fontWeight: 700, color: 'var(--red)', cursor: 'pointer', textAlign: 'center' }}
-                          onMouseEnter={e => e.currentTarget.style.background = 'var(--red-bg)'}
+                          style={{ padding: '8px 14px', borderTop: '1px solid var(--border)', fontSize: 11, fontWeight: 700, color: 'var(--app-text)', cursor: 'pointer', textAlign: 'center' }}
+                          onMouseEnter={e => e.currentTarget.style.background = 'var(--app-accent-light)'}
                           onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                         >
                           ✕ Clear selection
@@ -1075,7 +1075,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
           {/* Scope of Work */}
           <div className="mqc-card">
             <div className="mqc-card-header">
-              <div className="mqc-card-icon" style={{ background: 'var(--purple-bg)', color: 'var(--purple)' }}><i className="ti ti-tags"></i></div>
+              <div className="mqc-card-icon" style={{ background: 'var(--app-accent-light)', color: 'var(--app-accent)' }}><i className="ti ti-tags"></i></div>
               <div className="mqc-card-title">Scope of Work</div>
               <div style={{ marginLeft: 'auto', display: 'flex', gap: 6 }}>
 
@@ -1157,10 +1157,10 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
                     <button className="mqc-add-feat-btn" style={{ marginTop: 6 }} onClick={addIncl}><i className="ti ti-plus" style={{ fontSize: 12 }}></i> Add</button>
                   </div>
                   <div className="mqc-form-group">
-                    <label className="mqc-label" style={{ color: 'var(--red)' }}><i className="ti ti-circle-x" style={{ fontSize: 13 }}></i> What's Excluded</label>
+                    <label className="mqc-label" style={{ color: 'var(--app-text)' }}><i className="ti ti-circle-x" style={{ fontSize: 13 }}></i> What's Excluded</label>
                     {exclusions.map(i => (
                       <div key={i.id} className="mqc-incl-row">
-                        <div className="mqc-incl-dot" style={{ background: 'var(--red)' }}></div>
+                        <div className="mqc-incl-dot" style={{ background: 'var(--app-text)' }}></div>
                         <input type="text" className="mqc-incl-input" value={i.text} onChange={e => updExcl(i.id, e.target.value)} placeholder="Add exclusion…" />
                         <button className="mqc-incl-del" onClick={() => removeExcl(i.id)}><i className="ti ti-x"></i></button>
                       </div>
@@ -1175,7 +1175,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
           {/* Line Items */}
           <div className="mqc-card">
             <div className="mqc-card-header">
-              <div className="mqc-card-icon" style={{ background: 'var(--green-bg)', color: 'var(--green)' }}><i className="ti ti-list-numbers"></i></div>
+              <div className="mqc-card-icon" style={{ background: 'var(--app-accent-light)', color: 'var(--green)' }}><i className="ti ti-list-numbers"></i></div>
               <div className="mqc-card-title">Line Items / Pricing</div>
             </div>
             <div className="mqc-card-body">
@@ -1214,7 +1214,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
           {/* Validity */}
           <div className="mqc-card">
             <div className="mqc-card-header">
-              <div className="mqc-card-icon" style={{ background: 'var(--amber-bg)', color: 'var(--amber)' }}><i className="ti ti-clock"></i></div>
+              <div className="mqc-card-icon" style={{ background: 'var(--app-accent-light)', color: 'var(--app-muted)' }}><i className="ti ti-clock"></i></div>
               <div className="mqc-card-title">Validity Period</div>
             </div>
             <div className="mqc-card-body">
@@ -1230,7 +1230,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
                 <input className="mqc-input" type="number" min="1" placeholder="Enter days" value={customValidity}
                   onChange={e => { setCustomValidity(e.target.value); }} style={{ marginTop: 8 }} />
               )}
-              <div style={{ fontSize: 11, color: 'var(--amber)', fontWeight: 700, marginTop: 8, background: 'var(--amber-bg)', padding: '6px 12px', borderRadius: 8, borderLeft: '3px solid var(--amber)' }}>
+              <div style={{ fontSize: 11, color: 'var(--app-muted)', fontWeight: 700, marginTop: 8, background: 'var(--app-accent-light)', padding: '6px 12px', borderRadius: 8, borderLeft: '3px solid var(--app-muted)' }}>
                 Alarm Valid until: {validUntil}
               </div>
             </div>
@@ -1275,7 +1275,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
                   <div className="quo-id">#{qt.quoteNo}</div>
                   <div className="quo-dates">
                     <span>Date: {new Date(qt.quoteDate || today).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span><br />
-                    <span style={{ color: 'var(--amber)' }}>Valid until: {validUntil}</span>
+                    <span style={{ color: 'var(--app-muted)' }}>Valid until: {validUntil}</span>
                   </div>
                   <div className={`quo-badge ${qt.status.toLowerCase()}`}>{qt.status}</div>
                 </div>
@@ -1345,7 +1345,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
               {(inclusions.some(i => i.text.trim()) || exclusions.some(i => i.text.trim())) && (
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 14 }}>
                   {inclusions.some(i => i.text.trim()) && (
-                    <div style={{ padding: '8px 10px', background: 'var(--green-bg)', borderRadius: 8, borderLeft: '3px solid var(--green)' }}>
+                    <div style={{ padding: '8px 10px', background: 'var(--app-accent-light)', borderRadius: 8, borderLeft: '3px solid var(--green)' }}>
                       <div style={{ fontSize: 9, fontWeight: 700, color: 'var(--green)', textTransform: 'uppercase', letterSpacing: '.6px', marginBottom: 5 }}>✓ What's Included</div>
                       {inclusions.filter(i => i.text.trim()).map(i => (
                         <div key={i.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 5, fontSize: 10, color: 'var(--text2)', marginBottom: 3, lineHeight: 1.5 }}>
@@ -1355,11 +1355,11 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
                     </div>
                   )}
                   {exclusions.some(i => i.text.trim()) && (
-                    <div style={{ padding: '8px 10px', background: 'var(--red-bg)', borderRadius: 8, borderLeft: '3px solid var(--red)' }}>
-                      <div style={{ fontSize: 9, fontWeight: 700, color: 'var(--red)', textTransform: 'uppercase', letterSpacing: '.6px', marginBottom: 5 }}>✗ What's Excluded</div>
+                    <div style={{ padding: '8px 10px', background: 'var(--app-accent-light)', borderRadius: 8, borderLeft: '3px solid var(--app-text)' }}>
+                      <div style={{ fontSize: 9, fontWeight: 700, color: 'var(--app-text)', textTransform: 'uppercase', letterSpacing: '.6px', marginBottom: 5 }}>✗ What's Excluded</div>
                       {exclusions.filter(i => i.text.trim()).map(i => (
                         <div key={i.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 5, fontSize: 10, color: 'var(--text2)', marginBottom: 3, lineHeight: 1.5 }}>
-                          <span style={{ color: 'var(--red)', fontWeight: 800, flexShrink: 0 }}>•</span> {i.text}
+                          <span style={{ color: 'var(--app-text)', fontWeight: 800, flexShrink: 0 }}>•</span> {i.text}
                         </div>
                       ))}
                     </div>
@@ -1455,7 +1455,7 @@ export async function shareQuotationAsPDF(q, mode = 'share') {
   const todayStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 
   const bodyHTML = `
-    <div style="padding:22px;font-family:'Nunito',sans-serif;font-size:12px;color:#1E293B;background:#fff;">
+    <div style="padding:22px;font-family:'Nunito',sans-serif;font-size:12px;color:#1E293B;background:#FFFFFF;">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;padding-bottom:14px;border-bottom:3px solid #2563EB;">
         <div>
           <div style="font-size:13px;font-weight:800;">${qt.fromCompany || '—'}</div>
@@ -1483,12 +1483,12 @@ export async function shareQuotationAsPDF(q, mode = 'share') {
         <div style="font-size:13px;font-weight:800;">${qt.title || '—'}</div>
       </div>
       <table style="width:100%;border-collapse:collapse;margin-bottom:14px;">
-        <thead><tr style="background:linear-gradient(135deg,#2563EB,#006E7F);">
-          <th style="padding:7px 9px;font-size:10px;color:#fff;text-align:left;">#</th>
-          <th style="padding:7px 9px;font-size:10px;color:#fff;text-align:left;">Description</th>
-          <th style="padding:7px 9px;font-size:10px;color:#fff;text-align:left;">Qty</th>
-          <th style="padding:7px 9px;font-size:10px;color:#fff;text-align:left;">Price</th>
-          <th style="padding:7px 9px;font-size:10px;color:#fff;text-align:right;">Total</th>
+        <thead><tr style="background:linear-gradient(135deg,#2563EB,#16A34A);">
+          <th style="padding:7px 9px;font-size:10px;color:#FFFFFF;text-align:left;">#</th>
+          <th style="padding:7px 9px;font-size:10px;color:#FFFFFF;text-align:left;">Description</th>
+          <th style="padding:7px 9px;font-size:10px;color:#FFFFFF;text-align:left;">Qty</th>
+          <th style="padding:7px 9px;font-size:10px;color:#FFFFFF;text-align:left;">Price</th>
+          <th style="padding:7px 9px;font-size:10px;color:#FFFFFF;text-align:right;">Total</th>
         </tr></thead>
         <tbody>
           ${items.map((item, idx) => `
@@ -1503,9 +1503,9 @@ export async function shareQuotationAsPDF(q, mode = 'share') {
         </tbody>
       </table>
       <div style="display:flex;justify-content:flex-end;">
-        <div style="width:200px;padding:7px 10px;background:linear-gradient(135deg,#2563EB,#006E7F);border-radius:7px;display:flex;justify-content:space-between;">
-          <span style="font-size:11px;font-weight:800;color:#fff;">Total</span>
-          <span style="font-size:13px;font-weight:900;color:#fff;">${fmt(subtotal)}</span>
+        <div style="width:200px;padding:7px 10px;background:linear-gradient(135deg,#2563EB,#16A34A);border-radius:7px;display:flex;justify-content:space-between;">
+          <span style="font-size:11px;font-weight:800;color:#FFFFFF;">Total</span>
+          <span style="font-size:13px;font-weight:900;color:#FFFFFF;">${fmt(subtotal)}</span>
         </div>
       </div>
     </div>
@@ -1517,7 +1517,7 @@ export async function shareQuotationAsPDF(q, mode = 'share') {
 
   const container = document.createElement('div');
   container.id = '__quotation_pdf_container__';
-  container.style.cssText = 'position:fixed;top:0;left:-9999px;width:210mm;background:#fff;z-index:999999;pointer-events:none;';
+  container.style.cssText = 'position:fixed;top:0;left:-9999px;width:210mm;background:#FFFFFF;z-index:999999;pointer-events:none;';
   container.innerHTML = bodyHTML;
   document.body.appendChild(container);
 

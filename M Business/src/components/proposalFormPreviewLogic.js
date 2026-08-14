@@ -31,7 +31,7 @@ function up() {
   // Cover
   const t = document.getElementById('propTitle').value;
   document.getElementById('pv-title').textContent = t || '— Proposal Title —';
-  document.getElementById('pv-title').style.color = t ? '#fff' : 'rgba(255,255,255,.45)';
+  document.getElementById('pv-title').style.color = t ? '#FFFFFF' : 'rgba(255,255,255,.45)';
   const tc = document.getElementById('toComp').value;
   document.getElementById('pv-sub').textContent = tc ? 'Prepared for ' + tc + ' by Your Company Name' : 'Prepared by Your Company Name';
   document.getElementById('pv-date').textContent = fmtDate(document.getElementById('propDate').value);
@@ -214,7 +214,7 @@ function addValue() {
   const c = document.getElementById('valueList');
   const d = document.createElement('div');
   d.className = 'dv-item';
-  d.innerHTML = `<div class="dv-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ti ti-trending-up"></i></div>
+  d.innerHTML = `<div class="dv-icon" style="background:var(--app-accent-light);color:var(--app-muted)"><i class="ti ti-trending-up"></i></div>
     <input type="text" class="dv-input" placeholder="Value point or ROI…" oninput="up()">
     <i class="ti ti-x dv-del" onclick="this.parentElement.remove();up()"></i>`;
   c.appendChild(d);
@@ -288,7 +288,7 @@ function addWhyUs() {
   const c = document.getElementById('whyList');
   const d = document.createElement('div');
   d.className = 'dv-item';
-  d.innerHTML = `<div class="dv-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ti ti-star"></i></div>
+  d.innerHTML = `<div class="dv-icon" style="background:var(--app-accent-light);color:var(--app-muted)"><i class="ti ti-star"></i></div>
 <input type="text" class="dv-input" placeholder="Why choose us…">
     <i class="ti ti-x dv-del" onclick="this.parentElement.remove()"></i>`;
   c.appendChild(d);
@@ -302,7 +302,7 @@ function addTeamMember() {
   const exp = prompt('Years of experience (e.g. 5+ years · Web Dev):') || '';
   const skills = prompt('Skills (comma-separated):') || '';
   const c = document.getElementById('teamList');
-  const colors = ['linear-gradient(135deg,var(--teal),var(--teal4))', 'linear-gradient(135deg,var(--purple),#4E35B0)', 'linear-gradient(135deg,var(--amber),#D4880A)', 'linear-gradient(135deg,var(--blue),#1A4DB5)'];
+  const colors = ['linear-gradient(135deg,var(--teal),var(--app-primary))', 'linear-gradient(135deg,var(--app-accent),#64748B)', 'linear-gradient(135deg,var(--app-muted),#64748B)', 'linear-gradient(135deg,var(--blue),#2563EB)'];
   const col = colors[Math.floor(Math.random() * colors.length)];
   const init = name.trim().split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
   const skillTags = skills ? skills.split(',').map(s => `<span class="tc-skill">${s.trim()}</span>`).join('') : '';

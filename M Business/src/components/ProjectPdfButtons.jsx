@@ -34,7 +34,7 @@ export default function ProjectPdfButtons({
           flex: compact ? "0 0 auto" : 1,
           border: enabled ? "1.5px solid var(--app-accent, #2563EB)" : "1.5px solid #E2E8F0",
           background: enabled ? "var(--teal-light, #EFF6FF)" : "#F8FAFC",
-          color: enabled ? "var(--app-accent, #2563EB)" : "#94A3B8",
+          color: enabled ? "var(--app-accent, #2563EB)" : "#64748B",
           borderRadius: 8,
           padding: compact ? "5px 8px" : "7px 10px",
           fontSize: compact ? 10 : 11,

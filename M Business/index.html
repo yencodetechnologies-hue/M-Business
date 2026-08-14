@@ -23,7 +23,7 @@
 
     html.dark-mode,
     body.dark-mode {
-      background: #0a1628;
+      background: #0F172A;
     }
 
     #root {
@@ -42,14 +42,14 @@
       try {
         var dm = localStorage.getItem("empDarkMode") === "true" || localStorage.getItem("adminDarkMode") === "true";
         var THEMES = {
-          purple: { sidebar: "#2563eb", bg: "#eff6ff" },
-          ocean: { sidebar: "#0284c7", bg: "#f0f9ff" },
-          forest: { sidebar: "#16a34a", bg: "#f0fdf4" },
-          sunset: { sidebar: "#ea580c", bg: "#fff7ed" },
-          rose: { sidebar: "#e11d48", bg: "#fff1f2" },
-          slate: { sidebar: "#475569", bg: "#f8fafc" },
-          mint: { sidebar: "#2563eb", bg: "#f0fdfa" },
-          candy: { sidebar: "#c026d3", bg: "#fdf4ff" },
+          purple: { sidebar: "#2563EB", bg: "#EFF6FF" },
+          ocean: { sidebar: "#2563EB", bg: "#EFF6FF" },
+          forest: { sidebar: "#16A34A", bg: "#F8FAFC" },
+          sunset: { sidebar: "#64748B", bg: "#F8FAFC" },
+          rose: { sidebar: "#64748B", bg: "#F8FAFC" },
+          slate: { sidebar: "#64748B", bg: "#F8FAFC" },
+          mint: { sidebar: "#2563EB", bg: "#EFF6FF" },
+          candy: { sidebar: "#64748B", bg: "#F8FAFC" },
           teal: { sidebar: "#2563EB", bg: "#F8FAFC" }
         };
         var appTheme = localStorage.getItem("appTheme") || "teal";
@@ -65,8 +65,8 @@
         }
         if (dm) {
           document.documentElement.classList.add("dark-mode");
-          document.documentElement.style.setProperty("--app-bg", "#0a1628");
-          document.documentElement.style.setProperty("--app-sidebar", "#0a1628");
+          document.documentElement.style.setProperty("--app-bg", "#0F172A");
+          document.documentElement.style.setProperty("--app-sidebar", "#0F172A");
         } else {
           document.documentElement.style.setProperty("--app-bg", bgColor);
           document.documentElement.style.setProperty("--app-sidebar", sidebarColor);

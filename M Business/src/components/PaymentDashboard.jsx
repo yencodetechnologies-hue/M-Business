@@ -28,7 +28,7 @@ const planIcons = {
 };
 
 const CheckIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#3B6D11" strokeWidth="2" style={{ flexShrink: 0 }}>
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#1E293B" strokeWidth="2" style={{ flexShrink: 0 }}>
     <polyline points="2,8 6,12 14,4" />
   </svg>
 );

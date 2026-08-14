@@ -82,7 +82,7 @@ key: process.env.REACT_APP_RAZORPAY_KEY_ID, // Test key
         paymentId: order.id
       },
       theme: {
-        color: '#3399cc'
+        color: '#2563EB'
       },
       modal: {
         ondismiss: function() {

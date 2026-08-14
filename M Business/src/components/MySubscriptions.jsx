@@ -6,7 +6,7 @@ import { BASE_URL } from "../config";
 const T = {
   primary: "var(--app-sidebar)", sidebar: "var(--app-sidebar)", accent: "var(--app-accent)",
   bg: "var(--app-bg)", card: "var(--app-card)", text: "var(--app-sidebar)", muted: "var(--app-accent)",
-  border: "var(--app-border)", success: "#22C55E", warning: "#F59E0B", danger: "#EF4444"
+  border: "var(--app-border)", success: "#16A34A", warning: "#64748B", danger: "#64748B"
 };
 
 // ─── Load Razorpay Script ----------------------------------------------------
@@ -87,25 +87,25 @@ function PlanPickerModal({ subscription, payLoading, onClose, onSelectPlan, onSt
   const currentPlan = subscription?.planName;
   const trialAlreadyUsed = !!(subscription?.isTrial || subscription?.planName === "Trial" || subscription?.billingCycle === "trial");
   return (
-    <div style={{ position: "fixed", inset: 0, zIndex: 99990, background: "linear-gradient(135deg,#eff6ff 0%,#e8f5e9 50%,#e3f2fd 100%)", overflowY: "auto", display: "flex", flexDirection: "column" }}>
+    <div style={{ position: "fixed", inset: 0, zIndex: 99990, background: "linear-gradient(135deg,#EFF6FF 0%,#E2E8F0 50%,#EFF6FF 100%)", overflowY: "auto", display: "flex", flexDirection: "column" }}>
       <style>{`
         @keyframes ppFadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
         .pp-card { transition: transform 0.22s, box-shadow 0.22s; cursor:default; }
-        .pp-card:hover { transform: translateY(-6px) !important; box-shadow: 0 24px 48px rgba(0,150,136,0.13) !important; }
+        .pp-card:hover { transform: translateY(-6px) !important; box-shadow: 0 24px 48px rgba(22, 163, 74, 0.13) !important; }
         .pp-btn { transition: all 0.18s; }
         .pp-btn:hover:not(:disabled) { filter: brightness(0.93); transform: translateY(-1px); }
       `}</style>
 
       {/* Closebutton */}
-      <button onClick={onClose} style={{ position: "fixed", top: 18, right: 22, zIndex: 100000, background: "rgba(0,150,136,0.12)", border: "none", color: "#00796b", width: 38, height: 38, borderRadius: "50%", fontSize: 20, cursor: "pointer", fontFamily: "inherit", fontWeight: 700 }}>✕</button>
+      <button onClick={onClose} style={{ position: "fixed", top: 18, right: 22, zIndex: 100000, background: "rgba(22, 163, 74, 0.12)", border: "none", color: "#16A34A", width: 38, height: 38, borderRadius: "50%", fontSize: 20, cursor: "pointer", fontFamily: "inherit", fontWeight: 700 }}>✕</button>
 
       <div style={{ maxWidth: 1060, width: "100%", margin: "0 auto", padding: "48px 20px 60px", animation: "ppFadeUp 0.38s ease" }}>
 
         {/* Header */}
         <div style={{ textAlign: "center", marginBottom: 44 }}>
-          <h2 style={{ fontSize: 36, fontWeight: 900, color: "#00897b", margin: "0 0 10px", letterSpacing: "-0.5px" }}>Choose Your Plan</h2>
-          <p style={{ color: "#00796b", fontSize: 15, margin: "0 0 6px", fontWeight: 500 }}>Select the best plan for your business growth</p>
-          <div style={{ fontSize: 12, color: "#80cbc4", fontWeight: 700, letterSpacing: 0.5 }}>
+          <h2 style={{ fontSize: 36, fontWeight: 900, color: "#16A34A", margin: "0 0 10px", letterSpacing: "-0.5px" }}>Choose Your Plan</h2>
+          <p style={{ color: "#16A34A", fontSize: 15, margin: "0 0 6px", fontWeight: 500 }}>Select the best plan for your business growth</p>
+          <div style={{ fontSize: 12, color: "#64748B", fontWeight: 700, letterSpacing: 0.5 }}>
             {subscription ? `Current Plan: ${currentPlan}` : "Management Suite - subadmin"}
           </div>
         </div>
@@ -119,11 +119,11 @@ function PlanPickerModal({ subscription, payLoading, onClose, onSelectPlan, onSt
 
             return (
               <div key={plan.name} className="pp-card" style={{
-                background: "#fff",
+                background: "#FFFFFF",
                 borderRadius: 20,
                 padding: "36px 26px 28px",
-                border: isPopular ? "2.5px solid #00897b" : isCurrent ? "2.5px solid #26a69a" : "1.5px solid #e0f2f1",
-                boxShadow: isPopular ? "0 16px 48px rgba(0,137,123,0.16)" : "0 6px 24px rgba(0,0,0,0.05)",
+                border: isPopular ? "2.5px solid #16A34A" : isCurrent ? "2.5px solid #64748B" : "1.5px solid #E2E8F0",
+                boxShadow: isPopular ? "0 16px 48px rgba(22, 163, 74, 0.16)" : "0 6px 24px rgba(0,0,0,0.05)",
                 position: "relative",
                 display: "flex",
                 flexDirection: "column",
@@ -131,13 +131,13 @@ function PlanPickerModal({ subscription, payLoading, onClose, onSelectPlan, onSt
               }}>
                 {/* MOST POPULAR badge */}
                 {isPopular && (
-                  <div style={{ position: "absolute", top: -1, right: -1, background: "#00897b", color: "#fff", padding: "7px 18px", borderRadius: "0 18px 0 14px", fontSize: 11, fontWeight: 900, textTransform: "uppercase", letterSpacing: 1 }}>
+                  <div style={{ position: "absolute", top: -1, right: -1, background: "#16A34A", color: "#FFFFFF", padding: "7px 18px", borderRadius: "0 18px 0 14px", fontSize: 11, fontWeight: 900, textTransform: "uppercase", letterSpacing: 1 }}>
                     Most Popular
                   </div>
                 )}
                 {/* CURRENT PLAN badge */}
                 {isCurrent && (
-                  <div style={{ position: "absolute", top: -1, right: -1, background: "#26a69a", color: "#fff", padding: "7px 18px", borderRadius: "0 18px 0 14px", fontSize: 11, fontWeight: 900, textTransform: "uppercase", letterSpacing: 1 }}>
+                  <div style={{ position: "absolute", top: -1, right: -1, background: "#64748B", color: "#FFFFFF", padding: "7px 18px", borderRadius: "0 18px 0 14px", fontSize: 11, fontWeight: 900, textTransform: "uppercase", letterSpacing: 1 }}>
                     Current Plan
                   </div>
                 )}
@@ -146,22 +146,22 @@ function PlanPickerModal({ subscription, payLoading, onClose, onSelectPlan, onSt
                 <div style={{ fontSize: 38, marginBottom: 16 }}>{plan.icon}</div>
 
                 {/* Name */}
-                <h3 style={{ fontSize: 24, fontWeight: 900, color: isPopular ? "#00897b" : "#1e293b", margin: "0 0 16px" }}>{plan.name}</h3>
+                <h3 style={{ fontSize: 24, fontWeight: 900, color: isPopular ? "#16A34A" : "#1E293B", margin: "0 0 16px" }}>{plan.name}</h3>
 
                 {/* Price */}
                 <div style={{ display: "flex", alignItems: "baseline", gap: 3, marginBottom: 20 }}>
-                  <span style={{ fontSize: 40, fontWeight: 900, color: "#1e293b", letterSpacing: "-1px" }}>
+                  <span style={{ fontSize: 40, fontWeight: 900, color: "#1E293B", letterSpacing: "-1px" }}>
                     {plan.price === 0 ? "₹0" : plan.price === null ? "Custom" : `₹${plan.price.toLocaleString("en-IN")}`}
                   </span>
-                  {plan.price !== null && <span style={{ fontSize: 14, color: "#94a3b8", fontWeight: 600 }}> / month</span>}
+                  {plan.price !== null && <span style={{ fontSize: 14, color: "#64748B", fontWeight: 600 }}> / month</span>}
                 </div>
 
                 {/* Features */}
                 <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 11, marginBottom: 28 }}>
                   {plan.features.map((f, i) => (
                     <div key={i} style={{ display: "flex", alignItems: "center", gap: 9 }}>
-                      <span style={{ color: "#00897b", fontSize: 15, flexShrink: 0, fontWeight: 700 }}>✓</span>
-                      <span style={{ fontSize: 13.5, color: "#475569", fontWeight: 500 }}>{f}</span>
+                      <span style={{ color: "#16A34A", fontSize: 15, flexShrink: 0, fontWeight: 700 }}>✓</span>
+                      <span style={{ fontSize: 13.5, color: "#64748B", fontWeight: 500 }}>{f}</span>
                     </div>
                   ))}
                 </div>
@@ -176,20 +176,20 @@ function PlanPickerModal({ subscription, payLoading, onClose, onSelectPlan, onSt
                     fontFamily: "inherit", border: "none",
                     cursor: isCurrent || payLoading ? "not-allowed" : "pointer",
                     background: isCurrent
-                      ? "#e0f2f1"
+                      ? "#E2E8F0"
                       : isPopular
-                        ? "#00897b"
+                        ? "#16A34A"
                         : plan.isTrial
-                          ? "#e0f2f1"
-                          : "#e0f2f1",
+                          ? "#E2E8F0"
+                          : "#E2E8F0",
                     color: isCurrent
-                      ? "#26a69a"
+                      ? "#64748B"
                       : isPopular
-                        ? "#fff"
+                        ? "#FFFFFF"
                         : plan.isTrial
-                          ? "#00897b"
-                          : "#00897b",
-                    boxShadow: isPopular && !isCurrent ? "0 6px 18px rgba(0,137,123,0.3)" : "none"
+                          ? "#16A34A"
+                          : "#16A34A",
+                    boxShadow: isPopular && !isCurrent ? "0 6px 18px rgba(22, 163, 74, 0.3)" : "none"
                   }}
                 >
                   {isProcessing ? "Processing..." : (isCurrent && subscription?.status === "active") ? "✓ Current Plan" : (isCurrent && subscription?.status !== "active") ? "Renew Plan" : (plan.isTrial && trialAlreadyUsed) ? "Trial Used" : plan.btnLabel || "Get Started"}
@@ -199,7 +199,7 @@ function PlanPickerModal({ subscription, payLoading, onClose, onSelectPlan, onSt
           })}
         </div>
 
-        <div style={{ textAlign: "center", marginTop: 32, color: "#80cbc4", fontSize: 13, fontWeight: 600 }}>
+        <div style={{ textAlign: "center", marginTop: 32, color: "#64748B", fontSize: 13, fontWeight: 600 }}>
           Secure payment · Cancel anytime · 24/7 support
         </div>
       </div>
@@ -228,26 +228,26 @@ function MockPaymentGateway({ plan, userEmail, userName, payLoading, onClose, on
       : true;
 
   return (
-    <div style={{ position: "fixed", inset: 0, zIndex: 999998, background: "rgba(10,10,30,0.75)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+    <div style={{ position: "fixed", inset: 0, zIndex: 999998, background: "rgba(15, 23, 42, 0.75)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
       <style>{`
         @keyframes slideUp { from { opacity:0; transform:translateY(40px); } to { opacity:1; transform:translateY(0); } }
         @keyframes pgSpin { to { transform:rotate(360deg); } }
-        .pg-input { width:100%; padding:12px 14px; border:1.5px solid #e2e8f0; borderRadius:10px; fontSize:14px; fontFamily:inherit; outline:none; transition:border 0.2s; background:#fafafa; }
-        .pg-input:focus { border-color:#6366f1; background:#fff; }
-        .pg-method { display:flex; alignItems:center; gap:10px; padding:12px 16px; border:2px solid #e2e8f0; borderRadius:12px; cursor:pointer; transition:all 0.2s; fontWeight:600; fontSize:13px; }
-        .pg-method.active { border-color:#6366f1; background:#eff6ff; color:#6366f1; }
-        .pg-method:hover { border-color:#64748b; }
+        .pg-input { width:100%; padding:12px 14px; border:1.5px solid #E2E8F0; borderRadius:10px; fontSize:14px; fontFamily:inherit; outline:none; transition:border 0.2s; background:#F8FAFC; }
+        .pg-input:focus { border-color:#2563EB; background:#FFFFFF; }
+        .pg-method { display:flex; alignItems:center; gap:10px; padding:12px 16px; border:2px solid #E2E8F0; borderRadius:12px; cursor:pointer; transition:all 0.2s; fontWeight:600; fontSize:13px; }
+        .pg-method.active { border-color:#2563EB; background:#EFF6FF; color:#2563EB; }
+        .pg-method:hover { border-color:#64748B; }
       `}</style>
 
-      <div style={{ background: "#fff", borderRadius: 24, width: "100%", maxWidth: 480, boxShadow: "0 30px 60px rgba(0,0,0,0.3)", animation: "slideUp 0.35s ease", overflow: "hidden" }}>
+      <div style={{ background: "#FFFFFF", borderRadius: 24, width: "100%", maxWidth: 480, boxShadow: "0 30px 60px rgba(0,0,0,0.3)", animation: "slideUp 0.35s ease", overflow: "hidden" }}>
         {/* Header */}
-        <div style={{ background: "linear-gradient(135deg,#6366f1,#4f46e5)", padding: "24px 28px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div style={{ background: "linear-gradient(135deg,#2563EB,#2563EB)", padding: "24px 28px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div>
             <div style={{ color: "rgba(255,255,255,0.8)", fontSize: 12, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>Secure Payment</div>
-            <div style={{ color: "#fff", fontSize: 22, fontWeight: 900 }}>₹{plan.price?.toLocaleString("en-IN")}<span style={{ fontSize: 13, fontWeight: 600, opacity: 0.8 }}>/month</span></div>
+            <div style={{ color: "#FFFFFF", fontSize: 22, fontWeight: 900 }}>₹{plan.price?.toLocaleString("en-IN")}<span style={{ fontSize: 13, fontWeight: 600, opacity: 0.8 }}>/month</span></div>
             <div style={{ color: "rgba(255,255,255,0.85)", fontSize: 13, marginTop: 2 }}>{plan.icon} {plan.name} Plan</div>
           </div>
-          <button onClick={onClose} style={{ background: "rgba(255,255,255,0.2)", border: "none", color: "#fff", width: 36, height: 36, borderRadius: "50%", fontSize: 18, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "inherit" }}>Close</button>
+          <button onClick={onClose} style={{ background: "rgba(255,255,255,0.2)", border: "none", color: "#FFFFFF", width: 36, height: 36, borderRadius: "50%", fontSize: 18, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "inherit" }}>Close</button>
         </div>
 
         <div style={{ padding: "24px 28px" }}>
@@ -259,7 +259,7 @@ function MockPaymentGateway({ plan, userEmail, userName, payLoading, onClose, on
               { id: "netbanking", icon: "Bank", label: "Net Banking" }
             ].map(m => (
               <div key={m.id} className={`pg-method${method === m.id ? " active" : ""}`} onClick={() => setMethod(m.id)}
-                style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 12px", border: `2px solid ${method === m.id ? "#6366f1" : "#e2e8f0"}`, borderRadius: 12, cursor: "pointer", background: method === m.id ? "#eff6ff" : "#fafafa", color: method === m.id ? "#6366f1" : "#64748b", fontWeight: 700, fontSize: 12, transition: "all 0.2s" }}>
+                style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 12px", border: `2px solid ${method === m.id ? "#2563EB" : "#E2E8F0"}`, borderRadius: 12, cursor: "pointer", background: method === m.id ? "#EFF6FF" : "#F8FAFC", color: method === m.id ? "#2563EB" : "#64748B", fontWeight: 700, fontSize: 12, transition: "all 0.2s" }}>
                 <span style={{ fontSize: 18 }}>{m.icon}</span> {m.label}
               </div>
             ))}
@@ -269,29 +269,29 @@ function MockPaymentGateway({ plan, userEmail, userName, payLoading, onClose, on
           {method === "card" && (
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               <div>
-                <div style={{ fontSize: 12, fontWeight: 700, color: "#475569", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>Card Number</div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "#64748B", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>Card Number</div>
                 <input className="pg-input" placeholder="1234 5678 9012 3456" value={cardNum}
                   onChange={e => setCardNum(fmtCard(e.target.value))}
-                  style={{ width: "100%", padding: "12px 14px", border: "1.5px solid #e2e8f0", borderRadius: 10, fontSize: 15, fontFamily: "inherit", outline: "none", background: "#fafafa", letterSpacing: 2 }} />
+                  style={{ width: "100%", padding: "12px 14px", border: "1.5px solid #E2E8F0", borderRadius: 10, fontSize: 15, fontFamily: "inherit", outline: "none", background: "#F8FAFC", letterSpacing: 2 }} />
               </div>
               <div>
-                <div style={{ fontSize: 12, fontWeight: 700, color: "#475569", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>Cardholder Name</div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "#64748B", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>Cardholder Name</div>
                 <input className="pg-input" placeholder="Name on card" value={cardName}
                   onChange={e => setCardName(e.target.value)}
-                  style={{ width: "100%", padding: "12px 14px", border: "1.5px solid #e2e8f0", borderRadius: 10, fontSize: 14, fontFamily: "inherit", outline: "none", background: "#fafafa" }} />
+                  style={{ width: "100%", padding: "12px 14px", border: "1.5px solid #E2E8F0", borderRadius: 10, fontSize: 14, fontFamily: "inherit", outline: "none", background: "#F8FAFC" }} />
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 <div>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: "#475569", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>Expiry</div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: "#64748B", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>Expiry</div>
                   <input className="pg-input" placeholder="MM/YY" value={expiry}
                     onChange={e => setExpiry(fmtExp(e.target.value))}
-                    style={{ width: "100%", padding: "12px 14px", border: "1.5px solid #e2e8f0", borderRadius: 10, fontSize: 14, fontFamily: "inherit", outline: "none", background: "#fafafa" }} />
+                    style={{ width: "100%", padding: "12px 14px", border: "1.5px solid #E2E8F0", borderRadius: 10, fontSize: 14, fontFamily: "inherit", outline: "none", background: "#F8FAFC" }} />
                 </div>
                 <div>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: "#475569", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>CVV</div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: "#64748B", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>CVV</div>
                   <input className="pg-input" placeholder="•••" type="password" maxLength={4} value={cvv}
                     onChange={e => setCvv(e.target.value.replace(/\D/g, "").slice(0, 4))}
-                    style={{ width: "100%", padding: "12px 14px", border: "1.5px solid #e2e8f0", borderRadius: 10, fontSize: 14, fontFamily: "inherit", outline: "none", background: "#fafafa" }} />
+                    style={{ width: "100%", padding: "12px 14px", border: "1.5px solid #E2E8F0", borderRadius: 10, fontSize: 14, fontFamily: "inherit", outline: "none", background: "#F8FAFC" }} />
                 </div>
               </div>
             </div>
@@ -300,21 +300,21 @@ function MockPaymentGateway({ plan, userEmail, userName, payLoading, onClose, on
           {/* UPI */}
           {method === "upi" && (
             <div>
-              <div style={{ fontSize: 12, fontWeight: 700, color: "#475569", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>UPI ID</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "#64748B", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>UPI ID</div>
               <input placeholder="yourname@upi" value={upi} onChange={e => setUpi(e.target.value)}
-                style={{ width: "100%", padding: "12px 14px", border: "1.5px solid #e2e8f0", borderRadius: 10, fontSize: 14, fontFamily: "inherit", outline: "none", background: "#fafafa" }} />
-              <div style={{ marginTop: 8, fontSize: 12, color: "#94a3b8" }}>e.g. 9876543210@paytm, name@ybl</div>
+                style={{ width: "100%", padding: "12px 14px", border: "1.5px solid #E2E8F0", borderRadius: 10, fontSize: 14, fontFamily: "inherit", outline: "none", background: "#F8FAFC" }} />
+              <div style={{ marginTop: 8, fontSize: 12, color: "#64748B" }}>e.g. 9876543210@paytm, name@ybl</div>
             </div>
           )}
 
           {/* Net Banking */}
           {method === "netbanking" && (
             <div>
-              <div style={{ fontSize: 12, fontWeight: 700, color: "#475569", marginBottom: 8, textTransform: "uppercase", letterSpacing: 0.5 }}>Select Bank</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "#64748B", marginBottom: 8, textTransform: "uppercase", letterSpacing: 0.5 }}>Select Bank</div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                 {[{ id: "sbi", label: "State Bank of India" }, { id: "hdfc", label: "HDFC Bank" }, { id: "icici", label: "ICICI Bank" }, { id: "axis", label: "Axis Bank" }, { id: "kotak", label: "Kotak Bank" }, { id: "other", label: "Other Bank" }].map(b => (
                   <div key={b.id} onClick={() => setBank(b.id)}
-                    style={{ padding: "10px 14px", border: `2px solid ${bank === b.id ? "#6366f1" : "#e2e8f0"}`, borderRadius: 10, cursor: "pointer", fontSize: 12, fontWeight: 700, color: bank === b.id ? "#6366f1" : "#475569", background: bank === b.id ? "#eff6ff" : "#fafafa", transition: "all 0.15s" }}>
+                    style={{ padding: "10px 14px", border: `2px solid ${bank === b.id ? "#2563EB" : "#E2E8F0"}`, borderRadius: 10, cursor: "pointer", fontSize: 12, fontWeight: 700, color: bank === b.id ? "#2563EB" : "#64748B", background: bank === b.id ? "#EFF6FF" : "#F8FAFC", transition: "all 0.15s" }}>
                     {b.label}
                   </div>
                 ))}
@@ -323,25 +323,25 @@ function MockPaymentGateway({ plan, userEmail, userName, payLoading, onClose, on
           )}
 
           {/* Summary */}
-          <div style={{ marginTop: 20, background: "#f8fafc", borderRadius: 12, padding: "14px 16px", display: "flex", justifyContent: "space-between", alignItems: "center", border: "1px solid #e2e8f0" }}>
-            <div style={{ fontSize: 13, color: "#64748b", fontWeight: 600 }}>Total to pay</div>
-            <div style={{ fontSize: 20, fontWeight: 900, color: "#1e293b" }}>₹{plan.price?.toLocaleString("en-IN")}</div>
+          <div style={{ marginTop: 20, background: "#F8FAFC", borderRadius: 12, padding: "14px 16px", display: "flex", justifyContent: "space-between", alignItems: "center", border: "1px solid #E2E8F0" }}>
+            <div style={{ fontSize: 13, color: "#64748B", fontWeight: 600 }}>Total to pay</div>
+            <div style={{ fontSize: 20, fontWeight: 900, color: "#1E293B" }}>₹{plan.price?.toLocaleString("en-IN")}</div>
           </div>
 
           {/* Pay Button */}
           <button
             onClick={onPay}
             disabled={!canPay || loading}
-            style={{ marginTop: 16, width: "100%", padding: "15px", background: canPay && !loading ? "linear-gradient(135deg,#6366f1,#4f46e5)" : "#e2e8f0", color: canPay && !loading ? "#fff" : "#94a3b8", border: "none", borderRadius: 12, fontSize: 16, fontWeight: 800, cursor: canPay && !loading ? "pointer" : "not-allowed", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, transition: "all 0.2s", boxShadow: canPay && !loading ? "0 8px 20px rgba(37, 99, 235,0.35)" : "none" }}
+            style={{ marginTop: 16, width: "100%", padding: "15px", background: canPay && !loading ? "linear-gradient(135deg,#2563EB,#2563EB)" : "#E2E8F0", color: canPay && !loading ? "#FFFFFF" : "#64748B", border: "none", borderRadius: 12, fontSize: 16, fontWeight: 800, cursor: canPay && !loading ? "pointer" : "not-allowed", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, transition: "all 0.2s", boxShadow: canPay && !loading ? "0 8px 20px rgba(37, 99, 235, 0.35)" : "none" }}
           >
             {loading
-              ? <><div style={{ width: 18, height: 18, border: "2.5px solid #fff", borderTopColor: "transparent", borderRadius: "50%", animation: "pgSpin 0.8s linear infinite" }} /> Processing...</>
+              ? <><div style={{ width: 18, height: 18, border: "2.5px solid #FFFFFF", borderTopColor: "transparent", borderRadius: "50%", animation: "pgSpin 0.8s linear infinite" }} /> Processing...</>
               : <>Secure Pay ₹{plan.price?.toLocaleString("en-IN")} Now</>
             }
           </button>
 
           {/* Security badges */}
-          <div style={{ marginTop: 16, display: "flex", justifyContent: "center", gap: 20, color: "#94a3b8", fontSize: 11, fontWeight: 600 }}>
+          <div style={{ marginTop: 16, display: "flex", justifyContent: "center", gap: 20, color: "#64748B", fontSize: 11, fontWeight: 600 }}>
             <span>Secure 256-bit SSL</span>
             <span>Security PCI DSS</span>
             <span>Success RBI Compliant</span>
@@ -485,19 +485,19 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
         <head>
           <title>${type === 'invoice' ? 'Invoice' : 'Receipt'} - ${viewInvoice.invoiceNo}</title>
           <style>
-            body { font-family: 'Inter', -apple-system, sans-serif; padding: 40px; color: #1e293b; line-height: 1.5; }
-            .header { display: flex; justify-content: space-between; border-bottom: 2px solid #e2e8f0; padding-bottom: 20px; margin-bottom: 30px; }
-            .title { font-size: 24px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 1px; }
+            body { font-family: 'Inter', -apple-system, sans-serif; padding: 40px; color: #1E293B; line-height: 1.5; }
+            .header { display: flex; justify-content: space-between; border-bottom: 2px solid #E2E8F0; padding-bottom: 20px; margin-bottom: 30px; }
+            .title { font-size: 24px; font-weight: 800; color: #0F172A; text-transform: uppercase; letter-spacing: 1px; }
             .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 40px; }
-            .section-title { font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 8px; }
+            .section-title { font-size: 12px; font-weight: 700; color: #64748B; text-transform: uppercase; margin-bottom: 8px; }
             .value { font-size: 14px; font-weight: 600; }
             table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
-            th { text-align: left; padding: 12px; border-bottom: 2px solid #e2e8f0; font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; }
-            td { padding: 12px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
+            th { text-align: left; padding: 12px; border-bottom: 2px solid #E2E8F0; font-size: 12px; font-weight: 700; color: #64748B; text-transform: uppercase; }
+            td { padding: 12px; border-bottom: 1px solid #EFF6FF; font-size: 14px; }
             .totals { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
             .total-row { display: flex; width: 250px; justify-content: space-between; }
-            .grand-total { font-size: 20px; font-weight: 800; color: var(--app-accent, #6366f1); margin-top: 10px; padding-top: 10px; border-top: 2px solid #e2e8f0; }
-            .footer { margin-top: 60px; text-align: center; font-size: 12px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 20px; }
+            .grand-total { font-size: 20px; font-weight: 800; color: var(--app-accent, #2563EB); margin-top: 10px; padding-top: 10px; border-top: 2px solid #E2E8F0; }
+            .footer { margin-top: 60px; text-align: center; font-size: 12px; color: #64748B; border-top: 1px solid #E2E8F0; padding-top: 20px; }
             @media print { .no-print { display: none; } }
           </style>
         </head>
@@ -505,11 +505,11 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
           <div class="header">
             <div>
               <div class="title">${type === 'invoice' ? 'Invoice' : 'Receipt'}</div>
-              <div style="font-size: 14px; color: #64748b; margin-top: 4px;"># ${viewInvoice.invoiceNo}</div>
+              <div style="font-size: 14px; color: #64748B; margin-top: 4px;"># ${viewInvoice.invoiceNo}</div>
             </div>
             <div style="text-align: right;">
               <div style="font-weight: 800; font-size: 18px;">M Business</div>
-              <div style="font-size: 12px; color: #64748b;">Billing Support</div>
+              <div style="font-size: 12px; color: #64748B;">Billing Support</div>
             </div>
           </div>
 
@@ -517,7 +517,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
             <div>
               <div class="section-title">Billed To</div>
               <div class="value">${user?.companyName || user?.name || "Customer"}</div>
-              <div style="font-size: 12px; color: #64748b;">${user?.email || ""}</div>
+              <div style="font-size: 12px; color: #64748B;">${user?.email || ""}</div>
             </div>
             <div style="text-align: right;">
               <div class="section-title">Payment Details</div>
@@ -538,7 +538,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
               <tr>
                 <td>
                   <div style="font-weight: 700;">${viewInvoice.planName || "Subscription Plan"}</div>
-                  <div style="font-size: 12px; color: #64748b;">${viewInvoice.planDuration || "Monthly"} subscription</div>
+                  <div style="font-size: 12px; color: #64748B;">${viewInvoice.planDuration || "Monthly"} subscription</div>
                 </td>
                 <td style="text-align: right; font-weight: 700;">${formatCurrency(viewInvoice.amount, viewInvoice.currency)}</td>
               </tr>
@@ -547,11 +547,11 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
 
           <div class="totals">
             <div class="total-row">
-              <span style="color: #64748b;">Subtotal</span>
+              <span style="color: #64748B;">Subtotal</span>
               <span style="font-weight: 700;">${formatCurrency(viewInvoice.amount, viewInvoice.currency)}</span>
             </div>
             <div class="total-row">
-              <span style="color: #64748b;">Tax (GST 0%)</span>
+              <span style="color: #64748B;">Tax (GST 0%)</span>
               <span style="font-weight: 700;">${formatCurrency(0, viewInvoice.currency)}</span>
             </div>
             <div class="total-row grand-total">
@@ -718,13 +718,13 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
   // ── Plan Picker (Choose Your Plan overlay) ------------------------------------
   if (showPlanPicker) {
     return (
-      <div style={{ position: "fixed", inset: 0, zIndex: 99990, background: "#f8fafc", overflowY: "auto", padding: "48px 20px 60px" }}>
-        <button onClick={() => { setShowPlanPicker(false); if (onTabChange) onTabChange(); }} style={{ position: "fixed", top: 18, right: 22, zIndex: 100000, background: "#f1f5f9", border: "none", color: "#1e293b", width: 38, height: 38, borderRadius: "50%", fontSize: 20, cursor: "pointer", fontFamily: "inherit", fontWeight: 700 }}>✕</button>
+      <div style={{ position: "fixed", inset: 0, zIndex: 99990, background: "#F8FAFC", overflowY: "auto", padding: "48px 20px 60px" }}>
+        <button onClick={() => { setShowPlanPicker(false); if (onTabChange) onTabChange(); }} style={{ position: "fixed", top: 18, right: 22, zIndex: 100000, background: "#EFF6FF", border: "none", color: "#1E293B", width: 38, height: 38, borderRadius: "50%", fontSize: 20, cursor: "pointer", fontFamily: "inherit", fontWeight: 700 }}>✕</button>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 32, maxWidth: 1100, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 8 }}>
-            <h2 style={{ fontSize: 34, fontWeight: 900, color: "#1e293b", margin: "0 0 10px" }}>Choose your Plan</h2>
-            <p style={{ color: "#64748b", fontSize: 15, margin: 0 }}>Select the best plan for your business growth.</p>
+            <h2 style={{ fontSize: 34, fontWeight: 900, color: "#1E293B", margin: "0 0 10px" }}>Choose your Plan</h2>
+            <p style={{ color: "#64748B", fontSize: 15, margin: 0 }}>Select the best plan for your business growth.</p>
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(270px, 1fr))", gap: 24, width: "100%" }}>
@@ -733,10 +733,10 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
               const isProcessing = payLoading === plan.name;
               return (
                 <div key={plan.name} style={{
-                  background: "#fff",
+                  background: "#FFFFFF",
                   borderRadius: 20,
                   padding: "36px 28px 28px",
-                  border: plan.popular ? "2px solid var(--app-accent)" : "1.5px solid #e2e8f0",
+                  border: plan.popular ? "2px solid var(--app-accent)" : "1.5px solid #E2E8F0",
                   boxShadow: plan.popular ? "0 8px 32px rgba(var(--app-accent-rgb,0,188,212),0.13)" : "0 4px 16px rgba(0,0,0,0.04)",
                   position: "relative",
                   display: "flex",
@@ -745,7 +745,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
                   {plan.popular && (
                     <div style={{
                       position: "absolute", top: -16, left: "50%", transform: "translateX(-50%)",
-                      background: "var(--app-accent)", color: "#fff", padding: "6px 22px",
+                      background: "var(--app-accent)", color: "#FFFFFF", padding: "6px 22px",
                       borderRadius: 20, fontSize: 11, fontWeight: 900, textTransform: "uppercase",
                       letterSpacing: 1, whiteSpace: "nowrap"
                     }}>POPULAR</div>
@@ -753,31 +753,31 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
                   {isCurrent && (
                     <div style={{
                       position: "absolute", top: -1, right: -1,
-                      background: "#26a69a", color: "#fff", padding: "7px 18px",
+                      background: "#64748B", color: "#FFFFFF", padding: "7px 18px",
                       borderRadius: "0 18px 0 14px", fontSize: 11, fontWeight: 900, textTransform: "uppercase",
                       letterSpacing: 1
                     }}>Current Plan</div>
                   )}
 
-                  <div style={{ width: 52, height: 52, borderRadius: "50%", background: "#eff6ff", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 18 }}>
+                  <div style={{ width: 52, height: 52, borderRadius: "50%", background: "#EFF6FF", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 18 }}>
                     <span style={{ fontSize: 24 }}>🌱</span>
                   </div>
 
-                  <h3 style={{ fontSize: 22, fontWeight: 800, color: "#1e293b", margin: "0 0 4px" }}>{plan.name}</h3>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: "#94a3b8", letterSpacing: 1, textTransform: "uppercase", marginBottom: 16 }}>{plan.subtitle || "MONTHLY PLAN"}</div>
+                  <h3 style={{ fontSize: 22, fontWeight: 800, color: "#1E293B", margin: "0 0 4px" }}>{plan.name}</h3>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: "#64748B", letterSpacing: 1, textTransform: "uppercase", marginBottom: 16 }}>{plan.subtitle || "MONTHLY PLAN"}</div>
 
                   <div style={{ display: "flex", alignItems: "baseline", gap: 2, marginBottom: 24 }}>
-                    <span style={{ fontSize: 40, fontWeight: 900, color: "#1e293b", letterSpacing: "-1px" }}>
+                    <span style={{ fontSize: 40, fontWeight: 900, color: "#1E293B", letterSpacing: "-1px" }}>
                       {plan.price === 0 ? "Free" : `Rs.${plan.price.toLocaleString("en-IN")}`}
                     </span>
-                    {plan.price > 0 && <span style={{ fontSize: 14, color: "#94a3b8", fontWeight: 600 }}>/mo</span>}
+                    {plan.price > 0 && <span style={{ fontSize: 14, color: "#64748B", fontWeight: 600 }}>/mo</span>}
                   </div>
 
                   <div style={{ display: "flex", flexDirection: "column", gap: 10, flex: 1, marginBottom: 28 }}>
                     {plan.features.map((f, i) => (
                       <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
                         <span style={{ color: "var(--app-accent)", fontSize: 15, flexShrink: 0 }}>✓</span>
-                        <span style={{ fontSize: 13.5, color: "#475569", fontWeight: 500 }}>{f}</span>
+                        <span style={{ fontSize: 13.5, color: "#64748B", fontWeight: 500 }}>{f}</span>
                       </div>
                     ))}
                   </div>
@@ -788,8 +788,8 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
                     style={{
                       width: "100%", padding: "14px", borderRadius: 12, fontSize: 15, fontWeight: 800,
                       cursor: (isCurrent || payLoading) ? "not-allowed" : "pointer", fontFamily: "inherit", border: "none",
-                      background: isCurrent ? "#f1f5f9" : plan.popular ? "var(--app-accent)" : "#f1f5f9",
-                      color: isCurrent ? "#94a3b8" : plan.popular ? "#fff" : "#1e293b",
+                      background: isCurrent ? "#EFF6FF" : plan.popular ? "var(--app-accent)" : "#EFF6FF",
+                      color: isCurrent ? "#64748B" : plan.popular ? "#FFFFFF" : "#1E293B",
                       boxShadow: plan.popular && !isCurrent ? "0 6px 18px rgba(var(--app-accent-rgb,0,188,212),0.3)" : "none",
                       transition: "all 0.18s"
                     }}
@@ -801,7 +801,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
             })}
           </div>
 
-          <div style={{ textAlign: "center", color: "#94a3b8", fontSize: 13, fontWeight: 500 }}>
+          <div style={{ textAlign: "center", color: "#64748B", fontSize: 13, fontWeight: 500 }}>
             Need a custom solution or have questions?{" "}
             <span style={{ color: "var(--app-accent)", cursor: "pointer", textDecoration: "underline" }}>Chat with our billing team</span>
             {" "}or call us at +91 98765 43210
@@ -818,27 +818,27 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
         @keyframes scaleIn { 0% { transform: scale(0); } 60% { transform: scale(1.2); } 100% { transform: scale(1); } }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.4); } 50% { box-shadow: 0 0 0 16px rgba(16,185,129,0); } }
+        @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.4); } 50% { box-shadow: 0 0 0 16px rgba(22, 163, 74, 0); } }
       `}</style>
-        <div style={{ background: "#fff", borderRadius: 28, padding: "52px 44px", maxWidth: 460, width: "100%", textAlign: "center", boxShadow: "0 32px 80px rgba(0,0,0,0.35)", animation: "fadeInUp 0.5s ease", position: "relative" }}>
+        <div style={{ background: "#FFFFFF", borderRadius: 28, padding: "52px 44px", maxWidth: 460, width: "100%", textAlign: "center", boxShadow: "0 32px 80px rgba(0,0,0,0.35)", animation: "fadeInUp 0.5s ease", position: "relative" }}>
 
           {/* Success Icon */}
-          <div style={{ width: 100, height: 100, borderRadius: "50%", background: "linear-gradient(135deg,#10b981,#059669)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 48, margin: "0 auto 28px", animation: "scaleIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275), pulse 2s ease 0.5s infinite", boxShadow: "0 10px 30px rgba(16,185,129,0.35)" }}>
+          <div style={{ width: 100, height: 100, borderRadius: "50%", background: "linear-gradient(135deg,#16A34A,#16A34A)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 48, margin: "0 auto 28px", animation: "scaleIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275), pulse 2s ease 0.5s infinite", boxShadow: "0 10px 30px rgba(22, 163, 74, 0.35)" }}>
             ✓
           </div>
 
           {/* Title */}
-          <h2 style={{ fontSize: 28, fontWeight: 900, color: "#0f172a", margin: "0 0 12px", letterSpacing: "-0.5px" }}>
+          <h2 style={{ fontSize: 28, fontWeight: 900, color: "#0F172A", margin: "0 0 12px", letterSpacing: "-0.5px" }}>
             Payment Completed Successfully!
           </h2>
 
           {/* Subtitle */}
-          <p style={{ fontSize: 15, color: "#64748b", lineHeight: 1.7, maxWidth: 340, margin: "0 auto 12px" }}>
-            Your <strong style={{ color: "#0f172a" }}>{paymentSuccessData.name}</strong> plan is now active. Welcome aboard!
+          <p style={{ fontSize: 15, color: "#64748B", lineHeight: 1.7, maxWidth: 340, margin: "0 auto 12px" }}>
+            Your <strong style={{ color: "#0F172A" }}>{paymentSuccessData.name}</strong> plan is now active. Welcome aboard!
           </p>
 
           {/* Plan badge */}
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "#ecfdf5", border: "1.5px solid #6ee7b7", borderRadius: 20, padding: "6px 18px", fontSize: 13, fontWeight: 700, color: "#059669", marginBottom: 32 }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "#EFF6FF", border: "1.5px solid #64748B", borderRadius: 20, padding: "6px 18px", fontSize: 13, fontWeight: 700, color: "#16A34A", marginBottom: 32 }}>
             <span style={{ fontSize: 16 }}>🎉</span> {paymentSuccessData.name} Plan Activated
           </div>
 
@@ -849,14 +849,14 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
               if (onSubscriptionSuccess) onSubscriptionSuccess();
               else window.location.href = "/";
             }}
-            style={{ width: "100%", padding: "16px", borderRadius: 14, fontSize: 16, fontWeight: 800, cursor: "pointer", background: "linear-gradient(135deg,#10b981,#059669)", color: "#fff", border: "none", fontFamily: "inherit", boxShadow: "0 8px 24px rgba(16,185,129,0.35)", transition: "all 0.2s", marginBottom: 12 }}
-            onMouseOver={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 12px 28px rgba(16,185,129,0.45)"; }}
-            onMouseOut={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(16,185,129,0.35)"; }}
+            style={{ width: "100%", padding: "16px", borderRadius: 14, fontSize: 16, fontWeight: 800, cursor: "pointer", background: "linear-gradient(135deg,#16A34A,#16A34A)", color: "#FFFFFF", border: "none", fontFamily: "inherit", boxShadow: "0 8px 24px rgba(22, 163, 74, 0.35)", transition: "all 0.2s", marginBottom: 12 }}
+            onMouseOver={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 12px 28px rgba(22, 163, 74, 0.45)"; }}
+            onMouseOut={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(22, 163, 74, 0.35)"; }}
           >
             Login to Dashboard →
           </button>
 
-          <div style={{ fontSize: 12, color: "#94a3b8", fontWeight: 600 }}>
+          <div style={{ fontSize: 12, color: "#64748B", fontWeight: 600 }}>
             Redirecting automatically in a few seconds...
           </div>
         </div>
@@ -868,11 +868,11 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
   if (!subscription) {
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: 32, padding: "4px 0" }}>
-        {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "var(--app-sidebar)", color: "#fff", borderRadius: 12, padding: "14px 22px", fontSize: 14, fontWeight: 700, boxShadow: "0 8px 32px rgba(0,0,0,0.25)" }}>{toast}</div>}
+        {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "var(--app-sidebar)", color: "#FFFFFF", borderRadius: 12, padding: "14px 22px", fontSize: 14, fontWeight: 700, boxShadow: "0 8px 32px rgba(0,0,0,0.25)" }}>{toast}</div>}
 
         <div style={{ textAlign: "center", marginBottom: 8 }}>
-          <h2 style={{ fontSize: 34, fontWeight: 900, color: "#1e293b", margin: "0 0 10px" }}>Choose your Plan</h2>
-          <p style={{ color: "#64748b", fontSize: 15, margin: 0 }}>Select the best plan for your business growth.</p>
+          <h2 style={{ fontSize: 34, fontWeight: 900, color: "#1E293B", margin: "0 0 10px" }}>Choose your Plan</h2>
+          <p style={{ color: "#64748B", fontSize: 15, margin: 0 }}>Select the best plan for your business growth.</p>
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(270px, 1fr))", gap: 24, maxWidth: 1100, margin: "0 auto", width: "100%" }}>
@@ -880,11 +880,11 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
             const isProcessing = payLoading === plan.name;
             return (
               <div key={plan.name} style={{
-                background: "#fff",
+                background: "#FFFFFF",
                 borderRadius: 20,
                 padding: "36px 28px 28px",
-                border: plan.popular ? "2px solid  var(--app-accent, var(--app-accent, #2563EB))" : "1.5px solid #e2e8f0",
-                boxShadow: plan.popular ? "0 8px 32px rgba(37, 99, 235,0.13)" : "0 4px 16px rgba(0,0,0,0.04)",
+                border: plan.popular ? "2px solid  var(--app-accent, var(--app-accent, #2563EB))" : "1.5px solid #E2E8F0",
+                boxShadow: plan.popular ? "0 8px 32px rgba(37, 99, 235, 0.13)" : "0 4px 16px rgba(0,0,0,0.04)",
                 position: "relative",
                 display: "flex",
                 flexDirection: "column",
@@ -892,27 +892,27 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
                 {plan.popular && (
                   <div style={{
                     position: "absolute", top: -16, left: "50%", transform: "translateX(-50%)",
-                    background: " var(--app-accent, var(--app-accent, #2563EB))", color: "#fff", padding: "6px 22px",
+                    background: " var(--app-accent, var(--app-accent, #2563EB))", color: "#FFFFFF", padding: "6px 22px",
                     borderRadius: 20, fontSize: 11, fontWeight: 900, textTransform: "uppercase",
                     letterSpacing: 1, whiteSpace: "nowrap"
                   }}>POPULAR</div>
                 )}
 
                 {/* Icon */}
-                <div style={{ width: 52, height: 52, borderRadius: "50%", background: "#eff6ff", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 18 }}>
+                <div style={{ width: 52, height: 52, borderRadius: "50%", background: "#EFF6FF", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 18 }}>
                   <span style={{ fontSize: 24 }}>🌱</span>
                 </div>
 
                 {/* Plan name */}
-                <h3 style={{ fontSize: 22, fontWeight: 800, color: "#1e293b", margin: "0 0 4px" }}>{plan.name}</h3>
-                <div style={{ fontSize: 11, fontWeight: 700, color: "#94a3b8", letterSpacing: 1, textTransform: "uppercase", marginBottom: 16 }}>{plan.subtitle || "MONTHLY PLAN"}</div>
+                <h3 style={{ fontSize: 22, fontWeight: 800, color: "#1E293B", margin: "0 0 4px" }}>{plan.name}</h3>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "#64748B", letterSpacing: 1, textTransform: "uppercase", marginBottom: 16 }}>{plan.subtitle || "MONTHLY PLAN"}</div>
 
                 {/* Price */}
                 <div style={{ display: "flex", alignItems: "baseline", gap: 2, marginBottom: 24 }}>
-                  <span style={{ fontSize: 40, fontWeight: 900, color: "#1e293b", letterSpacing: "-1px" }}>
+                  <span style={{ fontSize: 40, fontWeight: 900, color: "#1E293B", letterSpacing: "-1px" }}>
                     {plan.price === 0 ? "Free" : `Rs.${plan.price.toLocaleString("en-IN")}`}
                   </span>
-                  {plan.price > 0 && <span style={{ fontSize: 14, color: "#94a3b8", fontWeight: 600 }}>/mo</span>}
+                  {plan.price > 0 && <span style={{ fontSize: 14, color: "#64748B", fontWeight: 600 }}>/mo</span>}
                 </div>
 
                 {/* Features */}
@@ -920,7 +920,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
                   {plan.features.map((f, i) => (
                     <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
                       <span style={{ color: " var(--app-accent, var(--app-accent, #2563EB))", fontSize: 15, flexShrink: 0 }}>✓</span>
-                      <span style={{ fontSize: 13.5, color: "#475569", fontWeight: 500 }}>{f}</span>
+                      <span style={{ fontSize: 13.5, color: "#64748B", fontWeight: 500 }}>{f}</span>
                     </div>
                   ))}
                 </div>
@@ -932,9 +932,9 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
                   style={{
                     width: "100%", padding: "14px", borderRadius: 12, fontSize: 15, fontWeight: 800,
                     cursor: payLoading ? "wait" : "pointer", fontFamily: "inherit", border: "none",
-                    background: plan.popular ? " var(--app-accent, var(--app-accent, #2563EB))" : "#f1f5f9",
-                    color: plan.popular ? "#fff" : "#1e293b",
-                    boxShadow: plan.popular ? "0 6px 18px rgba(37, 99, 235,0.3)" : "none",
+                    background: plan.popular ? " var(--app-accent, var(--app-accent, #2563EB))" : "#EFF6FF",
+                    color: plan.popular ? "#FFFFFF" : "#1E293B",
+                    boxShadow: plan.popular ? "0 6px 18px rgba(37, 99, 235, 0.3)" : "none",
                     transition: "all 0.18s"
                   }}
                 >
@@ -945,7 +945,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
           })}
         </div>
 
-        <div style={{ textAlign: "center", marginTop: 8, color: "#94a3b8", fontSize: 13, fontWeight: 500 }}>
+        <div style={{ textAlign: "center", marginTop: 8, color: "#64748B", fontSize: 13, fontWeight: 500 }}>
           Need a custom solution or have questions?{" "}
           <span style={{ color: " var(--app-accent, var(--app-accent, #2563EB))", cursor: "pointer", textDecoration: "underline" }}>Chat with our billing team</span>
           {" "}or call us at +91 98765 43210
@@ -970,15 +970,15 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
       return (
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 400, gap: 20, textAlign: "center", padding: 40 }}>
           <div style={{ fontSize: 60 }}>Secure</div>
-          <h2 style={{ fontSize: 22, fontWeight: 800, color: "#1e293b", margin: 0 }}>Subscription Access Restricted</h2>
-          <p style={{ color: "#64748b", fontSize: 14, maxWidth: 420, lineHeight: 1.7, margin: 0 }}>
+          <h2 style={{ fontSize: 22, fontWeight: 800, color: "#1E293B", margin: 0 }}>Subscription Access Restricted</h2>
+          <p style={{ color: "#64748B", fontSize: 14, maxWidth: 420, lineHeight: 1.7, margin: 0 }}>
             Your subscription expired {daysSinceExpiry} days ago. Access has been restricted. Please renew your plan to restore access.
           </p>
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center" }}>
-            <button onClick={() => handleTabChange("upgrade")} style={{ display: "inline-block", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", color: "#fff", textDecoration: "none", padding: "12px 24px", borderRadius: 10, fontWeight: 700, fontSize: 14, border: "none", cursor: "pointer", fontFamily: "inherit" }}>
+            <button onClick={() => handleTabChange("upgrade")} style={{ display: "inline-block", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", color: "#FFFFFF", textDecoration: "none", padding: "12px 24px", borderRadius: 10, fontWeight: 700, fontSize: 14, border: "none", cursor: "pointer", fontFamily: "inherit" }}>
               Launch Renew Subscription
             </button>
-            <a href="tel:+919876543210" style={{ display: "inline-block", background: "#f1f5f9", color: "var(--app-sidebar)", textDecoration: "none", padding: "12px 24px", borderRadius: 10, fontWeight: 700, fontSize: 14, border: "1.5px solid #e2e8f0" }}>
+            <a href="tel:+919876543210" style={{ display: "inline-block", background: "#EFF6FF", color: "var(--app-sidebar)", textDecoration: "none", padding: "12px 24px", borderRadius: 10, fontWeight: 700, fontSize: 14, border: "1.5px solid #E2E8F0" }}>
               Call Call Support
             </a>
           </div>
@@ -993,7 +993,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
       `}</style>
 
-      {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "var(--text)", color: "#fff", borderRadius: 12, padding: "14px 22px", fontSize: 14, fontWeight: 700, boxShadow: "0 8px 32px rgba(0,0,0,0.25)" }}>{toast}</div>}
+      {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "var(--text)", color: "#FFFFFF", borderRadius: 12, padding: "14px 22px", fontSize: 14, fontWeight: 700, boxShadow: "0 8px 32px rgba(0,0,0,0.25)" }}>{toast}</div>}
 
       {!subscription ? (
         <div className="plans-grid">
@@ -1027,7 +1027,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
         </div>
       ) : (
         <>
-          <div style={{ background: "var(--teal)", borderRadius: 20, padding: "32px 40px", color: "#fff", display: "flex", justifyContent: "space-between", position: "relative", overflow: "hidden", marginBottom: 10 }}>
+          <div style={{ background: "var(--teal)", borderRadius: 20, padding: "32px 40px", color: "#FFFFFF", display: "flex", justifyContent: "space-between", position: "relative", overflow: "hidden", marginBottom: 10 }}>
             <div style={{ zIndex: 1, maxWidth: "60%" }}>
               <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(255,255,255,0.2)", padding: "6px 12px", borderRadius: 20, fontSize: 11, fontWeight: 800, letterSpacing: 0.5, marginBottom: 16 }}>
                 <i className="ti ti-link"></i> CURRENT PLAN
@@ -1060,7 +1060,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
             <div style={{ zIndex: 1, textAlign: "right", display: "flex", flexDirection: "column", alignItems: "flex-end", justifyContent: "center" }}>
               <div style={{ fontSize: 42, fontWeight: 900, marginBottom: 4, letterSpacing: "-1px" }}>₹{subscription.planPrice?.toLocaleString("en-IN") || "0"}</div>
               <div style={{ fontSize: 13, color: "rgba(255,255,255,0.8)", fontWeight: 600, marginBottom: 24 }}>per {subscription.billingCycle || "month"}</div>
-              <button onClick={() => { handleTabChange("upgrade"); setTimeout(() => { const el = document.getElementById("upgrade-plans-section"); if (el) el.scrollIntoView({ behavior: "smooth", block: "start" }); }, 300); }} style={{ background: "#fff", color: "var(--teal)", border: "none", padding: "12px 24px", borderRadius: 12, fontSize: 14, fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: 8, transition: "all 0.2s" }}>
+              <button onClick={() => { handleTabChange("upgrade"); setTimeout(() => { const el = document.getElementById("upgrade-plans-section"); if (el) el.scrollIntoView({ behavior: "smooth", block: "start" }); }, 300); }} style={{ background: "#FFFFFF", color: "var(--teal)", border: "none", padding: "12px 24px", borderRadius: 12, fontSize: 14, fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: 8, transition: "all 0.2s" }}>
                 <i className="ti ti-arrow-up"></i> Upgrade Now
               </button>
               {daysLeft !== null && (
@@ -1087,12 +1087,12 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
                 return m ? parseFloat(m[0]) : fallback;
               };
               return [
-                { icon: "ti-building", label: "COMPANY NAMES", count: subscription.clientCount || 0, limit: parseLimit(subscription.clientLimit, 5), color: "var(--red)" },
+                { icon: "ti-building", label: "COMPANY NAMES", count: subscription.clientCount || 0, limit: parseLimit(subscription.clientLimit, 5), color: "var(--app-text)" },
                 { icon: "ti-users", label: "EMPLOYEES", count: subscription.employeeCount || 0, limit: parseLimit(subscription.employeeLimit, 20), color: "var(--green)" },
-                { icon: "ti-user-star", label: "MANAGERS", count: subscription.managerCount || 0, limit: parseLimit(subscription.managerLimit, 1), color: "var(--amber)" },
+                { icon: "ti-user-star", label: "MANAGERS", count: subscription.managerCount || 0, limit: parseLimit(subscription.managerLimit, 1), color: "var(--app-muted)" },
                 { icon: "ti-briefcase", label: "PROJECTS", count: subscription.projectCount || 0, limit: 10, color: "var(--teal)" },
                 { icon: "ti-file-invoice", label: "INVOICES", count: subscription.invoiceCount || 0, limit: 10, color: "var(--blue)" },
-                { icon: "ti-database", label: "STORAGE", count: subscription.storageUsedGB ?? "2.2", limit: parseLimit(subscription.storageLimitGB, 10), unit: "GB", color: "var(--purple)" },
+                { icon: "ti-database", label: "STORAGE", count: subscription.storageUsedGB ?? "2.2", limit: parseLimit(subscription.storageLimitGB, 10), unit: "GB", color: "var(--app-accent)" },
               ];
             })().map((stat, i) => {
               const numCount = typeof stat.count === 'string' ? parseFloat(stat.count) : stat.count;
@@ -1103,7 +1103,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
               const limitLabel = isUnlimited ? "Unlimited" : stat.limit;
 
               return (
-                <div key={i} style={{ background: "#fff", borderRadius: 16, padding: 24, border: "1.5px solid var(--border)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+                <div key={i} style={{ background: "#FFFFFF", borderRadius: 16, padding: 24, border: "1.5px solid var(--border)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
                     <div style={{ width: 40, height: 40, borderRadius: 10, background: `${stat.color}15`, color: stat.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>
                       <i className={`ti ${stat.icon}`}></i>
@@ -1118,10 +1118,10 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
                   </div>
 
                   <div style={{ height: 6, background: "var(--bg)", borderRadius: 3, overflow: "hidden", marginBottom: 10 }}>
-                    <div style={{ height: "100%", background: isOver ? "var(--red)" : stat.color, width: `${pct}%`, borderRadius: 3 }} />
+                    <div style={{ height: "100%", background: isOver ? "var(--app-text)" : stat.color, width: `${pct}%`, borderRadius: 3 }} />
                   </div>
 
-                  <div style={{ fontSize: 11, fontWeight: 600, color: isOver ? "var(--red)" : stat.color }}>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: isOver ? "var(--app-text)" : stat.color }}>
                     {isOver ? (
                       <span style={{ display: "flex", alignItems: "center", gap: 4 }}><i className="ti ti-alert-circle"></i> Over limit — upgrade plan</span>
                     ) : (
@@ -1139,37 +1139,37 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
                 const isProcessing = payLoading === plan.name;
                 return (
                   <div key={plan.name} style={{
-                    background: "#fff",
+                    background: "#FFFFFF",
                     borderRadius: 20,
                     padding: "36px 28px 28px",
-                    border: (plan.popular && !isCurrent) ? "2px solid  var(--app-accent, var(--app-accent, #2563EB))" : isCurrent ? "2px solid  var(--app-accent, var(--app-accent, #2563EB))" : "1.5px solid #e2e8f0",
-                    boxShadow: plan.popular ? "0 8px 32px rgba(37, 99, 235,0.13)" : "0 4px 16px rgba(0,0,0,0.04)",
+                    border: (plan.popular && !isCurrent) ? "2px solid  var(--app-accent, var(--app-accent, #2563EB))" : isCurrent ? "2px solid  var(--app-accent, var(--app-accent, #2563EB))" : "1.5px solid #E2E8F0",
+                    boxShadow: plan.popular ? "0 8px 32px rgba(37, 99, 235, 0.13)" : "0 4px 16px rgba(0,0,0,0.04)",
                     position: "relative",
                     display: "flex",
                     flexDirection: "column",
                   }}>
                     {isCurrent && (
-                      <div style={{ position: "absolute", top: -16, left: "50%", transform: "translateX(-50%)", background: " var(--app-accent, var(--app-accent, #2563EB))", color: "#fff", padding: "6px 22px", borderRadius: 20, fontSize: 11, fontWeight: 900, textTransform: "uppercase", letterSpacing: 1, whiteSpace: "nowrap" }}>CURRENT PLAN</div>
+                      <div style={{ position: "absolute", top: -16, left: "50%", transform: "translateX(-50%)", background: " var(--app-accent, var(--app-accent, #2563EB))", color: "#FFFFFF", padding: "6px 22px", borderRadius: 20, fontSize: 11, fontWeight: 900, textTransform: "uppercase", letterSpacing: 1, whiteSpace: "nowrap" }}>CURRENT PLAN</div>
                     )}
                     {!isCurrent && plan.popular && (
-                      <div style={{ position: "absolute", top: -16, left: "50%", transform: "translateX(-50%)", background: " var(--app-accent, var(--app-accent, #2563EB))", color: "#fff", padding: "6px 22px", borderRadius: 20, fontSize: 11, fontWeight: 900, textTransform: "uppercase", letterSpacing: 1, whiteSpace: "nowrap" }}>POPULAR</div>
+                      <div style={{ position: "absolute", top: -16, left: "50%", transform: "translateX(-50%)", background: " var(--app-accent, var(--app-accent, #2563EB))", color: "#FFFFFF", padding: "6px 22px", borderRadius: 20, fontSize: 11, fontWeight: 900, textTransform: "uppercase", letterSpacing: 1, whiteSpace: "nowrap" }}>POPULAR</div>
                     )}
-                    <div style={{ width: 52, height: 52, borderRadius: "50%", background: "#eff6ff", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 18 }}>
+                    <div style={{ width: 52, height: 52, borderRadius: "50%", background: "#EFF6FF", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 18 }}>
                       <span style={{ fontSize: 24 }}>🌱</span>
                     </div>
-                    <h3 style={{ fontSize: 22, fontWeight: 800, color: "#1e293b", margin: "0 0 4px" }}>{plan.name}</h3>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: "#94a3b8", letterSpacing: 1, textTransform: "uppercase", marginBottom: 16 }}>MONTHLY PLAN</div>
+                    <h3 style={{ fontSize: 22, fontWeight: 800, color: "#1E293B", margin: "0 0 4px" }}>{plan.name}</h3>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: "#64748B", letterSpacing: 1, textTransform: "uppercase", marginBottom: 16 }}>MONTHLY PLAN</div>
                     <div style={{ display: "flex", alignItems: "baseline", gap: 2, marginBottom: 24 }}>
-                      <span style={{ fontSize: 40, fontWeight: 900, color: "#1e293b", letterSpacing: "-1px" }}>
+                      <span style={{ fontSize: 40, fontWeight: 900, color: "#1E293B", letterSpacing: "-1px" }}>
                         {plan.price === 0 ? "Free" : `Rs.${plan.price?.toLocaleString("en-IN")}`}
                       </span>
-                      {plan.price > 0 && <span style={{ fontSize: 14, color: "#94a3b8", fontWeight: 600 }}>/mo</span>}
+                      {plan.price > 0 && <span style={{ fontSize: 14, color: "#64748B", fontWeight: 600 }}>/mo</span>}
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 10, flex: 1, marginBottom: 28 }}>
                       {plan.features.map((f, i) => (
                         <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
                           <span style={{ color: " var(--app-accent, var(--app-accent, #2563EB))", fontSize: 15, flexShrink: 0 }}>✓</span>
-                          <span style={{ fontSize: 13.5, color: "#475569", fontWeight: 500 }}>{f}</span>
+                          <span style={{ fontSize: 13.5, color: "#64748B", fontWeight: 500 }}>{f}</span>
                         </div>
                       ))}
                     </div>
@@ -1180,9 +1180,9 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
                         width: "100%", padding: "14px", borderRadius: 12, fontSize: 15, fontWeight: 800,
                         cursor: (isCurrent || payLoading) ? "not-allowed" : "pointer",
                         fontFamily: "inherit", border: "none",
-                        background: isCurrent ? "#eff6ff" : plan.popular ? " var(--app-accent, var(--app-accent, #2563EB))" : "#f1f5f9",
-                        color: isCurrent ? " var(--app-accent, var(--app-accent, #2563EB))" : plan.popular ? "#fff" : "#1e293b",
-                        boxShadow: (plan.popular && !isCurrent) ? "0 6px 18px rgba(37, 99, 235,0.3)" : "none",
+                        background: isCurrent ? "#EFF6FF" : plan.popular ? " var(--app-accent, var(--app-accent, #2563EB))" : "#EFF6FF",
+                        color: isCurrent ? " var(--app-accent, var(--app-accent, #2563EB))" : plan.popular ? "#FFFFFF" : "#1E293B",
+                        boxShadow: (plan.popular && !isCurrent) ? "0 6px 18px rgba(37, 99, 235, 0.3)" : "none",
                         transition: "all 0.18s"
                       }}
                     >
@@ -1281,7 +1281,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
       {
         viewPayment && (
           <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(12px)", zIndex: 10000, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }} onClick={() => setViewPayment(null)}>
-            <div style={{ background: "#fff", width: "100%", maxWidth: 440, borderRadius: 24, padding: 30, position: "relative", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" }} onClick={e => e.stopPropagation()}>
+            <div style={{ background: "#FFFFFF", width: "100%", maxWidth: 440, borderRadius: 24, padding: 30, position: "relative", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" }} onClick={e => e.stopPropagation()}>
               <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 20, color: "var(--text)", display: "flex", justifyContent: "space-between" }}>
                 Payment Details
                 <button onClick={() => setViewPayment(null)} style={{ background: "var(--surface2)", border: "none", color: "var(--text2)", width: 28, height: 28, borderRadius: "50%", cursor: "pointer" }}>Close</button>
@@ -1306,31 +1306,31 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
       {
         viewInvoice && (
           <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(12px)", zIndex: 10000, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }} onClick={() => setViewInvoice(null)}>
-            <div style={{ background: "#fff", width: "100%", maxWidth: 440, borderRadius: 24, padding: 40, position: "relative", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" }} onClick={e => e.stopPropagation()}>
-              <button onClick={() => setViewInvoice(null)} style={{ position: "absolute", top: 20, right: 20, background: "#f1f5f9", border: "none", color: "#64748b", width: 32, height: 32, borderRadius: "50%", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
+            <div style={{ background: "#FFFFFF", width: "100%", maxWidth: 440, borderRadius: 24, padding: 40, position: "relative", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" }} onClick={e => e.stopPropagation()}>
+              <button onClick={() => setViewInvoice(null)} style={{ position: "absolute", top: 20, right: 20, background: "#EFF6FF", border: "none", color: "#64748B", width: 32, height: 32, borderRadius: "50%", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
                 <div style={{ position: "relative", marginBottom: 20 }}>
-                  <div style={{ width: 80, height: 80, background: "#f8fafc", borderRadius: 16, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 40, border: "1px solid #e2e8f0", overflow: "hidden" }}>
-                    {user?.logoUrl ? <img src={user.logoUrl} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} /> : <i className="ti ti-receipt" style={{ color: "#94a3b8" }}></i>}
+                  <div style={{ width: 80, height: 80, background: "#F8FAFC", borderRadius: 16, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 40, border: "1px solid #E2E8F0", overflow: "hidden" }}>
+                    {user?.logoUrl ? <img src={user.logoUrl} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} /> : <i className="ti ti-receipt" style={{ color: "#64748B" }}></i>}
                   </div>
 
                 </div>
-                <div style={{ fontSize: 15, fontWeight: 600, color: "#64748b", marginBottom: 8 }}>Invoice paid</div>
-                <div style={{ fontSize: 48, fontWeight: 800, color: "#1e293b", marginBottom: 12 }}>{formatCurrency(viewInvoice.amount, viewInvoice.currency)}</div>
+                <div style={{ fontSize: 15, fontWeight: 600, color: "#64748B", marginBottom: 8 }}>Invoice paid</div>
+                <div style={{ fontSize: 48, fontWeight: 800, color: "#1E293B", marginBottom: 12 }}>{formatCurrency(viewInvoice.amount, viewInvoice.currency)}</div>
 
                 <div style={{ width: "100%", textAlign: "left", display: "flex", flexDirection: "column", gap: 16, marginBottom: 40, marginTop: 20 }}>
                   <div style={{ display: "flex", justifyContent: "space-between" }}>
-                    <span style={{ color: "#94a3b8", fontSize: 14 }}>Invoice number</span>
-                    <span style={{ color: "#1e293b", fontSize: 14, fontWeight: 600 }}>{viewInvoice.invoiceNo || "INV-0001"}</span>
+                    <span style={{ color: "#64748B", fontSize: 14 }}>Invoice number</span>
+                    <span style={{ color: "#1E293B", fontSize: 14, fontWeight: 600 }}>{viewInvoice.invoiceNo || "INV-0001"}</span>
                   </div>
                   <div style={{ display: "flex", justifyContent: "space-between" }}>
-                    <span style={{ color: "#94a3b8", fontSize: 14 }}>Payment date</span>
-                    <span style={{ color: "#1e293b", fontSize: 14, fontWeight: 600 }}>{formatDate(viewInvoice.paymentDate)}</span>
+                    <span style={{ color: "#64748B", fontSize: 14 }}>Payment date</span>
+                    <span style={{ color: "#1E293B", fontSize: 14, fontWeight: 600 }}>{formatDate(viewInvoice.paymentDate)}</span>
                   </div>
                 </div>
 
                 <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 12 }}>
-                  <button onClick={() => handlePrint("receipt")} style={{ width: "100%", padding: "14px", borderRadius: 12, background: "#1e293b", color: "#fff", border: "none", fontSize: 15, fontWeight: 700, cursor: "pointer" }}>Download receipt</button>
+                  <button onClick={() => handlePrint("receipt")} style={{ width: "100%", padding: "14px", borderRadius: 12, background: "#1E293B", color: "#FFFFFF", border: "none", fontSize: 15, fontWeight: 700, cursor: "pointer" }}>Download receipt</button>
 
                 </div>
               </div>

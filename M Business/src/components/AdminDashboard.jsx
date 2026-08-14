@@ -29,36 +29,36 @@ const NAV_ICONS = {
 
 const THEME_MAP = {
   light: {
-    bg: "#f8fafc",
-    sidebar: "#ffffff",
-    card: "#ffffff",
-    surface: "#f8fafc",
-    text: "#1e293b",
-    muted: "#64748b",
-    border: "#e2e8f0",
-    accent: "#2563eb",
-    accentSecondary: "#2563eb",
-    shadow: "0 10px 25px rgba(37, 99, 235,0.06)",
-    gradient: "linear-gradient(135deg, #0f172a 0%, #2563eb 100%)",
+    bg: "#F8FAFC",
+    sidebar: "#FFFFFF",
+    card: "#FFFFFF",
+    surface: "#F8FAFC",
+    text: "#1E293B",
+    muted: "#64748B",
+    border: "#E2E8F0",
+    accent: "#2563EB",
+    accentSecondary: "#2563EB",
+    shadow: "0 10px 25px rgba(37, 99, 235, 0.06)",
+    gradient: "linear-gradient(135deg, #0F172A 0%, #2563EB 100%)",
   },
   dark: {
-    bg: "#0a1628",           // deep navy page background
-    sidebar: "#0f172a",      // slightly lighter navy sidebar
-    card: "#112240",         // card surface
-    surface: "#0f172a",      // inner surface / table headers
-    text: "#e2e8f0",         // soft white text
-    muted: "#94a3b8",        // muted blue-gray
-    border: "#1e3a5f",       // dark navy border
-    accent: "#38bdf8",       // sky blue accent
-    accentSecondary: "#34d399", // teal green secondary
+    bg: "#0F172A",           // deep navy page background
+    sidebar: "#0F172A",      // slightly lighter navy sidebar
+    card: "#1E293B",         // card surface
+    surface: "#0F172A",      // inner surface / table headers
+    text: "#E2E8F0",         // soft white text
+    muted: "#64748B",        // muted blue-gray
+    border: "#1E293B",       // dark navy border
+    accent: "#2563EB",       // sky blue accent
+    accentSecondary: "#16A34A", // teal green secondary
     shadow: "0 10px 30px rgba(0,0,0,0.4)",
-    gradient: "linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%)",
+    gradient: "linear-gradient(135deg, #2563EB 0%, #2563EB 100%)",
   }
 };
 const sc = (s) => ({
-  Active: "#22C55E",
-  Inactive: "#EF4444",
-  Pending: "#F59E0B",
+  Active: "#16A34A",
+  Inactive: "#64748B",
+  Pending: "#64748B",
 }[s] || "var(--app-accent)");
 
 function Badge({ label }) {
@@ -151,31 +151,31 @@ export default function AdminDashboard({ user, setUser }) {
     () => localStorage.getItem("empDarkMode") === "true"
   );
   const T = darkMode ? {
-    bg: "#0a1628",
-    surface: "#112240",
-    sidebar: "#0f172a",
-    sidebarActive: "rgba(56,189,248,0.12)",
+    bg: "#0F172A",
+    surface: "#1E293B",
+    sidebar: "#0F172A",
+    sidebarActive: "rgba(37, 99, 235, 0.12)",
     sidebarText: "rgba(255,255,255,0.45)",
-    sidebarTextActive: "#38bdf8",
-    border: "#1e3a5f",
-    borderDark: "#2a4a7f",
-    text: "#e2e8f0",
-    textMuted: "#94a3b8",
-    textFaint: "#4a6fa5",
-    accent: "#38bdf8",
-    accentLight: "rgba(56,189,248,0.1)",
-    success: "#34d399",
-    successBg: "rgba(52,211,153,0.1)",
-    successBorder: "rgba(52,211,153,0.25)",
-    warning: "#fbbf24",
-    warningBg: "rgba(251,191,36,0.1)",
-    warningBorder: "rgba(251,191,36,0.25)",
-    danger: "#f87171",
-    dangerBg: "rgba(248,113,113,0.1)",
-    dangerBorder: "rgba(248,113,113,0.25)",
-    info: "#38bdf8",
-    infoBg: "rgba(56,189,248,0.1)",
-    infoBorder: "rgba(56,189,248,0.25)",
+    sidebarTextActive: "#2563EB",
+    border: "#1E293B",
+    borderDark: "#64748B",
+    text: "#E2E8F0",
+    textMuted: "#64748B",
+    textFaint: "#64748B",
+    accent: "#2563EB",
+    accentLight: "rgba(37, 99, 235, 0.1)",
+    success: "#16A34A",
+    successBg: "rgba(22, 163, 74, 0.1)",
+    successBorder: "rgba(22, 163, 74, 0.25)",
+    warning: "#64748B",
+    warningBg: "rgba(100, 116, 139, 0.1)",
+    warningBorder: "rgba(100, 116, 139, 0.25)",
+    danger: "#64748B",
+    dangerBg: "rgba(100, 116, 139, 0.1)",
+    dangerBorder: "rgba(100, 116, 139, 0.25)",
+    info: "#2563EB",
+    infoBg: "rgba(37, 99, 235, 0.1)",
+    infoBorder: "rgba(37, 99, 235, 0.25)",
     radius: "14px",
     radiusSm: "9px",
     radiusLg: "20px",
@@ -184,37 +184,37 @@ export default function AdminDashboard({ user, setUser }) {
     shadowLg: "0 12px 32px rgba(0,0,0,0.4)",
   } : {
     // Your existing light theme object here
-    bg: "#f8fafc",
-    surface: "#ffffff",
-    sidebar: "#ffffff",
-    sidebarActive: "rgba(37, 99, 235,0.08)",
-    sidebarText: "#94a3b8",
-    sidebarTextActive: "#2563eb",
-    border: "#e2e8f0",
-    borderDark: "#e2e8f0",
-    text: "#1e293b",
-    textMuted: "#64748b",
-    textFaint: "#64748b",
-    accent: "#2563eb",
-    accentLight: "#eff6ff",
-    success: "#16a34a",
-    successBg: "#f0fdf4",
-    successBorder: "#bbf7d0",
-    warning: "#b45309",
-    warningBg: "#fffbeb",
-    warningBorder: "#fde68a",
-    danger: "#dc2626",
-    dangerBg: "#fef2f2",
-    dangerBorder: "#fecaca",
-    info: "#2563eb",
-    infoBg: "#eff6ff",
-    infoBorder: "#e2e8f0",
+    bg: "#F8FAFC",
+    surface: "#FFFFFF",
+    sidebar: "#FFFFFF",
+    sidebarActive: "rgba(37, 99, 235, 0.08)",
+    sidebarText: "#64748B",
+    sidebarTextActive: "#2563EB",
+    border: "#E2E8F0",
+    borderDark: "#E2E8F0",
+    text: "#1E293B",
+    textMuted: "#64748B",
+    textFaint: "#64748B",
+    accent: "#2563EB",
+    accentLight: "#EFF6FF",
+    success: "#16A34A",
+    successBg: "#F8FAFC",
+    successBorder: "#E2E8F0",
+    warning: "#64748B",
+    warningBg: "#F8FAFC",
+    warningBorder: "#E2E8F0",
+    danger: "#64748B",
+    dangerBg: "#F8FAFC",
+    dangerBorder: "#E2E8F0",
+    info: "#2563EB",
+    infoBg: "#EFF6FF",
+    infoBorder: "#E2E8F0",
     radius: "14px",
     radiusSm: "9px",
     radiusLg: "20px",
-    shadow: "0 1px 4px rgba(37, 99, 235,0.06)",
-    shadowMd: "0 4px 16px rgba(37, 99, 235,0.10)",
-    shadowLg: "0 12px 32px rgba(37, 99, 235,0.13)",
+    shadow: "0 1px 4px rgba(37, 99, 235, 0.06)",
+    shadowMd: "0 4px 16px rgba(37, 99, 235, 0.10)",
+    shadowLg: "0 12px 32px rgba(37, 99, 235, 0.13)",
   };
 
   const THEME = darkMode ? THEME_MAP.dark : THEME_MAP.light;
@@ -427,7 +427,7 @@ export default function AdminDashboard({ user, setUser }) {
     const isVar = color && color.startsWith("var");
     return {
       background: isVar ? `var(--app-accent-gradient, linear-gradient(135deg, ${color}, ${color}))` : `linear-gradient(135deg, ${color}, ${color}cc)`,
-      color: "#fff",
+      color: "#FFFFFF",
       border: "none",
       borderRadius: 12,
       padding: "10px 20px",
@@ -435,7 +435,7 @@ export default function AdminDashboard({ user, setUser }) {
       fontSize: 13,
       cursor: "pointer",
       fontFamily: "inherit",
-      boxShadow: "0 8px 20px -6px rgba(59, 130, 246, 0.3)",
+      boxShadow: "0 8px 20px -6px rgba(37, 99, 235, 0.3)",
       transition: "all 0.3s ease",
       display: "inline-flex",
       alignItems: "center",
@@ -471,19 +471,19 @@ export default function AdminDashboard({ user, setUser }) {
         table th { background: ${THEME.surface} !important; color: ${THEME.muted} !important; border-bottom: 1.5px solid ${THEME.border} !important; }
         table td { border-bottom: 1px solid ${THEME.border} !important; color: ${THEME.text} !important; }
         input, select, textarea { background: ${THEME.card} !important; color: ${THEME.text} !important; border: 1.5px solid ${THEME.border} !important; }
-        .adm-nav-item:hover { background: ${darkMode ? "rgba(255,255,255,0.06)" : "rgba(37, 99, 235,0.06)"} !important; }
-        .adm-logout-btn:hover { background: rgba(239,68,68,0.18) !important; transform: translateY(-1px); }
-        .adm-theme-toggle:hover { background: ${darkMode ? "rgba(56,189,248,0.14)" : "rgba(0,0,0,0.05)"} !important; }
+        .adm-nav-item:hover { background: ${darkMode ? "rgba(255,255,255,0.06)" : "rgba(37, 99, 235, 0.06)"} !important; }
+        .adm-logout-btn:hover { background: rgba(100, 116, 139, 0.18) !important; transform: translateY(-1px); }
+        .adm-theme-toggle:hover { background: ${darkMode ? "rgba(37, 99, 235, 0.14)" : "rgba(0,0,0,0.05)"} !important; }
       `}</style>
 
       {/* SIDEBAR */}
-      <div style={{ width: 264, background: THEME.sidebar, color: darkMode ? "#fff" : THEME.text, display: "flex", flexDirection: "column", position: "relative", zIndex: 100, borderRight: `1.5px solid ${THEME.border}`, boxShadow: darkMode ? "4px 0 24px rgba(0,0,0,0.3)" : "4px 0 24px rgba(37, 99, 235,0.05)" }}>
+      <div style={{ width: 264, background: THEME.sidebar, color: darkMode ? "#FFFFFF" : THEME.text, display: "flex", flexDirection: "column", position: "relative", zIndex: 100, borderRight: `1.5px solid ${THEME.border}`, boxShadow: darkMode ? "4px 0 24px rgba(0,0,0,0.3)" : "4px 0 24px rgba(37, 99, 235, 0.05)" }}>
         <div style={{ padding: "28px 22px 22px", display: "flex", alignItems: "center", gap: 12, borderBottom: `1px solid ${THEME.border}` }}>
           <div style={{ width: 46, height: 46, background: THEME.gradient, borderRadius: 13, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", padding: 4, boxShadow: `0 8px 18px ${THEME.accent}40` }}>
-            {user?.logoUrl ? <img src={user.logoUrl} alt="logo" style={{ maxHeight: "100%", maxWidth: "100%", objectFit: "contain", borderRadius: 9 }} /> : <span style={{ color: "#fff", fontWeight: 900, fontSize: 18 }}>A</span>}
+            {user?.logoUrl ? <img src={user.logoUrl} alt="logo" style={{ maxHeight: "100%", maxWidth: "100%", objectFit: "contain", borderRadius: 9 }} /> : <span style={{ color: "#FFFFFF", fontWeight: 900, fontSize: 18 }}>A</span>}
           </div>
           <div>
-            <div style={{ fontWeight: 900, fontSize: 16, letterSpacing: "-0.5px", color: darkMode ? "#fff" : "#0f172a" }}>M Business</div>
+            <div style={{ fontWeight: 900, fontSize: 16, letterSpacing: "-0.5px", color: darkMode ? "#FFFFFF" : "#0F172A" }}>M Business</div>
             <div style={{ fontSize: 10, color: THEME.muted, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", marginTop: 1 }}>Platform Admin</div>
           </div>
         </div>
@@ -498,14 +498,14 @@ export default function AdminDashboard({ user, setUser }) {
                 className="adm-nav-item"
                 style={{
                   width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "10px 12px",
-                  background: on ? (darkMode ? "linear-gradient(90deg,rgba(56,189,248,0.16),rgba(56,189,248,0.02))" : "linear-gradient(90deg,rgba(37, 99, 235,0.12),rgba(37, 99, 235,0.02))") : "transparent",
-                  border: "none", borderRadius: 12, color: on ? THEME.accent : (darkMode ? "rgba(255,255,255,0.55)" : "#64748b"),
+                  background: on ? (darkMode ? "linear-gradient(90deg,rgba(37, 99, 235, 0.16),rgba(37, 99, 235, 0.02))" : "linear-gradient(90deg,rgba(37, 99, 235, 0.12),rgba(37, 99, 235, 0.02))") : "transparent",
+                  border: "none", borderRadius: 12, color: on ? THEME.accent : (darkMode ? "rgba(255,255,255,0.55)" : "#64748B"),
                   fontWeight: on ? 800 : 600, fontSize: 13.5, cursor: "pointer", marginBottom: 4, transition: "background 0.18s ease"
                 }}>
                 <span style={{
                   width: 30, height: 30, borderRadius: 9, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center",
-                  background: on ? `${THEME.accent}22` : (darkMode ? "rgba(255,255,255,0.05)" : "rgba(100,116,139,0.08)"),
-                  color: on ? THEME.accent : (darkMode ? "rgba(255,255,255,0.45)" : "#94a3b8"), transition: "background 0.18s ease, color 0.18s ease"
+                  background: on ? `${THEME.accent}22` : (darkMode ? "rgba(255,255,255,0.05)" : "rgba(100, 116, 139, 0.08)"),
+                  color: on ? THEME.accent : (darkMode ? "rgba(255,255,255,0.45)" : "#64748B"), transition: "background 0.18s ease, color 0.18s ease"
                 }}>
                   <Icon size={15} strokeWidth={2.3} />
                 </span>
@@ -525,7 +525,7 @@ export default function AdminDashboard({ user, setUser }) {
           }} className="adm-theme-toggle" style={{
             display: "flex", alignItems: "center", justifyContent: "space-between",
             padding: "10px 14px", borderRadius: 11, cursor: "pointer",
-            background: darkMode ? "rgba(56,189,248,0.08)" : "rgba(0,0,0,0.03)",
+            background: darkMode ? "rgba(37, 99, 235, 0.08)" : "rgba(0,0,0,0.03)",
             marginBottom: 10, transition: "background 0.18s ease"
           }}>
             <span style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, display: "flex", alignItems: "center", gap: 8 }}>
@@ -534,17 +534,17 @@ export default function AdminDashboard({ user, setUser }) {
             </span>
             <div style={{
               width: 36, height: 20,
-              background: darkMode ? "#38bdf8" : "#cbd5e1",
+              background: darkMode ? "#2563EB" : "#E2E8F0",
               borderRadius: 20, position: "relative", transition: "0.3s"
             }}>
               <div style={{
-                width: 14, height: 14, background: "#fff", borderRadius: "50%",
+                width: 14, height: 14, background: "#FFFFFF", borderRadius: "50%",
                 position: "absolute", top: 3,
                 left: darkMode ? 19 : 3, transition: "0.3s", boxShadow: "0 1px 3px rgba(0,0,0,0.3)"
               }} />
             </div>
           </div>
-          <button onClick={handleLogout} className="adm-logout-btn" style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.22)", borderRadius: 11, padding: "11px", color: "#f87171", fontSize: 13, fontWeight: 800, cursor: "pointer", transition: "all 0.18s ease" }}>
+          <button onClick={handleLogout} className="adm-logout-btn" style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "rgba(100, 116, 139, 0.1)", border: "1px solid rgba(100, 116, 139, 0.22)", borderRadius: 11, padding: "11px", color: "#64748B", fontSize: 13, fontWeight: 800, cursor: "pointer", transition: "all 0.18s ease" }}>
             <LogOut size={15} strokeWidth={2.3} /> Logout
           </button>
         </div>
@@ -558,7 +558,7 @@ export default function AdminDashboard({ user, setUser }) {
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
             {active === "packages" && (
               <button onClick={() => { setEditPkg(null); setNpkg({ title: "", description: "", icon: "Package", isFree: false, price: "", noOfDays: "30", planDuration: "Monthly Plan", businessLimit: "Single business manage", managerLimit: "1", clientLimit: "3", employeeLimit: "10", assignedSubadmins: [] }); setPkgError({}); setModal("package_add"); }}
-                style={{ background: THEME.accent, color: "#fff", border: "none", borderRadius: 12, padding: "10px 24px", fontWeight: 800, fontSize: 13, cursor: "pointer", boxShadow: "0 4px 12px rgba(37, 99, 235,0.2)" }}>
+                style={{ background: THEME.accent, color: "#FFFFFF", border: "none", borderRadius: 12, padding: "10px 24px", fontWeight: 800, fontSize: 13, cursor: "pointer", boxShadow: "0 4px 12px rgba(37, 99, 235, 0.2)" }}>
                 + Add Package
               </button>
             )}
@@ -652,12 +652,12 @@ export default function AdminDashboard({ user, setUser }) {
             {/* Header */}
             <div style={{
               padding: "20px 24px",
-              borderBottom: "1px solid #f1f5f9",
+              borderBottom: "1px solid #EFF6FF",
               display: "flex", justifyContent: "space-between", alignItems: "center",
-              background: "linear-gradient(135deg, #0a0a0f, #1a1a2e)"
+              background: "linear-gradient(135deg, #0F172A, #0F172A)"
             }}>
               <div>
-                <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#fff" }}>
+                <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#FFFFFF" }}>
                   {editPkg ? "Edit Edit Package" : "Package Add New Package"}
                 </h2>
                 <p style={{ margin: "4px 0 0", fontSize: 12, color: "rgba(255,255,255,0.4)" }}>
@@ -668,7 +668,7 @@ export default function AdminDashboard({ user, setUser }) {
                 background: "rgba(255,255,255,0.1)",
                 border: "1px solid rgba(255,255,255,0.15)",
                 borderRadius: 8, width: 32, height: 32,
-                color: "#fff", fontSize: 16, cursor: "pointer",
+                color: "#FFFFFF", fontSize: 16, cursor: "pointer",
                 display: "flex", alignItems: "center", justifyContent: "center"
               }}>Close</button>
             </div>
@@ -679,7 +679,7 @@ export default function AdminDashboard({ user, setUser }) {
               {/* Row 1: Title + Icon */}
               <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 12, marginBottom: 16 }}>
                 <div>
-                  <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", letterSpacing: 0.5, marginBottom: 6, textTransform: "uppercase" }}>Package Title *</label>
+                  <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748B", letterSpacing: 0.5, marginBottom: 6, textTransform: "uppercase" }}>Package Title *</label>
                   <input
                     type="text"
                     value={npkg.title}
@@ -687,18 +687,18 @@ export default function AdminDashboard({ user, setUser }) {
                     placeholder="e.g., Basic Plan"
                     style={{
                       width: "100%", padding: "11px 14px",
-                      border: pkgError.title ? "1.5px solid #ef4444" : "1.5px solid #e2e8f0",
+                      border: pkgError.title ? "1.5px solid #64748B" : "1.5px solid #E2E8F0",
                       borderRadius: 10, fontSize: 13, outline: "none",
-                      background: "#f8fafc", boxSizing: "border-box",
+                      background: "#F8FAFC", boxSizing: "border-box",
                       transition: "border-color 0.2s"
                     }}
-                    onFocus={e => e.target.style.borderColor = "#2563eb"}
-                    onBlur={e => e.target.style.borderColor = pkgError.title ? "#ef4444" : "#e2e8f0"}
+                    onFocus={e => e.target.style.borderColor = "#2563EB"}
+                    onBlur={e => e.target.style.borderColor = pkgError.title ? "#64748B" : "#E2E8F0"}
                   />
-                  {pkgError.title && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4 }}>Warning {pkgError.title}</div>}
+                  {pkgError.title && <div style={{ fontSize: 11, color: "#64748B", marginTop: 4 }}>Warning {pkgError.title}</div>}
                 </div>
                 <div style={{ width: 90 }}>
-                  <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", letterSpacing: 0.5, marginBottom: 6, textTransform: "uppercase" }}>Icon</label>
+                  <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748B", letterSpacing: 0.5, marginBottom: 6, textTransform: "uppercase" }}>Icon</label>
                   <input
                     type="text"
                     value={npkg.icon}
@@ -706,9 +706,9 @@ export default function AdminDashboard({ user, setUser }) {
                     placeholder="Package"
                     style={{
                       width: "100%", padding: "11px 10px",
-                      border: "1.5px solid #e2e8f0",
+                      border: "1.5px solid #E2E8F0",
                       borderRadius: 10, fontSize: 20, outline: "none",
-                      background: "#f8fafc", textAlign: "center",
+                      background: "#F8FAFC", textAlign: "center",
                       boxSizing: "border-box"
                     }}
                   />
@@ -717,7 +717,7 @@ export default function AdminDashboard({ user, setUser }) {
 
               {/* Description */}
               <div style={{ marginBottom: 16 }}>
-                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", letterSpacing: 0.5, marginBottom: 6, textTransform: "uppercase" }}>Description *</label>
+                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748B", letterSpacing: 0.5, marginBottom: 6, textTransform: "uppercase" }}>Description *</label>
                 <textarea
                   value={npkg.description}
                   onChange={e => setNpkg({ ...npkg, description: e.target.value })}
@@ -725,19 +725,19 @@ export default function AdminDashboard({ user, setUser }) {
                   rows={3}
                   style={{
                     width: "100%", padding: "11px 14px",
-                    border: pkgError.description ? "1.5px solid #ef4444" : "1.5px solid #e2e8f0",
+                    border: pkgError.description ? "1.5px solid #64748B" : "1.5px solid #E2E8F0",
                     borderRadius: 10, fontSize: 13, outline: "none",
-                    background: "#f8fafc", resize: "none",
+                    background: "#F8FAFC", resize: "none",
                     fontFamily: "inherit", boxSizing: "border-box"
                   }}
                 />
-                {pkgError.description && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4 }}>Warning {pkgError.description}</div>}
+                {pkgError.description && <div style={{ fontSize: 11, color: "#64748B", marginTop: 4 }}>Warning {pkgError.description}</div>}
               </div>
 
               {/* Package Type + Price in one row */}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
                 <div>
-                  <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", letterSpacing: 0.5, marginBottom: 8, textTransform: "uppercase" }}>Package Type *</label>
+                  <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748B", letterSpacing: 0.5, marginBottom: 8, textTransform: "uppercase" }}>Package Type *</label>
                   <div style={{ display: "flex", gap: 8 }}>
                     {["Free", "Paid"].map(type => (
                       <button
@@ -749,11 +749,11 @@ export default function AdminDashboard({ user, setUser }) {
                           cursor: "pointer", fontFamily: "inherit",
                           border: "1.5px solid",
                           borderColor: (type === "Free" ? npkg.isFree : !npkg.isFree)
-                            ? "#2563eb" : "#e2e8f0",
+                            ? "#2563EB" : "#E2E8F0",
                           background: (type === "Free" ? npkg.isFree : !npkg.isFree)
-                            ? "#eff6ff" : "#f8fafc",
+                            ? "#EFF6FF" : "#F8FAFC",
                           color: (type === "Free" ? npkg.isFree : !npkg.isFree)
-                            ? "#2563eb" : "#64748b",
+                            ? "#2563EB" : "#64748B",
                           transition: "all 0.15s"
                         }}
                       >
@@ -764,13 +764,13 @@ export default function AdminDashboard({ user, setUser }) {
                 </div>
 
                 <div>
-                  <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", letterSpacing: 0.5, marginBottom: 8, textTransform: "uppercase" }}>
+                  <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748B", letterSpacing: 0.5, marginBottom: 8, textTransform: "uppercase" }}>
                     Price {!npkg.isFree && "*"}
                   </label>
                   <div style={{ position: "relative" }}>
                     <span style={{
                       position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)",
-                      fontSize: 14, color: "#94a3b8", fontWeight: 600, pointerEvents: "none"
+                      fontSize: 14, color: "#64748B", fontWeight: 600, pointerEvents: "none"
                     }}>₹</span>
                     <input
                       type="text"
@@ -780,22 +780,22 @@ export default function AdminDashboard({ user, setUser }) {
                       placeholder="999"
                       style={{
                         width: "100%", padding: "11px 14px 11px 28px",
-                        border: pkgError.price ? "1.5px solid #ef4444" : "1.5px solid #e2e8f0",
+                        border: pkgError.price ? "1.5px solid #64748B" : "1.5px solid #E2E8F0",
                         borderRadius: 10, fontSize: 13, outline: "none",
-                        background: npkg.isFree ? "#f1f5f9" : "#f8fafc",
-                        color: npkg.isFree ? "#94a3b8" : "#0f172a",
+                        background: npkg.isFree ? "#EFF6FF" : "#F8FAFC",
+                        color: npkg.isFree ? "#64748B" : "#0F172A",
                         boxSizing: "border-box", fontFamily: "inherit"
                       }}
                     />
                   </div>
-                  {pkgError.price && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4 }}>Warning {pkgError.price}</div>}
+                  {pkgError.price && <div style={{ fontSize: 11, color: "#64748B", marginTop: 4 }}>Warning {pkgError.price}</div>}
                 </div>
               </div>
 
               {/* Row: Days + Plan Duration */}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 20 }}>
                 <div>
-                  <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", letterSpacing: 0.5, marginBottom: 8, textTransform: "uppercase" }}>Number of Days *</label>
+                  <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748B", letterSpacing: 0.5, marginBottom: 8, textTransform: "uppercase" }}>Number of Days *</label>
                   <input
                     type="text"
                     value={npkg.noOfDays}
@@ -803,22 +803,22 @@ export default function AdminDashboard({ user, setUser }) {
                     placeholder="e.g., 30, 90, 365"
                     style={{
                       width: "100%", padding: "11px 14px",
-                      border: pkgError.noOfDays ? "1.5px solid #ef4444" : "1.5px solid #e2e8f0",
+                      border: pkgError.noOfDays ? "1.5px solid #64748B" : "1.5px solid #E2E8F0",
                       borderRadius: 10, fontSize: 13, outline: "none",
-                      background: "#f8fafc", boxSizing: "border-box"
+                      background: "#F8FAFC", boxSizing: "border-box"
                     }}
                   />
-                  {pkgError.noOfDays && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4 }}>Warning {pkgError.noOfDays}</div>}
+                  {pkgError.noOfDays && <div style={{ fontSize: 11, color: "#64748B", marginTop: 4 }}>Warning {pkgError.noOfDays}</div>}
                 </div>
                 <div>
-                  <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", letterSpacing: 0.5, marginBottom: 8, textTransform: "uppercase" }}>Plan Duration</label>
+                  <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748B", letterSpacing: 0.5, marginBottom: 8, textTransform: "uppercase" }}>Plan Duration</label>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                     {["Monthly Plan", "90 days", "Yearly Plan"].map(d => (
                       <button key={d} onClick={() => setNpkg({ ...npkg, planDuration: d, noOfDays: d === "Monthly Plan" ? "30" : d === "90 days" ? "90" : "365" })} style={{
                         padding: "8px 12px", borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: "pointer", border: "1.5px solid",
-                        borderColor: npkg.planDuration === d ? "var(--app-accent)" : "#e2e8f0",
-                        background: npkg.planDuration === d ? "#eff6ff" : "transparent",
-                        color: npkg.planDuration === d ? "var(--app-accent)" : "#64748b",
+                        borderColor: npkg.planDuration === d ? "var(--app-accent)" : "#E2E8F0",
+                        background: npkg.planDuration === d ? "#EFF6FF" : "transparent",
+                        color: npkg.planDuration === d ? "var(--app-accent)" : "#64748B",
                         transition: "0.2s", display: "flex", alignItems: "center", gap: 4
                       }}>
                         {npkg.planDuration === d && "Yes"} {d}
@@ -830,14 +830,14 @@ export default function AdminDashboard({ user, setUser }) {
 
               {/* Row: Business Management */}
               <div style={{ marginBottom: 20 }}>
-                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", letterSpacing: 0.5, marginBottom: 8, textTransform: "uppercase" }}>Business Management</label>
+                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748B", letterSpacing: 0.5, marginBottom: 8, textTransform: "uppercase" }}>Business Management</label>
                 <div style={{ display: "flex", gap: 8 }}>
                   {["Single business manage", "Multiple business manage"].map(b => (
                     <button key={b} onClick={() => setNpkg({ ...npkg, businessLimit: b })} style={{
                       flex: 1, padding: "10px", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: "pointer", border: "1.5px solid",
-                      borderColor: npkg.businessLimit === b ? "var(--app-accent)" : "#e2e8f0",
-                      background: npkg.businessLimit === b ? "#eff6ff" : "transparent",
-                      color: npkg.businessLimit === b ? "var(--app-accent)" : "#64748b",
+                      borderColor: npkg.businessLimit === b ? "var(--app-accent)" : "#E2E8F0",
+                      background: npkg.businessLimit === b ? "#EFF6FF" : "transparent",
+                      color: npkg.businessLimit === b ? "var(--app-accent)" : "#64748B",
                       transition: "0.2s", display: "flex", alignItems: "center", justifyContent: "center", gap: 6
                     }}>
                       {npkg.businessLimit === b && "Yes"} {b}
@@ -848,7 +848,7 @@ export default function AdminDashboard({ user, setUser }) {
 
               {/* Row: Manager Limit */}
               <div style={{ marginBottom: 15 }}>
-                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", letterSpacing: 0.5, marginBottom: 8, textTransform: "uppercase" }}>Manager Limit</label>
+                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748B", letterSpacing: 0.5, marginBottom: 8, textTransform: "uppercase" }}>Manager Limit</label>
                 <div style={{ position: "relative" }}>
                   <input
                     type="text"
@@ -856,7 +856,7 @@ export default function AdminDashboard({ user, setUser }) {
                     value={npkg.managerLimit}
                     onChange={e => setNpkg({ ...npkg, managerLimit: e.target.value })}
                     placeholder="e.g. 5 Managers or Unlimited Managers"
-                    style={{ width: "100%", padding: "11px 14px", border: "1.5px solid #e2e8f0", borderRadius: 10, fontSize: 13, background: "#f8fafc", outline: "none" }}
+                    style={{ width: "100%", padding: "11px 14px", border: "1.5px solid #E2E8F0", borderRadius: 10, fontSize: 13, background: "#F8FAFC", outline: "none" }}
                   />
                   <datalist id="manager-limits">
                     <option value="2 Managers" />
@@ -869,7 +869,7 @@ export default function AdminDashboard({ user, setUser }) {
               </div>
 
               <div style={{ marginBottom: 15 }}>
-                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", letterSpacing: 0.5, marginBottom: 8, textTransform: "uppercase" }}>Client Limit (Company Name)</label>
+                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748B", letterSpacing: 0.5, marginBottom: 8, textTransform: "uppercase" }}>Client Limit (Company Name)</label>
                 <div style={{ position: "relative" }}>
                   <input
                     type="text"
@@ -877,7 +877,7 @@ export default function AdminDashboard({ user, setUser }) {
                     value={npkg.clientLimit}
                     onChange={e => setNpkg({ ...npkg, clientLimit: e.target.value })}
                     placeholder="e.g. 10 Company manage or Unlimited"
-                    style={{ width: "100%", padding: "11px 14px", border: "1.5px solid #e2e8f0", borderRadius: 10, fontSize: 13, background: "#f8fafc", outline: "none" }}
+                    style={{ width: "100%", padding: "11px 14px", border: "1.5px solid #E2E8F0", borderRadius: 10, fontSize: 13, background: "#F8FAFC", outline: "none" }}
                   />
                   <datalist id="client-limits">
                     <option value="1 Company manage" />
@@ -891,7 +891,7 @@ export default function AdminDashboard({ user, setUser }) {
 
               {/* Row: Employee Limit */}
               <div style={{ marginBottom: 15 }}>
-                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", letterSpacing: 0.5, marginBottom: 8, textTransform: "uppercase" }}>Employee Limit</label>
+                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748B", letterSpacing: 0.5, marginBottom: 8, textTransform: "uppercase" }}>Employee Limit</label>
                 <div style={{ position: "relative" }}>
                   <input
                     type="text"
@@ -899,7 +899,7 @@ export default function AdminDashboard({ user, setUser }) {
                     value={npkg.employeeLimit}
                     onChange={e => setNpkg({ ...npkg, employeeLimit: e.target.value })}
                     placeholder="e.g. 50 Employees or Unlimited"
-                    style={{ width: "100%", padding: "11px 14px", border: "1.5px solid #e2e8f0", borderRadius: 10, fontSize: 13, background: "#f8fafc", outline: "none" }}
+                    style={{ width: "100%", padding: "11px 14px", border: "1.5px solid #E2E8F0", borderRadius: 10, fontSize: 13, background: "#F8FAFC", outline: "none" }}
                   />
                   <datalist id="employee-limits">
                     <option value="5 Employees" />
@@ -913,9 +913,9 @@ export default function AdminDashboard({ user, setUser }) {
 
               {/* Assign to Subadmins */}
               <div style={{ marginBottom: 20 }}>
-                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", letterSpacing: 0.5, marginBottom: 6, textTransform: "uppercase" }}>
+                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748B", letterSpacing: 0.5, marginBottom: 6, textTransform: "uppercase" }}>
                   Assign to Subadmins
-                  <span style={{ fontSize: 10, fontWeight: 400, color: "#94a3b8", marginLeft: 6, textTransform: "none" }}></span>
+                  <span style={{ fontSize: 10, fontWeight: 400, color: "#64748B", marginLeft: 6, textTransform: "none" }}></span>
                 </label>
                 <SubadminDropdown
                   value={npkg.assignedSubadmins?.[0] || ""}
@@ -927,7 +927,7 @@ export default function AdminDashboard({ user, setUser }) {
                   }}
                 />
                 {/* {(npkg.assignedSubadmins?.length || 0) > 0 && (
-            <div style={{ fontSize: 11, color: "#2563eb", marginTop: 4, fontWeight: 600 }}>
+            <div style={{ fontSize: 11, color: "#2563EB", marginTop: 4, fontWeight: 600 }}>
               Yes {npkg.assignedSubadmins.length} subadmin(s) selected
             </div>
           )} */}
@@ -941,10 +941,10 @@ export default function AdminDashboard({ user, setUser }) {
                   onClick={() => setModal(null)}
                   style={{
                     flex: 1, padding: "12px",
-                    background: "#f8fafc",
-                    border: "1.5px solid #e2e8f0",
+                    background: "#F8FAFC",
+                    border: "1.5px solid #E2E8F0",
                     borderRadius: 10, fontSize: 13, fontWeight: 600,
-                    color: "#64748b", cursor: "pointer", fontFamily: "inherit"
+                    color: "#64748B", cursor: "pointer", fontFamily: "inherit"
                   }}
                 >
                   Cancel
@@ -955,13 +955,13 @@ export default function AdminDashboard({ user, setUser }) {
                   style={{
                     flex: 2, padding: "12px",
                     background: pkgSaveLoading
-                      ? "#2563eb"
-                      : "linear-gradient(135deg, #2563eb, #6d28d9)",
+                      ? "#2563EB"
+                      : "linear-gradient(135deg, #2563EB, #2563EB)",
                     border: "none", borderRadius: 10,
                     fontSize: 13, fontWeight: 700,
-                    color: "#fff", cursor: pkgSaveLoading ? "not-allowed" : "pointer",
+                    color: "#FFFFFF", cursor: pkgSaveLoading ? "not-allowed" : "pointer",
                     fontFamily: "inherit",
-                    boxShadow: "0 4px 14px rgba(37, 99, 235,0.35)",
+                    boxShadow: "0 4px 14px rgba(37, 99, 235, 0.35)",
                     transition: "all 0.2s"
                   }}
                 >
@@ -981,10 +981,10 @@ function OverviewPage({ THEME, subadmins, clients, employees, managers, projects
   const stats = [
     { label: "Total Company Names", value: clients.length, color: "var(--app-accent)" },
     { label: "Employees", value: employees.length, color: "var(--app-accent)" },
-    { label: "Managers", value: managers.length, color: "#f59e0b" },
+    { label: "Managers", value: managers.length, color: "#64748B" },
     { label: "Projects", value: projects.length, color: "var(--app-accent)" },
-    { label: "Subadmins", value: subadmins.length, color: "#3b82f6" },
-    { label: "Active Packages", value: packages.length, color: "#10b981" },
+    { label: "Subadmins", value: subadmins.length, color: "#2563EB" },
+    { label: "Active Packages", value: packages.length, color: "#16A34A" },
   ];
 
   return (
@@ -992,10 +992,10 @@ function OverviewPage({ THEME, subadmins, clients, employees, managers, projects
       {/* Premium Stats Grid */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 20 }}>
         {[
-          { label: "Total Company Names", value: clients.length, icon: "Company", iconBg: "#eff6ff", iconColor: "#3b82f6" },
-          { label: "Total Employees", value: employees.length, icon: "Team", iconBg: "#f0fdf4", iconColor: "#10b981" },
-          { label: "Recent Projects", value: projects.length, icon: "Document", iconBg: "#fdf4ff", iconColor: "#d946ef" },
-          { label: "Active Subadmins", value: subadmins.length, icon: "Security", iconBg: "#fff7ed", iconColor: "#f59e0b" },
+          { label: "Total Company Names", value: clients.length, icon: "Company", iconBg: "#EFF6FF", iconColor: "#2563EB" },
+          { label: "Total Employees", value: employees.length, icon: "Team", iconBg: "#F8FAFC", iconColor: "#16A34A" },
+          { label: "Recent Projects", value: projects.length, icon: "Document", iconBg: "#F8FAFC", iconColor: "#64748B" },
+          { label: "Active Subadmins", value: subadmins.length, icon: "Security", iconBg: "#F8FAFC", iconColor: "#64748B" },
         ].map((s, idx) => (
           <div key={idx} className="premium-card" style={{
             background: THEME.card,
@@ -1185,7 +1185,7 @@ function SubadminsList({ THEME, subadmins, refresh, packages, subscriptions, fet
     <div style={{ background: THEME.card, borderRadius: 24, padding: 32, border: `1.5px solid ${THEME.border}`, boxShadow: THEME.shadow }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <h3 style={{ margin: 0, fontSize: 18, fontWeight: 900, color: THEME.text }}>Registered Subadmins ({subadmins.length})</h3>
-        <button onClick={() => setModalOpen(true)} style={{ background: THEME.accent, color: "#fff", border: "none", borderRadius: 12, padding: "10px 24px", fontWeight: 800, fontSize: 13, cursor: "pointer" }}>+ Add Subadmin</button>
+        <button onClick={() => setModalOpen(true)} style={{ background: THEME.accent, color: "#FFFFFF", border: "none", borderRadius: 12, padding: "10px 24px", fontWeight: 800, fontSize: 13, cursor: "pointer" }}>+ Add Subadmin</button>
       </div>
 
       <div style={{ overflowX: "auto" }}>
@@ -1216,15 +1216,15 @@ function SubadminsList({ THEME, subadmins, refresh, packages, subscriptions, fet
                   </td>
                   <td style={{ padding: "14px 16px" }}>
                     <span style={{
-                      background: cl.toLowerCase().includes("unlimited") ? "rgba(16,185,129,0.1)" : "rgba(59,130,246,0.1)",
-                      color: cl.toLowerCase().includes("unlimited") ? "#10b981" : "#3b82f6",
+                      background: cl.toLowerCase().includes("unlimited") ? "rgba(22, 163, 74, 0.1)" : "rgba(37, 99, 235, 0.1)",
+                      color: cl.toLowerCase().includes("unlimited") ? "#16A34A" : "#2563EB",
                       padding: "3px 10px", borderRadius: 8, fontSize: 11, fontWeight: 700
                     }}>{cl}</span>
                   </td>
                   <td style={{ padding: "14px 16px" }}>
                     <span style={{
-                      background: el.toLowerCase().includes("unlimited") ? "rgba(16,185,129,0.1)" : "rgba(37, 99, 235,0.1)",
-                      color: el.toLowerCase().includes("unlimited") ? "#10b981" : "#2563eb",
+                      background: el.toLowerCase().includes("unlimited") ? "rgba(22, 163, 74, 0.1)" : "rgba(37, 99, 235, 0.1)",
+                      color: el.toLowerCase().includes("unlimited") ? "#16A34A" : "#2563EB",
                       padding: "3px 10px", borderRadius: 8, fontSize: 11, fontWeight: 700
                     }}>{el}</span>
                   </td>
@@ -1234,7 +1234,7 @@ function SubadminsList({ THEME, subadmins, refresh, packages, subscriptions, fet
                     <div style={{ display: "flex", gap: 8 }}>
                       <button onClick={() => openEditModal(s)} style={{ background: `${THEME.accent}15`, color: THEME.accent, border: "none", borderRadius: 8, padding: "6px 12px", fontSize: 11, fontWeight: 800, cursor: "pointer" }}>Edit Edit</button>
                       <button onClick={() => openAssignModal(s)} style={{ background: `${THEME.accentSecondary}15`, color: THEME.accentSecondary, border: "none", borderRadius: 8, padding: "6px 12px", fontSize: 11, fontWeight: 800, cursor: "pointer" }}>Package Assign</button>
-                      <button onClick={async () => { if (window.confirm("Delete?")) { await axios.delete(`${BASE_URL}/api/subadmins/${s._id}`); refresh(); } }} style={{ background: "#ef444415", color: "#ef4444", border: "none", borderRadius: 8, padding: "6px 12px", fontSize: 11, fontWeight: 800, cursor: "pointer" }}>Delete</button>
+                      <button onClick={async () => { if (window.confirm("Delete?")) { await axios.delete(`${BASE_URL}/api/subadmins/${s._id}`); refresh(); } }} style={{ background: "#64748B15", color: "#64748B", border: "none", borderRadius: 8, padding: "6px 12px", fontSize: 11, fontWeight: 800, cursor: "pointer" }}>Delete</button>
                     </div>
                   </td>
                 </tr>
@@ -1281,7 +1281,7 @@ function SubadminsList({ THEME, subadmins, refresh, packages, subscriptions, fet
               <input placeholder="Password" type="password" value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} style={{ padding: 12, borderRadius: 12, border: `1px solid ${THEME.border}`, background: THEME.surface, color: THEME.text }} />
               <div style={{ display: "flex", gap: 12, marginTop: 12 }}>
                 <button onClick={() => setModalOpen(false)} style={{ flex: 1, padding: 12, borderRadius: 12, border: "none", fontWeight: 700, background: THEME.surface, color: THEME.text }}>Cancel</button>
-                <button onClick={() => { axios.post(`${BASE_URL}/api/subadmins`, { ...form, role: "subadmin" }).then(() => { refresh(); setModalOpen(false); }) }} style={{ flex: 1, padding: 12, borderRadius: 12, border: "none", background: THEME.accent, color: "#fff", fontWeight: 700 }}>Create</button>
+                <button onClick={() => { axios.post(`${BASE_URL}/api/subadmins`, { ...form, role: "subadmin" }).then(() => { refresh(); setModalOpen(false); }) }} style={{ flex: 1, padding: 12, borderRadius: 12, border: "none", background: THEME.accent, color: "#FFFFFF", fontWeight: 700 }}>Create</button>
               </div>
             </div>
           </div>
@@ -1328,7 +1328,7 @@ function SubadminsList({ THEME, subadmins, refresh, packages, subscriptions, fet
               </div>
               <div style={{ display: "flex", gap: 12, marginTop: 12 }}>
                 <button onClick={() => setEditModalOpen(false)} style={{ flex: 1, padding: 12, borderRadius: 12, border: "none", fontWeight: 700, background: THEME.surface, color: THEME.text, cursor: "pointer" }}>Cancel</button>
-                <button onClick={handleEditSubadmin} disabled={loading} style={{ flex: 1, padding: 12, borderRadius: 12, border: "none", background: THEME.accent, color: "#fff", fontWeight: 700, cursor: "pointer" }}>
+                <button onClick={handleEditSubadmin} disabled={loading} style={{ flex: 1, padding: 12, borderRadius: 12, border: "none", background: THEME.accent, color: "#FFFFFF", fontWeight: 700, cursor: "pointer" }}>
                   {loading ? "Saving..." : "Save Changes"}
                 </button>
               </div>
@@ -1376,12 +1376,12 @@ function SubadminsList({ THEME, subadmins, refresh, packages, subscriptions, fet
                   <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: THEME.muted, marginBottom: 6, textTransform: "uppercase" }}>Duration (Days)</label>
                   <input type="number" value={durationDays} onChange={e => setDurationDays(e.target.value)} placeholder="30" style={{ width: "100%", padding: 12, borderRadius: 12, border: `1px solid ${THEME.border}`, background: THEME.surface, color: THEME.text, fontSize: 13, boxSizing: "border-box" }} />
                 </div>
-                <div style={{ background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.2)", borderRadius: 10, padding: "10px 14px", fontSize: 12, color: "#b45309" }}>
+                <div style={{ background: "rgba(100, 116, 139, 0.08)", border: "1px solid rgba(100, 116, 139, 0.2)", borderRadius: 10, padding: "10px 14px", fontSize: 12, color: "#64748B" }}>
                   Warning This will cancel any existing active subscription for this subadmin and replace it with the selected package.
                 </div>
                 <div style={{ display: "flex", gap: 12, marginTop: 4 }}>
                   <button onClick={() => setAssignModalOpen(false)} style={{ flex: 1, padding: 12, borderRadius: 12, border: `1px solid ${THEME.border}`, fontWeight: 700, background: THEME.surface, color: THEME.text, cursor: "pointer" }}>Cancel</button>
-                  <button onClick={handleAssignPackage} disabled={assignLoading} style={{ flex: 2, padding: 12, borderRadius: 12, border: "none", background: assignLoading ? "#2563eb" : THEME.accent, color: "#fff", fontWeight: 700, cursor: assignLoading ? "not-allowed" : "pointer" }}>
+                  <button onClick={handleAssignPackage} disabled={assignLoading} style={{ flex: 2, padding: 12, borderRadius: 12, border: "none", background: assignLoading ? "#2563EB" : THEME.accent, color: "#FFFFFF", fontWeight: 700, cursor: assignLoading ? "not-allowed" : "pointer" }}>
                     {assignLoading ? "Assigning..." : "Yes Assign Package"}
                   </button>
                 </div>
@@ -1403,7 +1403,7 @@ function formatDate(d) {
 function SubscriptionsPage({ THEME, subscriptions, subadmins }) {
   const [filter, setFilter] = useState("all");
   const filtered = subscriptions.filter(s => filter === "all" || s.status?.toLowerCase() === filter.toLowerCase());
-  const statusColors = { active: "#10b981", pending: "#f59e0b", expired: "#ef4444", cancelled: "#64748b", trial: "#2563eb" };
+  const statusColors = { active: "#16A34A", pending: "#64748B", expired: "#64748B", cancelled: "#64748B", trial: "#2563EB" };
 
   const getSubadminLimits = (sub) => {
     const sa = subadmins?.find(s => s._id === sub.userId || s._id === sub.companyId);
@@ -1457,15 +1457,15 @@ function SubscriptionsPage({ THEME, subscriptions, subadmins }) {
                   <td style={{ padding: "14px 16px", fontWeight: 900, color: THEME.text }}>₹{sub.planPrice || 0}</td>
                   <td style={{ padding: "14px 16px" }}>
                     <span style={{
-                      background: cl.toLowerCase().includes("unlimited") ? "rgba(16,185,129,0.1)" : "rgba(59,130,246,0.1)",
-                      color: cl.toLowerCase().includes("unlimited") ? "#10b981" : "#3b82f6",
+                      background: cl.toLowerCase().includes("unlimited") ? "rgba(22, 163, 74, 0.1)" : "rgba(37, 99, 235, 0.1)",
+                      color: cl.toLowerCase().includes("unlimited") ? "#16A34A" : "#2563EB",
                       padding: "3px 10px", borderRadius: 8, fontSize: 11, fontWeight: 700
                     }}>{cl}</span>
                   </td>
                   <td style={{ padding: "14px 16px" }}>
                     <span style={{
-                      background: el.toLowerCase().includes("unlimited") ? "rgba(16,185,129,0.1)" : "rgba(37, 99, 235,0.1)",
-                      color: el.toLowerCase().includes("unlimited") ? "#10b981" : "#2563eb",
+                      background: el.toLowerCase().includes("unlimited") ? "rgba(22, 163, 74, 0.1)" : "rgba(37, 99, 235, 0.1)",
+                      color: el.toLowerCase().includes("unlimited") ? "#16A34A" : "#2563EB",
                       padding: "3px 10px", borderRadius: 8, fontSize: 11, fontWeight: 700
                     }}>{el}</span>
                   </td>
@@ -1499,10 +1499,10 @@ function SubadminDropdown({ value, options, onChange, darkMode }) {
         onClick={() => setOpen(!open)}
         style={{
           width: "100%", padding: "11px 14px",
-          border: `1.5px solid ${open ? "var(--app-accent, #2563eb)" : "#e2e8f0"}`,
+          border: `1.5px solid ${open ? "var(--app-accent, #2563EB)" : "#E2E8F0"}`,
           borderRadius: 12, fontSize: 13, outline: "none",
-          background: darkMode ? "#1e293b" : "#f8fafc",
-          color: darkMode ? "#f8fafc" : "#0f172a",
+          background: darkMode ? "#1E293B" : "#F8FAFC",
+          color: darkMode ? "#F8FAFC" : "#0F172A",
           cursor: "pointer", boxSizing: "border-box",
           display: "flex", justifyContent: "space-between", alignItems: "center",
           transition: "all 0.2s"
@@ -1523,8 +1523,8 @@ function SubadminDropdown({ value, options, onChange, darkMode }) {
           <div
             style={{
               position: "absolute", top: "calc(100% + 6px)", left: 0, right: 0,
-              background: darkMode ? "#1e293b" : "#fff",
-              border: "1.5px solid #e2e8f0",
+              background: darkMode ? "#1E293B" : "#FFFFFF",
+              border: "1.5px solid #E2E8F0",
               borderRadius: 14, boxShadow: "0 12px 30px rgba(0,0,0,0.12)",
               zIndex: 999, maxHeight: 220, overflowY: "auto",
               padding: "6px", animation: "notif-slide-in 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)"
@@ -1532,8 +1532,8 @@ function SubadminDropdown({ value, options, onChange, darkMode }) {
           >
             <div
               onClick={() => { onChange([]); setOpen(false); }}
-              style={{ padding: "10px 14px", cursor: "pointer", borderRadius: 8, fontSize: 13, color: "#94a3b8", transition: "0.2s" }}
-              onMouseEnter={e => e.currentTarget.style.background = darkMode ? "rgba(255,255,255,0.05)" : "#f8fafc"}
+              style={{ padding: "10px 14px", cursor: "pointer", borderRadius: 8, fontSize: 13, color: "#64748B", transition: "0.2s" }}
+              onMouseEnter={e => e.currentTarget.style.background = darkMode ? "rgba(255,255,255,0.05)" : "#F8FAFC"}
               onMouseLeave={e => e.currentTarget.style.background = "transparent"}
             >
               -- Clear Selection --
@@ -1550,12 +1550,12 @@ function SubadminDropdown({ value, options, onChange, darkMode }) {
                   }}
                   style={{
                     padding: "10px 14px", cursor: "pointer", fontSize: 13, borderRadius: 8,
-                    background: isSelected ? "var(--app-accent, #2563eb)" : "transparent",
-                    color: isSelected ? "#fff" : (darkMode ? "#f8fafc" : "#0f172a"),
+                    background: isSelected ? "var(--app-accent, #2563EB)" : "transparent",
+                    color: isSelected ? "#FFFFFF" : (darkMode ? "#F8FAFC" : "#0F172A"),
                     marginBottom: "2px", transition: "0.2s",
                     display: "flex", justifyContent: "space-between", alignItems: "center"
                   }}
-                  onMouseEnter={e => { if (!isSelected) e.currentTarget.style.background = darkMode ? "rgba(255,255,255,0.05)" : "#f8fafc"; }}
+                  onMouseEnter={e => { if (!isSelected) e.currentTarget.style.background = darkMode ? "rgba(255,255,255,0.05)" : "#F8FAFC"; }}
                   onMouseLeave={e => { if (!isSelected) e.currentTarget.style.background = "transparent"; }}
                 >
                   <div>
@@ -1616,7 +1616,7 @@ function PackagesPage({ THEME, packages, onEdit, onDelete, darkMode }) {
                 <div style={{
                   position: "absolute", top: -50, left: "50%", transform: "translateX(-50%)",
                   width: 220, height: 220,
-                  background: "radial-gradient(ellipse, rgba(0,220,150,0.13) 0%, transparent 70%)",
+                  background: "radial-gradient(ellipse, rgba(22, 163, 74, 0.13) 0%, transparent 70%)",
                   pointerEvents: "none"
                 }} />
               )}
@@ -1625,11 +1625,11 @@ function PackagesPage({ THEME, packages, onEdit, onDelete, darkMode }) {
               {isPro && (
                 <div style={{
                   position: "absolute", top: 18, right: 18,
-                  background: "rgba(0,220,150,0.12)",
-                  border: "1px solid rgba(0,220,150,0.35)",
+                  background: "rgba(22, 163, 74, 0.12)",
+                  border: "1px solid rgba(22, 163, 74, 0.35)",
                   borderRadius: 100, padding: "3px 11px",
                   fontSize: 9, fontWeight: 800,
-                  color: "#00dc96", letterSpacing: 1.2,
+                  color: "#16A34A", letterSpacing: 1.2,
                   textTransform: "uppercase"
                 }}>
                   MOST POPULAR
@@ -1647,7 +1647,7 @@ function PackagesPage({ THEME, packages, onEdit, onDelete, darkMode }) {
                   style={{
                     background: "rgba(37, 99, 235, 0.1)",
                     border: "1px solid rgba(37, 99, 235, 0.2)",
-                    color: "#6366f1",
+                    color: "#2563EB",
                     borderRadius: 8,
                     padding: "6px 12px",
                     fontSize: 12,
@@ -1674,9 +1674,9 @@ function PackagesPage({ THEME, packages, onEdit, onDelete, darkMode }) {
                   onClick={(e) => { e.stopPropagation(); onDelete(p._id); }}
                   title="Delete Package"
                   style={{
-                    background: "rgba(239, 68, 68, 0.1)",
-                    border: "1px solid rgba(239, 68, 68, 0.2)",
-                    color: "#ef4444",
+                    background: "rgba(100, 116, 139, 0.1)",
+                    border: "1px solid rgba(100, 116, 139, 0.2)",
+                    color: "#64748B",
                     borderRadius: 8,
                     padding: "6px 12px",
                     fontSize: 12,
@@ -1689,11 +1689,11 @@ function PackagesPage({ THEME, packages, onEdit, onDelete, darkMode }) {
                     fontFamily: "inherit"
                   }}
                   onMouseEnter={e => {
-                    e.currentTarget.style.background = "rgba(239, 68, 68, 0.2)";
+                    e.currentTarget.style.background = "rgba(100, 116, 139, 0.2)";
                     e.currentTarget.style.transform = "translateY(-1px)";
                   }}
                   onMouseLeave={e => {
-                    e.currentTarget.style.background = "rgba(239, 68, 68, 0.1)";
+                    e.currentTarget.style.background = "rgba(100, 116, 139, 0.1)";
                     e.currentTarget.style.transform = "translateY(0)";
                   }}
                 >
@@ -1740,7 +1740,7 @@ function PackagesPage({ THEME, packages, onEdit, onDelete, darkMode }) {
               {/* Divider */}
               <div style={{
                 height: 1,
-                background: isPro ? "rgba(0,220,150,0.13)" : "rgba(255,255,255,0.06)",
+                background: isPro ? "rgba(22, 163, 74, 0.13)" : "rgba(255,255,255,0.06)",
                 marginBottom: 22
               }} />
 
@@ -1750,10 +1750,10 @@ function PackagesPage({ THEME, packages, onEdit, onDelete, darkMode }) {
                   <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
                     <div style={{
                       width: 17, height: 17, borderRadius: "50%", flexShrink: 0, marginTop: 1,
-                      background: isPro ? "rgba(0,220,150,0.12)" : (darkMode ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.05)"),
-                      border: isPro ? "1px solid rgba(0,220,150,0.35)" : (darkMode ? "1px solid rgba(255,255,255,0.12)" : "1px solid rgba(0,0,0,0.1)"),
+                      background: isPro ? "rgba(22, 163, 74, 0.12)" : (darkMode ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.05)"),
+                      border: isPro ? "1px solid rgba(22, 163, 74, 0.35)" : (darkMode ? "1px solid rgba(255,255,255,0.12)" : "1px solid rgba(0,0,0,0.1)"),
                       display: "flex", alignItems: "center", justifyContent: "center",
-                      fontSize: 8, color: isPro ? "#00dc96" : (darkMode ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.45)")
+                      fontSize: 8, color: isPro ? "#16A34A" : (darkMode ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.45)")
                     }}>Yes</div>
                     <span style={{
                       fontSize: 12.5, color: THEME.text, opacity: 0.8,
@@ -1770,9 +1770,9 @@ function PackagesPage({ THEME, packages, onEdit, onDelete, darkMode }) {
                   borderRadius: 11, fontSize: 14, fontWeight: 700,
                   cursor: "pointer", transition: "all 0.2s", fontFamily: "inherit",
                   ...(isPro ? {
-                    background: "linear-gradient(135deg, #00dc96, #00b87a)",
-                    border: "none", color: "#000",
-                    boxShadow: "0 6px 22px rgba(0,220,150,0.32)"
+                    background: "linear-gradient(135deg, #16A34A, #16A34A)",
+                    border: "none", color: "#0F172A",
+                    boxShadow: "0 6px 22px rgba(22, 163, 74, 0.32)"
                   } : {
                     background: "transparent",
                     border: `1.5px solid ${darkMode ? "rgba(255,255,255,0.14)" : "rgba(0,0,0,0.1)"}`,
@@ -1781,7 +1781,7 @@ function PackagesPage({ THEME, packages, onEdit, onDelete, darkMode }) {
                 }}
                 onMouseEnter={e => {
                   if (isPro) {
-                    e.currentTarget.style.boxShadow = "0 8px 30px rgba(0,220,150,0.48)";
+                    e.currentTarget.style.boxShadow = "0 8px 30px rgba(22, 163, 74, 0.48)";
                     e.currentTarget.style.transform = "translateY(-1px)";
                   } else {
                     e.currentTarget.style.borderColor = darkMode ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)";
@@ -1790,7 +1790,7 @@ function PackagesPage({ THEME, packages, onEdit, onDelete, darkMode }) {
                 }}
                 onMouseLeave={e => {
                   if (isPro) {
-                    e.currentTarget.style.boxShadow = "0 6px 22px rgba(0,220,150,0.32)";
+                    e.currentTarget.style.boxShadow = "0 6px 22px rgba(22, 163, 74, 0.32)";
                     e.currentTarget.style.transform = "translateY(0)";
                   } else {
                     e.currentTarget.style.borderColor = darkMode ? "rgba(255,255,255,0.14)" : "rgba(0,0,0,0.1)";
@@ -1835,30 +1835,30 @@ function ClientsPage({ THEME, clients, setClients, projects = [], setProjects, o
           placeholder="Search company names..."
           value={search}
           onChange={e => setSearch(e.target.value)}
-          style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #cbd5e1", fontSize: 13, minWidth: 200 }}
+          style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #E2E8F0", fontSize: 13, minWidth: 200 }}
         />
       </div>
       <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
         <thead>
-          <tr style={{ background: "#f8fafc" }}>
+          <tr style={{ background: "#F8FAFC" }}>
             {["Company Name", "Contact Person", "Email", "Phone", "Status", "Joined"].map(h => (
-              <th key={h} style={{ padding: "12px 16px", textAlign: "left", fontWeight: 700, color: "#64748b", borderBottom: "2px solid #e2e8f0" }}>{h}</th>
+              <th key={h} style={{ padding: "12px 16px", textAlign: "left", fontWeight: 700, color: "#64748B", borderBottom: "2px solid #E2E8F0" }}>{h}</th>
             ))}
           </tr>
         </thead>
         <tbody>
           {filtered.map((c, i) => (
-            <tr key={c._id || i} style={{ borderBottom: "1px solid #f1f5f9" }}>
-              <td style={{ padding: "14px 16px", fontWeight: 700, color: "#0f172a" }}>{c.clientName || c.name || "—"}</td>
-              <td style={{ padding: "14px 16px", color: "#475569" }}>{c.contactPersonName || "—"}</td>
-              <td style={{ padding: "14px 16px", color: "#475569" }}>{c.email || "—"}</td>
-              <td style={{ padding: "14px 16px", color: "#475569" }}>{c.phone || "—"}</td>
+            <tr key={c._id || i} style={{ borderBottom: "1px solid #EFF6FF" }}>
+              <td style={{ padding: "14px 16px", fontWeight: 700, color: "#0F172A" }}>{c.clientName || c.name || "—"}</td>
+              <td style={{ padding: "14px 16px", color: "#64748B" }}>{c.contactPersonName || "—"}</td>
+              <td style={{ padding: "14px 16px", color: "#64748B" }}>{c.email || "—"}</td>
+              <td style={{ padding: "14px 16px", color: "#64748B" }}>{c.phone || "—"}</td>
               <td style={{ padding: "14px 16px" }}><Badge label={c.status || "Active"} /></td>
-              <td style={{ padding: "14px 16px", color: "#64748b" }}>{c.createdAt ? new Date(c.createdAt).toLocaleDateString() : "—"}</td>
+              <td style={{ padding: "14px 16px", color: "#64748B" }}>{c.createdAt ? new Date(c.createdAt).toLocaleDateString() : "—"}</td>
             </tr>
           ))}
-          {loading && <tr><td colSpan={6} style={{ padding: 20, textAlign: "center", color: "#94a3b8" }}>Loading clients...</td></tr>}
-          {!loading && filtered.length === 0 && <tr><td colSpan={6} style={{ padding: 20, textAlign: "center", color: "#94a3b8" }}>No company names found</td></tr>}
+          {loading && <tr><td colSpan={6} style={{ padding: 20, textAlign: "center", color: "#64748B" }}>Loading clients...</td></tr>}
+          {!loading && filtered.length === 0 && <tr><td colSpan={6} style={{ padding: 20, textAlign: "center", color: "#64748B" }}>No company names found</td></tr>}
         </tbody>
       </table>
     </div>
@@ -2077,10 +2077,10 @@ function ProjectsPage({ THEME, projects, tasks, setProjects, clients, employees,
       {editProj && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center" }}
           onClick={e => { if (e.target === e.currentTarget) setEditProj(null); }}>
-          <div style={{ background: "#fff", borderRadius: 16, width: 560, maxHeight: "90vh", overflowY: "auto", boxShadow: "0 24px 80px rgba(0,0,0,0.18)" }}>
-            <div style={{ padding: "18px 24px 14px", borderBottom: "1px solid #eef0f4", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: "#1A2332" }}>Edit Edit Project</h3>
-              <button onClick={() => setEditProj(null)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 20, color: "#676879" }}>✕</button>
+          <div style={{ background: "#FFFFFF", borderRadius: 16, width: 560, maxHeight: "90vh", overflowY: "auto", boxShadow: "0 24px 80px rgba(0,0,0,0.18)" }}>
+            <div style={{ padding: "18px 24px 14px", borderBottom: "1px solid #EFF6FF", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: "#1E293B" }}>Edit Edit Project</h3>
+              <button onClick={() => setEditProj(null)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 20, color: "#64748B" }}>✕</button>
             </div>
             <form onSubmit={handleEditSave} style={{ padding: "20px 24px" }}>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
@@ -2154,11 +2154,11 @@ function ProjectsPage({ THEME, projects, tasks, setProjects, clients, employees,
               </div>
               <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 20 }}>
                 <button type="button" onClick={() => setEditProj(null)}
-                  style={{ padding: "9px 20px", borderRadius: 9, border: "1.5px solid #d1d5db", background: "#fff", color: "#374151", fontWeight: 600, cursor: "pointer", fontSize: 13 }}>
+                  style={{ padding: "9px 20px", borderRadius: 9, border: "1.5px solid #E2E8F0", background: "#FFFFFF", color: "#1E293B", fontWeight: 600, cursor: "pointer", fontSize: 13 }}>
                   Cancel
                 </button>
                 <button type="submit" disabled={saving}
-                  style={{ padding: "9px 22px", borderRadius: 9, border: "none", background: "var(--app-accent, #2563eb)", color: "#fff", fontWeight: 700, cursor: saving ? "default" : "pointer", fontSize: 13, opacity: saving ? 0.7 : 1 }}>
+                  style={{ padding: "9px 22px", borderRadius: 9, border: "none", background: "var(--app-accent, #2563EB)", color: "#FFFFFF", fontWeight: 700, cursor: saving ? "default" : "pointer", fontSize: 13, opacity: saving ? 0.7 : 1 }}>
                   {saving ? "Saving…" : "Yes Next"}
                 </button>
               </div>
@@ -2170,18 +2170,18 @@ function ProjectsPage({ THEME, projects, tasks, setProjects, clients, employees,
       {deleteTargetProj && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center" }}
           onClick={e => { if (e.target === e.currentTarget) setDeleteTargetProj(null); }}>
-          <div style={{ background: "#fff", borderRadius: 16, width: 400, padding: 24, boxShadow: "0 24px 80px rgba(0,0,0,0.18)" }}>
-            <h3 style={{ margin: "0 0 10px", fontSize: 16, fontWeight: 800, color: "#1A2332" }}>Delete Project</h3>
-            <p style={{ margin: "0 0 20px", fontSize: 13, color: "#676879" }}>
+          <div style={{ background: "#FFFFFF", borderRadius: 16, width: 400, padding: 24, boxShadow: "0 24px 80px rgba(0,0,0,0.18)" }}>
+            <h3 style={{ margin: "0 0 10px", fontSize: 16, fontWeight: 800, color: "#1E293B" }}>Delete Project</h3>
+            <p style={{ margin: "0 0 20px", fontSize: 13, color: "#64748B" }}>
               Are you sure you want to delete "<b>{deleteTargetProj.name}</b>"? This cannot be undone.
             </p>
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
               <button onClick={() => setDeleteTargetProj(null)}
-                style={{ padding: "9px 20px", borderRadius: 9, border: "1.5px solid #d1d5db", background: "#fff", color: "#374151", fontWeight: 600, cursor: "pointer", fontSize: 13 }}>
+                style={{ padding: "9px 20px", borderRadius: 9, border: "1.5px solid #E2E8F0", background: "#FFFFFF", color: "#1E293B", fontWeight: 600, cursor: "pointer", fontSize: 13 }}>
                 Cancel
               </button>
               <button onClick={handleDeleteProject} disabled={deletingProj}
-                style={{ padding: "9px 22px", borderRadius: 9, border: "none", background: "#ef4444", color: "#fff", fontWeight: 700, cursor: deletingProj ? "default" : "pointer", fontSize: 13, opacity: deletingProj ? 0.7 : 1 }}>
+                style={{ padding: "9px 22px", borderRadius: 9, border: "none", background: "#64748B", color: "#FFFFFF", fontWeight: 700, cursor: deletingProj ? "default" : "pointer", fontSize: 13, opacity: deletingProj ? 0.7 : 1 }}>
                 {deletingProj ? "Deleting…" : "Delete"}
               </button>
             </div>

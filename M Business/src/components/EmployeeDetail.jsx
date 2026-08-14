@@ -116,11 +116,11 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
   const projIcons = ['ti-world', 'ti-device-mobile', 'ti-chart-bar', 'ti-code', 'ti-building', 'ti-rocket'];
   const projColors = [
     { bg: 'var(--teal-lighter, #EFF6FF)', color: ' var(--app-accent, var(--app-accent, #2563EB))' },
-    { bg: '#EEF2FF', color: '#6366F1' },
-    { bg: '#ECFDF5', color: '#10B981' },
-    { bg: '#FFF7ED', color: '#F59E0B' },
-    { bg: '#FDF4FF', color: '#A855F7' },
-    { bg: '#FFF1F2', color: '#EF4444' },
+    { bg: '#EFF6FF', color: '#2563EB' },
+    { bg: '#EFF6FF', color: '#16A34A' },
+    { bg: '#F8FAFC', color: '#64748B' },
+    { bg: '#F8FAFC', color: '#64748B' },
+    { bg: '#F8FAFC', color: '#64748B' },
   ];
 
   // Tasks state
@@ -331,7 +331,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
         // Create a default Tasks group
         const groupRes = await axios.post(`${BASE_URL}/api/groups`, {
           label: "Tasks",
-          color: "#6366F1",
+          color: "#2563EB",
           companyId: emp?.companyId || ""
         });
         groupId = groupRes.data._id || groupRes.data.id;
@@ -400,9 +400,9 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
 
   const getPriorityStyle = (priority = '') => {
     const p = priority.toLowerCase();
-    if (p === 'high') return { background: '#FEF2F2', color: '#EF4444' };
-    if (p === 'low') return { background: '#ECFDF5', color: '#10B981' };
-    return { background: '#FFFBEB', color: '#F59E0B' }; // mid/medium
+    if (p === 'high') return { background: '#F8FAFC', color: '#64748B' };
+    if (p === 'low') return { background: '#EFF6FF', color: '#16A34A' };
+    return { background: '#F8FAFC', color: '#64748B' }; // mid/medium
   };
 
   const formatDue = (date) => {
@@ -415,12 +415,12 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
 
   // Documents helpers
   const docIcons = {
-    offer: { icon: 'ti-file-text', bg: '#EEF2FF', color: '#6366F1' },
-    id: { icon: 'ti-id', bg: '#E0F2FE', color: '#0ea5e9' },
-    contract: { icon: 'ti-file-certificate', bg: '#FFFBEB', color: '#f59e0b' },
-    degree: { icon: 'ti-certificate', bg: '#EFF6FF', color: '#8b5cf6' },
-    resume: { icon: 'ti-file-description', bg: '#FEF2F2', color: '#ef4444' },
-    default: { icon: 'ti-file', bg: '#F1F5F9', color: '#64748B' },
+    offer: { icon: 'ti-file-text', bg: '#EFF6FF', color: '#2563EB' },
+    id: { icon: 'ti-id', bg: '#EFF6FF', color: '#2563EB' },
+    contract: { icon: 'ti-file-certificate', bg: '#F8FAFC', color: '#64748B' },
+    degree: { icon: 'ti-certificate', bg: '#EFF6FF', color: '#2563EB' },
+    resume: { icon: 'ti-file-description', bg: '#F8FAFC', color: '#64748B' },
+    default: { icon: 'ti-file', bg: '#EFF6FF', color: '#64748B' },
   };
 
   const getDocStyle = (doc) => {
@@ -454,14 +454,14 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
   return (
     <div style={{
       "--teal": " var(--app-accent, var(--app-accent, #2563EB))",
-      "--bg": "#F5F7FA",
+      "--bg": "#F8FAFC",
       "--card": "#FFFFFF",
       "--text": "#1E293B",
       "--text-muted": "#64748B",
       "--border": "#E2E8F0",
-      "--danger": "#EF4444",
-      "--warning": "#F59E0B",
-      "--success": "#10B981",
+      "--danger": "#64748B",
+      "--warning": "#64748B",
+      "--success": "#16A34A",
       background: "var(--bg)",
       color: "var(--text)",
       fontFamily: "'Nunito', sans-serif",
@@ -472,28 +472,28 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
       <style>{`
         .ed-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
         .ed-title-area { display: flex; align-items: center; gap: 16px; }
-        .ed-back-btn { width: 40px; height: 40px; border-radius: 12px; background: #E0F2FE; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--teal); font-size: 18px; border: none; transition: all 0.2s; }
-        .ed-back-btn:hover { background: #BAE6FD; }
+        .ed-back-btn { width: 40px; height: 40px; border-radius: 12px; background: #EFF6FF; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--teal); font-size: 18px; border: none; transition: all 0.2s; }
+        .ed-back-btn:hover { background: #E2E8F0; }
         .ed-title { font-size: 20px; font-weight: 900; line-height: 1.2; color: #0F172A; }
         .ed-subtitle { font-size: 12px; color: var(--text-muted); font-weight: 600; }
         .ed-actions { display: flex; gap: 12px; }
         .ed-btn { padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 800; cursor: pointer; border: 1px solid var(--border); background: var(--card); color: var(--text); display: flex; align-items: center; gap: 8px; transition: all 0.2s; }
         .ed-btn:hover { border-color: var(--text-muted); }
-        .ed-btn.danger { color: var(--danger); border-color: transparent; background: #FEE2E2; }
-        .ed-btn.danger:hover { background: #FECACA; }
-        .ed-btn.warning { color: #D97706; border-color: #FDE68A; background: #FEF3C7; }
+        .ed-btn.danger { color: var(--danger); border-color: transparent; background: #E2E8F0; }
+        .ed-btn.danger:hover { background: #E2E8F0; }
+        .ed-btn.warning { color: #64748B; border-color: #E2E8F0; background: #E2E8F0; }
 
-        .ed-hero { background: var(--card); border-radius: 16px; padding: 24px 32px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; position: relative; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border-top: 4px solid #00E5FF; border-bottom: none; border-left: none; border-right: none; }
+        .ed-hero { background: var(--card); border-radius: 16px; padding: 24px 32px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; position: relative; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border-top: 4px solid #2563EB; border-bottom: none; border-left: none; border-right: none; }
         .ed-hero-left { display: flex; align-items: center; gap: 24px; }
-        .ed-avatar { width: 72px; height: 72px; border-radius: 50%; background: var(--teal); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 28px; font-weight: 800; flex-shrink: 0; }
+        .ed-avatar { width: 72px; height: 72px; border-radius: 50%; background: var(--teal); display: flex; align-items: center; justify-content: center; color: #FFFFFF; font-size: 28px; font-weight: 800; flex-shrink: 0; }
         .ed-name { font-size: 22px; font-weight: 900; color: #0F172A; margin-bottom: 6px; }
         .ed-roles { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 700; margin-bottom: 12px; }
-        .ed-badge { background: #F1F5F9; padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 800; color: #475569; }
+        .ed-badge { background: #EFF6FF; padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 800; color: #64748B; }
         .ed-contacts { display: flex; gap: 20px; font-size: 12px; color: var(--text-muted); font-weight: 600; }
         .ed-contacts span { display: flex; align-items: center; gap: 6px; }
         .ed-contacts i { color: var(--teal); font-size: 14px; }
         .ed-hero-right { text-align: right; display: flex; flexDirection: column; gap: 16px; align-items: flex-end; }
-        .ed-status { display: inline-flex; align-items: center; gap: 6px; background: #DCFCE7; color: #16A34A; padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 800; }
+        .ed-status { display: inline-flex; align-items: center; gap: 6px; background: #E2E8F0; color: #16A34A; padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 800; }
         .ed-status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
         .ed-tenure { font-size: 14px; font-weight: 900; color: #0F172A; }
         .ed-tenure span { display: block; font-size: 11px; font-weight: 600; color: var(--text-muted); margin-top: 2px; }
@@ -508,23 +508,23 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
         .ed-card-title i { color: var(--teal); font-size: 18px; }
         
         .ed-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .ed-info-item .lbl { font-size: 10px; font-weight: 800; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .ed-info-item .lbl { font-size: 10px; font-weight: 800; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
         .ed-info-item .val { font-size: 13px; font-weight: 800; color: #0F172A; word-break: break-all; }
 
         .ed-progress-group { margin-bottom: 16px; }
-        .ed-progress-header { display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; margin-bottom: 8px; color: #475569; }
+        .ed-progress-header { display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; margin-bottom: 8px; color: #64748B; }
         .ed-progress-bar { height: 6px; background: #E2E8F0; border-radius: 10px; overflow: hidden; }
         .ed-progress-fill { height: 100%; border-radius: 10px; }
 
         .ed-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        .ed-table th { text-align: left; padding: 10px; font-size: 10px; font-weight: 800; color: #94A3B8; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+        .ed-table th { text-align: left; padding: 10px; font-size: 10px; font-weight: 800; color: #64748B; text-transform: uppercase; border-bottom: 1px solid var(--border); }
         .ed-table th:first-child { padding-left: 0; }
-        .ed-table td { font-size: 12px; font-weight: 700; color: #334155; border-bottom: 1px solid #F1F5F9; }
+        .ed-table td { font-size: 12px; font-weight: 700; color: #1E293B; border-bottom: 1px solid #EFF6FF; }
         .ed-table tr:last-child td { border-bottom: none; }
 
-        .ed-proj-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #F1F5F9; cursor: pointer; }
+        .ed-proj-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #EFF6FF; cursor: pointer; }
         .ed-proj-item:last-child { border-bottom: none; }
-        .ed-proj-item:hover { background: #FAFAFA; }
+        .ed-proj-item:hover { background: #F8FAFC; }
         .ed-proj-info { display: flex; align-items: center; gap: 12px; }
         .ed-proj-icon { width: 36px; height: 36px; border-radius: 8px; background: var(--teal-lighter, #EFF6FF); color: var(--teal); display: flex; align-items: center; justify-content: center; font-size: 18px; }
         .ed-proj-name { font-size: 13px; font-weight: 800; color: #0F172A; }
@@ -533,32 +533,32 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
         .ed-proj-perc { font-size: 13px; font-weight: 900; color: var(--teal); }
         .ed-proj-lbl { font-size: 11px; font-weight: 600; color: #64748B; }
 
-        .ed-task-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid #F1F5F9; }
+        .ed-task-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid #EFF6FF; }
         .ed-task-item:last-child { border-bottom: none; }
-        .ed-task-cb { width: 16px; height: 16px; border-radius: 4px; border: 2px solid var(--teal); display: flex; align-items: center; justify-content: center; color: #fff; cursor: pointer; flex-shrink: 0; }
+        .ed-task-cb { width: 16px; height: 16px; border-radius: 4px; border: 2px solid var(--teal); display: flex; align-items: center; justify-content: center; color: #FFFFFF; cursor: pointer; flex-shrink: 0; }
         .ed-task-cb.done { background: var(--teal); }
         .ed-task-content { flex: 1; }
         .ed-task-title { font-size: 12px; font-weight: 800; margin-bottom: 2px; color: #0F172A; }
-        .ed-task-title.done { text-decoration: line-through; color: #94A3B8; }
+        .ed-task-title.done { text-decoration: line-through; color: #64748B; }
         .ed-task-due { font-size: 10px; font-weight: 700; color: #64748B; }
         .ed-task-tag { padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 800; flex-shrink: 0; }
 
         .ed-docs-list { display: flex; flex-direction: column; gap: 0; }
-        .ed-doc-row { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px solid #F1F5F9; }
+        .ed-doc-row { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px solid #EFF6FF; }
         .ed-doc-row:last-child { border-bottom: none; }
-        .ed-doc-icon { width: 36px; height: 36px; border-radius: 8px; background: #F1F5F9; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+        .ed-doc-icon { width: 36px; height: 36px; border-radius: 8px; background: #EFF6FF; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
         .ed-doc-info { flex: 1; }
         .ed-doc-name { font-size: 13px; font-weight: 800; color: #0F172A; }
         .ed-doc-meta { font-size: 10px; font-weight: 600; color: #64748B; }
         .ed-doc-actions { display: flex; gap: 8px; flex-shrink: 0; }
         .ed-doc-btn { padding: 5px 12px; border-radius: 6px; font-size: 11px; font-weight: 800; cursor: pointer; border: none; display: flex; align-items: center; gap: 5px; transition: all 0.2s; }
-        .ed-doc-btn.view { background: #E0F2FE; color: #0284C7; }
-        .ed-doc-btn.view:hover { background: #BAE6FD; }
-        .ed-doc-btn.download { background: var(--teal); color: #fff; }
+        .ed-doc-btn.view { background: #EFF6FF; color: #2563EB; }
+        .ed-doc-btn.view:hover { background: #E2E8F0; }
+        .ed-doc-btn.download { background: var(--teal); color: #FFFFFF; }
         .ed-doc-btn.download:hover { background: #2563EB; }
-        .ed-docs-sub { font-size: 10px; font-weight: 800; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
-        .ed-docs-sub span { background: var(--teal); color: #fff; border-radius: 10px; padding: 1px 7px; font-size: 10px; }
-        .ed-empty { text-align: center; padding: 24px 0; color: #94A3B8; font-size: 12px; font-weight: 600; }
+        .ed-docs-sub { font-size: 10px; font-weight: 800; color: #64748B; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+        .ed-docs-sub span { background: var(--teal); color: #FFFFFF; border-radius: 10px; padding: 1px 7px; font-size: 10px; }
+        .ed-empty { text-align: center; padding: 24px 0; color: #64748B; font-size: 12px; font-weight: 600; }
         .ed-tab { font-size: 12px; font-weight: 700; padding-bottom: 8px; cursor: pointer; color: var(--text-muted); }
         .ed-tab.active { color: var(--teal); border-bottom: 2px solid var(--teal); }
       `}</style>
@@ -595,8 +595,8 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
         <div className="ed-hero-right">
           <div className="ed-status" style={
             (emp.status || 'active').toLowerCase() === 'inactive'
-              ? { background: '#FEE2E2', color: '#DC2626' }
-              : { background: '#DCFCE7', color: '#16A34A' }
+              ? { background: '#E2E8F0', color: '#64748B' }
+              : { background: '#E2E8F0', color: '#16A34A' }
           }>
             <div className="ed-status-dot"></div> {(emp.status || "Active").toUpperCase()}
           </div>
@@ -653,7 +653,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
               </span>
               <button
                 className="ed-btn"
-                style={{ padding: "5px 12px", fontSize: "11px", borderRadius: "8px", background: "var(--teal)", color: "#fff", border: "none", cursor: "pointer", fontWeight: 700, display: "flex", alignItems: "center", gap: 4 }}
+                style={{ padding: "5px 12px", fontSize: "11px", borderRadius: "8px", background: "var(--teal)", color: "#FFFFFF", border: "none", cursor: "pointer", fontWeight: 700, display: "flex", alignItems: "center", gap: 4 }}
                 onClick={() => setShowLeaveModal(true)}
               >
                 <i className="ti ti-plus" style={{ fontSize: 12 }}></i> Add Leave
@@ -683,7 +683,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
                       </td>
                       <td style={{ padding: "14px 10px", verticalAlign: "top" }}>
                         <span style={{
-                          background: currentStatus === 'approved' ? '#ECFDF5' : currentStatus === 'rejected' ? '#FEF2F2' : '#FFFBEB',
+                          background: currentStatus === 'approved' ? '#EFF6FF' : currentStatus === 'rejected' ? '#F8FAFC' : '#F8FAFC',
                           color: currentStatus === 'approved' ? 'var(--success)' : currentStatus === 'rejected' ? 'var(--danger)' : 'var(--warning)',
                           padding: "6px 10px", borderRadius: "8px", fontSize: "11px", fontWeight: "800", textTransform: "capitalize", display: "inline-block"
                         }}>{currentStatus}</span>
@@ -711,7 +711,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
                             style={{
                               padding: "6px 10px", borderRadius: "8px", fontSize: "11px", fontWeight: "800",
                               fontFamily: "inherit", cursor: "pointer", width: "100%",
-                              background: "#F8FAFC", color: "#334155", border: "1.5px solid var(--border)"
+                              background: "#F8FAFC", color: "#1E293B", border: "1.5px solid var(--border)"
                             }}
                           >
                             <option value="" disabled>Select Action</option>
@@ -732,8 +732,8 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
 
         {rejectingLeaveIdx !== null && (
           <div style={{ position: 'fixed', inset: 0, zIndex: 99998, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }} onClick={() => setRejectingLeaveIdx(null)}>
-            <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: 14, width: '100%', maxWidth: 380, padding: 22, boxShadow: '0 8px 32px rgba(0,0,0,0.18)' }}>
-              <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-dark, #1A2332)', marginBottom: 12 }}>{localLeaves[rejectingLeaveIdx]?.status === 'rejected' ? 'Edit Rejection Reason' : 'Reject Leave Request'}</div>
+            <div onClick={e => e.stopPropagation()} style={{ background: '#FFFFFF', borderRadius: 14, width: '100%', maxWidth: 380, padding: 22, boxShadow: '0 8px 32px rgba(0,0,0,0.18)' }}>
+              <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-dark, #1E293B)', marginBottom: 12 }}>{localLeaves[rejectingLeaveIdx]?.status === 'rejected' ? 'Edit Rejection Reason' : 'Reject Leave Request'}</div>
               <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>Reason for rejection</label>
               <textarea
                 autoFocus
@@ -746,7 +746,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
                 <button className="ed-btn" style={{ padding: '7px 16px', fontSize: 12 }} onClick={() => { setRejectingLeaveIdx(null); setRejectReasonInput(''); }}>Cancel</button>
                 <button
                   className="ed-btn"
-                  style={{ padding: '7px 16px', fontSize: 12, background: 'var(--danger)', color: '#fff', border: 'none' }}
+                  style={{ padding: '7px 16px', fontSize: 12, background: 'var(--danger)', color: '#FFFFFF', border: 'none' }}
                   onClick={async () => {
                     if (!rejectReasonInput.trim()) { alert('Please enter a reason for rejection.'); return; }
                     await updateLeaveStatus(rejectingLeaveIdx, 'rejected', rejectReasonInput.trim());
@@ -811,7 +811,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
             <div className="ed-card-title"><i className="ti ti-checkbox"></i> Tasks</div>
             <span style={{ fontSize: "11px", fontWeight: "700", color: "var(--text-muted)" }}>
               {pendingTasks.length} pending &nbsp;
-              <button className="ed-btn" onClick={() => setShowAddTaskModal(true)} style={{ padding: "6px 12px", background: "var(--teal)", color: "#fff", border: "none", fontSize: "11px", borderRadius: "8px" }}>
+              <button className="ed-btn" onClick={() => setShowAddTaskModal(true)} style={{ padding: "6px 12px", background: "var(--teal)", color: "#FFFFFF", border: "none", fontSize: "11px", borderRadius: "8px" }}>
                 <i className="ti ti-plus"></i> Assign Task
               </button>
             </span>
@@ -849,8 +849,8 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
                         </div>
                         <span style={{
                           fontSize: 10, fontWeight: 700, padding: '1px 7px', borderRadius: 20,
-                          background: task.status === 'Completed' ? '#D1FAE5' : task.status === 'In Progress' ? '#DBEAFE' : task.status === 'On Hold' ? '#FEF3C7' : '#F1F5F9',
-                          color: task.status === 'Completed' ? '#065F46' : task.status === 'In Progress' ? '#1E40AF' : task.status === 'On Hold' ? '#92400E' : '#475569'
+                          background: task.status === 'Completed' ? '#E2E8F0' : task.status === 'In Progress' ? '#E2E8F0' : task.status === 'On Hold' ? '#E2E8F0' : '#EFF6FF',
+                          color: task.status === 'Completed' ? '#1E293B' : task.status === 'In Progress' ? '#2563EB' : task.status === 'On Hold' ? '#1E293B' : '#64748B'
                         }}>{task.status}</span>
                       </div>
                     </div>
@@ -867,7 +867,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
         <div className="ed-card">
           <div className="ed-card-header">
             <div className="ed-card-title"><i className="ti ti-folder"></i> Documents</div>
-            <button className="ed-btn" onClick={() => setShowRequestDocModal(true)} style={{ padding: "6px 14px", fontSize: "11px", borderRadius: "8px", background: "var(--teal)", color: "#fff", border: "none" }}>
+            <button className="ed-btn" onClick={() => setShowRequestDocModal(true)} style={{ padding: "6px 14px", fontSize: "11px", borderRadius: "8px", background: "var(--teal)", color: "#FFFFFF", border: "none" }}>
               <i className="ti ti-download"></i> Request Document
             </button>
           </div>
@@ -913,11 +913,11 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
                           }}><i className="ti ti-download" style={{ fontSize: 12 }}></i> Download</button>
                         </>
                       ) : (
-                        <span style={{ fontSize: 11, color: "var(--text-muted)", background: "#F1F5F9", padding: "4px 10px", borderRadius: 20, fontWeight: 700 }}>Sent</span>
+                        <span style={{ fontSize: 11, color: "var(--text-muted)", background: "#EFF6FF", padding: "4px 10px", borderRadius: 20, fontWeight: 700 }}>Sent</span>
                       )}
                       <button
                         className="ed-doc-btn"
-                        style={{ color: '#EF4444', borderColor: '#FCA5A5' }}
+                        style={{ color: '#64748B', borderColor: '#E2E8F0' }}
                         onClick={async () => {
                           if (!confirm('Delete this document?')) return;
                           // Remove from UI immediately
@@ -952,18 +952,18 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
       {showLeaveModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(6px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
           onClick={() => setShowLeaveModal(false)}>
-          <div style={{ background: '#fff', borderRadius: 18, width: '100%', maxWidth: 500, padding: '32px 32px 26px', boxShadow: '0 24px 60px rgba(0,0,0,0.18)', fontFamily: "'Nunito', sans-serif" }}
+          <div style={{ background: '#FFFFFF', borderRadius: 18, width: '100%', maxWidth: 500, padding: '32px 32px 26px', boxShadow: '0 24px 60px rgba(0,0,0,0.18)', fontFamily: "'Nunito', sans-serif" }}
             onClick={e => e.stopPropagation()}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 26 }}>
-              <div style={{ fontSize: 17, fontWeight: 800, color: '#0f172a', display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{ fontSize: 17, fontWeight: 800, color: '#0F172A', display: 'flex', alignItems: 'center', gap: 8 }}>
                 <i className="ti ti-calendar-plus" style={{ color: ' var(--app-accent, var(--app-accent, #2563EB))' }}></i> Add Leave Request
               </div>
-              <button onClick={() => setShowLeaveModal(false)} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: '#94a3b8' }}>✕</button>
+              <button onClick={() => setShowLeaveModal(false)} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: '#64748B' }}>✕</button>
             </div>
             <div style={{ marginBottom: 22 }}>
-              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#718096', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '.5px' }}>Leave Type</label>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#64748B', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '.5px' }}>Leave Type</label>
               <select value={leaveForm.type} onChange={e => setLeaveForm(p => ({ ...p, type: e.target.value, customType: '' }))}
-                style={{ width: '100%', padding: '12px 14px', border: '1.5px solid #E2E8F0', borderRadius: 10, fontSize: 13, outline: 'none', fontFamily: 'inherit', background: '#fff' }}>
+                style={{ width: '100%', padding: '12px 14px', border: '1.5px solid #E2E8F0', borderRadius: 10, fontSize: 13, outline: 'none', fontFamily: 'inherit', background: '#FFFFFF' }}>
                 {['Sick Leave', 'Casual Leave', 'Annual Leave', 'Maternity Leave', 'Paternity Leave', 'Unpaid Leave', 'Other'].map(t => <option key={t}>{t}</option>)}
               </select>
               {leaveForm.type === 'Other' && (
@@ -975,30 +975,30 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18, marginBottom: 22 }}>
               <div>
-                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#718096', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '.5px' }}>Start Date *</label>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#64748B', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '.5px' }}>Start Date *</label>
                 <input type="date" value={leaveForm.startDate} onChange={e => setLeaveForm(p => ({ ...p, startDate: e.target.value }))}
                   style={{ width: '100%', padding: '12px 14px', border: '1.5px solid #E2E8F0', borderRadius: 10, fontSize: 13, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#718096', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '.5px' }}>End Date *</label>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#64748B', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '.5px' }}>End Date *</label>
                 <input type="date" value={leaveForm.endDate} onChange={e => setLeaveForm(p => ({ ...p, endDate: e.target.value }))}
                   style={{ width: '100%', padding: '12px 14px', border: '1.5px solid #E2E8F0', borderRadius: 10, fontSize: 13, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
               </div>
             </div>
             <div style={{ marginBottom: 26 }}>
-              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#718096', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '.5px' }}>Reason (Optional)</label>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#64748B', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '.5px' }}>Reason (Optional)</label>
               <textarea value={leaveForm.reason} onChange={e => setLeaveForm(p => ({ ...p, reason: e.target.value }))}
                 placeholder="Reason for leave..."
                 style={{ width: '100%', padding: '12px 14px', border: '1.5px solid #E2E8F0', borderRadius: 10, fontSize: 13, outline: 'none', fontFamily: 'inherit', minHeight: 80, resize: 'vertical', boxSizing: 'border-box' }} />
             </div>
             <div style={{ display: 'flex', gap: 10 }}>
               <button onClick={() => setShowLeaveModal(false)}
-                style={{ flex: 1, padding: '11px', background: '#F1F5F9', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 700, color: '#64748b', cursor: 'pointer', fontFamily: 'inherit' }}>
+                style={{ flex: 1, padding: '11px', background: '#EFF6FF', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 700, color: '#64748B', cursor: 'pointer', fontFamily: 'inherit' }}>
                 Cancel
               </button>
               <button onClick={handleAddLeave} disabled={leaveSaving}
                 style={{
-                  flex: 1, padding: '11px', background: 'linear-gradient(135deg,var(--app-accent),#2563EB)', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 700, color: '#fff', cursor: leaveSaving ? 'not - allowed' : 'pointer', fontFamily: 'inherit', opacity: leaveSaving ? 0.7 : 1
+                  flex: 1, padding: '11px', background: 'linear-gradient(135deg,var(--app-accent),#2563EB)', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 700, color: '#FFFFFF', cursor: leaveSaving ? 'not - allowed' : 'pointer', fontFamily: 'inherit', opacity: leaveSaving ? 0.7 : 1
                 }}>
                 {leaveSaving ? 'Saving...' : '+ Add Leave'}
               </button>
@@ -1011,15 +1011,15 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
       {/* ADD TASK MODAL */}
       {
         showAddTaskModal && (
-          <div style={{ position: "fixed", inset: 0, background: "rgba(15,28,46,0.45)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, backdropFilter: "blur(4px)" }}>
-            <div style={{ background: "#fff", borderRadius: 16, padding: "28px 32px", width: 450, boxShadow: "0 24px 80px rgba(0,0,0,0.18)", border: "1px solid var(--border)", fontFamily: "'Nunito', sans-serif" }}>
+          <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.45)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, backdropFilter: "blur(4px)" }}>
+            <div style={{ background: "#FFFFFF", borderRadius: 16, padding: "28px 32px", width: 450, boxShadow: "0 24px 80px rgba(0,0,0,0.18)", border: "1px solid var(--border)", fontFamily: "'Nunito', sans-serif" }}>
               <div style={{ display: "flex", justifySpaceBetween: "space-between", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
                 <div style={{ fontSize: 18, fontWeight: 900, color: "var(--text)" }}>Assign New Task</div>
                 <button onClick={() => setShowAddTaskModal(false)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 18, color: "var(--text-muted)" }}><i className="ti ti-x"></i></button>
               </div>
               <form onSubmit={handleAddTaskSubmit}>
                 <div style={{ marginBottom: 16 }}>
-                  <label style={{ display: "block", fontSize: 11, fontWeight: 800, color: "#94A3B8", textTransform: "uppercase", marginBottom: 6 }}>Task Title</label>
+                  <label style={{ display: "block", fontSize: 11, fontWeight: 800, color: "#64748B", textTransform: "uppercase", marginBottom: 6 }}>Task Title</label>
                   <input
                     type="text"
                     value={newTaskTitle}
@@ -1031,11 +1031,11 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
                   <div>
-                    <label style={{ display: "block", fontSize: 11, fontWeight: 800, color: "#94A3B8", textTransform: "uppercase", marginBottom: 6 }}>Priority</label>
+                    <label style={{ display: "block", fontSize: 11, fontWeight: 800, color: "#64748B", textTransform: "uppercase", marginBottom: 6 }}>Priority</label>
                     <select
                       value={newTaskPriority}
                       onChange={e => setNewTaskPriority(e.target.value)}
-                      style={{ width: "100%", padding: "10px 14px", borderRadius: 8, border: "1px solid var(--border)", outline: "none", fontSize: 13, fontWeight: 700, background: "#fff" }}
+                      style={{ width: "100%", padding: "10px 14px", borderRadius: 8, border: "1px solid var(--border)", outline: "none", fontSize: 13, fontWeight: 700, background: "#FFFFFF" }}
                     >
                       <option value="Low">Low</option>
                       <option value="Medium">Medium</option>
@@ -1043,7 +1043,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
                     </select>
                   </div>
                   <div>
-                    <label style={{ display: "block", fontSize: 11, fontWeight: 800, color: "#94A3B8", textTransform: "uppercase", marginBottom: 6 }}>Due Date</label>
+                    <label style={{ display: "block", fontSize: 11, fontWeight: 800, color: "#64748B", textTransform: "uppercase", marginBottom: 6 }}>Due Date</label>
                     <input
                       type="date"
                       value={newTaskDueDate}
@@ -1053,8 +1053,8 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
                   </div>
                 </div>
                 <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
-                  <button type="button" onClick={() => setShowAddTaskModal(false)} style={{ background: "#f1f5f9", color: "var(--text-muted)", border: "none", padding: "10px 18px", borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Cancel</button>
-                  <button type="submit" style={{ background: "var(--teal)", color: "#fff", border: "none", padding: "10px 20px", borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Assign Task</button>
+                  <button type="button" onClick={() => setShowAddTaskModal(false)} style={{ background: "#EFF6FF", color: "var(--text-muted)", border: "none", padding: "10px 18px", borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Cancel</button>
+                  <button type="submit" style={{ background: "var(--teal)", color: "#FFFFFF", border: "none", padding: "10px 20px", borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Assign Task</button>
                 </div>
               </form>
             </div>
@@ -1065,19 +1065,19 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
       {/* REQUEST DOCUMENT MODAL */}
       {
         showRequestDocModal && (
-          <div style={{ position: "fixed", inset: 0, background: "rgba(15,28,46,0.45)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, backdropFilter: "blur(4px)" }}>
-            <div style={{ background: "#fff", borderRadius: 16, padding: "28px 32px", width: 450, boxShadow: "0 24px 80px rgba(0,0,0,0.18)", border: "1px solid var(--border)", fontFamily: "'Nunito', sans-serif" }}>
+          <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.45)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, backdropFilter: "blur(4px)" }}>
+            <div style={{ background: "#FFFFFF", borderRadius: 16, padding: "28px 32px", width: 450, boxShadow: "0 24px 80px rgba(0,0,0,0.18)", border: "1px solid var(--border)", fontFamily: "'Nunito', sans-serif" }}>
               <div style={{ display: "flex", justifySpaceBetween: "space-between", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
                 <div style={{ fontSize: 18, fontWeight: 900, color: "var(--text)" }}>Request Document</div>
                 <button onClick={() => setShowRequestDocModal(false)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 18, color: "var(--text-muted)" }}><i className="ti ti-x"></i></button>
               </div>
               <form onSubmit={handleRequestDocSubmit}>
                 <div style={{ marginBottom: 16 }}>
-                  <label style={{ display: "block", fontSize: 11, fontWeight: 800, color: "#94A3B8", textTransform: "uppercase", marginBottom: 6 }}>Document Type</label>
+                  <label style={{ display: "block", fontSize: 11, fontWeight: 800, color: "#64748B", textTransform: "uppercase", marginBottom: 6 }}>Document Type</label>
                   <select
                     value={newDocType}
                     onChange={e => setNewDocType(e.target.value)}
-                    style={{ width: "100%", padding: "10px 14px", borderRadius: 8, border: "1px solid var(--border)", outline: "none", fontSize: 13, fontWeight: 700, background: "#fff" }}
+                    style={{ width: "100%", padding: "10px 14px", borderRadius: 8, border: "1px solid var(--border)", outline: "none", fontSize: 13, fontWeight: 700, background: "#FFFFFF" }}
                   >
                     <option value="Offer Letter">Offer Letter</option>
                     <option value="ID Proof">ID Proof</option>
@@ -1089,7 +1089,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
                 </div>
                 {newDocType === "Other" ? (
                   <div style={{ marginBottom: 20 }}>
-                    <label style={{ display: "block", fontSize: 11, fontWeight: 800, color: "#94A3B8", textTransform: "uppercase", marginBottom: 6 }}>Custom Document Name</label>
+                    <label style={{ display: "block", fontSize: 11, fontWeight: 800, color: "#64748B", textTransform: "uppercase", marginBottom: 6 }}>Custom Document Name</label>
                     <input
                       type="text"
                       value={newDocCustomName}
@@ -1101,7 +1101,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
                   </div>
                 ) : (
                   <div style={{ marginBottom: 20 }}>
-                    <label style={{ display: "block", fontSize: 11, fontWeight: 800, color: "#94A3B8", textTransform: "uppercase", marginBottom: 6 }}>Document Name</label>
+                    <label style={{ display: "block", fontSize: 11, fontWeight: 800, color: "#64748B", textTransform: "uppercase", marginBottom: 6 }}>Document Name</label>
                     <input
                       type="text"
                       value={newDocName}
@@ -1113,8 +1113,8 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
                   </div>
                 )}
                 <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
-                  <button type="button" onClick={() => setShowRequestDocModal(false)} style={{ background: "#f1f5f9", color: "var(--text-muted)", border: "none", padding: "10px 18px", borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Cancel</button>
-                  <button type="submit" style={{ background: "var(--teal)", color: "#fff", border: "none", padding: "10px 20px", borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Request Document</button>
+                  <button type="button" onClick={() => setShowRequestDocModal(false)} style={{ background: "#EFF6FF", color: "var(--text-muted)", border: "none", padding: "10px 18px", borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Cancel</button>
+                  <button type="submit" style={{ background: "var(--teal)", color: "#FFFFFF", border: "none", padding: "10px 20px", borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Request Document</button>
                 </div>
               </form>
             </div>

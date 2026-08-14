@@ -9,23 +9,23 @@ import {
 } from 'lucide-react';
 
 const STY = {
-  label: { fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' },
+  label: { fontSize: 12, fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.05em' },
   field: { display: 'flex', flexDirection: 'column', gap: 6 },
-  input: { width: '100%', height: 44, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 10, fontSize: 14, background: '#F8FAFB', outline: 'none', transition: 'border-color 0.15s, box-shadow 0.15s, background 0.15s' },
-  errText: { fontSize: 11, color: '#EF4444', marginTop: 2, fontWeight: 600 },
-  required: { color: '#EF4444' }
+  input: { width: '100%', height: 44, padding: '0 14px', border: '1.5px solid #E2E8F0', borderRadius: 10, fontSize: 14, background: '#F8FAFC', outline: 'none', transition: 'border-color 0.15s, box-shadow 0.15s, background 0.15s' },
+  errText: { fontSize: 11, color: '#64748B', marginTop: 2, fontWeight: 600 },
+  required: { color: '#64748B' }
 };
 
 function SectionCard({ icon: Icon, title, sub, tc, tcLight, children, id }) {
   return (
-    <div id={id} className="acv-section" style={{ background: '#fff', border: '1px solid #EDF1F4', borderRadius: 18, boxShadow: '0 2px 10px rgba(20,30,50,0.05)', overflow: 'hidden' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 13, padding: '16px 22px', borderBottom: '1px solid #EEF2F5', background: `linear-gradient(90deg, ${tcLight} 0%, #ffffff 90%)` }}>
+    <div id={id} className="acv-section" style={{ background: '#FFFFFF', border: '1px solid #EFF6FF', borderRadius: 18, boxShadow: '0 2px 10px rgba(15, 23, 42, 0.05)', overflow: 'hidden' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 13, padding: '16px 22px', borderBottom: '1px solid #EFF6FF', background: `linear-gradient(90deg, ${tcLight} 0%, #FFFFFF 90%)` }}>
         <div style={{ width: 38, height: 38, background: `linear-gradient(135deg, ${tc}, ${tc}cc)`, borderRadius: 11, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: `0 4px 12px ${tc}40`, flexShrink: 0 }}>
-          <Icon size={18} color="#fff" strokeWidth={2.3} />
+          <Icon size={18} color="#FFFFFF" strokeWidth={2.3} />
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 14.5, fontWeight: 800, color: '#16202B' }}>{title}</div>
-          {sub && <div style={{ fontSize: 12, color: '#8B9AA8', marginTop: 1 }}>{sub}</div>}
+          <div style={{ fontSize: 14.5, fontWeight: 800, color: '#0F172A' }}>{title}</div>
+          {sub && <div style={{ fontSize: 12, color: '#64748B', marginTop: 1 }}>{sub}</div>}
         </div>
       </div>
       <div style={{ padding: 22 }}>{children}</div>
@@ -49,7 +49,7 @@ function TextField({ label, required, error, tc, ...props }) {
       <input
         {...props}
         className="acv-input"
-        style={{ ...STY.input, borderColor: error ? '#EF4444' : '#E0E6EA' }}
+        style={{ ...STY.input, borderColor: error ? '#64748B' : '#E2E8F0' }}
       />
     </Field>
   );
@@ -295,26 +295,26 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
   };
 
   return (
-    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(10,15,30,0.55)', backdropFilter: 'blur(4px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.55)', backdropFilter: 'blur(4px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
       <style>{`
         @keyframes acv-spin { to { transform: rotate(360deg); } }
         @keyframes acv-pop { from { opacity: 0; transform: translateY(14px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
         .acv-modal::-webkit-scrollbar { width: 7px; }
         .acv-modal::-webkit-scrollbar-track { background: transparent; }
-        .acv-modal::-webkit-scrollbar-thumb { background: #D8E0E6; border-radius: 6px; }
-        .acv-input:focus, .acv-select:focus, .acv-textarea:focus { border-color: ${TC} !important; background: #fff !important; box-shadow: 0 0 0 4px ${TC_LIGHT}; }
+        .acv-modal::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 6px; }
+        .acv-input:focus, .acv-select:focus, .acv-textarea:focus { border-color: ${TC} !important; background: #FFFFFF !important; box-shadow: 0 0 0 4px ${TC_LIGHT}; }
         .acv-section { transition: box-shadow 0.2s ease, transform 0.2s ease; }
         .acv-type-card { transition: all 0.15s ease; }
-        .acv-type-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(20,30,50,0.08); }
+        .acv-type-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08); }
         .acv-submit-btn:hover:not(:disabled) { filter: brightness(1.06); transform: translateY(-1px); box-shadow: 0 8px 20px ${TC}55; }
-        .acv-cancel-btn:hover { background: #EEF2F5 !important; }
+        .acv-cancel-btn:hover { background: #EFF6FF !important; }
         .acv-logo-drop:hover { border-color: ${TC} !important; background: ${TC_LIGHT} !important; }
         .acv-eye-btn:hover { color: ${TC} !important; }
       `}</style>
 
       <div className="acv-modal" style={{
-        background: '#F6F8FA', width: '100%', maxWidth: 840, maxHeight: '92vh', overflowY: 'auto',
-        borderRadius: 22, fontFamily: "'Nunito', sans-serif", color: '#1A2332', display: 'flex',
+        background: '#F8FAFC', width: '100%', maxWidth: 840, maxHeight: '92vh', overflowY: 'auto',
+        borderRadius: 22, fontFamily: "'Nunito', sans-serif", color: '#1E293B', display: 'flex',
         flexDirection: 'column', position: 'relative', boxShadow: '0 30px 80px rgba(0,0,0,0.35)',
         animation: 'acv-pop 0.22s cubic-bezier(0.16,1,0.3,1)'
       }}>
@@ -322,7 +322,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
         {/* Header */}
         <div style={{
           padding: '22px 26px', background: `linear-gradient(120deg, ${TC} 0%, ${TC}cc 100%)`,
-          position: 'sticky', top: 0, zIndex: 10, color: '#fff'
+          position: 'sticky', top: 0, zIndex: 10, color: '#FFFFFF'
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 13 }}>
@@ -334,7 +334,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
                 <p style={{ margin: '3px 0 0', fontSize: 12.5, color: 'rgba(255,255,255,0.85)' }}>{isEdit ? 'Update this client’s profile & portal details' : 'Fill in the details to onboard a new client'}</p>
               </div>
             </div>
-            <button onClick={onBack} style={{ background: 'rgba(255,255,255,0.18)', border: '1px solid rgba(255,255,255,0.28)', width: 34, height: 34, borderRadius: 10, cursor: 'pointer', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <button onClick={onBack} style={{ background: 'rgba(255,255,255,0.18)', border: '1px solid rgba(255,255,255,0.28)', width: 34, height: 34, borderRadius: 10, cursor: 'pointer', color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <X size={18} strokeWidth={2.4} />
             </button>
           </div>
@@ -346,7 +346,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
               <span>{progress}%</span>
             </div>
             <div style={{ height: 6, borderRadius: 6, background: 'rgba(255,255,255,0.25)', overflow: 'hidden' }}>
-              <div style={{ height: '100%', width: `${progress}%`, borderRadius: 6, background: '#fff', transition: 'width 0.3s ease' }} />
+              <div style={{ height: '100%', width: `${progress}%`, borderRadius: 6, background: '#FFFFFF', transition: 'width 0.3s ease' }} />
             </div>
           </div>
         </div>
@@ -355,12 +355,12 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
 
           {/* Logo Section */}
           <SectionCard id="logo" icon={ImagePlus} title="Client Logo" sub="Upload a company logo or avatar" tc={TC} tcLight={TC_LIGHT}>
-            <div onClick={() => fileInputRef.current.click()} className="acv-logo-drop" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: 28, border: '2px dashed #DCE3E8', borderRadius: 14, background: '#F8FAFB', cursor: 'pointer', transition: 'all 0.15s ease' }}>
-              <div style={{ width: 76, height: 76, borderRadius: 16, background: '#fff', border: '1.5px solid #E0E6EA', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', boxShadow: '0 4px 12px rgba(20,30,50,0.06)' }}>
-                {formData.logoUrl ? <img src={formData.logoUrl} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <ImagePlus size={28} color="#B0BCC7" strokeWidth={1.8} />}
+            <div onClick={() => fileInputRef.current.click()} className="acv-logo-drop" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: 28, border: '2px dashed #E2E8F0', borderRadius: 14, background: '#F8FAFC', cursor: 'pointer', transition: 'all 0.15s ease' }}>
+              <div style={{ width: 76, height: 76, borderRadius: 16, background: '#FFFFFF', border: '1.5px solid #E2E8F0', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', boxShadow: '0 4px 12px rgba(15, 23, 42, 0.06)' }}>
+                {formData.logoUrl ? <img src={formData.logoUrl} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <ImagePlus size={28} color="#E2E8F0" strokeWidth={1.8} />}
               </div>
               <button type="button" style={{ background: TC, color: 'white', padding: '9px 18px', borderRadius: 9, fontSize: 13, fontWeight: 700, border: 'none', cursor: 'pointer' }}>Choose logo</button>
-              <span style={{ fontSize: 12, color: '#94A3B0' }}>PNG, JPG or SVG · Max 2MB · Recommended 200✕200px</span>
+              <span style={{ fontSize: 12, color: '#64748B' }}>PNG, JPG or SVG · Max 2MB · Recommended 200✕200px</span>
             </div>
             <input type="file" ref={fileInputRef} accept="image/*" style={{ display: 'none' }} onChange={handleLogoUpload} />
           </SectionCard>
@@ -378,11 +378,11 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
                   const isSel = formData.clientType === t.id;
                   const Ico = t.icon;
                   return (
-                    <div key={t.id} onClick={() => setFormData({ ...formData, clientType: t.id })} className="acv-type-card" style={{ border: `2px solid ${isSel ? TC : '#E0E6EA'}`, borderRadius: 13, padding: '16px 12px', textAlign: 'center', cursor: 'pointer', background: isSel ? TC_LIGHT : '#fff', position: 'relative' }}>
-                      {isSel && <div style={{ position: 'absolute', top: 8, right: 8, width: 16, height: 16, borderRadius: '50%', background: TC, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Check size={10} color="#fff" strokeWidth={3.5} /></div>}
-                      <Ico size={22} color={isSel ? TC : '#94A3B0'} strokeWidth={2} style={{ display: 'block', margin: '0 auto 8px' }} />
-                      <div style={{ fontSize: 13, fontWeight: 700, color: isSel ? TC : '#5A6A7A' }}>{t.label}</div>
-                      <div style={{ fontSize: 11, color: '#94A3B0', marginTop: 2 }}>{t.sub}</div>
+                    <div key={t.id} onClick={() => setFormData({ ...formData, clientType: t.id })} className="acv-type-card" style={{ border: `2px solid ${isSel ? TC : '#E2E8F0'}`, borderRadius: 13, padding: '16px 12px', textAlign: 'center', cursor: 'pointer', background: isSel ? TC_LIGHT : '#FFFFFF', position: 'relative' }}>
+                      {isSel && <div style={{ position: 'absolute', top: 8, right: 8, width: 16, height: 16, borderRadius: '50%', background: TC, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Check size={10} color="#FFFFFF" strokeWidth={3.5} /></div>}
+                      <Ico size={22} color={isSel ? TC : '#64748B'} strokeWidth={2} style={{ display: 'block', margin: '0 auto 8px' }} />
+                      <div style={{ fontSize: 13, fontWeight: 700, color: isSel ? TC : '#64748B' }}>{t.label}</div>
+                      <div style={{ fontSize: 11, color: '#64748B', marginTop: 2 }}>{t.sub}</div>
                     </div>
                   );
                 })}
@@ -397,7 +397,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
                 {customInputMode.category ? (
                   <div style={{ display: 'flex', gap: 8 }}>
                     <input name="category" value={formData.category} onChange={handleChange} placeholder="Type custom category..." className="acv-input" style={{ ...STY.input, flex: 1 }} autoFocus onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); if (formData.category) { setCustomCats(prev => { const next = Array.from(new Set([...prev, formData.category])); try { localStorage.setItem('mb_customCategories', JSON.stringify(next)); } catch (err) { } return next; }); } setCustomInputMode(prev => ({ ...prev, category: false })); } }} />
-                    <button type="button" onClick={() => { if (formData.category) { setCustomCats(prev => { const next = Array.from(new Set([...prev, formData.category])); try { localStorage.setItem('mb_customCategories', JSON.stringify(next)); } catch (err) { } return next; }); } setCustomInputMode(prev => ({ ...prev, category: false })); }} style={{ width: 44, height: 44, background: '#F8FAFB', border: '1.5px solid #E0E6EA', borderRadius: 10, cursor: 'pointer', color: '#5A6A7A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Check size={16} /></button>
+                    <button type="button" onClick={() => { if (formData.category) { setCustomCats(prev => { const next = Array.from(new Set([...prev, formData.category])); try { localStorage.setItem('mb_customCategories', JSON.stringify(next)); } catch (err) { } return next; }); } setCustomInputMode(prev => ({ ...prev, category: false })); }} style={{ width: 44, height: 44, background: '#F8FAFC', border: '1.5px solid #E2E8F0', borderRadius: 10, cursor: 'pointer', color: '#64748B', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Check size={16} /></button>
                   </div>
                 ) : (
                   <select name="category" value={formData.category} onChange={handleSelectChange} className="acv-select" style={STY.input}>
@@ -418,7 +418,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
                 {customInputMode.source ? (
                   <div style={{ display: 'flex', gap: 8 }}>
                     <input name="source" value={formData.source} onChange={handleChange} placeholder="Type custom source..." className="acv-input" style={{ ...STY.input, flex: 1 }} autoFocus onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); if (formData.source) { setCustomSources(prev => { const next = Array.from(new Set([...prev, formData.source])); try { localStorage.setItem('mb_customSources', JSON.stringify(next)); } catch (err) { } return next; }); } setCustomInputMode(prev => ({ ...prev, source: false })); } }} />
-                    <button type="button" onClick={() => { if (formData.source) { setCustomSources(prev => { const next = Array.from(new Set([...prev, formData.source])); try { localStorage.setItem('mb_customSources', JSON.stringify(next)); } catch (err) { } return next; }); } setCustomInputMode(prev => ({ ...prev, source: false })); }} style={{ width: 44, height: 44, background: '#F8FAFB', border: '1.5px solid #E0E6EA', borderRadius: 10, cursor: 'pointer', color: '#5A6A7A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Check size={16} /></button>
+                    <button type="button" onClick={() => { if (formData.source) { setCustomSources(prev => { const next = Array.from(new Set([...prev, formData.source])); try { localStorage.setItem('mb_customSources', JSON.stringify(next)); } catch (err) { } return next; }); } setCustomInputMode(prev => ({ ...prev, source: false })); }} style={{ width: 44, height: 44, background: '#F8FAFC', border: '1.5px solid #E2E8F0', borderRadius: 10, cursor: 'pointer', color: '#64748B', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Check size={16} /></button>
                   </div>
                 ) : (
                   <select name="source" value={formData.source} onChange={handleSelectChange} className="acv-select" style={STY.input}>
@@ -464,7 +464,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
                 {customInputMode.country ? (
                   <div style={{ display: 'flex', gap: 8 }}>
                     <input name="country" value={formData.country} onChange={handleChange} placeholder="Type custom country..." className="acv-input" style={{ ...STY.input, flex: 1 }} autoFocus onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); if (formData.country) { setCustomCountries(prev => { const next = Array.from(new Set([...prev, formData.country])); try { localStorage.setItem('mb_customCountries', JSON.stringify(next)); } catch (err) { } return next; }); } setCustomInputMode(prev => ({ ...prev, country: false })); } }} />
-                    <button type="button" onClick={() => { if (formData.country) { setCustomCountries(prev => { const next = Array.from(new Set([...prev, formData.country])); try { localStorage.setItem('mb_customCountries', JSON.stringify(next)); } catch (err) { } return next; }); } setCustomInputMode(prev => ({ ...prev, country: false })); }} style={{ width: 44, height: 44, background: '#F8FAFB', border: '1.5px solid #E0E6EA', borderRadius: 10, cursor: 'pointer', color: '#5A6A7A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Check size={16} /></button>
+                    <button type="button" onClick={() => { if (formData.country) { setCustomCountries(prev => { const next = Array.from(new Set([...prev, formData.country])); try { localStorage.setItem('mb_customCountries', JSON.stringify(next)); } catch (err) { } return next; }); } setCustomInputMode(prev => ({ ...prev, country: false })); }} style={{ width: 44, height: 44, background: '#F8FAFC', border: '1.5px solid #E2E8F0', borderRadius: 10, cursor: 'pointer', color: '#64748B', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Check size={16} /></button>
                   </div>
                 ) : (
                   <select name="country" value={formData.country} onChange={handleSelectChange} className="acv-select" style={STY.input}>
@@ -496,7 +496,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
                 {customInputMode.billingCurrency ? (
                   <div style={{ display: 'flex', gap: 8 }}>
                     <input name="billingCurrency" value={formData.billingCurrency} onChange={handleChange} placeholder="Type custom currency..." className="acv-input" style={{ ...STY.input, flex: 1 }} autoFocus onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); if (formData.billingCurrency) { setCustomCurrencies(prev => { const next = Array.from(new Set([...prev, formData.billingCurrency])); try { localStorage.setItem('mb_customCurrencies', JSON.stringify(next)); } catch (err) { } return next; }); } setCustomInputMode(prev => ({ ...prev, billingCurrency: false })); } }} />
-                    <button type="button" onClick={() => { if (formData.billingCurrency) { setCustomCurrencies(prev => { const next = Array.from(new Set([...prev, formData.billingCurrency])); try { localStorage.setItem('mb_customCurrencies', JSON.stringify(next)); } catch (err) { } return next; }); } setCustomInputMode(prev => ({ ...prev, billingCurrency: false })); }} style={{ width: 44, height: 44, background: '#F8FAFB', border: '1.5px solid #E0E6EA', borderRadius: 10, cursor: 'pointer', color: '#5A6A7A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Check size={16} /></button>
+                    <button type="button" onClick={() => { if (formData.billingCurrency) { setCustomCurrencies(prev => { const next = Array.from(new Set([...prev, formData.billingCurrency])); try { localStorage.setItem('mb_customCurrencies', JSON.stringify(next)); } catch (err) { } return next; }); } setCustomInputMode(prev => ({ ...prev, billingCurrency: false })); }} style={{ width: 44, height: 44, background: '#F8FAFC', border: '1.5px solid #E2E8F0', borderRadius: 10, cursor: 'pointer', color: '#64748B', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Check size={16} /></button>
                   </div>
                 ) : (
                   <select name="billingCurrency" value={formData.billingCurrency} onChange={handleSelectChange} className="acv-select" style={STY.input}>
@@ -514,7 +514,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
                 {customInputMode.paymentTerms ? (
                   <div style={{ display: 'flex', gap: 8 }}>
                     <input name="paymentTerms" value={formData.paymentTerms} onChange={handleChange} placeholder="Type custom terms..." className="acv-input" style={{ ...STY.input, flex: 1 }} autoFocus onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); if (formData.paymentTerms) { setCustomPaymentTerms(prev => { const next = Array.from(new Set([...prev, formData.paymentTerms])); try { localStorage.setItem('mb_customPaymentTerms', JSON.stringify(next)); } catch (err) { } return next; }); } setCustomInputMode(prev => ({ ...prev, paymentTerms: false })); } }} />
-                    <button type="button" onClick={() => { if (formData.paymentTerms) { setCustomPaymentTerms(prev => { const next = Array.from(new Set([...prev, formData.paymentTerms])); try { localStorage.setItem('mb_customPaymentTerms', JSON.stringify(next)); } catch (err) { } return next; }); } setCustomInputMode(prev => ({ ...prev, paymentTerms: false })); }} style={{ width: 44, height: 44, background: '#F8FAFB', border: '1.5px solid #E0E6EA', borderRadius: 10, cursor: 'pointer', color: '#5A6A7A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Check size={16} /></button>
+                    <button type="button" onClick={() => { if (formData.paymentTerms) { setCustomPaymentTerms(prev => { const next = Array.from(new Set([...prev, formData.paymentTerms])); try { localStorage.setItem('mb_customPaymentTerms', JSON.stringify(next)); } catch (err) { } return next; }); } setCustomInputMode(prev => ({ ...prev, paymentTerms: false })); }} style={{ width: 44, height: 44, background: '#F8FAFC', border: '1.5px solid #E2E8F0', borderRadius: 10, cursor: 'pointer', color: '#64748B', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Check size={16} /></button>
                   </div>
                 ) : (
                   <select name="paymentTerms" value={formData.paymentTerms} onChange={handleSelectChange} className="acv-select" style={STY.input}>
@@ -533,7 +533,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
                 {customInputMode.PaymentMode ? (
                   <div style={{ display: 'flex', gap: 8 }}>
                     <input name="PaymentMode" value={formData.PaymentMode} onChange={handleChange} placeholder="Type custom mode..." className="acv-input" style={{ ...STY.input, flex: 1 }} autoFocus onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); if (formData.PaymentMode) { setCustomPaymentModes(prev => { const next = Array.from(new Set([...prev, formData.PaymentMode])); try { localStorage.setItem('mb_customPaymentModes', JSON.stringify(next)); } catch (err) { } return next; }); } setCustomInputMode(prev => ({ ...prev, PaymentMode: false })); } }} />
-                    <button type="button" onClick={() => { if (formData.PaymentMode) { setCustomPaymentModes(prev => { const next = Array.from(new Set([...prev, formData.PaymentMode])); try { localStorage.setItem('mb_customPaymentModes', JSON.stringify(next)); } catch (err) { } return next; }); } setCustomInputMode(prev => ({ ...prev, PaymentMode: false })); }} style={{ width: 44, height: 44, background: '#F8FAFB', border: '1.5px solid #E0E6EA', borderRadius: 10, cursor: 'pointer', color: '#5A6A7A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Check size={16} /></button>
+                    <button type="button" onClick={() => { if (formData.PaymentMode) { setCustomPaymentModes(prev => { const next = Array.from(new Set([...prev, formData.PaymentMode])); try { localStorage.setItem('mb_customPaymentModes', JSON.stringify(next)); } catch (err) { } return next; }); } setCustomInputMode(prev => ({ ...prev, PaymentMode: false })); }} style={{ width: 44, height: 44, background: '#F8FAFC', border: '1.5px solid #E2E8F0', borderRadius: 10, cursor: 'pointer', color: '#64748B', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Check size={16} /></button>
                   </div>
                 ) : (
                   <select name="PaymentMode" value={formData.PaymentMode} onChange={handleSelectChange} className="acv-select" style={STY.input}>
@@ -555,14 +555,14 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
               <Field label="Portal password" required error={errors.password}>
                 <div style={{ position: 'relative' }}>
-                  <input type={showPass ? 'text' : 'password'} name="password" value={formData.password} onChange={e => { handleChange(e); setErrors({ ...errors, password: '' }); }} placeholder="Set client portal password" className="acv-input" style={{ ...STY.input, padding: '0 46px 0 14px', borderColor: errors.password ? '#EF4444' : '#E0E6EA' }} />
-                  <button onClick={() => setShowPass(!showPass)} className="acv-eye-btn" style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#94A3B0', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>{showPass ? <EyeOff size={16} /> : <Eye size={16} />}</button>
+                  <input type={showPass ? 'text' : 'password'} name="password" value={formData.password} onChange={e => { handleChange(e); setErrors({ ...errors, password: '' }); }} placeholder="Set client portal password" className="acv-input" style={{ ...STY.input, padding: '0 46px 0 14px', borderColor: errors.password ? '#64748B' : '#E2E8F0' }} />
+                  <button onClick={() => setShowPass(!showPass)} className="acv-eye-btn" style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#64748B', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>{showPass ? <EyeOff size={16} /> : <Eye size={16} />}</button>
                 </div>
               </Field>
               <Field label="Confirm password" error={errors.confirmPassword}>
                 <div style={{ position: 'relative' }}>
-                  <input type={showConfirmPass ? 'text' : 'password'} value={confirmPassword} onChange={e => { setConfirmPassword(e.target.value); setErrors({ ...errors, confirmPassword: '' }) }} placeholder="Re-enter password" className="acv-input" style={{ ...STY.input, padding: '0 46px 0 14px', borderColor: errors.confirmPassword ? '#EF4444' : '#E0E6EA' }} />
-                  <button onClick={() => setShowConfirmPass(!showConfirmPass)} className="acv-eye-btn" style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#94A3B0', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>{showConfirmPass ? <EyeOff size={16} /> : <Eye size={16} />}</button>
+                  <input type={showConfirmPass ? 'text' : 'password'} value={confirmPassword} onChange={e => { setConfirmPassword(e.target.value); setErrors({ ...errors, confirmPassword: '' }) }} placeholder="Re-enter password" className="acv-input" style={{ ...STY.input, padding: '0 46px 0 14px', borderColor: errors.confirmPassword ? '#64748B' : '#E2E8F0' }} />
+                  <button onClick={() => setShowConfirmPass(!showConfirmPass)} className="acv-eye-btn" style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#64748B', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>{showConfirmPass ? <EyeOff size={16} /> : <Eye size={16} />}</button>
                 </div>
               </Field>
             </div>
@@ -576,12 +576,12 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
           </SectionCard>
 
           {/* Footer actions */}
-          <div style={{ background: '#fff', border: '1px solid #EDF1F4', borderRadius: 16, padding: '16px 22px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 2px 10px rgba(20,30,50,0.05)', gap: 12, flexWrap: 'wrap' }}>
-            <div style={{ fontSize: 12.5, color: '#94A3B0', display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div style={{ background: '#FFFFFF', border: '1px solid #EFF6FF', borderRadius: 16, padding: '16px 22px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 2px 10px rgba(15, 23, 42, 0.05)', gap: 12, flexWrap: 'wrap' }}>
+            <div style={{ fontSize: 12.5, color: '#64748B', display: 'flex', alignItems: 'center', gap: 6 }}>
               <span style={STY.required}>*</span> Required fields
             </div>
             <div style={{ display: 'flex', gap: 10 }}>
-              <button onClick={onBack} className="acv-cancel-btn" style={{ padding: '11px 20px', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', background: '#F4F6F8', color: '#5A6A7A', border: '1.5px solid #E0E6EA', transition: 'background 0.15s' }}>
+              <button onClick={onBack} className="acv-cancel-btn" style={{ padding: '11px 20px', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', background: '#F8FAFC', color: '#64748B', border: '1.5px solid #E2E8F0', transition: 'background 0.15s' }}>
                 Cancel
               </button>
               <button onClick={submitForm} disabled={saving} className="acv-submit-btn" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '11px 24px', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer', background: TC, color: 'white', border: `1.5px solid ${TC}`, opacity: saving ? 0.75 : 1, transition: 'all 0.15s', boxShadow: `0 4px 14px ${TC}40` }}>

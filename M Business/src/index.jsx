@@ -14,13 +14,13 @@ export const T = {
 };
 
 export const colors = {
-  dark: "#0f172a",
-  sidebar: "#1e293b",
-  accent: "#3b82f6",
-  accent2: "#2563eb",
-  bg: "#f8fafc",
-  card: "#ffffff",
-  text: "#1e293b",
-  muted: "#64748b",
-  border: "#e2e8f0"
+  dark: "#0F172A",
+  sidebar: "#0F172A",
+  accent: "#2563EB",
+  accent2: "#2563EB",
+  bg: "#F8FAFC",
+  card: "#FFFFFF",
+  text: "#1E293B",
+  muted: "#64748B",
+  border: "#E2E8F0"
 };

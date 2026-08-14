@@ -11,9 +11,9 @@ import { CLOUDINARY_FOLDERS, uploadToCloudinary } from "../utils/cloudinaryUploa
 const BASE = `${BASE_URL}/api/employee-dashboard`;
 
 export const DOC_TYPES = [
-  { key: "aadhaar", label: "Aadhaar Card", icon: "ti-id-badge-2", desc: "Government issued identity card", color: "#f97316", accept: "image/*,application/pdf", maxMB: 5 },
+  { key: "aadhaar", label: "Aadhaar Card", icon: "ti-id-badge-2", desc: "Government issued identity card", color: "#64748B", accept: "image/*,application/pdf", maxMB: 5 },
   { key: "pan", label: "PAN Card", icon: "ti-credit-card", desc: "Permanent Account Number card", color: "var(--app-accent)", accept: "image/*,application/pdf", maxMB: 5 },
-  { key: "passbook", label: "Bank Passbook", icon: "ti-building-bank", desc: "First page of bank passbook", color: "#10b981", accept: "image/*,application/pdf", maxMB: 10 },
+  { key: "passbook", label: "Bank Passbook", icon: "ti-building-bank", desc: "First page of bank passbook", color: "#16A34A", accept: "image/*,application/pdf", maxMB: 10 },
   { key: "itr", label: "ITR", icon: "ti-file-text", desc: "Income Tax Return document", color: "var(--app-muted)", accept: "image/*,application/pdf", maxMB: 10 },
 ];
 
@@ -30,7 +30,7 @@ function ProgressRing({ pct, color }) {
   const r = 18, circ = 2 * Math.PI * r, dash = circ - (pct / 100) * circ;
   return (
     <svg width="44" height="44" style={{ transform: "rotate(-90deg)" }}>
-      <circle cx="22" cy="22" r={r} fill="none" stroke="#e2e8f0" strokeWidth="4" />
+      <circle cx="22" cy="22" r={r} fill="none" stroke="#E2E8F0" strokeWidth="4" />
       <circle cx="22" cy="22" r={r} fill="none" stroke={color} strokeWidth="4"
         strokeDasharray={`${circ}`} strokeDashoffset={dash} strokeLinecap="round"
         style={{ transition: "stroke-dashoffset 0.3s" }} />
@@ -99,45 +99,45 @@ function DocCard({ doc, empName, onUploaded, notify }) {
   const hasDoc = !!viewUrl;
 
   return (
-    <div style={{ background: "#fff", borderRadius: 14, border: `1.5px solid ${hasDoc ? doc.color + "40" : "#f1f5f9"}`, overflow: "hidden", transition: "box-shadow 0.2s", boxShadow: hasDoc ? `0 2px 16px ${doc.color}18` : "none" }}>
+    <div style={{ background: "#FFFFFF", borderRadius: 14, border: `1.5px solid ${hasDoc ? doc.color + "40" : "#EFF6FF"}`, overflow: "hidden", transition: "box-shadow 0.2s", boxShadow: hasDoc ? `0 2px 16px ${doc.color}18` : "none" }}>
       {/* Header */}
-      <div style={{ padding: "12px 14px", background: hasDoc ? `${doc.color}08` : "#f8fafc", borderBottom: `1px solid ${hasDoc ? doc.color + "20" : "#f1f5f9"}`, display: "flex", alignItems: "center", gap: 10 }}>
+      <div style={{ padding: "12px 14px", background: hasDoc ? `${doc.color}08` : "#F8FAFC", borderBottom: `1px solid ${hasDoc ? doc.color + "20" : "#EFF6FF"}`, display: "flex", alignItems: "center", gap: 10 }}>
         <div style={{ width: 36, height: 36, borderRadius: 10, background: `${doc.color}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0, color: doc.color }}><i className={`ti ${doc.icon}`}></i></div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 13, fontWeight: 800, color: "#0f172a" }}>{doc.label}</div>
-          <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 1 }}>{doc.desc}</div>
+          <div style={{ fontSize: 13, fontWeight: 800, color: "#0F172A" }}>{doc.label}</div>
+          <div style={{ fontSize: 11, color: "#64748B", marginTop: 1 }}>{doc.desc}</div>
         </div>
         {loading
-          ? <div style={{ width: 20, height: 20, borderRadius: "50%", border: "2px solid #e2e8f0", borderTopColor: doc.color, animation: "spin 0.8s linear infinite" }} />
+          ? <div style={{ width: 20, height: 20, borderRadius: "50%", border: "2px solid #E2E8F0", borderTopColor: doc.color, animation: "spin 0.8s linear infinite" }} />
           : hasDoc
             ? <div style={{ display: "flex", alignItems: "center", gap: 4, background: `${doc.color}15`, border: `1px solid ${doc.color}30`, borderRadius: 20, padding: "3px 10px", fontSize: 11, fontWeight: 700, color: doc.color }}>Yes Uploaded</div>
-            : <div style={{ fontSize: 11, color: "#cbd5e1", fontWeight: 600 }}>Not uploaded</div>}
+            : <div style={{ fontSize: 11, color: "#E2E8F0", fontWeight: 600 }}>Not uploaded</div>}
       </div>
       {/* Body */}
       <div style={{ padding: "12px 14px" }}>
         {uploading ? (
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, padding: "12px 0" }}>
             <ProgressRing pct={progress} color={doc.color} />
-            <div style={{ fontSize: 12, color: "#64748b", fontWeight: 600 }}>Uploading… {progress}%</div>
+            <div style={{ fontSize: 12, color: "#64748B", fontWeight: 600 }}>Uploading… {progress}%</div>
           </div>
         ) : hasDoc ? (
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {isImage(viewUrl)
-              ? <div style={{ borderRadius: 10, overflow: "hidden", border: "1px solid #f1f5f9", maxHeight: 120, display: "flex", alignItems: "center", justifyContent: "center", background: "#f8fafc" }}>
+              ? <div style={{ borderRadius: 10, overflow: "hidden", border: "1px solid #EFF6FF", maxHeight: 120, display: "flex", alignItems: "center", justifyContent: "center", background: "#F8FAFC" }}>
                 <img src={viewUrl} alt={doc.label} style={{ maxWidth: "100%", maxHeight: 120, objectFit: "contain" }} />
               </div>
-              : <div style={{ borderRadius: 10, border: "1px solid #f1f5f9", padding: "14px", background: "#f8fafc", display: "flex", alignItems: "center", gap: 10 }}>
+              : <div style={{ borderRadius: 10, border: "1px solid #EFF6FF", padding: "14px", background: "#F8FAFC", display: "flex", alignItems: "center", gap: 10 }}>
                 <div style={{ fontSize: 28 }}>Document</div>
                 <div>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: "#0f172a" }}>{existing?.fileName || `${doc.label}.pdf`}</div>
-                  {existing?.fileSize && <div style={{ fontSize: 11, color: "#94a3b8" }}>{fmtSize(existing.fileSize)}</div>}
+                  <div style={{ fontSize: 12, fontWeight: 700, color: "#0F172A" }}>{existing?.fileName || `${doc.label}.pdf`}</div>
+                  {existing?.fileSize && <div style={{ fontSize: 11, color: "#64748B" }}>{fmtSize(existing.fileSize)}</div>}
                 </div>
               </div>}
-            {existing?.uploadedAt && <div style={{ fontSize: 10, color: "#94a3b8" }}>Uploaded: {new Date(existing.uploadedAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}</div>}
+            {existing?.uploadedAt && <div style={{ fontSize: 10, color: "#64748B" }}>Uploaded: {new Date(existing.uploadedAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}</div>}
             <div style={{ display: "flex", gap: 6 }}>
               <button onClick={() => window.open(viewUrl, "_blank")} style={{ flex: 1, padding: "7px 10px", background: `${doc.color}10`, border: `1px solid ${doc.color}30`, borderRadius: 8, fontSize: 11, fontWeight: 700, color: doc.color, cursor: "pointer", fontFamily: "inherit" }}>View</button>
-              <button onClick={() => inputRef.current?.click()} style={{ flex: 1, padding: "7px 10px", background: "#f1f5f9", border: "1px solid #e2e8f0", borderRadius: 8, fontSize: 11, fontWeight: 700, color: "#475569", cursor: "pointer", fontFamily: "inherit" }}>Sync Replace</button>
-              <button onClick={handleDelete} style={{ padding: "7px 10px", background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 8, fontSize: 11, fontWeight: 700, color: "#ef4444", cursor: "pointer", fontFamily: "inherit" }}>Delete</button>
+              <button onClick={() => inputRef.current?.click()} style={{ flex: 1, padding: "7px 10px", background: "#EFF6FF", border: "1px solid #E2E8F0", borderRadius: 8, fontSize: 11, fontWeight: 700, color: "#64748B", cursor: "pointer", fontFamily: "inherit" }}>Sync Replace</button>
+              <button onClick={handleDelete} style={{ padding: "7px 10px", background: "#F8FAFC", border: "1px solid #E2E8F0", borderRadius: 8, fontSize: 11, fontWeight: 700, color: "#64748B", cursor: "pointer", fontFamily: "inherit" }}>Delete</button>
             </div>
           </div>
         ) : (
@@ -147,7 +147,7 @@ function DocCard({ doc, empName, onUploaded, notify }) {
             onMouseLeave={e => { e.currentTarget.style.background = `${doc.color}05`; e.currentTarget.style.borderColor = `${doc.color}40`; }}>
             <div style={{ fontSize: 24, marginBottom: 6 }}>Cloud</div>
             <div style={{ fontSize: 12, fontWeight: 700, color: doc.color, marginBottom: 3 }}>Click or drag to upload</div>
-            <div style={{ fontSize: 10, color: "#94a3b8" }}>JPG, PNG or PDF · Max {doc.maxMB}MB</div>
+            <div style={{ fontSize: 10, color: "#64748B" }}>JPG, PNG or PDF · Max {doc.maxMB}MB</div>
           </div>
         )}
       </div>
@@ -203,43 +203,43 @@ export function EmployeeProfilePanel({ empName, user, notify, onDocStatusChange,
 
   return (
     <>
-      {open && <div onClick={handleClose} style={{ position: "fixed", inset: 0, background: "rgba(15,23,42,0.4)", zIndex: 997, backdropFilter: "blur(2px)" }} />}
+      {open && <div onClick={handleClose} style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.4)", zIndex: 997, backdropFilter: "blur(2px)" }} />}
 
-      <div style={{ position: "fixed", top: 0, right: 0, bottom: 0, width: 340, background: "#fff", zIndex: 998, boxShadow: "-8px 0 40px rgba(37, 99, 235,0.18)", transform: open ? "translateX(0)" : "translateX(100%)", transition: "transform 0.3s cubic-bezier(0.4,0,0.2,1)", display: "flex", flexDirection: "column", overflowY: "auto" }}>
+      <div style={{ position: "fixed", top: 0, right: 0, bottom: 0, width: 340, background: "#FFFFFF", zIndex: 998, boxShadow: "-8px 0 40px rgba(37, 99, 235, 0.18)", transform: open ? "translateX(0)" : "translateX(100%)", transition: "transform 0.3s cubic-bezier(0.4,0,0.2,1)", display: "flex", flexDirection: "column", overflowY: "auto" }}>
         {/* Header */}
-        <div style={{ background: THEME?.sidebar || "linear-gradient(135deg,#0f172a,#1e293b)", padding: "20px 18px 16px", flexShrink: 0 }}>
+        <div style={{ background: THEME?.sidebar || "linear-gradient(135deg,#0F172A,#1E293B)", padding: "20px 18px 16px", flexShrink: 0 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 14 }}>
             <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase" }}>My Profile</div>
             <button onClick={handleClose} style={{ background: "rgba(255,255,255,0.1)", border: "none", borderRadius: 8, width: 28, height: 28, cursor: "pointer", color: "rgba(255,255,255,0.6)", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center" }}>Close</button>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <div style={{ width: 52, height: 52, borderRadius: 14, background: THEME?.accent ? `linear-gradient(135deg,${THEME.accent},var(--app-muted))` : "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 800, color: "#fff", flexShrink: 0, border: "2px solid rgba(255,255,255,0.2)" }}>{initials}</div>
+            <div style={{ width: 52, height: 52, borderRadius: 14, background: THEME?.accent ? `linear-gradient(135deg,${THEME.accent},var(--app-muted))` : "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 800, color: "#FFFFFF", flexShrink: 0, border: "2px solid rgba(255,255,255,0.2)" }}>{initials}</div>
             <div>
-              <div style={{ fontSize: 16, fontWeight: 800, color: "#fff" }}>{empName || "Employee"}</div>
+              <div style={{ fontSize: 16, fontWeight: 800, color: "#FFFFFF" }}>{empName || "Employee"}</div>
               <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", marginTop: 2 }}>{user?.department || "Employee"} · {user?.role || "Staff"}</div>
             </div>
           </div>
           <div style={{ marginTop: 14 }}>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
               <span style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", fontWeight: 700 }}>DOCUMENTS UPLOADED</span>
-              <span style={{ fontSize: 10, color: "#64748b", fontWeight: 800 }}>{uploadedCount}/{DOC_TYPES.length}</span>
+              <span style={{ fontSize: 10, color: "#64748B", fontWeight: 800 }}>{uploadedCount}/{DOC_TYPES.length}</span>
             </div>
             <div style={{ background: "rgba(255,255,255,0.1)", borderRadius: 99, height: 5 }}>
-              <div style={{ width: `${(uploadedCount / DOC_TYPES.length) * 100}%`, background: uploadedCount === DOC_TYPES.length ? "linear-gradient(90deg,#10b981,#34d399)" : "linear-gradient(90deg,var(--app-accent),var(--app-muted))", borderRadius: 99, height: "100%", transition: "width 0.5s" }} />
+              <div style={{ width: `${(uploadedCount / DOC_TYPES.length) * 100}%`, background: uploadedCount === DOC_TYPES.length ? "linear-gradient(90deg,#16A34A,#16A34A)" : "linear-gradient(90deg,var(--app-accent),var(--app-muted))", borderRadius: 99, height: "100%", transition: "width 0.5s" }} />
             </div>
           </div>
         </div>
 
         {/* Employee info */}
         {user && (
-          <div style={{ padding: "14px 16px", borderBottom: "1px solid #f1f5f9", background: "#f8fafc" }}>
+          <div style={{ padding: "14px 16px", borderBottom: "1px solid #EFF6FF", background: "#F8FAFC" }}>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
               {[["", "Email", user.email], ["", "Phone", user.phone], ["Company", "Dept", user.department], ["Cost", "Salary", user.salary]]
                 .filter(([, , v]) => v)
                 .map(([icon, label, value]) => (
-                  <div key={label} style={{ background: "#fff", borderRadius: 8, padding: "8px 10px", border: "1px solid #f1f5f9" }}>
-                    <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700, letterSpacing: 0.5, textTransform: "uppercase" }}>{icon} {label}</div>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: "#0f172a", marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{value}</div>
+                  <div key={label} style={{ background: "#FFFFFF", borderRadius: 8, padding: "8px 10px", border: "1px solid #EFF6FF" }}>
+                    <div style={{ fontSize: 9, color: "#64748B", fontWeight: 700, letterSpacing: 0.5, textTransform: "uppercase" }}>{icon} {label}</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: "#0F172A", marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{value}</div>
                   </div>
                 ))}
             </div>
@@ -248,10 +248,10 @@ export function EmployeeProfilePanel({ empName, user, notify, onDocStatusChange,
 
         {/* Documents section */}
         <div style={{ padding: "14px 16px", flex: 1 }}>
-          <div style={{ fontSize: 12, fontWeight: 800, color: "#0f172a", marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
+          <div style={{ fontSize: 12, fontWeight: 800, color: "#0F172A", marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
             Folder My Documents
             {uploadedCount < DOC_TYPES.length && (
-              <span style={{ background: "#fef3c7", border: "1px solid #fde68a", borderRadius: 20, padding: "2px 8px", fontSize: 10, fontWeight: 700, color: "#d97706" }}>{DOC_TYPES.length - uploadedCount} pending</span>
+              <span style={{ background: "#E2E8F0", border: "1px solid #E2E8F0", borderRadius: 20, padding: "2px 8px", fontSize: 10, fontWeight: 700, color: "#64748B" }}>{DOC_TYPES.length - uploadedCount} pending</span>
             )}
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -260,11 +260,11 @@ export function EmployeeProfilePanel({ empName, user, notify, onDocStatusChange,
             ))}
           </div>
           {uploadedCount === DOC_TYPES.length && (
-            <div style={{ marginTop: 14, background: "linear-gradient(135deg,#f0fdf4,#dcfce7)", border: "1px solid #bbf7d0", borderRadius: 12, padding: "12px 14px", display: "flex", alignItems: "center", gap: 10 }}>
+            <div style={{ marginTop: 14, background: "linear-gradient(135deg,#F8FAFC,#E2E8F0)", border: "1px solid #E2E8F0", borderRadius: 12, padding: "12px 14px", display: "flex", alignItems: "center", gap: 10 }}>
               <div style={{ fontSize: 22 }}>Celebration</div>
               <div>
-                <div style={{ fontSize: 12, fontWeight: 800, color: "#166534" }}>All documents uploaded!</div>
-                <div style={{ fontSize: 11, color: "#15803d", marginTop: 2 }}>Your profile is complete.</div>
+                <div style={{ fontSize: 12, fontWeight: 800, color: "#1E293B" }}>All documents uploaded!</div>
+                <div style={{ fontSize: 11, color: "#16A34A", marginTop: 2 }}>Your profile is complete.</div>
               </div>
             </div>
           )}
@@ -318,7 +318,7 @@ export function SubAdminDocumentsPage({ employees = [] }) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      <div style={{ background: "#fff", borderRadius: 16, border: "1px solid var(--app-border)", padding: "16px 18px" }}>
+      <div style={{ background: "#FFFFFF", borderRadius: 16, border: "1px solid var(--app-border)", padding: "16px 18px" }}>
         <div style={{ fontSize: 14, fontWeight: 800, color: "var(--app-text)", marginBottom: 14 }}>Folder Employee Documents</div>
         <div style={{ position: "relative", marginBottom: 14 }}>
           <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)" }}></span>
@@ -342,10 +342,10 @@ export function SubAdminDocumentsPage({ employees = [] }) {
                   const uploaded = docStatusMap[emp.name] || [];
                   const isSel = selected?.name === emp.name;
                   return (
-                    <tr key={i} style={{ borderBottom: "1px solid var(--app-bg)", background: isSel ? "#eff6ff" : "transparent" }}>
+                    <tr key={i} style={{ borderBottom: "1px solid var(--app-bg)", background: isSel ? "#EFF6FF" : "transparent" }}>
                       <td style={{ padding: "11px 12px" }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                          <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700 }}>
+                          <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 11, fontWeight: 700 }}>
                             {(emp.name || "?")[0].toUpperCase()}
                           </div>
                           <div>
@@ -358,7 +358,7 @@ export function SubAdminDocumentsPage({ employees = [] }) {
                         const has = uploaded.includes(dt.key);
                         return (
                           <td key={dt.key} style={{ padding: "11px 12px" }}>
-                            <span style={{ background: has ? `${dt.color}15` : "#f1f5f9", border: `1px solid ${has ? dt.color + "30" : "#e2e8f0"}`, borderRadius: 20, padding: "3px 10px", fontSize: 10, fontWeight: 700, color: has ? dt.color : "#94a3b8" }}>
+                            <span style={{ background: has ? `${dt.color}15` : "#EFF6FF", border: `1px solid ${has ? dt.color + "30" : "#E2E8F0"}`, borderRadius: 20, padding: "3px 10px", fontSize: 10, fontWeight: 700, color: has ? dt.color : "#64748B" }}>
                               {has ? "Yes Done" : "Cancel Missing"}
                             </span>
                           </td>
@@ -366,7 +366,7 @@ export function SubAdminDocumentsPage({ employees = [] }) {
                       })}
                       <td style={{ padding: "11px 12px" }}>
                         <button onClick={() => loadEmployeeDocs(emp)}
-                          style={{ padding: "5px 12px", background: isSel ? "var(--app-accent)" : "rgba(var(--app-accent-rgb, 124, 58, 237),0.08)", border: `1px solid ${isSel ? "var(--app-accent)" : "rgba(var(--app-accent-rgb, 124, 58, 237),0.25)"}`, borderRadius: 8, fontSize: 11, fontWeight: 700, color: isSel ? "#fff" : "var(--app-accent)", cursor: "pointer", fontFamily: "inherit" }}>
+                          style={{ padding: "5px 12px", background: isSel ? "var(--app-accent)" : "rgba(var(--app-accent-rgb, 124, 58, 237),0.08)", border: `1px solid ${isSel ? "var(--app-accent)" : "rgba(var(--app-accent-rgb, 124, 58, 237),0.25)"}`, borderRadius: 8, fontSize: 11, fontWeight: 700, color: isSel ? "#FFFFFF" : "var(--app-accent)", cursor: "pointer", fontFamily: "inherit" }}>
                           {isSel ? "Viewing" : "View"}
                         </button>
                       </td>
@@ -379,7 +379,7 @@ export function SubAdminDocumentsPage({ employees = [] }) {
       </div>
 
       {selected && (
-        <div style={{ background: "#fff", borderRadius: 16, border: "1px solid var(--app-border)", padding: "16px 18px" }}>
+        <div style={{ background: "#FFFFFF", borderRadius: 16, border: "1px solid var(--app-border)", padding: "16px 18px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
             <div style={{ fontSize: 14, fontWeight: 800, color: "var(--app-text)" }}>Document {selected.name} — Documents</div>
             <button onClick={() => setSelected(null)} style={{ background: "none", border: "none", fontSize: 16, cursor: "pointer", color: "var(--app-muted)" }}>Close</button>
@@ -392,28 +392,28 @@ export function SubAdminDocumentsPage({ employees = [] }) {
                 const doc = docData[dt.key];
                 const hasDoc = !!doc?.url;
                 return (
-                  <div key={dt.key} style={{ border: `1.5px solid ${hasDoc ? dt.color + "35" : "#f1f5f9"}`, borderRadius: 12, padding: "12px 14px", background: hasDoc ? `${dt.color}04` : "#f8fafc" }}>
+                  <div key={dt.key} style={{ border: `1.5px solid ${hasDoc ? dt.color + "35" : "#EFF6FF"}`, borderRadius: 12, padding: "12px 14px", background: hasDoc ? `${dt.color}04` : "#F8FAFC" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: hasDoc ? 10 : 0 }}>
                       <span style={{ fontSize: 18, color: dt.color }}><i className={`ti ${dt.icon}`}></i></span>
                       <div style={{ flex: 1, fontWeight: 700, fontSize: 13, color: "var(--app-text)" }}>{dt.label}</div>
                       {hasDoc
                         ? <span style={{ background: `${dt.color}15`, border: `1px solid ${dt.color}30`, borderRadius: 20, padding: "3px 10px", fontSize: 10, fontWeight: 700, color: dt.color }}>Yes Uploaded</span>
-                        : <span style={{ background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 20, padding: "3px 10px", fontSize: 10, fontWeight: 700, color: "#ef4444" }}>Cancel Missing</span>}
+                        : <span style={{ background: "#F8FAFC", border: "1px solid #E2E8F0", borderRadius: 20, padding: "3px 10px", fontSize: 10, fontWeight: 700, color: "#64748B" }}>Cancel Missing</span>}
                     </div>
                     {hasDoc && (
                       <div>
                         {isImage(doc.url)
-                          ? <img src={doc.url} alt={dt.label} style={{ width: "100%", maxHeight: 140, objectFit: "contain", borderRadius: 8, border: "1px solid #f1f5f9" }} />
-                          : <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", background: "#fff", borderRadius: 8, border: "1px solid #f1f5f9" }}>
+                          ? <img src={doc.url} alt={dt.label} style={{ width: "100%", maxHeight: 140, objectFit: "contain", borderRadius: 8, border: "1px solid #EFF6FF" }} />
+                          : <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", background: "#FFFFFF", borderRadius: 8, border: "1px solid #EFF6FF" }}>
                             <span style={{ fontSize: 22 }}>Document</span>
                             <div style={{ flex: 1 }}>
                               <div style={{ fontSize: 11, fontWeight: 700, color: "var(--app-text)" }}>{doc.fileName || `${dt.label}.pdf`}</div>
-                              {doc.fileSize && <div style={{ fontSize: 10, color: "#94a3b8" }}>{fmtSize(doc.fileSize)}</div>}
+                              {doc.fileSize && <div style={{ fontSize: 10, color: "#64748B" }}>{fmtSize(doc.fileSize)}</div>}
                             </div>
                           </div>}
                         <div style={{ display: "flex", gap: 6, marginTop: 8 }}>
                           <button onClick={() => window.open(doc.url, "_blank")} style={{ flex: 1, padding: "6px 10px", background: `${dt.color}10`, border: `1px solid ${dt.color}30`, borderRadius: 7, fontSize: 11, fontWeight: 700, color: dt.color, cursor: "pointer", fontFamily: "inherit" }}>View</button>
-                          <a href={doc.url} download style={{ flex: 1, padding: "6px 10px", background: "#f1f5f9", border: "1px solid #e2e8f0", borderRadius: 7, fontSize: 11, fontWeight: 700, color: "#475569", textDecoration: "none", display: "flex", alignItems: "center", justifyContent: "center" }}> Download</a>
+                          <a href={doc.url} download style={{ flex: 1, padding: "6px 10px", background: "#EFF6FF", border: "1px solid #E2E8F0", borderRadius: 7, fontSize: 11, fontWeight: 700, color: "#64748B", textDecoration: "none", display: "flex", alignItems: "center", justifyContent: "center" }}> Download</a>
                         </div>
                       </div>
                     )}

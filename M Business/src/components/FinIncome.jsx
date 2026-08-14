@@ -11,7 +11,7 @@ const MODES = ['Cash', 'Card', 'UPI', 'Bank Transfer', 'Cheque', 'NEFT', 'RTGS',
 function Toast({ msg, type }) {
   if (!msg) return null;
   return (
-    <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 9999, background: type === 'error' ? '#EF4444' : '#16A34A', color: '#fff', borderRadius: 12, padding: '13px 22px', fontWeight: 700, fontSize: 14, boxShadow: '0 4px 20px rgba(0,0,0,.18)' }}>
+    <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 9999, background: type === 'error' ? '#64748B' : '#16A34A', color: '#FFFFFF', borderRadius: 12, padding: '13px 22px', fontWeight: 700, fontSize: 14, boxShadow: '0 4px 20px rgba(0,0,0,.18)' }}>
       {msg}
     </div>
   );
@@ -95,32 +95,32 @@ export default function FinIncome({ income: propIncome, setIncome: propSetIncome
 
   const S = {
     overlay: { position: 'fixed', inset: 0, background: 'rgba(0,0,0,.45)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(3px)' },
-    modal: { background: '#fff', borderRadius: 18, padding: '28px 30px', width: 560, maxWidth: '95vw', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 20px 60px rgba(0,0,0,.18)' },
-    label: { display: 'block', fontSize: 11, fontWeight: 800, color: '#4A5568', textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 6 },
-    input: { width: '100%', padding: '11px 14px', border: '1.5px solid #E2E8F0', borderRadius: 10, fontFamily: 'Nunito,sans-serif', fontSize: 14, color: '#1A2332', background: '#F0F4F8', outline: 'none', boxSizing: 'border-box' },
-    btn: (bg, color = '#fff') => ({ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '9px 18px', borderRadius: 10, fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 700, cursor: 'pointer', border: 'none', background: bg, color }),
-    actionBtn: (danger) => ({ background: 'transparent', border: `1.5px solid ${danger ? '#FCA5A5' : '#E2E8F0'}`, borderRadius: 8, padding: '5px 10px', cursor: 'pointer', color: danger ? '#EF4444' : '#4A5568', fontSize: 13, display: 'inline-flex', alignItems: 'center' }),
+    modal: { background: '#FFFFFF', borderRadius: 18, padding: '28px 30px', width: 560, maxWidth: '95vw', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 20px 60px rgba(0,0,0,.18)' },
+    label: { display: 'block', fontSize: 11, fontWeight: 800, color: '#64748B', textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 6 },
+    input: { width: '100%', padding: '11px 14px', border: '1.5px solid #E2E8F0', borderRadius: 10, fontFamily: 'Nunito,sans-serif', fontSize: 14, color: '#1E293B', background: '#EFF6FF', outline: 'none', boxSizing: 'border-box' },
+    btn: (bg, color = '#FFFFFF') => ({ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '9px 18px', borderRadius: 10, fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 700, cursor: 'pointer', border: 'none', background: bg, color }),
+    actionBtn: (danger) => ({ background: 'transparent', border: `1.5px solid ${danger ? '#E2E8F0' : '#E2E8F0'}`, borderRadius: 8, padding: '5px 10px', cursor: 'pointer', color: danger ? '#64748B' : '#64748B', fontSize: 13, display: 'inline-flex', alignItems: 'center' }),
   };
 
   return (
     <>
       <style>{`
-        .fi-table td, .fi-table th { padding: 12px 14px; border-bottom: 1px solid #F0F4F8; font-size: 13px; }
-        .fi-table th { font-size: 11px; font-weight: 800; color: #718096; text-transform: uppercase; letter-spacing: .7px; background: #F0F4F8; }
-        .fi-table tr:hover td { background: #FAFCFE; }
-        .fi-badge-received, .fi-badge-paid { background: #D1FAE5; color: #065F46; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
-        .fi-badge-pending { background: #FEF3C7; color: #92400E; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
-        .fi-badge-overdue { background: #FEE2E2; color: #EF4444; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+        .fi-table td, .fi-table th { padding: 12px 14px; border-bottom: 1px solid #EFF6FF; font-size: 13px; }
+        .fi-table th { font-size: 11px; font-weight: 800; color: #64748B; text-transform: uppercase; letter-spacing: .7px; background: #EFF6FF; }
+        .fi-table tr:hover td { background: #F8FAFC; }
+        .fi-badge-received, .fi-badge-paid { background: #E2E8F0; color: #1E293B; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+        .fi-badge-pending { background: #E2E8F0; color: #1E293B; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+        .fi-badge-overdue { background: #E2E8F0; color: #64748B; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
       `}</style>
       <Toast {...toast} />
 
-      <div style={{ padding: 26, background: '#F0F4F8', minHeight: '100%', fontFamily: 'Nunito,sans-serif' }}>
+      <div style={{ padding: 26, background: '#EFF6FF', minHeight: '100%', fontFamily: 'Nunito,sans-serif' }}>
 
         {/* HEADER */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 22, flexWrap: 'wrap', gap: 10 }}>
           <div>
-            <div style={{ fontSize: 22, fontWeight: 900, color: '#1A2332' }}>Payments / Income</div>
-            <div style={{ fontSize: 13, color: '#718096', marginTop: 2 }}>Track all incoming payments and revenue</div>
+            <div style={{ fontSize: 22, fontWeight: 900, color: '#1E293B' }}>Payments / Income</div>
+            <div style={{ fontSize: 13, color: '#64748B', marginTop: 2 }}>Track all incoming payments and revenue</div>
           </div>
           <button style={S.btn('#16A34A')} onClick={() => { setForm(emptyForm); setAddOpen(true); }}>
             <i className="ti ti-plus" /> Record Income
@@ -129,11 +129,11 @@ export default function FinIncome({ income: propIncome, setIncome: propSetIncome
 
         {/* KPI CARDS */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginBottom: 22 }} className="fi-kpi-row">
-          {[['Total Income', total, '#16A34A', 'ti-cash', income.length + ' records'], ['Received', received, '#2563EB', 'ti-check', income.filter(i => i.status !== 'Pending').length + ' payments'], ['Pending', pending, '#F59E0B', 'ti-clock', income.filter(i => i.status === 'Pending').length + ' outstanding']].map(([label, val, color, icon, sub]) => (
-            <div key={label} style={{ cursor: 'default', minWidth: 0, background: '#fff', border: '1.5px solid #E2E8F0', borderRadius: 14, padding: '14px 10px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 8, boxShadow: '0 2px 10px rgba(0,0,0,0.02)', overflow: 'hidden' }}>
+          {[['Total Income', total, '#16A34A', 'ti-cash', income.length + ' records'], ['Received', received, '#2563EB', 'ti-check', income.filter(i => i.status !== 'Pending').length + ' payments'], ['Pending', pending, '#64748B', 'ti-clock', income.filter(i => i.status === 'Pending').length + ' outstanding']].map(([label, val, color, icon, sub]) => (
+            <div key={label} style={{ cursor: 'default', minWidth: 0, background: '#FFFFFF', border: '1.5px solid #E2E8F0', borderRadius: 14, padding: '14px 10px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 8, boxShadow: '0 2px 10px rgba(0,0,0,0.02)', overflow: 'hidden' }}>
               <div style={{ width: 32, height: 32, borderRadius: 8, background: `${color}1a`, color: color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, flexShrink: 0 }}><i className={`ti ${icon}`} /></div>
               <div style={{ minWidth: 0, width: '100%' }}>
-                <div style={{ fontSize: 'clamp(13px, 4.2vw, 20px)', fontWeight: 800, color: '#1A2332', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{fmt(val)}</div>
+                <div style={{ fontSize: 'clamp(13px, 4.2vw, 20px)', fontWeight: 800, color: '#1E293B', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{fmt(val)}</div>
                 <div style={{ fontSize: 11, fontWeight: 700, color: '#64748B', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</div>
               </div>
             </div>
@@ -142,22 +142,22 @@ export default function FinIncome({ income: propIncome, setIncome: propSetIncome
 
         {/* FILTERS */}
         <div style={{ display: 'flex', gap: 10, marginBottom: 18, flexWrap: 'wrap', alignItems: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#fff', border: '1.5px solid #E2E8F0', borderRadius: 10, padding: '9px 14px', minWidth: 220 }}>
-            <i className="ti ti-search" style={{ color: '#718096' }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#FFFFFF', border: '1.5px solid #E2E8F0', borderRadius: 10, padding: '9px 14px', minWidth: 220 }}>
+            <i className="ti ti-search" style={{ color: '#64748B' }} />
             <input placeholder="Search income records..." value={search} onChange={e => setSearch(e.target.value)} style={{ border: 'none', outline: 'none', fontFamily: 'Nunito,sans-serif', fontSize: 13, width: '100%', background: 'transparent' }} />
           </div>
-          <select value={catFilter} onChange={e => setCatFilter(e.target.value)} style={{ padding: '9px 14px', border: '1.5px solid #E2E8F0', borderRadius: 10, fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 600, color: '#4A5568', background: '#fff', outline: 'none', cursor: 'pointer' }}>
+          <select value={catFilter} onChange={e => setCatFilter(e.target.value)} style={{ padding: '9px 14px', border: '1.5px solid #E2E8F0', borderRadius: 10, fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 600, color: '#64748B', background: '#FFFFFF', outline: 'none', cursor: 'pointer' }}>
             <option value="All">All Types</option>
             {CATEGORIES.map(c => <option key={c}>{c}</option>)}
           </select>
-          <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} style={{ padding: '9px 14px', border: '1.5px solid #E2E8F0', borderRadius: 10, fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 600, color: '#4A5568', background: '#fff', outline: 'none', cursor: 'pointer' }}>
+          <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} style={{ padding: '9px 14px', border: '1.5px solid #E2E8F0', borderRadius: 10, fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 600, color: '#64748B', background: '#FFFFFF', outline: 'none', cursor: 'pointer' }}>
             <option value="All">All Status</option>
             <option>Received</option><option>Pending</option><option>Overdue</option>
           </select>
         </div>
 
         {/* TABLE */}
-        <div style={{ background: '#fff', borderRadius: 14, boxShadow: '0 2px 12px rgba(37, 99, 235,.08)', overflow: 'hidden' }}>
+        <div style={{ background: '#FFFFFF', borderRadius: 14, boxShadow: '0 2px 12px rgba(37, 99, 235, .08)', overflow: 'hidden' }}>
           <div style={{ overflowX: 'auto' }}>
             <table className="fi-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
@@ -168,9 +168,9 @@ export default function FinIncome({ income: propIncome, setIncome: propSetIncome
               </thead>
               <tbody>
                 {loading ? (
-                  <tr><td colSpan={8} style={{ textAlign: 'center', padding: 40, color: '#718096' }}>Loading income records...</td></tr>
+                  <tr><td colSpan={8} style={{ textAlign: 'center', padding: 40, color: '#64748B' }}>Loading income records...</td></tr>
                 ) : filtered.length === 0 ? (
-                  <tr><td colSpan={8} style={{ textAlign: 'center', padding: 40, color: '#718096' }}>{income.length === 0 ? 'No income recorded yet. Click "Record Income" to start.' : 'No results match your filters.'}</td></tr>
+                  <tr><td colSpan={8} style={{ textAlign: 'center', padding: 40, color: '#64748B' }}>{income.length === 0 ? 'No income recorded yet. Click "Record Income" to start.' : 'No results match your filters.'}</td></tr>
                 ) : filtered.map(inc => (
                   <tr key={inc._id}>
                     <td style={{ whiteSpace: 'nowrap' }}>{new Date(inc.date || inc.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</td>
@@ -192,7 +192,7 @@ export default function FinIncome({ income: propIncome, setIncome: propSetIncome
               </tbody>
             </table>
           </div>
-          <div style={{ padding: '12px 16px', borderTop: '1px solid #E2E8F0', fontSize: 13, color: '#718096' }}>
+          <div style={{ padding: '12px 16px', borderTop: '1px solid #E2E8F0', fontSize: 13, color: '#64748B' }}>
             Showing {filtered.length} of {income.length} records
           </div>
         </div>
@@ -202,17 +202,17 @@ export default function FinIncome({ income: propIncome, setIncome: propSetIncome
       {viewItem && (
         <div style={S.overlay} onClick={e => e.target === e.currentTarget && setViewItem(null)}>
           <div style={S.modal}>
-            <div style={{ fontSize: 18, fontWeight: 900, color: '#1A2332', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ fontSize: 18, fontWeight: 900, color: '#1E293B', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
               <i className="ti ti-cash" style={{ color: '#16A34A' }} /> Income Details
             </div>
             {[['Client', viewItem.client], ['Title', viewItem.title], ['Description', viewItem.description], ['Category', viewItem.category], ['Amount', fmt(viewItem.amount)], ['Payment Mode', viewItem.paymentMode], ['Status', viewItem.status], ['Date', new Date(viewItem.date || viewItem.createdAt).toLocaleDateString('en-IN')]].map(([l, v]) => (
-              <div key={l} style={{ display: 'flex', justifyContent: 'space-between', padding: '11px 0', borderBottom: '1px solid #F0F4F8', fontSize: 13 }}>
-                <span style={{ fontWeight: 700, color: '#718096' }}>{l}</span>
-                <span style={{ fontWeight: 700, color: '#1A2332' }}>{v || '—'}</span>
+              <div key={l} style={{ display: 'flex', justifyContent: 'space-between', padding: '11px 0', borderBottom: '1px solid #EFF6FF', fontSize: 13 }}>
+                <span style={{ fontWeight: 700, color: '#64748B' }}>{l}</span>
+                <span style={{ fontWeight: 700, color: '#1E293B' }}>{v || '—'}</span>
               </div>
             ))}
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 22 }}>
-              <button style={S.btn('#F0F4F8', '#1A2332')} onClick={() => setViewItem(null)}>Close</button>
+              <button style={S.btn('#EFF6FF', '#1E293B')} onClick={() => setViewItem(null)}>Close</button>
               <button style={S.btn('#16A34A')} onClick={() => { const item = viewItem; setViewItem(null); setEditItem(item); setEditForm({ client: item.client || '', title: item.title || '', description: item.description || '', category: item.category || 'Project Revenue', amount: item.amount, paymentMode: item.paymentMode || 'Bank Transfer', status: item.status || 'Received', date: (item.date || item.createdAt || '').slice(0, 10) }); }}>Edit</button>
             </div>
           </div>
@@ -223,7 +223,7 @@ export default function FinIncome({ income: propIncome, setIncome: propSetIncome
       {addOpen && (
         <div style={S.overlay} onClick={e => e.target === e.currentTarget && setAddOpen(false)}>
           <div style={S.modal}>
-            <div style={{ fontSize: 18, fontWeight: 900, color: '#1A2332', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ fontSize: 18, fontWeight: 900, color: '#1E293B', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
               <i className="ti ti-plus" style={{ color: '#16A34A' }} /> Record Income
             </div>
             {[['Client *', 'client', 'text', 'Client name'], ['Title *', 'title', 'text', 'e.g. Milestone 1 Payment'], ['Amount (₹) *', 'amount', 'number', '0.00'], ['Date', 'date', 'date', '']].map(([label, key, type, ph]) => (
@@ -241,7 +241,7 @@ export default function FinIncome({ income: propIncome, setIncome: propSetIncome
               ))}
             </div>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 22, paddingTop: 16, borderTop: '1px solid #E2E8F0' }}>
-              <button style={S.btn('#F0F4F8', '#1A2332')} onClick={() => setAddOpen(false)}>Cancel</button>
+              <button style={S.btn('#EFF6FF', '#1E293B')} onClick={() => setAddOpen(false)}>Cancel</button>
               <button style={S.btn('#16A34A')} disabled={saving} onClick={handleAdd}>{saving ? 'Saving...' : 'Save Income'}</button>
             </div>
           </div>
@@ -252,7 +252,7 @@ export default function FinIncome({ income: propIncome, setIncome: propSetIncome
       {editItem && (
         <div style={S.overlay} onClick={e => e.target === e.currentTarget && setEditItem(null)}>
           <div style={S.modal}>
-            <div style={{ fontSize: 18, fontWeight: 900, color: '#1A2332', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ fontSize: 18, fontWeight: 900, color: '#1E293B', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
               <i className="ti ti-pencil" style={{ color: '#16A34A' }} /> Edit Income
             </div>
             {[['Client *', 'client', 'text', ''], ['Title', 'title', 'text', ''], ['Description', 'description', 'text', ''], ['Amount (₹) *', 'amount', 'number', ''], ['Date', 'date', 'date', '']].map(([label, key, type, ph]) => (
@@ -270,7 +270,7 @@ export default function FinIncome({ income: propIncome, setIncome: propSetIncome
               ))}
             </div>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 22, paddingTop: 16, borderTop: '1px solid #E2E8F0' }}>
-              <button style={S.btn('#F0F4F8', '#1A2332')} onClick={() => setEditItem(null)}>Cancel</button>
+              <button style={S.btn('#EFF6FF', '#1E293B')} onClick={() => setEditItem(null)}>Cancel</button>
               <button style={S.btn('#16A34A')} disabled={saving} onClick={handleEdit}>{saving ? 'Updating...' : 'Update Income'}</button>
             </div>
           </div>

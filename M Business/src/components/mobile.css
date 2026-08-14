@@ -121,7 +121,7 @@
         height: auto !important;
         max-height: calc(100vh - 32px) !important;
         border-radius: 20px !important;
-        background: #fff !important;
+        background: #FFFFFF !important;
         display: flex !important;
         flex-direction: column !important;
         overflow: hidden !important;

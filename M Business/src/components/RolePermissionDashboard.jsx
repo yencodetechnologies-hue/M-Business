@@ -78,14 +78,14 @@ const RolePermissionDashboard = () => {
   if (!loading && roles.length === 0) {
     return (
       <div style={{ padding: 40, textAlign: "center", color: T.muted }}>
-        No roles found. <button onClick={fetchRoles} style={{ marginLeft: 8, background: "var(--app-accent)", color: "#fff", border: "none", borderRadius: 8, padding: "6px 14px", cursor: "pointer", fontWeight: 700 }}>Retry</button>
+        No roles found. <button onClick={fetchRoles} style={{ marginLeft: 8, background: "var(--app-accent)", color: "#FFFFFF", border: "none", borderRadius: 8, padding: "6px 14px", cursor: "pointer", fontWeight: 700 }}>Retry</button>
       </div>
     );
   }
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20, padding: "10px" }}>
-      <div style={{ background: "#fff", borderRadius: 16, padding: 24, boxShadow: "0 4px 20px rgba(0,0,0,0.05)", border: `1px solid ${T.border}` }}>
+      <div style={{ background: "#FFFFFF", borderRadius: 16, padding: 24, boxShadow: "0 4px 20px rgba(0,0,0,0.05)", border: `1px solid ${T.border}` }}>
 
 
         <div style={{ overflowX: "auto" }}>
@@ -97,7 +97,7 @@ const RolePermissionDashboard = () => {
                   <th key={r.role} style={{ padding: "10px 15px", textAlign: "center" }}>
                     <div style={{
                       background: "linear-gradient(135deg, var(--app-accent), var(--app-accent))",
-                      color: "#fff",
+                      color: "#FFFFFF",
                       padding: "6px 16px",
                       borderRadius: 10,
                       fontSize: 12,
@@ -115,7 +115,7 @@ const RolePermissionDashboard = () => {
             </thead>
             <tbody>
               {PERMISSION_KEYS.map(key => (
-                <tr key={key} style={{ background: "#fcfaff", borderBottom: `1px solid ${T.border}` }}>
+                <tr key={key} style={{ background: "#F8FAFC", borderBottom: `1px solid ${T.border}` }}>
                   <td style={{
                     padding: "16px 15px",
                     fontSize: 14,
@@ -145,10 +145,10 @@ const RolePermissionDashboard = () => {
                         <span style={{
                           position: "absolute",
                           top: 0, left: 0, right: 0, bottom: 0,
-                          backgroundColor: r.permissions[key] ? "#22C55E" : "#cbd5e1",
+                          backgroundColor: r.permissions[key] ? "#16A34A" : "#E2E8F0",
                           transition: ".3s",
                           borderRadius: 24,
-                          boxShadow: r.permissions[key] ? "0 2px 8px rgba(34,197,94,0.3)" : "none"
+                          boxShadow: r.permissions[key] ? "0 2px 8px rgba(22, 163, 74, 0.3)" : "none"
                         }}>
                           <span style={{
                             position: "absolute",

@@ -12,7 +12,7 @@ const EXPENSE_TYPES = ['Operational', 'Capital', 'Recurring', 'One-Time'];
 function Toast({ msg, type }) {
   if (!msg) return null;
   return (
-    <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 9999, background: type === 'error' ? '#EF4444' : '#16A34A', color: '#fff', borderRadius: 12, padding: '13px 22px', fontWeight: 700, fontSize: 14, boxShadow: '0 4px 20px rgba(0,0,0,.18)' }}>
+    <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 9999, background: type === 'error' ? '#64748B' : '#16A34A', color: '#FFFFFF', borderRadius: 12, padding: '13px 22px', fontWeight: 700, fontSize: 14, boxShadow: '0 4px 20px rgba(0,0,0,.18)' }}>
       {msg}
     </div>
   );
@@ -98,51 +98,51 @@ export default function FinExpenses({ expenses: propExpenses, setExpenses: propS
 
   const S = {
     overlay: { position: 'fixed', inset: 0, background: 'rgba(0,0,0,.45)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(3px)' },
-    modal: { background: '#fff', borderRadius: 18, padding: '28px 30px', width: 560, maxWidth: '95vw', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 20px 60px rgba(0,0,0,.18)' },
-    label: { display: 'block', fontSize: 11, fontWeight: 800, color: '#4A5568', textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 6 },
-    input: { width: '100%', padding: '11px 14px', border: '1.5px solid #E2E8F0', borderRadius: 10, fontFamily: 'Nunito,sans-serif', fontSize: 14, color: '#1A2332', background: '#F0F4F8', outline: 'none', boxSizing: 'border-box' },
-    btn: (bg, color = '#fff') => ({ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '9px 18px', borderRadius: 10, fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 700, cursor: 'pointer', border: 'none', background: bg, color }),
-    actionBtn: (danger) => ({ background: 'transparent', border: `1.5px solid ${danger ? '#FCA5A5' : '#E2E8F0'}`, borderRadius: 8, padding: '5px 10px', cursor: 'pointer', color: danger ? '#EF4444' : '#4A5568', fontSize: 13, display: 'inline-flex', alignItems: 'center' }),
+    modal: { background: '#FFFFFF', borderRadius: 18, padding: '28px 30px', width: 560, maxWidth: '95vw', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 20px 60px rgba(0,0,0,.18)' },
+    label: { display: 'block', fontSize: 11, fontWeight: 800, color: '#64748B', textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 6 },
+    input: { width: '100%', padding: '11px 14px', border: '1.5px solid #E2E8F0', borderRadius: 10, fontFamily: 'Nunito,sans-serif', fontSize: 14, color: '#1E293B', background: '#EFF6FF', outline: 'none', boxSizing: 'border-box' },
+    btn: (bg, color = '#FFFFFF') => ({ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '9px 18px', borderRadius: 10, fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 700, cursor: 'pointer', border: 'none', background: bg, color }),
+    actionBtn: (danger) => ({ background: 'transparent', border: `1.5px solid ${danger ? '#E2E8F0' : '#E2E8F0'}`, borderRadius: 8, padding: '5px 10px', cursor: 'pointer', color: danger ? '#64748B' : '#64748B', fontSize: 13, display: 'inline-flex', alignItems: 'center' }),
   };
 
   return (
     <>
       <style>{`
-        .fe-table td, .fe-table th { padding: 12px 14px; border-bottom: 1px solid #F0F4F8; font-size: 13px; }
-        .fe-table th { font-size: 11px; font-weight: 800; color: #718096; text-transform: uppercase; letter-spacing: .7px; background: #F0F4F8; }
-        .fe-table tr:hover td { background: #FAFCFE; }
-        .fe-badge-paid { background: #D1FAE5; color: #065F46; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
-        .fe-badge-pending { background: #FEF3C7; color: #92400E; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
-        .fe-badge-overdue { background: #FEE2E2; color: #EF4444; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+        .fe-table td, .fe-table th { padding: 12px 14px; border-bottom: 1px solid #EFF6FF; font-size: 13px; }
+        .fe-table th { font-size: 11px; font-weight: 800; color: #64748B; text-transform: uppercase; letter-spacing: .7px; background: #EFF6FF; }
+        .fe-table tr:hover td { background: #F8FAFC; }
+        .fe-badge-paid { background: #E2E8F0; color: #1E293B; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+        .fe-badge-pending { background: #E2E8F0; color: #1E293B; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+        .fe-badge-overdue { background: #E2E8F0; color: #64748B; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
       `}</style>
       <Toast {...toast} />
 
-      <div style={{ padding: 26, background: '#F0F4F8', minHeight: '100%', fontFamily: 'Nunito,sans-serif' }}>
+      <div style={{ padding: 26, background: '#EFF6FF', minHeight: '100%', fontFamily: 'Nunito,sans-serif' }}>
 
         {/* HEADER */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 22, flexWrap: 'wrap', gap: 10 }}>
           <div>
-            <div style={{ fontSize: 22, fontWeight: 900, color: '#1A2332' }}>Expenses</div>
-            <div style={{ fontSize: 13, color: '#718096', marginTop: 2 }}>Track and manage all business outgoings</div>
+            <div style={{ fontSize: 22, fontWeight: 900, color: '#1E293B' }}>Expenses</div>
+            <div style={{ fontSize: 13, color: '#64748B', marginTop: 2 }}>Track and manage all business outgoings</div>
           </div>
-          <button style={S.btn('#EF4444')} onClick={() => { setForm(emptyForm); setAddOpen(true); }}>
+          <button style={S.btn('#64748B')} onClick={() => { setForm(emptyForm); setAddOpen(true); }}>
             <i className="ti ti-plus" /> Add Expense
           </button>
         </div>
         {/* KPI CARDS */}
         <div style={{ display: 'flex', gap: 16, marginBottom: 22, flexWrap: 'wrap' }}>
-          <div style={{ cursor: 'default', flex: '1 1 200px', minWidth: 200, background: '#fff', border: '1.5px solid #E2E8F0', borderRadius: 14, padding: '18px 20px', display: 'flex', alignItems: 'center', gap: 12, boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
-            <div style={{ width: 40, height: 40, borderRadius: 10, background: '#EF44441a', color: '#EF4444', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}><i className="ti ti-receipt" /></div>
+          <div style={{ cursor: 'default', flex: '1 1 200px', minWidth: 200, background: '#FFFFFF', border: '1.5px solid #E2E8F0', borderRadius: 14, padding: '18px 20px', display: 'flex', alignItems: 'center', gap: 12, boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
+            <div style={{ width: 40, height: 40, borderRadius: 10, background: '#64748B1A', color: '#64748B', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}><i className="ti ti-receipt" /></div>
             <div>
-              <div style={{ fontSize: 24, fontWeight: 800, color: '#1A2332' }}>{fmt(total)}</div>
+              <div style={{ fontSize: 24, fontWeight: 800, color: '#1E293B' }}>{fmt(total)}</div>
               <div style={{ fontSize: 12, fontWeight: 700, color: '#64748B' }}>Total Expenses</div>
             </div>
           </div>
           {byCategory.map(c => (
-            <div key={c.name} style={{ cursor: 'default', flex: '1 1 200px', minWidth: 200, background: '#fff', border: '1.5px solid #E2E8F0', borderRadius: 14, padding: '18px 20px', display: 'flex', alignItems: 'center', gap: 12, boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
-              <div style={{ width: 40, height: 40, borderRadius: 10, background: 'rgba(37, 99, 235,0.1)', color: 'var(--app-accent, #2563EB)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}><i className="ti ti-category" /></div>
+            <div key={c.name} style={{ cursor: 'default', flex: '1 1 200px', minWidth: 200, background: '#FFFFFF', border: '1.5px solid #E2E8F0', borderRadius: 14, padding: '18px 20px', display: 'flex', alignItems: 'center', gap: 12, boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
+              <div style={{ width: 40, height: 40, borderRadius: 10, background: 'rgba(37, 99, 235, 0.1)', color: 'var(--app-accent, #2563EB)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}><i className="ti ti-category" /></div>
               <div>
-                <div style={{ fontSize: 24, fontWeight: 800, color: '#1A2332' }}>{fmt(c.total)}</div>
+                <div style={{ fontSize: 24, fontWeight: 800, color: '#1E293B' }}>{fmt(c.total)}</div>
                 <div style={{ fontSize: 12, fontWeight: 700, color: '#64748B' }}>{c.name}</div>
               </div>
             </div>
@@ -151,22 +151,22 @@ export default function FinExpenses({ expenses: propExpenses, setExpenses: propS
 
         {/* FILTERS */}
         <div style={{ display: 'flex', gap: 10, marginBottom: 18, flexWrap: 'wrap', alignItems: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#fff', border: '1.5px solid #E2E8F0', borderRadius: 10, padding: '9px 14px', minWidth: 220 }}>
-            <i className="ti ti-search" style={{ color: '#718096' }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#FFFFFF', border: '1.5px solid #E2E8F0', borderRadius: 10, padding: '9px 14px', minWidth: 220 }}>
+            <i className="ti ti-search" style={{ color: '#64748B' }} />
             <input placeholder="Search expenses..." value={search} onChange={e => setSearch(e.target.value)} style={{ border: 'none', outline: 'none', fontFamily: 'Nunito,sans-serif', fontSize: 13, width: '100%', background: 'transparent' }} />
           </div>
-          <select value={catFilter} onChange={e => setCatFilter(e.target.value)} style={{ padding: '9px 14px', border: '1.5px solid #E2E8F0', borderRadius: 10, fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 600, color: '#4A5568', background: '#fff', outline: 'none', cursor: 'pointer' }}>
+          <select value={catFilter} onChange={e => setCatFilter(e.target.value)} style={{ padding: '9px 14px', border: '1.5px solid #E2E8F0', borderRadius: 10, fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 600, color: '#64748B', background: '#FFFFFF', outline: 'none', cursor: 'pointer' }}>
             <option value="All">All Categories</option>
             {CATEGORIES.map(c => <option key={c}>{c}</option>)}
           </select>
-          <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} style={{ padding: '9px 14px', border: '1.5px solid #E2E8F0', borderRadius: 10, fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 600, color: '#4A5568', background: '#fff', outline: 'none', cursor: 'pointer' }}>
+          <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} style={{ padding: '9px 14px', border: '1.5px solid #E2E8F0', borderRadius: 10, fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 600, color: '#64748B', background: '#FFFFFF', outline: 'none', cursor: 'pointer' }}>
             <option value="All">All Status</option>
             <option>Paid</option><option>Pending</option><option>Overdue</option>
           </select>
         </div>
 
         {/* TABLE */}
-        <div style={{ background: '#fff', borderRadius: 14, boxShadow: '0 2px 12px rgba(37, 99, 235,.08)', overflow: 'hidden' }}>
+        <div style={{ background: '#FFFFFF', borderRadius: 14, boxShadow: '0 2px 12px rgba(37, 99, 235, .08)', overflow: 'hidden' }}>
           <div style={{ overflowX: 'auto' }}>
             <table className="fe-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
@@ -177,16 +177,16 @@ export default function FinExpenses({ expenses: propExpenses, setExpenses: propS
               </thead>
               <tbody>
                 {loading ? (
-                  <tr><td colSpan={8} style={{ textAlign: 'center', padding: 40, color: '#718096' }}>Loading expenses...</td></tr>
+                  <tr><td colSpan={8} style={{ textAlign: 'center', padding: 40, color: '#64748B' }}>Loading expenses...</td></tr>
                 ) : filtered.length === 0 ? (
-                  <tr><td colSpan={8} style={{ textAlign: 'center', padding: 40, color: '#718096' }}>{expenses.length === 0 ? 'No expenses yet. Click "Add Expense" to get started.' : 'No results match your filters.'}</td></tr>
+                  <tr><td colSpan={8} style={{ textAlign: 'center', padding: 40, color: '#64748B' }}>{expenses.length === 0 ? 'No expenses yet. Click "Add Expense" to get started.' : 'No results match your filters.'}</td></tr>
                 ) : filtered.map(exp => (
                   <tr key={exp._id}>
                     <td style={{ whiteSpace: 'nowrap' }}>{exp.date ? new Date(exp.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : new Date(exp.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</td>
                     <td style={{ fontWeight: 700 }}>{exp.title || '—'}</td>
                     <td>{exp.description || '—'}</td>
-                    <td><span style={{ background: '#FEE2E2', color: '#EF4444', padding: '2px 8px', borderRadius: 20, fontSize: 11, fontWeight: 700 }}>{exp.category}</span></td>
-                    <td style={{ color: '#EF4444', fontWeight: 800 }}>−{fmt(exp.amount)}</td>
+                    <td><span style={{ background: '#E2E8F0', color: '#64748B', padding: '2px 8px', borderRadius: 20, fontSize: 11, fontWeight: 700 }}>{exp.category}</span></td>
+                    <td style={{ color: '#64748B', fontWeight: 800 }}>−{fmt(exp.amount)}</td>
                     <td>{exp.paymentMode || exp.payment_mode || '—'}</td>
                     <td><span className={`fe-badge-${(exp.status || 'paid').toLowerCase()}`}>{exp.status || 'Paid'}</span></td>
                     <td>
@@ -201,7 +201,7 @@ export default function FinExpenses({ expenses: propExpenses, setExpenses: propS
               </tbody>
             </table>
           </div>
-          <div style={{ padding: '12px 16px', borderTop: '1px solid #E2E8F0', fontSize: 13, color: '#718096' }}>
+          <div style={{ padding: '12px 16px', borderTop: '1px solid #E2E8F0', fontSize: 13, color: '#64748B' }}>
             Showing {filtered.length} of {expenses.length} records
           </div>
         </div>
@@ -211,18 +211,18 @@ export default function FinExpenses({ expenses: propExpenses, setExpenses: propS
       {viewItem && (
         <div style={S.overlay} onClick={e => e.target === e.currentTarget && setViewItem(null)}>
           <div style={S.modal}>
-            <div style={{ fontSize: 18, fontWeight: 900, color: '#1A2332', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
-              <i className="ti ti-receipt" style={{ color: '#EF4444' }} /> Expense Details
+            <div style={{ fontSize: 18, fontWeight: 900, color: '#1E293B', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
+              <i className="ti ti-receipt" style={{ color: '#64748B' }} /> Expense Details
             </div>
             {[['Title', viewItem.title], ['Description', viewItem.description], ['Category', viewItem.category], ['Expense Type', viewItem.expenseType], ['Amount', fmt(viewItem.amount)], ['Payment Mode', viewItem.paymentMode], ['Status', viewItem.status], ['Date', new Date(viewItem.date || viewItem.createdAt).toLocaleDateString('en-IN')]].map(([l, v]) => (
-              <div key={l} style={{ display: 'flex', justifyContent: 'space-between', padding: '11px 0', borderBottom: '1px solid #F0F4F8', fontSize: 13 }}>
-                <span style={{ fontWeight: 700, color: '#718096' }}>{l}</span>
-                <span style={{ fontWeight: 700, color: '#1A2332' }}>{v || '—'}</span>
+              <div key={l} style={{ display: 'flex', justifyContent: 'space-between', padding: '11px 0', borderBottom: '1px solid #EFF6FF', fontSize: 13 }}>
+                <span style={{ fontWeight: 700, color: '#64748B' }}>{l}</span>
+                <span style={{ fontWeight: 700, color: '#1E293B' }}>{v || '—'}</span>
               </div>
             ))}
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 22 }}>
-              <button style={S.btn('#F0F4F8', '#1A2332')} onClick={() => setViewItem(null)}>Close</button>
-              <button style={S.btn('#EF4444')} onClick={() => { const item = viewItem; setViewItem(null); setEditItem(item); setEditForm({ title: item.title || '', description: item.description || '', category: item.category || 'Office', expenseType: item.expenseType || 'Operational', amount: item.amount, paymentMode: item.paymentMode || 'Cash', status: item.status || 'Pending', date: (item.date || item.createdAt || '').slice(0, 10) }); }}>Edit</button>
+              <button style={S.btn('#EFF6FF', '#1E293B')} onClick={() => setViewItem(null)}>Close</button>
+              <button style={S.btn('#64748B')} onClick={() => { const item = viewItem; setViewItem(null); setEditItem(item); setEditForm({ title: item.title || '', description: item.description || '', category: item.category || 'Office', expenseType: item.expenseType || 'Operational', amount: item.amount, paymentMode: item.paymentMode || 'Cash', status: item.status || 'Pending', date: (item.date || item.createdAt || '').slice(0, 10) }); }}>Edit</button>
             </div>
           </div>
         </div>
@@ -232,8 +232,8 @@ export default function FinExpenses({ expenses: propExpenses, setExpenses: propS
       {addOpen && (
         <div style={S.overlay} onClick={e => e.target === e.currentTarget && setAddOpen(false)}>
           <div style={S.modal}>
-            <div style={{ fontSize: 18, fontWeight: 900, color: '#1A2332', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
-              <i className="ti ti-plus" style={{ color: '#EF4444' }} /> Add Expense
+            <div style={{ fontSize: 18, fontWeight: 900, color: '#1E293B', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
+              <i className="ti ti-plus" style={{ color: '#64748B' }} /> Add Expense
             </div>
             {[['Title *', 'title', 'text', 'e.g. Office Rent, AWS Bill'], ['Description', 'description', 'text', 'What was this for?'], ['Amount (₹) *', 'amount', 'number', '0.00'], ['Date', 'date', 'date', '']].map(([label, key, type, ph]) => (
               <div key={key} style={{ marginBottom: 14 }}>
@@ -250,8 +250,8 @@ export default function FinExpenses({ expenses: propExpenses, setExpenses: propS
               ))}
             </div>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 22, paddingTop: 16, borderTop: '1px solid #E2E8F0' }}>
-              <button style={S.btn('#F0F4F8', '#1A2332')} onClick={() => setAddOpen(false)}>Cancel</button>
-              <button style={S.btn('#EF4444')} disabled={saving} onClick={handleAdd}>{saving ? 'Saving...' : 'Save Expense'}</button>
+              <button style={S.btn('#EFF6FF', '#1E293B')} onClick={() => setAddOpen(false)}>Cancel</button>
+              <button style={S.btn('#64748B')} disabled={saving} onClick={handleAdd}>{saving ? 'Saving...' : 'Save Expense'}</button>
             </div>
           </div>
         </div>
@@ -261,8 +261,8 @@ export default function FinExpenses({ expenses: propExpenses, setExpenses: propS
       {editItem && (
         <div style={S.overlay} onClick={e => e.target === e.currentTarget && setEditItem(null)}>
           <div style={S.modal}>
-            <div style={{ fontSize: 18, fontWeight: 900, color: '#1A2332', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
-              <i className="ti ti-pencil" style={{ color: '#EF4444' }} /> Edit Expense
+            <div style={{ fontSize: 18, fontWeight: 900, color: '#1E293B', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
+              <i className="ti ti-pencil" style={{ color: '#64748B' }} /> Edit Expense
             </div>
             {[['Title *', 'title', 'text', ''], ['Description', 'description', 'text', ''], ['Amount (₹) *', 'amount', 'number', ''], ['Date', 'date', 'date', '']].map(([label, key, type, ph]) => (
               <div key={key} style={{ marginBottom: 14 }}>
@@ -279,8 +279,8 @@ export default function FinExpenses({ expenses: propExpenses, setExpenses: propS
               ))}
             </div>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 22, paddingTop: 16, borderTop: '1px solid #E2E8F0' }}>
-              <button style={S.btn('#F0F4F8', '#1A2332')} onClick={() => setEditItem(null)}>Cancel</button>
-              <button style={S.btn('#EF4444')} disabled={saving} onClick={handleEdit}>{saving ? 'Updating...' : 'Update Expense'}</button>
+              <button style={S.btn('#EFF6FF', '#1E293B')} onClick={() => setEditItem(null)}>Cancel</button>
+              <button style={S.btn('#64748B')} disabled={saving} onClick={handleEdit}>{saving ? 'Updating...' : 'Update Expense'}</button>
             </div>
           </div>
         </div>

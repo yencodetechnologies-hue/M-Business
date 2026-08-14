@@ -5,13 +5,13 @@ import { BASE_URL } from "../config";
 // ─── THEMES -------------------------------------------------------------------
 const THEMES = [
   { name: "Violet", p: "var(--app-accent)", g: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", l: "var(--app-border)", t: "var(--app-accent)" },
-  { name: "Cobalt", p: "#1d4ed8", g: "linear-gradient(135deg,#1e40af,#3b82f6)", l: "#dbeafe", t: "#1e3a8a" },
-  { name: "Emerald", p: "#059669", g: "linear-gradient(135deg,#065f46,#10b981)", l: "#d1fae5", t: "#064e3b" },
-  { name: "Rose", p: "#e11d48", g: "linear-gradient(135deg,#9f1239,#f43f5e)", l: "#ffe4e6", t: "#881337" },
-  { name: "Amber", p: "#d97706", g: "linear-gradient(135deg,#92400e,#fbbf24)", l: "#fef3c7", t: "#78350f" },
-  { name: "Slate", p: "#334155", g: "linear-gradient(135deg,#0f172a,#475569)", l: "#f1f5f9", t: "#0f172a" },
-  { name: "Teal", p: "#2563eb", g: "linear-gradient(135deg,#134e4a,#2dd4bf)", l: "#ccfbf1", t: "#134e4a" },
-  { name: "Fuchsia", p: "var(--app-accent)", g: "linear-gradient(135deg,#701a75,#e879f9)", l: "var(--app-border)", t: "#4a044e" },
+  { name: "Cobalt", p: "#2563EB", g: "linear-gradient(135deg,#2563EB,#2563EB)", l: "#E2E8F0", t: "#1E293B" },
+  { name: "Emerald", p: "#16A34A", g: "linear-gradient(135deg,#1E293B,#16A34A)", l: "#E2E8F0", t: "#1E293B" },
+  { name: "Rose", p: "#64748B", g: "linear-gradient(135deg,#1E293B,#64748B)", l: "#E2E8F0", t: "#1E293B" },
+  { name: "Amber", p: "#64748B", g: "linear-gradient(135deg,#1E293B,#64748B)", l: "#E2E8F0", t: "#1E293B" },
+  { name: "Slate", p: "#1E293B", g: "linear-gradient(135deg,#0F172A,#64748B)", l: "#EFF6FF", t: "#0F172A" },
+  { name: "Teal", p: "#2563EB", g: "linear-gradient(135deg,#1E293B,#2563EB)", l: "#E2E8F0", t: "#1E293B" },
+  { name: "Fuchsia", p: "var(--app-accent)", g: "linear-gradient(135deg,#64748B,#E2E8F0)", l: "var(--app-border)", t: "#1E293B" },
 ];
 
 const P = {
@@ -121,8 +121,8 @@ function CanvasElement({ element, isSelected, onSelect, onUpdate, onDelete, canv
             width: 22,
             height: 22,
             borderRadius: "50%",
-            background: "#e2445c",
-            color: "#fff",
+            background: "#64748B",
+            color: "#FFFFFF",
             border: "none",
             cursor: "pointer",
             fontSize: 13,
@@ -146,7 +146,7 @@ function CanvasElement({ element, isSelected, onSelect, onUpdate, onDelete, canv
           style={{
             fontSize: element.fontSize || 16,
             fontWeight: element.fontWeight || 400,
-            color: element.color || "#000",
+            color: element.color || "#0F172A",
             fontFamily: element.fontFamily || "'Plus Jakarta Sans', sans-serif",
             outline: "none",
             padding: 4,
@@ -255,7 +255,7 @@ function CanvasSizeControls({ currentSize, onSizeChange }) {
 
   return (
     <div style={{
-      background: '#fff', border: `1px solid ${P.border}`,
+      background: '#FFFFFF', border: `1px solid ${P.border}`,
       borderRadius: 12, padding: 16, marginBottom: 16,
       boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
     }}>
@@ -274,7 +274,7 @@ function CanvasSizeControls({ currentSize, onSizeChange }) {
               flex: 1, padding: '8px 6px',
               border: `1.5px solid ${active ? P.accent : P.border}`,
               borderRadius: 8,
-              background: active ? P.light : '#fff',
+              background: active ? P.light : '#FFFFFF',
               color: active ? P.accent : P.muted,
               fontSize: 12, fontWeight: active ? 700 : 400,
               cursor: active ? 'default' : 'pointer',
@@ -300,7 +300,7 @@ function CanvasSizeControls({ currentSize, onSizeChange }) {
               style={{
                 padding: '7px 10px', border: `1px solid ${active ? P.accent : P.border}`,
                 borderRadius: 7, textAlign: 'left',
-                background: active ? P.light : '#fff',
+                background: active ? P.light : '#FFFFFF',
                 color: active ? P.accent : P.text,
                 fontSize: 12, cursor: 'pointer',
                 fontWeight: active ? 700 : 400,
@@ -309,7 +309,7 @@ function CanvasSizeControls({ currentSize, onSizeChange }) {
               }}
             >
               <span>{preset.name}</span>
-              <span style={{ fontSize: 10, color: active ? P.muted : '#c4b5fd' }}>
+              <span style={{ fontSize: 10, color: active ? P.muted : '#E2E8F0' }}>
                 {preset.width}✕{preset.height}
               </span>
             </button>
@@ -340,7 +340,7 @@ function CanvasSizeControls({ currentSize, onSizeChange }) {
           disabled={!isCustom}
           style={{
             padding: '6px 10px', background: isCustom ? P.accent : P.border,
-            color: isCustom ? '#fff' : P.muted, border: 'none',
+            color: isCustom ? '#FFFFFF' : P.muted, border: 'none',
             borderRadius: 6, fontSize: 11, cursor: isCustom ? 'pointer' : 'default',
             fontWeight: 600,
           }}
@@ -583,7 +583,7 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose, isPr
 
       {/* Header */}
       <div style={{
-        background: '#fff', borderRadius: 12, padding: 16, marginBottom: 20,
+        background: '#FFFFFF', borderRadius: 12, padding: 16, marginBottom: 20,
         boxShadow: '0 2px 8px rgba(0,0,0,0.08)', display: 'flex',
         justifyContent: 'space-between', alignItems: 'center', gap: 12
       }}>
@@ -599,11 +599,11 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose, isPr
                 fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 20,
                 background: (() => {
                   const s = (proposalData?.status || propDataProp?.status || 'draft').toLowerCase();
-                  return s === 'approved' ? '#f0fdf4' : s === 'sent' ? '#EFF4FF' : s === 'rejected' ? '#fff1f2' : '#f8fafc';
+                  return s === 'approved' ? '#F8FAFC' : s === 'sent' ? '#EFF6FF' : s === 'rejected' ? '#F8FAFC' : '#F8FAFC';
                 })(),
                 color: (() => {
                   const s = (proposalData?.status || propDataProp?.status || 'draft').toLowerCase();
-                  return s === 'approved' ? '#15803D' : s === 'sent' ? '#2563EB' : s === 'rejected' ? '#9f1239' : '#475569';
+                  return s === 'approved' ? '#16A34A' : s === 'sent' ? '#2563EB' : s === 'rejected' ? '#1E293B' : '#64748B';
                 })(),
               }}>
                 {(proposalData?.status || propDataProp?.status || 'draft').toUpperCase()}
@@ -612,7 +612,7 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose, isPr
             {isPreview && (proposalData?.clientSignature || propDataProp?.clientSignature) && (
               <span style={{
                 fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 20,
-                background: '#f0fdf4', color: '#15803D',
+                background: '#F8FAFC', color: '#16A34A',
               }}>
                 Yes Client Signed
               </span>
@@ -639,7 +639,7 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose, isPr
                   style={{
                     width: '100%', padding: '6px 8px',
                     border: `1px solid ${P.border}`, borderRadius: 6,
-                    fontSize: 12, background: '#fff', outline: 'none', color: P.text
+                    fontSize: 12, background: '#FFFFFF', outline: 'none', color: P.text
                   }}
                 >
                   <option value="">Select Client</option>
@@ -660,7 +660,7 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose, isPr
                   style={{
                     width: '100%', padding: '6px 8px',
                     border: `1px solid ${P.border}`, borderRadius: 6,
-                    fontSize: 12, background: '#fff', outline: 'none', color: P.text
+                    fontSize: 12, background: '#FFFFFF', outline: 'none', color: P.text
                   }}
                 />
               </div>
@@ -673,7 +673,7 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose, isPr
           <button
             onClick={onClose}
             style={{
-              background: '#f3f4f6', color: '#6b7280', border: 'none',
+              background: '#F8FAFC', color: '#64748B', border: 'none',
               borderRadius: 8, padding: '8px 16px', fontSize: 13,
               fontWeight: 600, cursor: 'pointer',
               display: 'flex', alignItems: 'center', gap: 6
@@ -687,8 +687,8 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose, isPr
             <button
               onClick={() => setIsPreview(v => !v)}
               style={{
-                background: isPreview ? '#f3f4f6' : P.accent,
-                color: isPreview ? '#6b7280' : '#fff',
+                background: isPreview ? '#F8FAFC' : P.accent,
+                color: isPreview ? '#64748B' : '#FFFFFF',
                 border: 'none', borderRadius: 8, padding: '8px 16px',
                 fontSize: 13, fontWeight: 600, cursor: 'pointer',
               }}
@@ -702,7 +702,7 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose, isPr
             <button
               onClick={() => window.print()}
               style={{
-                background: '#f3f4f6', color: '#374151', border: 'none',
+                background: '#F8FAFC', color: '#1E293B', border: 'none',
                 borderRadius: 8, padding: '8px 16px', fontSize: 13,
                 fontWeight: 600, cursor: 'pointer',
               }}
@@ -717,7 +717,7 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose, isPr
               onClick={handleSave}
               disabled={saving}
               style={{
-                background: P.accent, color: '#fff', border: 'none',
+                background: P.accent, color: '#FFFFFF', border: 'none',
                 borderRadius: 8, padding: '8px 16px', fontSize: 13,
                 fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer',
                 opacity: saving ? 0.7 : 1
@@ -738,7 +738,7 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose, isPr
 
           {/* Elements Panel */}
           <div style={{
-            background: '#fff', border: `1px solid ${P.border}`,
+            background: '#FFFFFF', border: `1px solid ${P.border}`,
             borderRadius: 12, padding: 16, marginBottom: 16,
             boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
           }}>
@@ -817,7 +817,7 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose, isPr
                 style={{
                   padding: '8px 12px',
                   background: isAddingText ? P.mid : P.accent,
-                  color: '#fff', border: 'none', borderRadius: 8,
+                  color: '#FFFFFF', border: 'none', borderRadius: 8,
                   fontSize: 12, fontWeight: 600, cursor: 'pointer',
                 }}
               >
@@ -837,7 +837,7 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose, isPr
                 style={{
                   padding: '8px 12px',
                   background: isAddingHeading ? P.mid : P.accent,
-                  color: '#fff', border: 'none', borderRadius: 8,
+                  color: '#FFFFFF', border: 'none', borderRadius: 8,
                   fontSize: 12, fontWeight: 600, cursor: 'pointer',
                 }}
               >
@@ -857,7 +857,7 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose, isPr
                 style={{
                   padding: '8px 12px',
                   background: isAddingLine ? P.mid : P.accent,
-                  color: '#fff', border: 'none', borderRadius: 8,
+                  color: '#FFFFFF', border: 'none', borderRadius: 8,
                   fontSize: 12, fontWeight: 600, cursor: 'pointer',
                 }}
               >
@@ -877,7 +877,7 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose, isPr
                 style={{
                   padding: '8px 12px',
                   background: isAddingRectangle ? P.mid : P.accent,
-                  color: '#fff', border: 'none', borderRadius: 8,
+                  color: '#FFFFFF', border: 'none', borderRadius: 8,
                   fontSize: 12, fontWeight: 600, cursor: 'pointer',
                 }}
               >
@@ -897,7 +897,7 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose, isPr
                 style={{
                   padding: '8px 12px',
                   background: isAddingCircle ? P.mid : P.accent,
-                  color: '#fff', border: 'none', borderRadius: 8,
+                  color: '#FFFFFF', border: 'none', borderRadius: 8,
                   fontSize: 12, fontWeight: 600, cursor: 'pointer',
                 }}
               >
@@ -907,7 +907,7 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose, isPr
               <label style={{
                 padding: '8px 12px',
                 background: isAddingImage ? P.mid : P.accent,
-                color: '#fff', border: 'none', borderRadius: 8,
+                color: '#FFFFFF', border: 'none', borderRadius: 8,
                 fontSize: 12, fontWeight: 600, cursor: 'pointer',
                 display: 'block', textAlign: 'center',
               }}>
@@ -938,7 +938,7 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose, isPr
           {/* Elements List */}
           {elements.length > 0 && (
             <div style={{
-              background: '#fff', border: `1px solid ${P.border}`,
+              background: '#FFFFFF', border: `1px solid ${P.border}`,
               borderRadius: 12, padding: 16,
               boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
             }}>
@@ -951,7 +951,7 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose, isPr
                     style={{
                       padding: '6px 9px', borderRadius: 6,
                       border: `1px solid ${selectedElement === element.id ? P.accent : P.border}`,
-                      background: selectedElement === element.id ? P.light : '#fff',
+                      background: selectedElement === element.id ? P.light : '#FFFFFF',
                       fontSize: 12, color: P.text, cursor: 'pointer',
                       display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                     }}
@@ -974,7 +974,7 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose, isPr
             onClick={handleCanvasClick}
             style={{
               width: canvasSize.width, height: canvasSize.height,
-              background: '#fff',
+              background: '#FFFFFF',
               border: `2px solid ${P.border}`,
               borderRadius: 8, position: 'relative',
               margin: '0 auto',
@@ -1001,7 +1001,7 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose, isPr
                     <div style={{
                       fontSize: element.fontSize || 16,
                       fontWeight: element.fontWeight || 400,
-                      color: element.color || '#000',
+                      color: element.color || '#0F172A',
                       fontFamily: element.fontFamily || "'Plus Jakarta Sans', sans-serif",
                       padding: 4,
                     }}>{element.text}</div>

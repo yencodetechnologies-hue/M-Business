@@ -14,14 +14,14 @@
   align-items: center;
   justify-content: center;
   padding: 40px;
-  color: #666;
+  color: #64748B;
 }
 
 .spinner {
   width: 40px;
   height: 40px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #3498db;
+  border: 4px solid #F8FAFC;
+  border-top: 4px solid #2563EB;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 16px;
@@ -44,17 +44,17 @@
   align-items: center;
   margin-bottom: 30px;
   padding-bottom: 20px;
-  border-bottom: 2px solid #f0f0f0;
+  border-bottom: 2px solid #E2E8F0;
 }
 
 .dashboard-header h2 {
-  color: #2c3e50;
+  color: #1E293B;
   margin: 0;
   font-size: 28px;
 }
 
 .user-info {
-  color: #7f8c8d;
+  color: #64748B;
   font-size: 14px;
 }
 
@@ -64,7 +64,7 @@
 }
 
 .subscription-card {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #2563EB 0%, #64748B 100%);
   color: white;
   padding: 24px;
   border-radius: 12px;
@@ -130,13 +130,13 @@
 }
 
 .days-remaining {
-  color: #ffd700 !important;
+  color: #64748B !important;
 }
 
 /* Tabs */
 .payment-tabs {
   display: flex;
-  border-bottom: 2px solid #e0e0e0;
+  border-bottom: 2px solid #E2E8F0;
   margin-bottom: 30px;
 }
 
@@ -145,7 +145,7 @@
   padding: 16px 24px;
   background: none;
   border: none;
-  color: #666;
+  color: #64748B;
   font-size: 13px;
   cursor: pointer;
   display: flex;
@@ -157,14 +157,14 @@
 }
 
 .tab-btn:hover {
-  background: #f8f9fa;
-  color: #333;
+  background: #F8FAFC;
+  color: #1E293B;
 }
 
 .tab-btn.active {
-  color: #3498db;
-  border-bottom-color: #3498db;
-  background: #f8f9fa;
+  color: #2563EB;
+  border-bottom-color: #2563EB;
+  background: #F8FAFC;
 }
 
 .tab-icon {
@@ -180,23 +180,23 @@
 .active-subscription-notice {
   text-align: center;
   padding: 60px 20px;
-  background: #f8f9fa;
+  background: #F8FAFC;
   border-radius: 12px;
-  border: 2px solid #e9ecef;
+  border: 2px solid #E2E8F0;
 }
 
 .active-subscription-notice h3 {
-  color: #28a745;
+  color: #16A34A;
   margin-bottom: 16px;
 }
 
 .active-subscription-notice p {
-  color: #666;
+  color: #64748B;
   margin-bottom: 12px;
 }
 
 .btn-primary {
-  background: #3498db;
+  background: #2563EB;
   color: white;
   border: none;
   padding: 12px 24px;
@@ -207,13 +207,13 @@
 }
 
 .btn-primary:hover {
-  background: #2980b9;
+  background: #2563EB;
 }
 
 /* Subscription Plans Tab */
 .subscription-plans-tab h3 {
   margin-bottom: 30px;
-  color: #2c3e50;
+  color: #1E293B;
 }
 
 .plans-grid {
@@ -225,7 +225,7 @@
 
 .plan-card {
   background: white;
-  border: 2px solid #e0e0e0;
+  border: 2px solid #E2E8F0;
   border-radius: 12px;
   padding: 24px;
   transition: all 0.3s ease;
@@ -238,8 +238,8 @@
 }
 
 .plan-card.active {
-  border-color: #3498db;
-  background: linear-gradient(to bottom, #f8f9fa, white);
+  border-color: #2563EB;
+  background: linear-gradient(to bottom, #F8FAFC, white);
 }
 
 .plan-header {
@@ -249,7 +249,7 @@
 
 .plan-header h4 {
   margin: 0 0 12px 0;
-  color: #2c3e50;
+  color: #1E293B;
   font-size: 20px;
 }
 
@@ -263,11 +263,11 @@
 .price-amount {
   font-size: 32px;
   font-weight: 700;
-  color: #3498db;
+  color: #2563EB;
 }
 
 .price-duration {
-  color: #666;
+  color: #64748B;
   font-size: 13px;
 }
 
@@ -282,11 +282,11 @@
   align-items: center;
   gap: 8px;
   padding: 8px 0;
-  color: #555;
+  color: #64748B;
 }
 
 .feature-icon {
-  color: #28a745;
+  color: #16A34A;
   font-size: 13px;
 }
 
@@ -295,7 +295,7 @@
 }
 
 .btn-secondary {
-  background: #6c757d;
+  background: #64748B;
   color: white;
   border: none;
   padding: 12px 24px;
@@ -306,7 +306,7 @@
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: #5a6268;
+  background: #64748B;
 }
 
 .btn-secondary:disabled {
@@ -325,7 +325,7 @@
 }
 
 .payment-summary {
-  background: #f8f9fa;
+  background: #F8FAFC;
   padding: 20px;
   border-radius: 8px;
   margin-bottom: 24px;
@@ -333,23 +333,23 @@
 
 .payment-summary h3 {
   margin: 0 0 16px 0;
-  color: #2c3e50;
+  color: #1E293B;
 }
 
 .summary-item {
   display: flex;
   justify-content: space-between;
   padding: 8px 0;
-  color: #666;
+  color: #64748B;
 }
 
 .summary-item.total {
-  border-top: 2px solid #dee2e6;
+  border-top: 2px solid #E2E8F0;
   margin-top: 12px;
   padding-top: 16px;
   font-weight: 600;
   font-size: 18px;
-  color: #2c3e50;
+  color: #1E293B;
 }
 
 .payment-methods {
@@ -358,7 +358,7 @@
 
 .payment-methods h4 {
   margin: 0 0 16px 0;
-  color: #2c3e50;
+  color: #1E293B;
 }
 
 .methods-grid {
@@ -373,7 +373,7 @@
   align-items: center;
   gap: 8px;
   padding: 16px 12px;
-  border: 2px solid #e0e0e0;
+  border: 2px solid #E2E8F0;
   border-radius: 8px;
   background: white;
   cursor: pointer;
@@ -381,32 +381,32 @@
 }
 
 .method-btn:hover {
-  border-color: #3498db;
-  background: #f8f9fa;
+  border-color: #2563EB;
+  background: #F8FAFC;
 }
 
 .method-btn.selected {
-  border-color: #3498db;
-  background: #e3f2fd;
+  border-color: #2563EB;
+  background: #EFF6FF;
 }
 
 .method-icon {
   font-size: 24px;
-  color: #666;
+  color: #64748B;
 }
 
 .payment-error {
-  background: #f8d7da;
-  color: #721c24;
+  background: #E2E8F0;
+  color: #1E293B;
   padding: 12px;
   border-radius: 6px;
   margin-bottom: 20px;
-  border: 1px solid #f5c6cb;
+  border: 1px solid #E2E8F0;
 }
 
 .payment-btn {
   width: 100%;
-  background: #3498db;
+  background: #2563EB;
   color: white;
   border: none;
   padding: 16px;
@@ -422,11 +422,11 @@
 }
 
 .payment-btn:hover:not(:disabled) {
-  background: #2980b9;
+  background: #2563EB;
 }
 
 .payment-btn:disabled {
-  background: #6c757d;
+  background: #64748B;
   cursor: not-allowed;
 }
 
@@ -436,19 +436,19 @@
   gap: 16px;
   margin-top: 24px;
   padding-top: 24px;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid #E2E8F0;
 }
 
 .security-item {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #666;
+  color: #64748B;
   font-size: 14px;
 }
 
 .security-icon {
-  color: #28a745;
+  color: #16A34A;
 }
 
 /* Payment History Styles */
@@ -468,12 +468,12 @@
 
 .payment-history-header h3 {
   margin: 0;
-  color: #2c3e50;
+  color: #1E293B;
 }
 
 .filter-select {
   padding: 8px 12px;
-  border: 1px solid #ddd;
+  border: 1px solid #E2E8F0;
   border-radius: 6px;
   background: white;
   font-size: 14px;
@@ -487,7 +487,7 @@
 }
 
 .payment-widget-stat-card {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #2563EB 0%, #64748B 100%);
   color: white;
   padding: 20px;
   border-radius: 8px;
@@ -513,7 +513,7 @@
 .no-payments {
   text-align: center;
   padding: 40px;
-  color: #666;
+  color: #64748B;
 }
 
 .payments-list {
@@ -523,7 +523,7 @@
 }
 
 .payment-item {
-  border: 1px solid #e0e0e0;
+  border: 1px solid #E2E8F0;
   border-radius: 8px;
   padding: 20px;
   transition: box-shadow 0.3s ease;
@@ -551,17 +551,17 @@
 }
 
 .payment-id .label {
-  color: #666;
+  color: #64748B;
   font-size: 14px;
 }
 
 .payment-id .value {
   font-weight: 600;
-  color: #2c3e50;
+  color: #1E293B;
 }
 
 .payment-date {
-  color: #666;
+  color: #64748B;
   font-size: 14px;
 }
 
@@ -573,7 +573,7 @@
   display: block;
   font-size: 18px;
   font-weight: 700;
-  color: #2c3e50;
+  color: #1E293B;
   margin-bottom: 4px;
 }
 
@@ -589,28 +589,28 @@
 }
 
 .status-success {
-  background: #d4edda;
-  color: #155724;
+  background: #E2E8F0;
+  color: #1E293B;
 }
 
 .status-warning {
-  background: #fff3cd;
-  color: #856404;
+  background: #E2E8F0;
+  color: #1E293B;
 }
 
 .status-danger {
-  background: #f8d7da;
-  color: #721c24;
+  background: #E2E8F0;
+  color: #1E293B;
 }
 
 .status-info {
-  background: #d1ecf1;
-  color: #0c5460;
+  background: #E2E8F0;
+  color: #1E293B;
 }
 
 .status-secondary {
-  background: #e2e3e5;
-  color: #383d41;
+  background: #E2E8F0;
+  color: #1E293B;
 }
 
 .payment-details {
@@ -627,7 +627,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  color: #666;
+  color: #64748B;
   font-size: 14px;
 }
 
@@ -636,7 +636,7 @@
 }
 
 .payment-description {
-  color: #666;
+  color: #64748B;
   font-size: 14px;
   font-style: italic;
   margin-top: 8px;
@@ -653,9 +653,9 @@
   align-items: center;
   gap: 6px;
   padding: 8px 16px;
-  border: 1px solid #3498db;
+  border: 1px solid #2563EB;
   background: white;
-  color: #3498db;
+  color: #2563EB;
   border-radius: 6px;
   cursor: pointer;
   font-size: 14px;
@@ -663,23 +663,23 @@
 }
 
 .action-btn:hover {
-  background: #3498db;
+  background: #2563EB;
   color: white;
 }
 
 .action-btn.secondary {
-  border-color: #6c757d;
-  color: #6c757d;
+  border-color: #64748B;
+  color: #64748B;
 }
 
 .action-btn.secondary:hover {
-  background: #6c757d;
+  background: #64748B;
   color: white;
 }
 
 /* Payment Summary */
 .payment-summary {
-  background: #f8f9fa;
+  background: #F8FAFC;
   padding: 24px;
   border-radius: 12px;
   margin-top: 30px;
@@ -687,7 +687,7 @@
 
 .payment-summary h4 {
   margin: 0 0 16px 0;
-  color: #2c3e50;
+  color: #1E293B;
 }
 
 .summary-grid {
@@ -702,17 +702,17 @@
   padding: 12px;
   background: white;
   border-radius: 6px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #E2E8F0;
 }
 
 .summary-label {
-  color: #666;
+  color: #64748B;
   font-size: 14px;
 }
 
 .summary-value {
   font-weight: 600;
-  color: #2c3e50;
+  color: #1E293B;
 }
 
 /* Responsive Design */
@@ -736,12 +736,12 @@
   }
 
   .tab-btn {
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid #E2E8F0;
     border-right: none;
   }
 
   .tab-btn.active {
-    border-bottom-color: #3498db;
+    border-bottom-color: #2563EB;
   }
 
   .plans-grid {

@@ -164,17 +164,17 @@ export default function InvoiceViewer() {
   };
 
   if (error) return (
-    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f8fafc", fontFamily: "'Plus Jakarta Sans', sans-serif", padding: 24 }}>
+    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#F8FAFC", fontFamily: "'Plus Jakarta Sans', sans-serif", padding: 24 }}>
       <div style={{ textAlign: "center" }}>
         <div style={{ fontSize: 48, marginBottom: 12 }}>Warning</div>
-        <div style={{ fontSize: 16, fontWeight: 700, color: "#0f172a" }}>{error}</div>
+        <div style={{ fontSize: 16, fontWeight: 700, color: "#0F172A" }}>{error}</div>
       </div>
     </div>
   );
 
   if (!data) return (
-    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f8fafc", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-      <div style={{ textAlign: "center", fontSize: 14, color: "#6366f1" }}>Loading invoice...</div>
+    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#F8FAFC", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+      <div style={{ textAlign: "center", fontSize: 14, color: "#2563EB" }}>Loading invoice...</div>
     </div>
   );
 
@@ -189,11 +189,11 @@ export default function InvoiceViewer() {
     switch (templateName) {
       case "Minimal":
         return {
-          primaryColor: "#111827",
-          primaryBg: "#F3F4F6",
-          logoColor: "linear-gradient(135deg, #374151, #111827)",
-          borderStyle: "1px solid #E5E7EB",
-          headerUnderline: "1px solid #E5E7EB",
+          primaryColor: "#0F172A",
+          primaryBg: "#F8FAFC",
+          logoColor: "linear-gradient(135deg, #1E293B, #0F172A)",
+          borderStyle: "1px solid #E2E8F0",
+          headerUnderline: "1px solid #E2E8F0",
           fontFamily: "'Plus Jakarta Sans', sans-serif"
         };
       case "Classic":
@@ -208,11 +208,11 @@ export default function InvoiceViewer() {
       case "Modern":
       default:
         return {
-          primaryColor: "#7C5CFC",
-          primaryBg: "#EEE9FF",
-          logoColor: "linear-gradient(135deg, #7C5CFC, #0F172A)",
-          borderStyle: "1px solid #E5E7EB",
-          headerUnderline: "3px solid #7C5CFC",
+          primaryColor: "#2563EB",
+          primaryBg: "#EFF6FF",
+          logoColor: "linear-gradient(135deg, #2563EB, #0F172A)",
+          borderStyle: "1px solid #E2E8F0",
+          headerUnderline: "3px solid #2563EB",
           fontFamily: "'Plus Jakarta Sans', sans-serif"
         };
     }
@@ -236,11 +236,11 @@ export default function InvoiceViewer() {
   }
 
   return (
-    <div className="print-wrapper" style={{ fontFamily: currentT.fontFamily || "'Plus Jakarta Sans', sans-serif", background: "#f1f5f9", minHeight: "100vh", padding: "8px 12px" }}>
+    <div className="print-wrapper" style={{ fontFamily: currentT.fontFamily || "'Plus Jakarta Sans', sans-serif", background: "#EFF6FF", minHeight: "100vh", padding: "8px 12px" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Dancing+Script:wght@700&display=swap');
         * { box-sizing: border-box; }
-        .inv-paper { max-width: 794px; margin: 0 auto; background: #fff; border-radius: 18px; box-shadow: 0 24px 80px rgba(37, 99, 235,0.15); overflow: hidden; display: flex; flex-direction: column; min-height: 1122px; }
+        .inv-paper { max-width: 794px; margin: 0 auto; background: #FFFFFF; border-radius: 18px; box-shadow: 0 24px 80px rgba(37, 99, 235, 0.15); overflow: hidden; display: flex; flex-direction: column; min-height: 1122px; }
         @media print {
           @page { size: A4 portrait; margin: 12mm 14mm; }
           html, body { margin: 0 !important; padding: 0 !important; background: white !important; }
@@ -261,19 +261,19 @@ export default function InvoiceViewer() {
 
       <div className="no-print" style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 8, flexWrap: "wrap" }}>
         <button className="action-btn" onClick={() => window.print()}
-          style={{ padding: "10px 22px", background: currentT.logoColor || currentT.primaryColor, border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>
+          style={{ padding: "10px 22px", background: currentT.logoColor || currentT.primaryColor, border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#FFFFFF", fontFamily: "inherit" }}>
           Print / Save PDF
         </button>
         {inv.upiId && balanceDue > 0 && (
           <button className="action-btn" onClick={() => {
             const upiLink = `upi://pay?pa=${inv.upiId}&pn=${encodeURIComponent(inv.companyName)}&am=${balanceDue.toFixed(2)}&cu=INR&tn=${encodeURIComponent("Invoice " + inv.invoiceNo)}`;
             window.location.href = upiLink;
-          }} style={{ padding: "10px 22px", background: "linear-gradient(135deg,#065f46,#059669)", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>
+          }} style={{ padding: "10px 22px", background: "linear-gradient(135deg,#1E293B,#16A34A)", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#FFFFFF", fontFamily: "inherit" }}>
             Pay via UPI
           </button>
         )}
         <button className="action-btn" onClick={handleShare}
-          style={{ padding: "10px 22px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>
+          style={{ padding: "10px 22px", background: "#FFFFFF", border: "1.5px solid #E2E8F0", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#1E293B", fontFamily: "inherit" }}>
           Share Link
         </button>
       </div>
@@ -288,30 +288,30 @@ export default function InvoiceViewer() {
             <div key={pageIndex} className="inv-paper" style={{ width: "100%" }}>
               {/* Header */}
               {isFirstPage && (
-                <div style={{ background: "#fff", padding: "16px 40px 0", flexShrink: 0 }}>
+                <div style={{ background: "#FFFFFF", padding: "16px 40px 0", flexShrink: 0 }}>
                   <div className="inv-hgrid" style={{ display: "flex", justifyContent: "flex-start", alignItems: "center", gap: 24 }}>
                     {inv.logoUrl && (
                       <img src={inv.logoUrl} alt="logo" style={{ height: 56, width: 90, borderRadius: 8, objectFit: "contain" }} />
                     )}
                     <div style={{ textAlign: "right", flex: 1 }}>
-                      <div style={{ fontSize: 15, fontWeight: 800, color: "#0f172a", textTransform: "uppercase", letterSpacing: 0.5 }}>{inv.companyName}</div>
-                      {inv.companyAddress && <div style={{ fontSize: 10, fontWeight: 700, color: "#0f172a", marginTop: 5 }}>{inv.companyAddress}</div>}
-                      {inv.companyPhone && <div style={{ fontSize: 10, fontWeight: 700, color: "#0f172a" }}>{inv.companyPhone}</div>}
-                      <div style={{ fontSize: 10, fontWeight: 700, color: "#0f172a", marginTop: 3 }}>GSTIN: {inv.gstin || "—"}</div>
+                      <div style={{ fontSize: 15, fontWeight: 800, color: "#0F172A", textTransform: "uppercase", letterSpacing: 0.5 }}>{inv.companyName}</div>
+                      {inv.companyAddress && <div style={{ fontSize: 10, fontWeight: 700, color: "#0F172A", marginTop: 5 }}>{inv.companyAddress}</div>}
+                      {inv.companyPhone && <div style={{ fontSize: 10, fontWeight: 700, color: "#0F172A" }}>{inv.companyPhone}</div>}
+                      <div style={{ fontSize: 10, fontWeight: 700, color: "#0F172A", marginTop: 3 }}>GSTIN: {inv.gstin || "—"}</div>
                     </div>
                   </div>
-                  <div style={{ textAlign: "center", fontSize: 22, fontWeight: 800, color: "#0f172a", letterSpacing: 2, margin: "22px 0 0" }}> INVOICE</div>
+                  <div style={{ textAlign: "center", fontSize: 22, fontWeight: 800, color: "#0F172A", letterSpacing: 2, margin: "22px 0 0" }}> INVOICE</div>
                 </div>
               )}
               {/* Bill To + Meta Box */}
               {isFirstPage && (
-                <div style={{ margin: "0 40px 20px", border: "1px solid #1e293b", padding: "14px 18px", display: "flex", justifyContent: "space-between", gap: 20 }}>
+                <div style={{ margin: "0 40px 20px", border: "1px solid #1E293B", padding: "14px 18px", display: "flex", justifyContent: "space-between", gap: 20 }}>
                   <div>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: "#0f172a" }}>Bill To:</div>
-                    <div style={{ fontSize: 13, fontWeight: 800, color: "#0f172a", marginTop: 2 }}>{inv.client || "—"}</div>
-                    {inv.project && <div style={{ fontSize: 11, color: "#374151", marginTop: 2 }}>{inv.project}</div>}
+                    <div style={{ fontSize: 11, fontWeight: 700, color: "#0F172A" }}>Bill To:</div>
+                    <div style={{ fontSize: 13, fontWeight: 800, color: "#0F172A", marginTop: 2 }}>{inv.client || "—"}</div>
+                    {inv.project && <div style={{ fontSize: 11, color: "#1E293B", marginTop: 2 }}>{inv.project}</div>}
                   </div>
-                  <div style={{ fontSize: 11, color: "#0f172a", textAlign: "left", minWidth: 220 }}>
+                  <div style={{ fontSize: 11, color: "#0F172A", textAlign: "left", minWidth: 220 }}>
                     <div><b>Invoice No:</b> {inv.invoiceNo}</div>
                     <div><b>Invoice Date:</b> {formatDate(inv.date)}</div>
                     <div><b>Due Date:</b> {formatDate(inv.dueDate)}</div>
@@ -325,7 +325,7 @@ export default function InvoiceViewer() {
                   <thead>
                     <tr style={{ background: currentT.primaryColor || "#1E293B" }}>
                       {["#", "Description", "Qty", "Unit Rate", "Amount"].map((h, i) => (
-                        <th key={i} style={{ padding: "9px 11px", fontSize: 9, fontWeight: 700, color: "#fff", letterSpacing: 1.5, borderBottom: "2px solid var(--app-border)", textAlign: ["Amount", "Unit Rate", "Qty"].includes(h) ? "right" : "left" }}>{h.toUpperCase()}</th>
+                        <th key={i} style={{ padding: "9px 11px", fontSize: 9, fontWeight: 700, color: "#FFFFFF", letterSpacing: 1.5, borderBottom: "2px solid var(--app-border)", textAlign: ["Amount", "Unit Rate", "Qty"].includes(h) ? "right" : "left" }}>{h.toUpperCase()}</th>
                       ))}
                     </tr>
                   </thead>
@@ -333,10 +333,10 @@ export default function InvoiceViewer() {
                     {pageItems.map((item, idx) => (
                       <tr key={idx} style={{ borderBottom: "1px solid var(--app-border)" }}>
                         <td style={{ padding: "12px 11px", color: "var(--app-muted)", fontWeight: 700, fontSize: 13, opacity: 0.5 }}>{String(globalItemOffset + idx + 1).padStart(2, "0")}</td>
-                        <td style={{ padding: "12px 11px", fontSize: 13, fontWeight: 600, color: "#111827" }}>{item.description || "—"}</td>
-                        <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, fontWeight: 600, color: "#111827" }}>{item.quantity}</td>
-                        <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, fontWeight: 600, color: "#111827" }}>{formatCurrency(item.rate, inv.currency)}</td>
-                        <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, fontWeight: 600, color: "#111827" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), inv.currency)}</td>
+                        <td style={{ padding: "12px 11px", fontSize: 13, fontWeight: 600, color: "#0F172A" }}>{item.description || "—"}</td>
+                        <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, fontWeight: 600, color: "#0F172A" }}>{item.quantity}</td>
+                        <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, fontWeight: 600, color: "#0F172A" }}>{formatCurrency(item.rate, inv.currency)}</td>
+                        <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, fontWeight: 600, color: "#0F172A" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), inv.currency)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -352,14 +352,14 @@ export default function InvoiceViewer() {
                         ["Total Amount", formatCurrency(total, inv.currency)],
                         ["Amount Paid", formatCurrency(finalPaid, inv.currency)]
                       ].map(([l, v]) => (
-                        <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid #f8fafc" }}>
-                          <span style={{ fontSize: 12, color: "#111827" }}>{l}</span>
-                          <span style={{ fontSize: 12, fontWeight: 600, color: "#111827" }}>{v}</span>
+                        <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid #F8FAFC" }}>
+                          <span style={{ fontSize: 12, color: "#0F172A" }}>{l}</span>
+                          <span style={{ fontSize: 12, fontWeight: 600, color: "#0F172A" }}>{v}</span>
                         </div>
                       ))}
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 16px", background: currentT.primaryBg, borderRadius: 12, marginTop: 8, border: currentT.borderStyle || "1.5px solid #e2e8f0" }}>
-                        <span style={{ fontSize: 13, fontWeight: 700, color: "#111827" }}>BALANCE DUE</span>
-                        <span style={{ fontSize: 19, fontWeight: 900, color: isPaid ? "#059669" : currentT.primaryColor }}>{formatCurrency(balanceDue, inv.currency)}</span>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 16px", background: currentT.primaryBg, borderRadius: 12, marginTop: 8, border: currentT.borderStyle || "1.5px solid #E2E8F0" }}>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: "#0F172A" }}>BALANCE DUE</span>
+                        <span style={{ fontSize: 19, fontWeight: 900, color: isPaid ? "#16A34A" : currentT.primaryColor }}>{formatCurrency(balanceDue, inv.currency)}</span>
                       </div>
                     </div>
                   </div>
@@ -371,43 +371,43 @@ export default function InvoiceViewer() {
                 <div className="invoice-bottom-grid" style={{ padding: "0 32px 24px", alignItems: "flex-start", flexShrink: 0 }}>
                   <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                     {inv.notes && (
-                      <div style={{ background: "#f8fafc", borderRadius: 11, padding: "14px 16px", border: "1px solid #e2e8f0" }}>
+                      <div style={{ background: "#F8FAFC", borderRadius: 11, padding: "14px 16px", border: "1px solid #E2E8F0" }}>
                         <div style={{ fontSize: 9, color: currentT.primaryColor, fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>Edit NOTES</div>
-                        <div style={{ fontSize: 12, color: "#374151", lineHeight: 1.7 }}>{inv.notes}</div>
+                        <div style={{ fontSize: 12, color: "#1E293B", lineHeight: 1.7 }}>{inv.notes}</div>
                       </div>
                     )}
                     {inv.terms && (
-                      <div style={{ background: "#f8fafc", borderRadius: 11, padding: "14px 16px", border: "1px solid #e2e8f0" }}>
+                      <div style={{ background: "#F8FAFC", borderRadius: 11, padding: "14px 16px", border: "1px solid #E2E8F0" }}>
                         <div style={{ fontSize: 9, color: currentT.primaryColor, fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>Scroll TERMS</div>
-                        <div style={{ fontSize: 12, color: "#374151", lineHeight: 1.7 }}>{inv.terms}</div>
+                        <div style={{ fontSize: 12, color: "#1E293B", lineHeight: 1.7 }}>{inv.terms}</div>
                       </div>
                     )}
                     {inv.upiId && (
-                      <div style={{ background: "#f8fafc", borderRadius: 11, padding: "14px 16px", border: "1px solid #e2e8f0" }}>
+                      <div style={{ background: "#F8FAFC", borderRadius: 11, padding: "14px 16px", border: "1px solid #E2E8F0" }}>
                         <div style={{ fontSize: 9, color: currentT.primaryColor, fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}> UPI PAYMENT</div>
-                        <div style={{ fontSize: 12, fontWeight: 700, color: "#111827" }}>{inv.upiId}</div>
+                        <div style={{ fontSize: 12, fontWeight: 700, color: "#0F172A" }}>{inv.upiId}</div>
                       </div>
                     )}
                     {inv.paymentHistory?.length > 0 && (
-                      <div style={{ background: "#f8fafc", borderRadius: 11, padding: "14px 16px", border: "1px solid #e2e8f0" }}>
+                      <div style={{ background: "#F8FAFC", borderRadius: 11, padding: "14px 16px", border: "1px solid #E2E8F0" }}>
                         <div style={{ fontSize: 9, color: currentT.primaryColor, fontWeight: 700, letterSpacing: 1.5, marginBottom: 8 }}> PAYMENT HISTORY</div>
                         {inv.paymentHistory.map((p, i) => (
-                          <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 11, padding: "4px 0", borderBottom: i < inv.paymentHistory.length - 1 ? "1px solid #f1f5f9" : "none" }}>
-                            <span style={{ color: "#64748b" }}>{formatDate(p.date)}{p.category === "Advance" ? " (Advance)" : ""}</span>
-                            <span style={{ fontWeight: 700, color: "#0f172a" }}>{formatCurrency(p.amount, inv.currency)}</span>
+                          <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 11, padding: "4px 0", borderBottom: i < inv.paymentHistory.length - 1 ? "1px solid #EFF6FF" : "none" }}>
+                            <span style={{ color: "#64748B" }}>{formatDate(p.date)}{p.category === "Advance" ? " (Advance)" : ""}</span>
+                            <span style={{ fontWeight: 700, color: "#0F172A" }}>{formatCurrency(p.amount, inv.currency)}</span>
                           </div>
                         ))}
                       </div>
                     )}
                   </div>
-                  <div className="no-print" style={{ display: "flex", flexDirection: "column", alignItems: "center", background: "#f8fafc", borderRadius: 12, padding: "14px 16px", border: currentT.borderStyle || "1px solid #e2e8f0", minWidth: 140 }}>
+                  <div className="no-print" style={{ display: "flex", flexDirection: "column", alignItems: "center", background: "#F8FAFC", borderRadius: 12, padding: "14px 16px", border: currentT.borderStyle || "1px solid #E2E8F0", minWidth: 140 }}>
                     <div style={{ fontSize: 9, color: currentT.primaryColor, fontWeight: 700, letterSpacing: 1.5, marginBottom: 8, textAlign: "center" }}>SCAN INVOICE</div>
-                    <div style={{ background: "#fff", padding: 12, borderRadius: 8, border: currentT.borderStyle || "1px solid #e2e8f0" }}>
-                      <QRCodeSVG value={qrData} size={160} bgColor="#ffffff" fgColor={currentT.primaryColor} />
+                    <div style={{ background: "#FFFFFF", padding: 12, borderRadius: 8, border: currentT.borderStyle || "1px solid #E2E8F0" }}>
+                      <QRCodeSVG value={qrData} size={160} bgColor="#FFFFFF" fgColor={currentT.primaryColor} />
                     </div>
-                    <div style={{ fontSize: 8, color: "#9ca3af", marginTop: 7, textAlign: "center", fontWeight: 600 }}>{inv.invoiceNo}</div>
+                    <div style={{ fontSize: 8, color: "#64748B", marginTop: 7, textAlign: "center", fontWeight: 600 }}>{inv.invoiceNo}</div>
                   </div>
-                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", background: "#f8fafc", borderRadius: 12, padding: "14px 16px", border: currentT.borderStyle || "1px solid #e2e8f0", minWidth: 140, minHeight: 145 }}>
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", background: "#F8FAFC", borderRadius: 12, padding: "14px 16px", border: currentT.borderStyle || "1px solid #E2E8F0", minWidth: 140, minHeight: 145 }}>
                     <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 8 }}>
                       {inv.signature ? (
                         inv.signatureType === "image" ? (
@@ -419,9 +419,9 @@ export default function InvoiceViewer() {
                         <div style={{ height: 45 }} />
                       )}
                     </div>
-                    <div style={{ width: "100%", height: 1, background: currentT.borderStyle || "#e2e8f0", marginBottom: 4 }}></div>
-                    <div style={{ fontSize: 9, fontWeight: 700, color: "#1e293b", textAlign: "center" }}>{inv.companyName}</div>
-                    <div style={{ fontSize: 8, color: "#64748b", textAlign: "center", marginTop: 2 }}>Authorized Signatory</div>
+                    <div style={{ width: "100%", height: 1, background: currentT.borderStyle || "#E2E8F0", marginBottom: 4 }}></div>
+                    <div style={{ fontSize: 9, fontWeight: 700, color: "#1E293B", textAlign: "center" }}>{inv.companyName}</div>
+                    <div style={{ fontSize: 8, color: "#64748B", textAlign: "center", marginTop: 2 }}>Authorized Signatory</div>
                   </div>
                 </div>
               )}
@@ -429,10 +429,10 @@ export default function InvoiceViewer() {
               <div className="flex-spacer" style={{ flex: 1 }} />
 
               {/* Footer */}
-              <div style={{ background: "#f8fafc", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0, borderTop: currentT.borderStyle || "1px solid #e2e8f0" }}>
-                <div style={{ fontSize: 11, color: "#94a3b8" }}>{inv.companyName}</div>
+              <div style={{ background: "#F8FAFC", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0, borderTop: currentT.borderStyle || "1px solid #E2E8F0" }}>
+                <div style={{ fontSize: 11, color: "#64748B" }}>{inv.companyName}</div>
                 <div style={{ fontSize: 12, fontWeight: 700, color: currentT.primaryColor }}>Thank you for your business!</div>
-                <div style={{ fontSize: 11, color: "#94a3b8" }}>Page {pageIndex + 1} of {pages.length}</div>
+                <div style={{ fontSize: 11, color: "#64748B" }}>Page {pageIndex + 1} of {pages.length}</div>
               </div>
             </div>
           );

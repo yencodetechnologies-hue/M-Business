@@ -13,26 +13,26 @@
       --primary: var(--app-accent, var(--app-accent, #2563EB));
       --primary-dark: #2563EB;
       --primary-light: var(--teal-light, #EFF6FF);
-      --primary-mid: #B2EBF2;
-      --text-dark: #1A2332;
-      --text-mid: #4A5568;
-      --text-light: #718096;
-      --bg: #F0F4F8;
+      --primary-mid: #E2E8F0;
+      --text-dark: #1E293B;
+      --text-mid: #64748B;
+      --text-light: #64748B;
+      --bg: #EFF6FF;
       --white: #FFFFFF;
       --border: #E2E8F0;
       --green: #16A34A;
-      --green-light: #D1FAE5;
-      --green-dark: #065F46;
-      --orange: #F59E0B;
-      --orange-light: #FEF3C7;
-      --orange-dark: #92400E;
-      --red: #FF6B6B;
-      --red-dark: #EF4444;
-      --red-light: #FEE2E2;
-      --purple: #8B5CF6;
+      --green-light: #E2E8F0;
+      --green-dark: #1E293B;
+      --orange: #64748B;
+      --orange-light: #E2E8F0;
+      --orange-dark: #1E293B;
+      --red: #64748B;
+      --red-dark: #64748B;
+      --red-light: #E2E8F0;
+      --purple: #2563EB;
       --purple-light: #EFF6FF;
-      --blue: #3B82F6;
-      --blue-light: #DBEAFE;
+      --blue: #2563EB;
+      --blue-light: #E2E8F0;
       --radius: 14px;
       --shadow: 0 2px 12px rgba(37, 99, 235, .08);
       --shadow-lg: 0 8px 32px rgba(37, 99, 235, .14);
@@ -94,7 +94,7 @@
     }
 
     .logo-icon i {
-      color: #fff;
+      color: #FFFFFF;
       font-size: 17px;
     }
 
@@ -144,7 +144,7 @@
 
     .nav-item.active {
       background: var(--primary);
-      color: #fff;
+      color: #FFFFFF;
     }
 
     .sidebar-footer {
@@ -234,7 +234,7 @@
 
     .btn-primary {
       background: var(--primary);
-      color: #fff;
+      color: #FFFFFF;
     }
 
     .btn-primary:hover {
@@ -255,22 +255,22 @@
 
     .btn-green {
       background: var(--green);
-      color: #fff;
+      color: #FFFFFF;
     }
 
     .btn-green:hover {
-      background: #1aab6d;
+      background: #16A34A;
     }
 
     .btn-red {
-      background: var(--red-light);
-      color: var(--red-dark);
-      border: 1.5px solid #FCA5A5;
+      background: var(--app-accent-light);
+      color: var(--app-text);
+      border: 1.5px solid #E2E8F0;
     }
 
     .btn-red:hover {
-      background: var(--red-dark);
-      color: #fff;
+      background: var(--app-text);
+      color: #FFFFFF;
     }
 
     .btn-sm {
@@ -314,7 +314,7 @@
     }
 
     .kpi.expense {
-      border-left-color: var(--red);
+      border-left-color: var(--app-text);
     }
 
     .kpi.profit {
@@ -322,11 +322,11 @@
     }
 
     .kpi.pending {
-      border-left-color: var(--orange);
+      border-left-color: var(--app-muted);
     }
 
     .kpi.vendor {
-      border-left-color: var(--purple);
+      border-left-color: var(--app-accent);
     }
 
     .kpi-label {
@@ -358,7 +358,7 @@
     }
 
     .kpi-sub.down {
-      color: var(--red);
+      color: var(--app-text);
     }
 
     .kpi-sub.neutral {
@@ -403,7 +403,7 @@
     }
 
     tr:hover td {
-      background: #FAFCFE;
+      background: #F8FAFC;
     }
 
     /* BADGES */
@@ -423,8 +423,8 @@
     }
 
     .badge-expense {
-      background: var(--red-light);
-      color: var(--red-dark);
+      background: var(--app-accent-light);
+      color: var(--app-text);
     }
 
     .badge-paid {
@@ -433,18 +433,18 @@
     }
 
     .badge-pending {
-      background: var(--orange-light);
-      color: var(--orange-dark);
+      background: var(--app-accent-light);
+      color: var(--app-muted);
     }
 
     .badge-overdue {
-      background: var(--red-light);
-      color: var(--red-dark);
+      background: var(--app-accent-light);
+      color: var(--app-text);
     }
 
     .badge-partial {
       background: var(--blue-light);
-      color: #1E40AF;
+      color: #2563EB;
     }
 
     /* FORMS */
@@ -481,7 +481,7 @@
     .form-group select:focus,
     .form-group textarea:focus {
       border-color: var(--primary);
-      background: #fff;
+      background: #FFFFFF;
     }
 
     .form-2col {
@@ -630,11 +630,11 @@
     }
 
     .pf-green {
-      background: linear-gradient(90deg, var(--green), #059669);
+      background: linear-gradient(90deg, var(--green), #16A34A);
     }
 
     .pf-red {
-      background: linear-gradient(90deg, var(--red), #DC2626);
+      background: linear-gradient(90deg, var(--app-text), #64748B);
     }
 
     .pf-primary {
@@ -642,7 +642,7 @@
     }
 
     .pf-orange {
-      background: linear-gradient(90deg, var(--orange), #D97706);
+      background: linear-gradient(90deg, var(--app-muted), #64748B);
     }
 
     /* AVATAR */
@@ -652,7 +652,7 @@
       align-items: center;
       justify-content: center;
       font-weight: 800;
-      color: #fff;
+      color: #FFFFFF;
       flex-shrink: 0;
     }
 
@@ -681,7 +681,7 @@
 
     .toast {
       background: var(--text-dark);
-      color: #fff;
+      color: #FFFFFF;
       padding: 13px 20px;
       border-radius: 12px;
       font-size: 13px;
@@ -703,11 +703,11 @@
     }
 
     .toast.warning i {
-      color: var(--orange);
+      color: var(--app-muted);
     }
 
     .toast.error i {
-      color: var(--red);
+      color: var(--app-text);
     }
 
     @keyframes toastIn {
@@ -799,36 +799,36 @@
     }
 
     .exp-pdf {
-      background: var(--red-light);
-      color: var(--red-dark);
-      border-color: #FCA5A5;
+      background: var(--app-accent-light);
+      color: var(--app-text);
+      border-color: #E2E8F0;
     }
 
     .exp-pdf:hover {
-      background: var(--red-dark);
-      color: #fff;
+      background: var(--app-text);
+      color: #FFFFFF;
     }
 
     .exp-excel {
       background: var(--green-light);
       color: var(--green-dark);
-      border-color: #6EE7B7;
+      border-color: #64748B;
     }
 
     .exp-excel:hover {
       background: var(--green);
-      color: #fff;
+      color: #FFFFFF;
     }
 
     .exp-csv {
       background: var(--blue-light);
-      color: #1E40AF;
-      border-color: #93C5FD;
+      color: #2563EB;
+      border-color: #E2E8F0;
     }
 
     .exp-csv:hover {
       background: var(--blue);
-      color: #fff;
+      color: #FFFFFF;
     }
 
     /* LAYOUT HELPERS */
@@ -863,7 +863,7 @@
     }
 
     .amt-out {
-      color: var(--red-dark);
+      color: var(--app-text);
       font-weight: 800;
     }
 
@@ -874,12 +874,12 @@
 
     body {
       display: block;
-      background: #F0F4F8;
+      background: #EFF6FF;
     }
 
     .aud-topnav {
-      background: #1A2332;
-      border-bottom: 1px solid #2D3748;
+      background: #1E293B;
+      border-bottom: 1px solid #1E293B;
       padding: 0 32px;
       height: 62px;
       display: flex;
@@ -899,7 +899,7 @@
     .aud-brand-icon {
       width: 36px;
       height: 36px;
-      background: linear-gradient(135deg, #8B5CF6, #2563EB);
+      background: linear-gradient(135deg, #2563EB, #2563EB);
       border-radius: 10px;
       display: flex;
       align-items: center;
@@ -908,13 +908,13 @@
 
     .aud-brand-icon i {
       font-size: 18px;
-      color: #fff;
+      color: #FFFFFF;
     }
 
     .aud-brand-name {
       font-size: 16px;
       font-weight: 900;
-      color: #fff;
+      color: #FFFFFF;
     }
 
     .aud-brand-sub {
@@ -943,7 +943,7 @@
     }
 
     .aud-hero {
-      background: linear-gradient(135deg, #1A2332, #2D3748);
+      background: linear-gradient(135deg, #1E293B, #1E293B);
       border-radius: var(--radius);
       padding: 24px 28px;
       margin-bottom: 22px;
@@ -955,7 +955,7 @@
     .aud-hero-left h1 {
       font-size: 19px;
       font-weight: 900;
-      color: #fff;
+      color: #FFFFFF;
       margin-bottom: 4px;
     }
 
@@ -979,7 +979,7 @@
     .ahs .n {
       font-size: 20px;
       font-weight: 900;
-      color: #fff;
+      color: #FFFFFF;
     }
 
     .ahs .l {
@@ -1016,8 +1016,8 @@
     }
 
     .atab.active {
-      color: var(--purple);
-      border-bottom-color: var(--purple);
+      color: var(--app-accent);
+      border-bottom-color: var(--app-accent);
     }
 
     .atab:hover:not(.active) {
@@ -1025,8 +1025,8 @@
     }
 
     .tab-notif {
-      background: var(--red);
-      color: #fff;
+      background: var(--app-text);
+      color: #FFFFFF;
       font-size: 10px;
       font-weight: 800;
       border-radius: 20px;
@@ -1111,17 +1111,17 @@
     }
 
     .txn-type.out {
-      background: var(--red-light);
+      background: var(--app-accent-light);
     }
 
     .txn-type.out i {
-      color: var(--red-dark);
+      color: var(--app-text);
     }
 
     .flag-btn {
-      background: var(--orange-light);
-      color: var(--orange-dark);
-      border: 1px solid var(--orange);
+      background: var(--app-accent-light);
+      color: var(--app-muted);
+      border: 1px solid var(--app-muted);
       border-radius: 8px;
       padding: 4px 10px;
       font-size: 11px;
@@ -1131,14 +1131,14 @@
     }
 
     .flag-btn:hover {
-      background: var(--orange);
-      color: #fff;
+      background: var(--app-muted);
+      color: #FFFFFF;
     }
 
     .note-btn {
-      background: var(--purple-light);
-      color: var(--purple);
-      border: 1px solid var(--purple);
+      background: var(--app-accent-light);
+      color: var(--app-accent);
+      border: 1px solid var(--app-accent);
       border-radius: 8px;
       padding: 4px 10px;
       font-size: 11px;
@@ -1148,17 +1148,17 @@
     }
 
     .note-btn:hover {
-      background: var(--purple);
-      color: #fff;
+      background: var(--app-accent);
+      color: #FFFFFF;
     }
 
     .flagged-row td {
-      background: #FFFBEB !important;
+      background: #F8FAFC !important;
     }
 
     .audit-note {
       font-size: 11px;
-      color: var(--orange-dark);
+      color: var(--app-muted);
       font-style: italic;
       margin-top: 3px;
       display: flex;
@@ -1178,7 +1178,7 @@
     </div>
     <div style="display:flex;align-items:center;gap:10px;">
       <div class="aud-chip">
-        <div class="av av-sm" style="background:#8B5CF6;">RA</div>Rajan Auditors & Co.
+        <div class="av av-sm" style="background:#2563EB;">RA</div>Rajan Auditors & Co.
       </div>
       <div class="aud-chip" style="color:rgba(255,255,255,.5);cursor:pointer;"
         onclick="location.href='auditor-login.html'"><i class="ti ti-logout" style="font-size:14px;"></i>Logout</div>
@@ -1254,19 +1254,19 @@
       </div>
 
       <div
-        style="background:linear-gradient(135deg,#1A2332,#2D3748);border-radius:14px;padding:18px 22px;margin-bottom:18px;display:flex;align-items:center;gap:14px;">
+        style="background:linear-gradient(135deg,#1E293B,#1E293B);border-radius:14px;padding:18px 22px;margin-bottom:18px;display:flex;align-items:center;gap:14px;">
         <div
-          style="width:44px;height:44px;background:rgba(37, 99, 235,.3);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-          <i class="ti ti-upload" style="color:#8B5CF6;font-size:22px;"></i>
+          style="width:44px;height:44px;background:rgba(37, 99, 235, .3);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <i class="ti ti-upload" style="color:#2563EB;font-size:22px;"></i>
         </div>
         <div style="flex:1;">
-          <div style="font-size:14px;font-weight:800;color:#fff;">Last Import: HDFC ••••4821 — Jun 5, 2026</div>
+          <div style="font-size:14px;font-weight:800;color:#FFFFFF;">Last Import: HDFC ••••4821 — Jun 5, 2026</div>
           <div style="font-size:12px;color:rgba(255,255,255,.6);margin-top:2px;">144 transactions imported · 4
             duplicates skipped · 1 flagged for review</div>
         </div>
         <div style="display:flex;gap:8px;">
           <span
-            style="background:rgba(38,194,129,.2);border:1px solid rgba(38,194,129,.4);color:#6EE7B7;padding:5px 12px;border-radius:8px;font-size:12px;font-weight:700;">Yes
+            style="background:rgba(22, 163, 74, .2);border:1px solid rgba(22, 163, 74, .4);color:#64748B;padding:5px 12px;border-radius:8px;font-size:12px;font-weight:700;">Yes
             Reconciled</span>
           <button class="exp-btn exp-pdf" onclick="dlToast('Imported Statement','PDF')"><i
               class="ti ti-file-type-pdf"></i>Download</button>
@@ -1289,8 +1289,8 @@
         </div>
       </div>
       <div class="dl-card">
-        <div class="dl-icon" style="background:var(--red-light);"><i class="ti ti-arrow-bar-up"
-            style="color:var(--red-dark);"></i></div>
+        <div class="dl-icon" style="background:var(--app-accent-light);"><i class="ti ti-arrow-bar-up"
+            style="color:var(--app-text);"></i></div>
         <div>
           <div class="dl-title">Expense Statement</div>
           <div class="dl-meta">32 transactions · ₹9,87,500 total · June 2026</div>
@@ -1321,8 +1321,8 @@
         </div>
       </div>
       <div class="dl-card">
-        <div class="dl-icon" style="background:var(--orange-light);"><i class="ti ti-building-bank"
-            style="color:var(--orange);"></i></div>
+        <div class="dl-icon" style="background:var(--app-accent-light);"><i class="ti ti-building-bank"
+            style="color:var(--app-muted);"></i></div>
         <div>
           <div class="dl-title">Bank Statement — HDFC ••••4821</div>
           <div class="dl-meta">148 transactions · Closing ₹12,84,320 · June 2026</div>
@@ -1337,8 +1337,8 @@
         </div>
       </div>
       <div class="dl-card">
-        <div class="dl-icon" style="background:var(--purple-light);"><i class="ti ti-building-bank"
-            style="color:var(--purple);"></i></div>
+        <div class="dl-icon" style="background:var(--app-accent-light);"><i class="ti ti-building-bank"
+            style="color:var(--app-accent);"></i></div>
         <div>
           <div class="dl-title">Bank Statement — ICICI ••••7734</div>
           <div class="dl-meta">52 transactions · Closing ₹4,21,800 · June 2026</div>
@@ -1413,7 +1413,7 @@
               </tr>
               <tr>
                 <td>Jun 4</td>
-                <td style="color:var(--red-dark);font-weight:700;">EXP-062</td>
+                <td style="color:var(--app-text);font-weight:700;">EXP-062</td>
                 <td>AWS Cloud — June</td>
                 <td><span class="badge badge-expense">Expense</span></td>
                 <td class="amt-out">−₹42,000</td>
@@ -1427,7 +1427,7 @@
               </tr>
               <tr class="flagged-row" id="flaggedRow1">
                 <td>Jun 5</td>
-                <td style="color:var(--orange-dark);font-weight:700;">BANK-TXN</td>
+                <td style="color:var(--app-muted);font-weight:700;">BANK-TXN</td>
                 <td>Unknown Credit — IMPS<div class="audit-note"><i class="ti ti-flag"
                       style="font-size:11px;"></i>Flagged: Source unclear — needs clarification</div>
                 </td>
@@ -1437,7 +1437,7 @@
                 <td><span class="badge badge-pending">Unmatched</span></td>
                 <td>
                   <div style="display:flex;gap:5px;"><button class="flag-btn"
-                      style="background:var(--orange);color:#fff;border-color:var(--orange);">Flagged</button><button
+                      style="background:var(--app-muted);color:#FFFFFF;border-color:var(--app-muted);">Flagged</button><button
                       class="note-btn" onclick="addNote(this)"><i class="ti ti-message-2"
                         style="font-size:11px;"></i>Note</button></div>
                 </td>
@@ -1458,7 +1458,7 @@
               </tr>
               <tr>
                 <td>Jun 2</td>
-                <td style="color:var(--red-dark);font-weight:700;">EXP-063</td>
+                <td style="color:var(--app-text);font-weight:700;">EXP-063</td>
                 <td>Office Rent — June</td>
                 <td><span class="badge badge-expense">Expense</span></td>
                 <td class="amt-out">−₹75,000</td>
@@ -1472,7 +1472,7 @@
               </tr>
               <tr>
                 <td>Jun 1</td>
-                <td style="color:var(--red-dark);font-weight:700;">EXP-061</td>
+                <td style="color:var(--app-text);font-weight:700;">EXP-061</td>
                 <td>Salaries — June Payroll</td>
                 <td><span class="badge badge-expense">Expense</span></td>
                 <td class="amt-out">−₹5,40,000</td>
@@ -1522,7 +1522,7 @@
         </div>
         <div class="card">
           <div style="font-size:14px;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:7px;"><i
-              class="ti ti-building-bank" style="color:var(--purple);"></i>ICICI ••••7734</div>
+              class="ti ti-building-bank" style="color:var(--app-accent);"></i>ICICI ••••7734</div>
           <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
             <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--bg);">
               <span style="color:var(--text-light);">Opening Balance</span><span
@@ -1536,7 +1536,7 @@
             </div>
             <div style="display:flex;justify-content:space-between;padding:7px 0;"><span
                 style="font-weight:800;">Closing Balance</span><span
-                style="font-weight:900;color:var(--purple);font-size:15px;">₹4,21,800</span></div>
+                style="font-weight:900;color:var(--app-accent);font-size:15px;">₹4,21,800</span></div>
           </div>
           <div style="margin-top:14px;display:flex;gap:7px;">
             <button class="exp-btn exp-pdf" onclick="dlToast('ICICI Bank Statement','PDF')"><i
@@ -1567,21 +1567,21 @@
     <div id="atab-notes" style="display:none;">
       <div class="card" style="margin-bottom:18px;">
         <div style="font-size:14px;font-weight:800;margin-bottom:16px;display:flex;align-items:center;gap:7px;"><i
-            class="ti ti-message-2" style="color:var(--purple);"></i>Add Audit Note</div>
+            class="ti ti-message-2" style="color:var(--app-accent);"></i>Add Audit Note</div>
         <div class="form-group"><label>Transaction / Reference</label><input placeholder="e.g. INV-019 or EXP-063"
             class="inp"
             style="border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;font-family:Nunito,sans-serif;font-size:13px;width:100%;outline:none;background:var(--bg);"
-            onfocus="this.style.borderColor='var(--purple)'" onblur="this.style.borderColor='var(--border)'"></div>
+            onfocus="this.style.borderColor='var(--app-accent)'" onblur="this.style.borderColor='var(--border)'"></div>
         <div class="form-group"><label>Note / Remark</label><textarea
             placeholder="Enter your audit observation, query or remark here..."
             style="width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:Nunito,sans-serif;font-size:13px;color:var(--text-dark);background:var(--bg);outline:none;min-height:90px;resize:vertical;transition:border .15s;"
-            onfocus="this.style.borderColor='var(--purple)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+            onfocus="this.style.borderColor='var(--app-accent)'" onblur="this.style.borderColor='var(--border)'"></textarea>
         </div>
         <div style="display:flex;gap:10px;">
           <button class="btn"
-            style="background:var(--orange-light);color:var(--orange-dark);border:1px solid var(--orange);"
+            style="background:var(--app-accent-light);color:var(--app-muted);border:1px solid var(--app-muted);"
             onclick="saveNote('flag')"><i class="ti ti-flag"></i>Flag Transaction</button>
-          <button class="btn" style="background:var(--purple-light);color:var(--purple);border:1px solid var(--purple);"
+          <button class="btn" style="background:var(--app-accent-light);color:var(--app-accent);border:1px solid var(--app-accent);"
             onclick="saveNote('note')"><i class="ti ti-message-2"></i>Save Note</button>
         </div>
       </div>
@@ -1589,9 +1589,9 @@
       <div class="card">
         <div style="font-size:14px;font-weight:800;margin-bottom:16px;">Existing Notes & Flags</div>
         <div
-          style="padding:14px;background:var(--orange-light);border-radius:10px;border-left:4px solid var(--orange);margin-bottom:12px;">
+          style="padding:14px;background:var(--app-accent-light);border-radius:10px;border-left:4px solid var(--app-muted);margin-bottom:12px;">
           <div
-            style="font-size:12px;font-weight:800;color:var(--orange-dark);margin-bottom:4px;display:flex;align-items:center;gap:6px;">
+            style="font-size:12px;font-weight:800;color:var(--app-muted);margin-bottom:4px;display:flex;align-items:center;gap:6px;">
             <i class="ti ti-flag" style="font-size:14px;"></i>FLAGGED — BANK-TXN (Jun 5)
           </div>
           <div style="font-size:13px;color:var(--text-dark);">Unknown credit of ₹50,000 via IMPS. Source of funds
@@ -1600,9 +1600,9 @@
             &nbsp;·&nbsp; Jun 5, 2026 at 2:30 PM</div>
         </div>
         <div
-          style="padding:14px;background:var(--purple-light);border-radius:10px;border-left:4px solid var(--purple);">
+          style="padding:14px;background:var(--app-accent-light);border-radius:10px;border-left:4px solid var(--app-accent);">
           <div
-            style="font-size:12px;font-weight:800;color:var(--purple);margin-bottom:4px;display:flex;align-items:center;gap:6px;">
+            style="font-size:12px;font-weight:800;color:var(--app-accent);margin-bottom:4px;display:flex;align-items:center;gap:6px;">
             <i class="ti ti-message-2" style="font-size:14px;"></i>NOTE — EXP-063 (Jun 2)
           </div>
           <div style="font-size:13px;color:var(--text-dark);">Office rent payment verified against lease agreement.
@@ -1625,8 +1625,8 @@
     function dlToast(name, fmt) { toast(`Downloading ${name} as ${fmt}...`, "success"); }
     function flagRow(btn) {
       const row = btn.closest("tr");
-      row.style.background = "#FFFBEB";
-      btn.textContent = "Flagged"; btn.style.background = "var(--orange)"; btn.style.color = "#fff"; btn.style.borderColor = "var(--orange)";
+      row.style.background = "#F8FAFC";
+      btn.textContent = "Flagged"; btn.style.background = "var(--app-muted)"; btn.style.color = "#FFFFFF"; btn.style.borderColor = "var(--app-muted)";
       toast("Transaction flagged for review!", "warning");
     }
     function addNote(btn) { const n = prompt("Enter audit note:"); if (n) toast("Note saved: " + n, "success"); }

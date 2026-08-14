@@ -79,7 +79,7 @@ export default function FinDashboard() {
   };
   const maxCashflow = cashflow.length ? Math.max(...cashflow.map(m => Math.max(m.income, m.expense))) : 1;
   const pfColors = ['pf-red', 'pf-orange', 'pf-primary', ''];
-  const pfStyles = [null, null, null, { background: 'var(--purple)' }];
+  const pfStyles = [null, null, null, { background: 'var(--app-accent)' }];
 
   const openImport = () => {
     setIsImportModalOpen(true);
@@ -122,15 +122,15 @@ export default function FinDashboard() {
       <style>{`
 /* ── M Business Finance Design System ── */
 :root {
-  --primary: var(--app-accent, var(--app-accent, #2563EB)); --primary-dark:#2563EB; --primary-light:var(--teal-light, var(--teal-light, #EFF6FF)); --primary-mid:#B2EBF2;
-  --text-dark:#1A2332; --text-mid:#4A5568; --text-light:#718096;
-  --bg:#F0F4F8; --white:#FFFFFF; --border:#E2E8F0;
-  --green:#16A34A; --green-light:#D1FAE5; --green-dark:#065F46;
-  --orange:#F59E0B; --orange-light:#FEF3C7; --orange-dark:#92400E;
-  --red:#FF6B6B; --red-dark:#EF4444; --red-light:#FEE2E2;
-  --purple:#8B5CF6; --purple-light:#EFF6FF;
-  --blue:#3B82F6; --blue-light:#DBEAFE;
-  --radius:14px; --shadow:0 2px 12px rgba(37, 99, 235,.08); --shadow-lg:0 8px 32px rgba(37, 99, 235,.14);
+  --primary: var(--app-accent, var(--app-accent, #2563EB)); --primary-dark:#2563EB; --primary-light:var(--teal-light, var(--teal-light, #EFF6FF)); --primary-mid:#E2E8F0;
+  --text-dark:#1E293B; --text-mid:#64748B; --text-light:#64748B;
+  --bg:#EFF6FF; --white:#FFFFFF; --border:#E2E8F0;
+  --green:#16A34A; --green-light:#E2E8F0; --green-dark:#1E293B;
+  --orange:#64748B; --orange-light:#E2E8F0; --orange-dark:#1E293B;
+  --red:#64748B; --red-dark:#64748B; --red-light:#E2E8F0;
+  --purple:#2563EB; --purple-light:#EFF6FF;
+  --blue:#2563EB; --blue-light:#E2E8F0;
+  --radius:14px; --shadow:0 2px 12px rgba(37, 99, 235, .08); --shadow-lg:0 8px 32px rgba(37, 99, 235, .14);
 }
 * { box-sizing: border-box; }
 a { text-decoration: none; color: inherit; }
@@ -140,10 +140,10 @@ a { text-decoration: none; color: inherit; }
 .topbar-actions{display:flex;align-items:center;gap:10px;}
 .content{padding:26px;flex:1;}
 .btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:10px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .15s;}
-.btn-primary{background:var(--primary);color:#fff;}.btn-primary:hover{background:var(--primary-dark);}
+.btn-primary{background:var(--primary);color:#FFFFFF;}.btn-primary:hover{background:var(--primary-dark);}
 .btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text-mid);}.btn-outline:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-light);}
-.btn-green{background:var(--green);color:#fff;}.btn-green:hover{background:#1aab6d;}
-.btn-red{background:var(--red-light);color:var(--red-dark);border:1.5px solid #FCA5A5;}.btn-red:hover{background:var(--red-dark);color:#fff;}
+.btn-green{background:var(--green);color:#FFFFFF;}.btn-green:hover{background:#16A34A;}
+.btn-red{background:var(--app-accent-light);color:var(--app-text);border:1.5px solid #E2E8F0;}.btn-red:hover{background:var(--app-text);color:#FFFFFF;}
 .btn-sm{padding:6px 12px;font-size:12px;}
 .card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px 24px;}
 .kpi-grid{display:grid;gap:16px;margin-bottom:22px;}
@@ -156,52 +156,52 @@ a { text-decoration: none; color: inherit; }
 .kpi-value{font-size:19px;font-weight:900;color:var(--text-dark);line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .kpi-sub{font-size:10px;font-weight:600;display:flex;align-items:center;gap:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .kpi-sub.up{color:var(--green);}
-.kpi-sub.down{color:var(--red);}
+.kpi-sub.down{color:var(--app-text);}
 .kpi-sub.neutral{color:var(--text-light);}
-.kpi.income .kpi-icon{background:rgba(16,185,129,0.15);color:var(--green);}
-.kpi.expense .kpi-icon{background:rgba(220,38,38,0.15);color:var(--red-dark);}
-.kpi.profit .kpi-icon{background:rgba(37,99,235,0.15);color:var(--primary);}
-.kpi.pending .kpi-icon{background:rgba(245,158,11,0.15);color:#F59E0B;}
-.kpi.vendor .kpi-icon{background:rgba(37, 99, 235,0.15);color:var(--purple);}
+.kpi.income .kpi-icon{background:rgba(22, 163, 74, 0.15);color:var(--green);}
+.kpi.expense .kpi-icon{background:rgba(100, 116, 139, 0.15);color:var(--app-text);}
+.kpi.profit .kpi-icon{background:rgba(37, 99, 235, 0.15);color:var(--primary);}
+.kpi.pending .kpi-icon{background:rgba(100, 116, 139, 0.15);color:#64748B;}
+.kpi.vendor .kpi-icon{background:rgba(37, 99, 235, 0.15);color:var(--app-accent);}
 .table-wrap{overflow-x:auto;}
 table{width:100%;border-collapse:collapse;font-size:13px;}
 thead tr{background:var(--bg);}
 th{padding:10px 14px;text-align:left;font-size:11px;font-weight:800;color:var(--text-light);text-transform:uppercase;letter-spacing:.7px;white-space:nowrap;}
 td{padding:12px 14px;border-bottom:1px solid var(--bg);color:var(--text-dark);font-weight:600;}
 tr:last-child td{border-bottom:none;}
-tr:hover td{background:#FAFCFE;}
+tr:hover td{background:#F8FAFC;}
 .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
 .badge-income{background:var(--green-light);color:var(--green-dark);}
-.badge-expense{background:var(--red-light);color:var(--red-dark);}
+.badge-expense{background:var(--app-accent-light);color:var(--app-text);}
 .badge-paid{background:var(--green-light);color:var(--green-dark);}
-.badge-pending{background:var(--orange-light);color:var(--orange-dark);}
-.badge-overdue{background:var(--red-light);color:var(--red-dark);}
-.badge-partial{background:var(--blue-light);color:#1E40AF;}
+.badge-pending{background:var(--app-accent-light);color:var(--app-muted);}
+.badge-overdue{background:var(--app-accent-light);color:var(--app-text);}
+.badge-partial{background:var(--blue-light);color:#2563EB;}
 .progress-bg{background:var(--bg);border-radius:20px;height:8px;overflow:hidden;}
 .progress-fill{height:100%;border-radius:20px;}
-.pf-green{background:linear-gradient(90deg,var(--green),#059669);}
-.pf-red{background:linear-gradient(90deg,var(--red),#DC2626);}
+.pf-green{background:linear-gradient(90deg,var(--green),#16A34A);}
+.pf-red{background:linear-gradient(90deg,var(--app-text),#64748B);}
 .pf-primary{background:linear-gradient(90deg,var(--primary),var(--primary-dark));}
-.pf-orange{background:linear-gradient(90deg,var(--orange),#D97706);}
+.pf-orange{background:linear-gradient(90deg,var(--app-muted),#64748B);}
 .filter-sel{padding:9px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:600;color:var(--text-mid);background:var(--white);outline:none;cursor:pointer;}
 .filter-sel:focus{border-color:var(--primary);}
 .grid-main-side{display:grid;grid-template-columns:1fr 320px;gap:22px;}
 .amt-in{color:var(--green);font-weight:800;}
-.amt-out{color:var(--red-dark);font-weight:800;}
+.amt-out{color:var(--app-text);font-weight:800;}
 .amt-neutral{color:var(--text-dark);font-weight:800;}
 .imp-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
 .imp-modal-bg.open{display:flex;}
-.imp-modal{background:#fff;border-radius:20px;width:780px;max-width:96vw;max-height:92vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.22);animation:modalIn .2s ease;}
+.imp-modal{background:#FFFFFF;border-radius:20px;width:780px;max-width:96vw;max-height:92vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.22);animation:modalIn .2s ease;}
 @keyframes modalIn{from{opacity:0;transform:translateY(-16px) scale(.97)}to{opacity:1;transform:none}}
 .imp-header{background:linear-gradient(135deg,var(--primary),var(--primary-dark));padding:22px 28px;border-radius:20px 20px 0 0;}
-.imp-header h2{font-size:18px;font-weight:900;color:#fff;display:flex;align-items:center;gap:10px;margin-bottom:4px;}
+.imp-header h2{font-size:18px;font-weight:900;color:#FFFFFF;display:flex;align-items:center;gap:10px;margin-bottom:4px;}
 .imp-header p{font-size:13px;color:rgba(255,255,255,.8);}
 .imp-body{padding:24px 28px;}
 .imp-steps{display:flex;align-items:center;margin-bottom:26px;}
 .imp-step{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--text-light);}
 .imp-step-num{width:26px;height:26px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;}
-.imp-step.done .imp-step-num{background:var(--green);border-color:var(--green);color:#fff;}
-.imp-step.active .imp-step-num{background:var(--primary);border-color:var(--primary);color:#fff;}
+.imp-step.done .imp-step-num{background:var(--green);border-color:var(--green);color:#FFFFFF;}
+.imp-step.active .imp-step-num{background:var(--primary);border-color:var(--primary);color:#FFFFFF;}
 .imp-step.active{color:var(--text-dark);}
 .imp-step-line{flex:1;height:2px;background:var(--border);margin:0 8px;}
 .imp-step-line.done{background:var(--green);}
@@ -213,9 +213,9 @@ tr:hover td{background:#FAFCFE;}
 .drop-zone p{font-size:13px;color:var(--text-light);}
 .format-chips{display:flex;gap:8px;justify-content:center;margin-top:14px;flex-wrap:wrap;}
 .fmt-chip{padding:5px 14px;border-radius:20px;font-size:11px;font-weight:700;border:1.5px solid var(--border);color:var(--text-mid);}
-.fmt-chip.csv{background:#DBEAFE;border-color:#93C5FD;color:#1E40AF;}
-.fmt-chip.excel{background:var(--green-light);border-color:#6EE7B7;color:var(--green-dark);}
-.fmt-chip.pdf{background:var(--red-light);border-color:#FCA5A5;color:var(--red-dark);}
+.fmt-chip.csv{background:#E2E8F0;border-color:#E2E8F0;color:#2563EB;}
+.fmt-chip.excel{background:var(--green-light);border-color:#64748B;color:var(--green-dark);}
+.fmt-chip.pdf{background:var(--app-accent-light);border-color:#E2E8F0;color:var(--app-text);}
 .bank-selector{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;}
 .bs-opt{padding:14px 16px;border:2px solid var(--border);border-radius:12px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:10px;}
 .bs-opt:hover{border-color:var(--primary);background:var(--primary-light);}
@@ -233,9 +233,9 @@ tr:hover td{background:#FAFCFE;}
 .preview-table-wrap table{width:100%;border-collapse:collapse;font-size:12px;}
 .preview-table-wrap th{padding:8px 12px;background:var(--bg);font-size:10px;font-weight:800;color:var(--text-light);text-transform:uppercase;letter-spacing:.6px;position:sticky;top:0;}
 .preview-table-wrap td{padding:9px 12px;border-bottom:1px solid var(--bg);font-weight:600;}
-.preview-table-wrap tr:hover td{background:#FAFCFE;}
+.preview-table-wrap tr:hover td{background:#F8FAFC;}
 .row-in td:first-child{border-left:3px solid var(--green);}
-.row-out td:first-child{border-left:3px solid var(--red-dark);}
+.row-out td:first-child{border-left:3px solid var(--app-text);}
 .imp-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px;}
 .is-box{background:var(--bg);border-radius:10px;padding:12px;text-align:center;border:1.5px solid var(--border);}
 .is-num{font-size:18px;font-weight:900;color:var(--text-dark);}
@@ -262,7 +262,7 @@ tr:hover td{background:#FAFCFE;}
               style={{ cursor: 'pointer' }}
             />
 
-            <button className="btn btn-primary" style={{ background: 'var(--purple)' }}>
+            <button className="btn btn-primary" style={{ background: 'var(--app-accent)' }}>
               <i className="ti ti-shield-check"></i>Auditor Portal
             </button>
           </div>
@@ -271,10 +271,10 @@ tr:hover td{background:#FAFCFE;}
         <div className="content" ref={mainScrollRef}>
 
           {error && (
-            <div style={{ background: 'var(--red-light)', border: '1.5px solid #FCA5A5', borderRadius: '12px', padding: '16px 20px', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <i className="ti ti-alert-circle" style={{ color: 'var(--red-dark)', fontSize: '20px' }}></i>
-              <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--red-dark)' }}>{error}</span>
-              <button className="btn btn-sm" style={{ marginLeft: 'auto', background: 'var(--red-dark)', color: '#fff', border: 'none' }} onClick={fetchDashboardData}>Retry</button>
+            <div style={{ background: 'var(--app-accent-light)', border: '1.5px solid #E2E8F0', borderRadius: '12px', padding: '16px 20px', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <i className="ti ti-alert-circle" style={{ color: 'var(--app-text)', fontSize: '20px' }}></i>
+              <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--app-text)' }}>{error}</span>
+              <button className="btn btn-sm" style={{ marginLeft: 'auto', background: 'var(--app-text)', color: '#FFFFFF', border: 'none' }} onClick={fetchDashboardData}>Retry</button>
             </div>
           )}
           {(
@@ -338,8 +338,8 @@ tr:hover td{background:#FAFCFE;}
                         <span style={{ display: 'flex', alignItems: 'center', gap: '5px', color: 'var(--green)' }}>
                           <span style={{ width: '10px', height: '10px', background: 'var(--green)', borderRadius: '50%', display: 'inline-block' }}></span>Income
                         </span>
-                        <span style={{ display: 'flex', alignItems: 'center', gap: '5px', color: 'var(--red-dark)' }}>
-                          <span style={{ width: '10px', height: '10px', background: 'var(--red-dark)', borderRadius: '50%', display: 'inline-block' }}></span>Expenses
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '5px', color: 'var(--app-text)' }}>
+                          <span style={{ width: '10px', height: '10px', background: 'var(--app-text)', borderRadius: '50%', display: 'inline-block' }}></span>Expenses
                         </span>
                       </div>
                     </div>
@@ -358,7 +358,7 @@ tr:hover td{background:#FAFCFE;}
                             <div key={m.month} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px' }}>
                               <div style={{ display: 'flex', gap: '3px', alignItems: 'flex-end', height: '130px' }}>
                                 <div style={{ width: '14px', background: 'var(--green)', borderRadius: '4px 4px 0 0', height: `${incH}%`, opacity: isLast ? 1 : 0.85, boxShadow: isLast ? '0 0 0 2px var(--green-light)' : 'none' }}></div>
-                                <div style={{ width: '14px', background: 'var(--red-dark)', borderRadius: '4px 4px 0 0', height: `${expH}%`, opacity: isLast ? 1 : 0.85, boxShadow: isLast ? '0 0 0 2px var(--red-light)' : 'none' }}></div>
+                                <div style={{ width: '14px', background: 'var(--app-text)', borderRadius: '4px 4px 0 0', height: `${expH}%`, opacity: isLast ? 1 : 0.85, boxShadow: isLast ? '0 0 0 2px var(--app-accent-light)' : 'none' }}></div>
                               </div>
                               <div style={{ fontSize: '10px', color: isLast ? 'var(--primary)' : 'var(--text-light)', fontWeight: isLast ? 800 : 700 }}>{m.month}{isLast ? ' ●' : ''}</div>
                             </div>
@@ -410,9 +410,9 @@ tr:hover td{background:#FAFCFE;}
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                       {bankAccounts.map((acc, i) => (
-                        <div key={i} style={acc.primary ? { background: 'linear-gradient(135deg,var(--primary),var(--primary-dark))', borderRadius: '12px', padding: '14px 16px', color: '#fff' } : { background: 'var(--bg)', borderRadius: '12px', padding: '14px 16px', border: '1.5px solid var(--border)' }}>
+                        <div key={i} style={acc.primary ? { background: 'linear-gradient(135deg,var(--primary),var(--primary-dark))', borderRadius: '12px', padding: '14px 16px', color: '#FFFFFF' } : { background: 'var(--bg)', borderRadius: '12px', padding: '14px 16px', border: '1.5px solid var(--border)' }}>
                           <div style={{ fontSize: '10px', fontWeight: 700, opacity: acc.primary ? 0.8 : 1, color: acc.primary ? undefined : 'var(--text-light)', textTransform: 'uppercase', letterSpacing: '.7px' }}>{acc.bank} — {acc.type}</div>
-                          <div style={{ fontSize: '20px', fontWeight: 900, margin: '6px 0', color: acc.primary ? '#fff' : 'var(--text-dark)' }}>{fmt(acc.balance)}</div>
+                          <div style={{ fontSize: '20px', fontWeight: 900, margin: '6px 0', color: acc.primary ? '#FFFFFF' : 'var(--text-dark)' }}>{fmt(acc.balance)}</div>
                           <div style={{ fontSize: '11px', opacity: acc.primary ? 0.8 : 1, color: acc.primary ? undefined : 'var(--text-light)' }}>•••• •••• {acc.last4} · Synced {acc.synced}</div>
                         </div>
                       ))}
@@ -445,8 +445,8 @@ tr:hover td{background:#FAFCFE;}
                     <div style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-dark)', marginBottom: '12px' }}>Quick Actions</div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                       <button className="btn btn-outline" style={{ justifyContent: 'flex-start', fontSize: '13px' }}><i className="ti ti-arrow-bar-down" style={{ color: 'var(--green)' }}></i>Record Income</button>
-                      <button className="btn btn-outline" style={{ justifyContent: 'flex-start', fontSize: '13px' }}><i className="ti ti-arrow-bar-up" style={{ color: 'var(--red-dark)' }}></i>Add Expense</button>
-                      <button className="btn btn-outline" style={{ justifyContent: 'flex-start', fontSize: '13px' }}><i className="ti ti-truck" style={{ color: 'var(--purple)' }}></i>Manage Vendors</button>
+                      <button className="btn btn-outline" style={{ justifyContent: 'flex-start', fontSize: '13px' }}><i className="ti ti-arrow-bar-up" style={{ color: 'var(--app-text)' }}></i>Add Expense</button>
+                      <button className="btn btn-outline" style={{ justifyContent: 'flex-start', fontSize: '13px' }}><i className="ti ti-truck" style={{ color: 'var(--app-accent)' }}></i>Manage Vendors</button>
                       <button className="btn btn-outline" style={{ justifyContent: 'flex-start', fontSize: '13px' }} onClick={fetchDashboardData}><i className="ti ti-refresh" style={{ color: 'var(--primary)' }}></i>Refresh Data</button>
                     </div>
                   </div>
@@ -468,7 +468,7 @@ tr:hover td{background:#FAFCFE;}
                   background: 'rgba(255,255,255,0.2)', border: 'none',
                   borderRadius: '50%', width: '32px', height: '32px',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  cursor: 'pointer', color: '#fff', fontSize: '18px', fontWeight: 700,
+                  cursor: 'pointer', color: '#FFFFFF', fontSize: '18px', fontWeight: 700,
                   lineHeight: 1, transition: 'background .15s'
                 }}
                 onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.35)'}
@@ -493,8 +493,8 @@ tr:hover td{background:#FAFCFE;}
                   <div className="bank-selector">
                     {bankAccounts.map((acc) => (
                       <div key={acc.bank} className={`bs-opt ${selectedBank === acc.bank ? 'sel' : ''}`} onClick={() => handleBankSelect(acc.bank)}>
-                        <div className="bs-opt-icon" style={{ background: acc.primary ? 'var(--primary-light)' : 'var(--purple-light)' }}>
-                          <i className="ti ti-building-bank" style={{ color: acc.primary ? 'var(--primary)' : 'var(--purple)' }}></i>
+                        <div className="bs-opt-icon" style={{ background: acc.primary ? 'var(--primary-light)' : 'var(--app-accent-light)' }}>
+                          <i className="ti ti-building-bank" style={{ color: acc.primary ? 'var(--primary)' : 'var(--app-accent)' }}></i>
                         </div>
                         <div>
                           <div className="bs-opt-name">{acc.bank}</div>

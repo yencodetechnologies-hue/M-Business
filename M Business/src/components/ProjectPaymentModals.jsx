@@ -7,14 +7,14 @@ const overlayStyle = {
   display: 'flex', alignItems: 'center', justifyContent: 'center'
 };
 const modalStyle = {
-  background: '#fff', borderRadius: 14, width: 500, padding: 24,
+  background: '#FFFFFF', borderRadius: 14, width: 500, padding: 24,
   boxShadow: '0 8px 32px rgba(0,0,0,0.15)', boxSizing: 'border-box',
   maxHeight: '90vh', overflowY: 'auto'
 };
 const headerStyle = {
   display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20
 };
-const titleStyle = { margin: 0, fontSize: 18, color: '#1A2332', display: 'flex', alignItems: 'center', gap: 8 };
+const titleStyle = { margin: 0, fontSize: 18, color: '#1E293B', display: 'flex', alignItems: 'center', gap: 8 };
 const closeBtnStyle = { background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: '#64748B' };
 
 const labelStyle = { display: 'block', fontSize: 10, fontWeight: 800, color: '#64748B', textTransform: 'uppercase', letterSpacing: '.5px', marginBottom: 6 };
@@ -22,8 +22,8 @@ const inputStyle = { width: '100%', padding: '10px 12px', borderRadius: 8, borde
 const rowStyle = { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 };
 const btnRowStyle = { display: 'flex', justifyContent: 'center', gap: 12, marginTop: 24 };
 
-const submitBtnStyle = { padding: '10px 24px', background: ' var(--app-accent, var(--app-accent, #2563EB))', color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: 'pointer' };
-const cancelBtnStyle = { padding: '10px 24px', background: '#fff', color: '#4A5568', border: '1.5px solid #E2E8F0', borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: 'pointer' };
+const submitBtnStyle = { padding: '10px 24px', background: ' var(--app-accent, var(--app-accent, #2563EB))', color: '#FFFFFF', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: 'pointer' };
+const cancelBtnStyle = { padding: '10px 24px', background: '#FFFFFF', color: '#64748B', border: '1.5px solid #E2E8F0', borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: 'pointer' };
 
 export default function ProjectPaymentModals({
   project,
@@ -421,14 +421,14 @@ export default function ProjectPaymentModals({
                         <tr key={item.id}>
                           <td>
                             <input type="text" id={`item_${item.id}_description`} className="inv-creator-item-input desc" placeholder="Item description" value={item.description || ""} onChange={(e) => updItem(item.id, "description", e.target.value)} />
-                            {dErr && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 2 }}>Warning Required</div>}
+                            {dErr && <div style={{ fontSize: 11, color: "#64748B", marginTop: 2 }}>Warning Required</div>}
                           </td>
                           <td>
                             <input type="number" className="inv-creator-item-input num" value={item.quantity === 0 ? "" : item.quantity} onChange={(e) => updItem(item.id, "quantity", e.target.value === "" ? 0 : Number(e.target.value))} onWheel={(e) => e.target.blur()} />
                           </td>
                           <td>
                             <input type="number" id={`item_${item.id}_rate`} className="inv-creator-item-input num" value={item.rate === 0 ? "" : item.rate} onChange={(e) => updItem(item.id, "rate", e.target.value === "" ? 0 : Number(e.target.value))} onWheel={(e) => e.target.blur()} style={{ width: "90px" }} />
-                            {rErr && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 2 }}>Warning Required</div>}
+                            {rErr && <div style={{ fontSize: 11, color: "#64748B", marginTop: 2 }}>Warning Required</div>}
                           </td>
                           <td>
                             <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
@@ -491,7 +491,7 @@ export default function ProjectPaymentModals({
             {/* -- 4. PAYMENT TERMS & BANK DETAILS -- */}
             <div className="inv-creator-card">
               <div className="inv-creator-card-header">
-                <div className="inv-creator-card-icon" style={{ background: "var(--green-bg)", color: "var(--green)" }}><i className="ti ti-clock"></i></div>
+                <div className="inv-creator-card-icon" style={{ background: "var(--app-accent-light)", color: "var(--green)" }}><i className="ti ti-clock"></i></div>
                 <div className="inv-creator-card-title">Payment Terms & Bank Details</div>
               </div>
               <div className="inv-creator-card-body">
@@ -567,7 +567,7 @@ export default function ProjectPaymentModals({
 
             <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
               <input type="checkbox" id="notify-inv" checked={form.notifyClient || false} onChange={e => handleInputChange('notifyClient', e.target.checked)} />
-              <label htmlFor="notify-inv" style={{ fontSize: 12, color: '#4A5568', fontWeight: 600, cursor: 'pointer' }}>Send to Client Portal</label>
+              <label htmlFor="notify-inv" style={{ fontSize: 12, color: '#64748B', fontWeight: 600, cursor: 'pointer' }}>Send to Client Portal</label>
             </div>
 
             <div style={btnRowStyle}>
@@ -586,7 +586,7 @@ export default function ProjectPaymentModals({
         <div style={modalStyle}>
           <div style={headerStyle}>
             <h3 style={titleStyle}>
-              <div style={{ background: '#DCFCE7', color: '#22C55E', padding: 8, borderRadius: 8 }}><i className="ti ti-credit-card"></i></div>
+              <div style={{ background: '#E2E8F0', color: '#16A34A', padding: 8, borderRadius: 8 }}><i className="ti ti-credit-card"></i></div>
               Record Payment
             </h3>
             <button style={closeBtnStyle} onClick={closeModals}>✕</button>
@@ -703,7 +703,7 @@ export default function ProjectPaymentModals({
 
             <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
               <input type="checkbox" id="notify-pay" checked={form.notifyClient || false} onChange={e => handleInputChange('notifyClient', e.target.checked)} />
-              <label htmlFor="notify-pay" style={{ fontSize: 12, color: '#4A5568', fontWeight: 600, cursor: 'pointer' }}>Send to Client Portal </label>
+              <label htmlFor="notify-pay" style={{ fontSize: 12, color: '#64748B', fontWeight: 600, cursor: 'pointer' }}>Send to Client Portal </label>
             </div>
 
             <div style={btnRowStyle}>
@@ -722,7 +722,7 @@ export default function ProjectPaymentModals({
         <div style={modalStyle}>
           <div style={headerStyle}>
             <h3 style={titleStyle}>
-              <div style={{ background: '#EFF6FF', color: '#8B5CF6', padding: 8, borderRadius: 8 }}><i className="ti ti-pig-money"></i></div>
+              <div style={{ background: '#EFF6FF', color: '#2563EB', padding: 8, borderRadius: 8 }}><i className="ti ti-pig-money"></i></div>
               Add Advance Payment
             </h3>
             <button style={closeBtnStyle} onClick={closeModals}>✕</button>
@@ -766,7 +766,7 @@ export default function ProjectPaymentModals({
 
             <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
               <input type="checkbox" id="notify-adv" checked={form.notifyClient || false} onChange={e => handleInputChange('notifyClient', e.target.checked)} />
-              <label htmlFor="notify-adv" style={{ fontSize: 12, color: '#4A5568', fontWeight: 600, cursor: 'pointer' }}>Send to Client Portal </label>
+              <label htmlFor="notify-adv" style={{ fontSize: 12, color: '#64748B', fontWeight: 600, cursor: 'pointer' }}>Send to Client Portal </label>
             </div>
 
             <div style={btnRowStyle}>
@@ -785,7 +785,7 @@ export default function ProjectPaymentModals({
         <div style={modalStyle}>
           <div style={headerStyle}>
             <h3 style={titleStyle}>
-              <div style={{ background: '#FEF3C7', color: '#F59E0B', padding: 8, borderRadius: 8 }}>
+              <div style={{ background: '#E2E8F0', color: '#64748B', padding: 8, borderRadius: 8 }}>
                 <i className="ti ti-flag"></i>
               </div>
               Add Milestone Payment
@@ -856,7 +856,7 @@ export default function ProjectPaymentModals({
 
             <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
               <input type="checkbox" id="notify-mil" checked={form.notifyClient || false} onChange={e => handleInputChange('notifyClient', e.target.checked)} />
-              <label htmlFor="notify-mil" style={{ fontSize: 12, color: '#4A5568', fontWeight: 600, cursor: 'pointer' }}>
+              <label htmlFor="notify-mil" style={{ fontSize: 12, color: '#64748B', fontWeight: 600, cursor: 'pointer' }}>
                 Send to Client Portal
               </label>
             </div>
@@ -879,7 +879,7 @@ export default function ProjectPaymentModals({
         <div style={modalStyle}>
           <div style={headerStyle}>
             <h3 style={titleStyle}>
-              <div style={{ background: '#FFEDD5', color: '#F97316', padding: 8, borderRadius: 8 }}><i className="ti ti-circle-plus"></i></div>
+              <div style={{ background: '#E2E8F0', color: '#64748B', padding: 8, borderRadius: 8 }}><i className="ti ti-circle-plus"></i></div>
               Add Additional Charge
             </h3>
             <button style={closeBtnStyle} onClick={closeModals}>✕</button>
@@ -915,7 +915,7 @@ export default function ProjectPaymentModals({
 
             <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
               <input type="checkbox" id="notify-add" checked={form.notifyClient || false} onChange={e => handleInputChange('notifyClient', e.target.checked)} />
-              <label htmlFor="notify-add" style={{ fontSize: 12, color: '#4A5568', fontWeight: 600, cursor: 'pointer' }}>Send to Client Portal </label>
+              <label htmlFor="notify-add" style={{ fontSize: 12, color: '#64748B', fontWeight: 600, cursor: 'pointer' }}>Send to Client Portal </label>
             </div>
 
             <div style={btnRowStyle}>
@@ -934,7 +934,7 @@ export default function ProjectPaymentModals({
         <div style={modalStyle}>
           <div style={headerStyle}>
             <h3 style={titleStyle}>
-              <div style={{ background: '#F3F4F6', color: '#6B7280', padding: 8, borderRadius: 8 }}><i className="ti ti-receipt"></i></div>
+              <div style={{ background: '#F8FAFC', color: '#64748B', padding: 8, borderRadius: 8 }}><i className="ti ti-receipt"></i></div>
               Add Project Expense
             </h3>
             <button style={closeBtnStyle} onClick={closeModals}>✕</button>
@@ -978,7 +978,7 @@ export default function ProjectPaymentModals({
 
             <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
               <input type="checkbox" id="notify-exp" checked={form.notifyClient || false} onChange={e => handleInputChange('notifyClient', e.target.checked)} />
-              <label htmlFor="notify-exp" style={{ fontSize: 12, color: '#4A5568', fontWeight: 600, cursor: 'pointer' }}>Log to Project Updates</label>
+              <label htmlFor="notify-exp" style={{ fontSize: 12, color: '#64748B', fontWeight: 600, cursor: 'pointer' }}>Log to Project Updates</label>
             </div>
 
             <div style={btnRowStyle}>

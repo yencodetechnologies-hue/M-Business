@@ -103,7 +103,7 @@ function DraggableItem({ id, x, y, width, height, content, onDrag, onResize, onD
         left: x, top: y, width, height,
         border: isSelected ? `2px solid ${P.accent}` : `1px solid ${P.border}`,
         borderRadius: 8,
-        background: '#fff',
+        background: '#FFFFFF',
         cursor: isDragging ? 'grabbing' : 'grab',
         boxShadow: isSelected ? '0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237),0.25)' : '0 2px 8px rgba(0,0,0,0.08)',
         padding: 12,
@@ -122,7 +122,7 @@ function DraggableItem({ id, x, y, width, height, content, onDrag, onResize, onD
           style={{
             position: 'absolute', top: -10, right: -10,
             width: 22, height: 22, borderRadius: '50%',
-            background: '#e2445c', color: '#fff', border: 'none',
+            background: '#64748B', color: '#FFFFFF', border: 'none',
             cursor: 'pointer', fontSize: 13, fontWeight: 'bold',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             boxShadow: '0 2px 6px rgba(0,0,0,0.2)', zIndex: 20,
@@ -176,7 +176,7 @@ function CanvasSizeControls({ currentSize, onSizeChange }) {
 
   return (
     <div style={{
-      background: '#fff', border: `1px solid ${P.border}`,
+      background: '#FFFFFF', border: `1px solid ${P.border}`,
       borderRadius: 12, padding: 16, marginBottom: 16,
       boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
     }}>
@@ -195,7 +195,7 @@ function CanvasSizeControls({ currentSize, onSizeChange }) {
               flex: 1, padding: '8px 6px',
               border: `1.5px solid ${active ? P.accent : P.border}`,
               borderRadius: 8,
-              background: active ? P.light : '#fff',
+              background: active ? P.light : '#FFFFFF',
               color: active ? P.accent : P.muted,
               fontSize: 12, fontWeight: active ? 700 : 400,
               cursor: active ? 'default' : 'pointer',
@@ -221,7 +221,7 @@ function CanvasSizeControls({ currentSize, onSizeChange }) {
               style={{
                 padding: '7px 10px', border: `1px solid ${active ? P.accent : P.border}`,
                 borderRadius: 7, textAlign: 'left',
-                background: active ? P.light : '#fff',
+                background: active ? P.light : '#FFFFFF',
                 color: active ? P.accent : P.text,
                 fontSize: 12, cursor: 'pointer',
                 fontWeight: active ? 700 : 400,
@@ -230,7 +230,7 @@ function CanvasSizeControls({ currentSize, onSizeChange }) {
               }}
             >
               <span>{preset.name}</span>
-              <span style={{ fontSize: 10, color: active ? P.muted : '#c4b5fd' }}>
+              <span style={{ fontSize: 10, color: active ? P.muted : '#E2E8F0' }}>
                 {preset.width}✕{preset.height}
               </span>
             </button>
@@ -261,7 +261,7 @@ function CanvasSizeControls({ currentSize, onSizeChange }) {
           disabled={!isCustom}
           style={{
             padding: '6px 10px', background: isCustom ? P.accent : P.border,
-            color: isCustom ? '#fff' : P.muted, border: 'none',
+            color: isCustom ? '#FFFFFF' : P.muted, border: 'none',
             borderRadius: 6, fontSize: 11, cursor: isCustom ? 'pointer' : 'default',
             fontWeight: 600,
           }}
@@ -339,7 +339,7 @@ export default function CanvasPage() {
 
           {/* Items panel */}
           <div style={{
-            background: '#fff', border: `1px solid ${P.border}`,
+            background: '#FFFFFF', border: `1px solid ${P.border}`,
             borderRadius: 12, padding: 16,
             boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
           }}>
@@ -349,7 +349,7 @@ export default function CanvasPage() {
               style={{
                 width: '100%', padding: '8px 12px',
                 background: isAddingItem ? P.mid : P.accent,
-                color: '#fff', border: 'none', borderRadius: 8,
+                color: '#FFFFFF', border: 'none', borderRadius: 8,
                 fontSize: 12, fontWeight: 600, cursor: 'pointer', marginBottom: 10,
               }}
             >
@@ -378,7 +378,7 @@ export default function CanvasPage() {
                     style={{
                       padding: '6px 9px', borderRadius: 6,
                       border: `1px solid ${selectedItem === item.id ? P.accent : P.border}`,
-                      background: selectedItem === item.id ? P.light : '#fff',
+                      background: selectedItem === item.id ? P.light : '#FFFFFF',
                       fontSize: 12, color: P.text, cursor: 'pointer',
                       display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                     }}
@@ -406,7 +406,7 @@ export default function CanvasPage() {
             }}
             style={{
               width: canvasSize.width, height: canvasSize.height,
-              background: '#fff',
+              background: '#FFFFFF',
               border: `2px solid ${P.border}`,
               borderRadius: 8, position: 'relative',
               margin: '0 auto',

@@ -113,17 +113,17 @@ export default function QuotationViewer() {
   };
 
   if (error) return (
-    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f0fdf4", fontFamily: "'Plus Jakarta Sans', sans-serif", padding: 24 }}>
+    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#F8FAFC", fontFamily: "'Plus Jakarta Sans', sans-serif", padding: 24 }}>
       <div style={{ textAlign: "center" }}>
         <div style={{ fontSize: 48, marginBottom: 12 }}>Warning</div>
-        <div style={{ fontSize: 16, fontWeight: 700, color: "#064e3b" }}>{error}</div>
+        <div style={{ fontSize: 16, fontWeight: 700, color: "#1E293B" }}>{error}</div>
       </div>
     </div>
   );
 
   if (!data) return (
-    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f0fdf4", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-      <div style={{ textAlign: "center", fontSize: 14, color: "#10b981" }}>Loading quotation...</div>
+    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#F8FAFC", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+      <div style={{ textAlign: "center", fontSize: 14, color: "#16A34A" }}>Loading quotation...</div>
     </div>
   );
 
@@ -132,20 +132,20 @@ export default function QuotationViewer() {
   const qrData = window.location.href;
 
   return (
-    <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "#ecfdf5", minHeight: "100vh", padding: "20px 12px" }}>
+    <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "#EFF6FF", minHeight: "100vh", padding: "20px 12px" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
         * { box-sizing: border-box; }
-        .qt-paper { max-width: 794px; margin: 0 auto; background: #fff; border-radius: 18px; box-shadow: 0 24px 80px rgba(5,150,105,0.15); overflow: hidden; display: flex; flex-direction: column; min-height: 1050px; }
-        .qt-footer { background: #f8fafc; padding: 14px 32px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; border-top: 1px solid #e2e8f0; margin-top: auto; }
+        .qt-paper { max-width: 794px; margin: 0 auto; background: #FFFFFF; border-radius: 18px; box-shadow: 0 24px 80px rgba(22, 163, 74, 0.15); overflow: hidden; display: flex; flex-direction: column; min-height: 1050px; }
+        .qt-footer { background: #F8FAFC; padding: 14px 32px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; border-top: 1px solid #E2E8F0; margin-top: auto; }
         .qt-content-spacer { flex: 1; }
         .qt-print-footer { display: none; }
         @media print {
           @page { size: A4 portrait; margin: 0; }
           html { margin: 0 !important; padding: 0 !important; }
-          body { margin: 0 !important; padding: 0 !important; background: #fff !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+          body { margin: 0 !important; padding: 0 !important; background: #FFFFFF !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
           .no-print, .no-print * { display: none !important; }
-          body > div { padding: 0 !important; margin: 0 !important; background: #fff !important; }
+          body > div { padding: 0 !important; margin: 0 !important; background: #FFFFFF !important; }
           .qt-paper {
             width: 210mm !important;
             max-width: 210mm !important;
@@ -166,8 +166,8 @@ export default function QuotationViewer() {
             left: 0 !important;
             right: 0 !important;
             height: 42px !important;
-            background: #f8fafc !important;
-            border-top: 1px solid #e2e8f0 !important;
+            background: #F8FAFC !important;
+            border-top: 1px solid #E2E8F0 !important;
             padding: 0 32px !important;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
@@ -185,29 +185,29 @@ export default function QuotationViewer() {
 
       <div className="qt-paper">
         {/* Header */}
-        <div style={{ background: "#f8fafc", padding: "28px 32px", position: "relative", overflow: "hidden", flexShrink: 0, borderBottom: "1px solid #e2e8f0" }}>
-          <div style={{ position: "absolute", width: 240, height: 240, borderRadius: "50%", background: "radial-gradient(circle,rgba(5,150,105,0.05),transparent)", top: -80, right: -40, pointerEvents: "none" }} />
+        <div style={{ background: "#F8FAFC", padding: "28px 32px", position: "relative", overflow: "hidden", flexShrink: 0, borderBottom: "1px solid #E2E8F0" }}>
+          <div style={{ position: "absolute", width: 240, height: 240, borderRadius: "50%", background: "radial-gradient(circle,rgba(22, 163, 74, 0.05),transparent)", top: -80, right: -40, pointerEvents: "none" }} />
           <div className="qt-hgrid" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", position: "relative", zIndex: 1, gap: 20 }}>
             <div>
               {qt.logoUrl && (
                 <img src={qt.logoUrl} alt="logo" style={{ height: 85, borderRadius: 10, marginBottom: 12, objectFit: "contain" }} />
               )}
-              <div style={{ fontSize: 24, fontWeight: 900, color: "#064e3b", textTransform: "uppercase", letterSpacing: 1 }}>{qt.companyName}</div>
-              {qt.companyEmail && <div style={{ fontSize: 11, color: "#065f46", marginTop: 3 }}>{qt.companyEmail}</div>}
-              {qt.companyPhone && <div style={{ fontSize: 11, color: "#065f46", marginTop: 2 }}>{qt.companyPhone}</div>}
-              {qt.companyAddress && <div style={{ fontSize: 11, color: "#065f46", marginTop: 2 }}>{qt.companyAddress}</div>}
+              <div style={{ fontSize: 24, fontWeight: 900, color: "#1E293B", textTransform: "uppercase", letterSpacing: 1 }}>{qt.companyName}</div>
+              {qt.companyEmail && <div style={{ fontSize: 11, color: "#1E293B", marginTop: 3 }}>{qt.companyEmail}</div>}
+              {qt.companyPhone && <div style={{ fontSize: 11, color: "#1E293B", marginTop: 2 }}>{qt.companyPhone}</div>}
+              {qt.companyAddress && <div style={{ fontSize: 11, color: "#1E293B", marginTop: 2 }}>{qt.companyAddress}</div>}
             </div>
             <div style={{ textAlign: "right" }}>
-              <div style={{ fontSize: 32, fontWeight: 900, color: "rgba(5,150,105,0.1)", letterSpacing: -2, lineHeight: 1, marginBottom: 4 }}>QUOTATION</div>
-              <div style={{ fontSize: 16, fontWeight: 800, color: "#059669" }}>{qt.quoteNo}</div>
+              <div style={{ fontSize: 32, fontWeight: 900, color: "rgba(22, 163, 74, 0.1)", letterSpacing: -2, lineHeight: 1, marginBottom: 4 }}>QUOTATION</div>
+              <div style={{ fontSize: 16, fontWeight: 800, color: "#16A34A" }}>{qt.quoteNo}</div>
               <div style={{ marginTop: 14, display: "flex", gap: 20, justifyContent: "flex-end" }}>
                 <div style={{ textAlign: "right" }}>
-                  <div style={{ fontSize: 9, color: "#059669", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>DATE</div>
-                  <div style={{ fontSize: 12, color: "#064e3b", fontWeight: 700 }}>{formatDate(qt.date)}</div>
+                  <div style={{ fontSize: 9, color: "#16A34A", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>DATE</div>
+                  <div style={{ fontSize: 12, color: "#1E293B", fontWeight: 700 }}>{formatDate(qt.date)}</div>
                 </div>
                 <div style={{ textAlign: "right" }}>
-                  <div style={{ fontSize: 9, color: "#059669", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>VALID UNTIL</div>
-                  <div style={{ fontSize: 12, color: isExpired ? "#dc2626" : "#ea580c", fontWeight: 700 }}>{formatDate(qt.expiryDate)}</div>
+                  <div style={{ fontSize: 9, color: "#16A34A", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>VALID UNTIL</div>
+                  <div style={{ fontSize: 12, color: isExpired ? "#64748B" : "#64748B", fontWeight: 700 }}>{formatDate(qt.expiryDate)}</div>
                 </div>
               </div>
             </div>
@@ -215,15 +215,15 @@ export default function QuotationViewer() {
         </div>
 
         {/* Prepared for */}
-        <div className="qt-btgrid" style={{ display: "grid", gridTemplateColumns: qt.project ? "1fr 1fr" : "1fr", borderBottom: "2px solid #f0fdf4", flexShrink: 0 }}>
-          <div style={{ padding: "20px 32px", borderRight: qt.project ? "1px solid #f0fdf4" : "none" }}>
-            <div style={{ fontSize: 9, color: "#059669", fontWeight: 700, letterSpacing: 2, marginBottom: 10 }}>PREPARED FOR</div>
-            <div style={{ fontSize: 17, fontWeight: 800, color: "#111827" }}>{qt.client || "—"}</div>
+        <div className="qt-btgrid" style={{ display: "grid", gridTemplateColumns: qt.project ? "1fr 1fr" : "1fr", borderBottom: "2px solid #F8FAFC", flexShrink: 0 }}>
+          <div style={{ padding: "20px 32px", borderRight: qt.project ? "1px solid #F8FAFC" : "none" }}>
+            <div style={{ fontSize: 9, color: "#16A34A", fontWeight: 700, letterSpacing: 2, marginBottom: 10 }}>PREPARED FOR</div>
+            <div style={{ fontSize: 17, fontWeight: 800, color: "#0F172A" }}>{qt.client || "—"}</div>
           </div>
           {qt.project && (
             <div style={{ padding: "20px 32px" }}>
-              <div style={{ fontSize: 9, color: "#059669", fontWeight: 700, letterSpacing: 2, marginBottom: 10 }}>PROJECT</div>
-              <div style={{ fontSize: 15, fontWeight: 700, color: "#111827" }}>{qt.project}</div>
+              <div style={{ fontSize: 9, color: "#16A34A", fontWeight: 700, letterSpacing: 2, marginBottom: 10 }}>PROJECT</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: "#0F172A" }}>{qt.project}</div>
             </div>
           )}
         </div>
@@ -232,20 +232,20 @@ export default function QuotationViewer() {
         <div className="qt-table-wrap" style={{ padding: "22px 32px", overflowX: "auto", flexShrink: 0 }}>
           <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 360 }}>
             <thead>
-              <tr style={{ background: "linear-gradient(90deg,#f0fdf4,#f7fffe)" }}>
+              <tr style={{ background: "linear-gradient(90deg,#F8FAFC,#F8FAFC)" }}>
                 {["#", "Description", "Qty", "Unit Rate", "Amount"].map((h, i) => (
-                  <th key={i} style={{ padding: "9px 11px", fontSize: 9, fontWeight: 700, color: "#059669", letterSpacing: 1.5, borderBottom: "2px solid #d1fae5", textAlign: ["Amount", "Unit Rate", "Qty"].includes(h) ? "right" : "left" }}>{h.toUpperCase()}</th>
+                  <th key={i} style={{ padding: "9px 11px", fontSize: 9, fontWeight: 700, color: "#16A34A", letterSpacing: 1.5, borderBottom: "2px solid #E2E8F0", textAlign: ["Amount", "Unit Rate", "Qty"].includes(h) ? "right" : "left" }}>{h.toUpperCase()}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {items.map((item, idx) => (
-                <tr key={idx} style={{ borderBottom: "1px solid #f0fdf4" }}>
-                  <td style={{ padding: "12px 11px", color: "#6ee7b7", fontWeight: 700, fontSize: 12 }}>{String(idx + 1).padStart(2, "0")}</td>
-                  <td style={{ padding: "12px 11px", fontSize: 13, fontWeight: 600, color: "#111827" }}>{item.description || "—"}</td>
-                  <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{item.quantity}</td>
-                  <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{formatCurrency(item.rate, qt.currency)}</td>
-                  <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 14, fontWeight: 700, color: "#111827" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), qt.currency)}</td>
+                <tr key={idx} style={{ borderBottom: "1px solid #F8FAFC" }}>
+                  <td style={{ padding: "12px 11px", color: "#64748B", fontWeight: 700, fontSize: 12 }}>{String(idx + 1).padStart(2, "0")}</td>
+                  <td style={{ padding: "12px 11px", fontSize: 13, fontWeight: 600, color: "#0F172A" }}>{item.description || "—"}</td>
+                  <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#1E293B" }}>{item.quantity}</td>
+                  <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#1E293B" }}>{formatCurrency(item.rate, qt.currency)}</td>
+                  <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 14, fontWeight: 700, color: "#0F172A" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), qt.currency)}</td>
                 </tr>
               ))}
             </tbody>
@@ -258,14 +258,14 @@ export default function QuotationViewer() {
                 ["Total Amount", formatCurrency(total, qt.currency)],
                 ["Amount Paid", formatCurrency(qt.amountPaid, qt.currency)]
               ].map(([l, v]) => (
-                <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid #f0fdf4" }}>
-                  <span style={{ fontSize: 12, color: "#6b7280" }}>{l}</span>
-                  <span style={{ fontSize: 12, fontWeight: 600, color: "#111827" }}>{v}</span>
+                <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid #F8FAFC" }}>
+                  <span style={{ fontSize: 12, color: "#64748B" }}>{l}</span>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: "#0F172A" }}>{v}</span>
                 </div>
               ))}
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 16px", background: "#f8fafc", borderRadius: 12, marginTop: 8, border: "1.5px solid #e2e8f0" }}>
-                <span style={{ fontSize: 13, fontWeight: 800, color: "#64748b" }}>BALANCE DUE</span>
-                <span style={{ fontSize: 19, fontWeight: 900, color: "#064e3b" }}>{formatCurrency(balanceDue, qt.currency)}</span>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 16px", background: "#F8FAFC", borderRadius: 12, marginTop: 8, border: "1.5px solid #E2E8F0" }}>
+                <span style={{ fontSize: 13, fontWeight: 800, color: "#64748B" }}>BALANCE DUE</span>
+                <span style={{ fontSize: 19, fontWeight: 900, color: "#1E293B" }}>{formatCurrency(balanceDue, qt.currency)}</span>
               </div>
             </div>
           </div>
@@ -275,30 +275,30 @@ export default function QuotationViewer() {
         <div style={{ padding: "0 32px 24px", display: "grid", gridTemplateColumns: "1fr auto", gap: 16, alignItems: "flex-start", flexShrink: 0 }}>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {qt.notes && (
-              <div style={{ background: "#f0fdf4", borderRadius: 11, padding: "14px 16px", border: "1px solid #d1fae5" }}>
-                <div style={{ fontSize: 9, color: "#059669", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>Edit NOTES</div>
-                <div style={{ fontSize: 12, color: "#374151", lineHeight: 1.7 }}>{qt.notes}</div>
+              <div style={{ background: "#F8FAFC", borderRadius: 11, padding: "14px 16px", border: "1px solid #E2E8F0" }}>
+                <div style={{ fontSize: 9, color: "#16A34A", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>Edit NOTES</div>
+                <div style={{ fontSize: 12, color: "#1E293B", lineHeight: 1.7 }}>{qt.notes}</div>
               </div>
             )}
             {qt.terms && (
-              <div style={{ background: "#f0fdf4", borderRadius: 11, padding: "14px 16px", border: "1px solid #d1fae5" }}>
-                <div style={{ fontSize: 9, color: "#059669", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>Scroll TERMS</div>
-                <div style={{ fontSize: 12, color: "#374151", lineHeight: 1.7 }}>{qt.terms}</div>
+              <div style={{ background: "#F8FAFC", borderRadius: 11, padding: "14px 16px", border: "1px solid #E2E8F0" }}>
+                <div style={{ fontSize: 9, color: "#16A34A", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>Scroll TERMS</div>
+                <div style={{ fontSize: 12, color: "#1E293B", lineHeight: 1.7 }}>{qt.terms}</div>
               </div>
             )}
             {qt.upiId && (
-              <div style={{ background: "#f8fafc", borderRadius: 11, padding: "14px 16px", border: "1px solid #e2e8f0" }}>
-                <div style={{ fontSize: 9, color: "#059669", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}> UPI PAYMENT</div>
-                <div style={{ fontSize: 12, fontWeight: 700, color: "#111827" }}>{qt.upiId}</div>
+              <div style={{ background: "#F8FAFC", borderRadius: 11, padding: "14px 16px", border: "1px solid #E2E8F0" }}>
+                <div style={{ fontSize: 9, color: "#16A34A", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}> UPI PAYMENT</div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "#0F172A" }}>{qt.upiId}</div>
               </div>
             )}
           </div>
-          <div className="no-print" style={{ display: "flex", flexDirection: "column", alignItems: "center", background: "#f0fdf4", borderRadius: 12, padding: "14px 16px", border: "1px solid #d1fae5", minWidth: 110 }}>
-            <div style={{ fontSize: 8, color: "#059669", fontWeight: 700, letterSpacing: 1.5, marginBottom: 8, textAlign: "center" }}>SCAN QUOTE</div>
-            <div style={{ background: "#fff", padding: 6, borderRadius: 8, border: "1px solid #d1fae5" }}>
-              <QRCodeSVG value={qrData} size={88} bgColor="#ffffff" fgColor="#064e3b" />
+          <div className="no-print" style={{ display: "flex", flexDirection: "column", alignItems: "center", background: "#F8FAFC", borderRadius: 12, padding: "14px 16px", border: "1px solid #E2E8F0", minWidth: 110 }}>
+            <div style={{ fontSize: 8, color: "#16A34A", fontWeight: 700, letterSpacing: 1.5, marginBottom: 8, textAlign: "center" }}>SCAN QUOTE</div>
+            <div style={{ background: "#FFFFFF", padding: 6, borderRadius: 8, border: "1px solid #E2E8F0" }}>
+              <QRCodeSVG value={qrData} size={88} bgColor="#FFFFFF" fgColor="#1E293B" />
             </div>
-            <div style={{ fontSize: 8, color: "#9ca3af", marginTop: 7, textAlign: "center", fontWeight: 600 }}>{qt.quoteNo}</div>
+            <div style={{ fontSize: 8, color: "#64748B", marginTop: 7, textAlign: "center", fontWeight: 600 }}>{qt.quoteNo}</div>
           </div>
         </div>
 
@@ -307,17 +307,17 @@ export default function QuotationViewer() {
 
         {/* Footer visible on screen */}
         <div className="qt-footer">
-          <div style={{ fontSize: 11, color: "#94a3b8" }}>{qt.companyName}</div>
-          <div style={{ fontSize: 12, fontWeight: 700, color: "#059669" }}>{qt.footerMessage || "Thank you for your business!"}</div>
-          <div style={{ fontSize: 11, color: "#94a3b8" }}>{qt.quoteNo}</div>
+          <div style={{ fontSize: 11, color: "#64748B" }}>{qt.companyName}</div>
+          <div style={{ fontSize: 12, fontWeight: 700, color: "#16A34A" }}>{qt.footerMessage || "Thank you for your business!"}</div>
+          <div style={{ fontSize: 11, color: "#64748B" }}>{qt.quoteNo}</div>
         </div>
       </div>
 
       {/* Footer fixed at bottom of every print page — outside qt-paper */}
       <div className="qt-print-footer">
-        <div style={{ fontSize: 11, color: "#94a3b8" }}>{qt.companyName}</div>
-        <div style={{ fontSize: 12, fontWeight: 700, color: "#059669" }}>{qt.footerMessage || "Thank you for your business!"}</div>
-        <div style={{ fontSize: 11, color: "#94a3b8" }}>{qt.quoteNo}</div>
+        <div style={{ fontSize: 11, color: "#64748B" }}>{qt.companyName}</div>
+        <div style={{ fontSize: 12, fontWeight: 700, color: "#16A34A" }}>{qt.footerMessage || "Thank you for your business!"}</div>
+        <div style={{ fontSize: 11, color: "#64748B" }}>{qt.quoteNo}</div>
       </div>
     </div>
 

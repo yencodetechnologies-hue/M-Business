@@ -76,11 +76,11 @@ function formatDateTime(ts) {
 // ── Status Badge ---------------------------------------------
 function StatusBadge({ status }) {
   const map = {
-    paid: { bg: "#dcfce7", color: "#16a34a", label: "Success Paid" },
-    unpaid: { bg: "#fff7ed", color: "#ea580c", label: "Pending Unpaid" },
-    overdue: { bg: "#fee2e2", color: "#dc2626", label: " Overdue" },
-    draft: { bg: "var(--app-surface)", color: "#64748b", label: "Draft" },
-    sent: { bg: "#eff6ff", color: "#2563eb", label: "Sent" },
+    paid: { bg: "#E2E8F0", color: "#16A34A", label: "Success Paid" },
+    unpaid: { bg: "#F8FAFC", color: "#64748B", label: "Pending Unpaid" },
+    overdue: { bg: "#E2E8F0", color: "#64748B", label: " Overdue" },
+    draft: { bg: "var(--app-surface)", color: "#64748B", label: "Draft" },
+    sent: { bg: "#EFF6FF", color: "#2563EB", label: "Sent" },
     part_paid: { bg: "var(--app-bg)", color: "var(--app-accent)", label: "Cost Part Payment" },
   };
   const s = map[(status || "draft").toLowerCase()] || map.draft;
@@ -97,13 +97,13 @@ function ConfirmModal({ invoiceNo, onConfirm, onCancel }) {
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(8px)", zIndex: 2000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
       <div style={{ background: "var(--app-card)", borderRadius: 24, width: "100%", maxWidth: 380, padding: "32px", boxShadow: "var(--app-shadow)", textAlign: "center", border: "1px solid var(--app-border)" }}>
 
-        <h3 style={{ margin: "0 0 10px", fontSize: 18, fontWeight: 800, color: "#0f172a" }}>Delete Invoice?</h3>
-        <p style={{ color: "#64748b", fontSize: 14, margin: "0 0 24px", lineHeight: 1.5 }}>
+        <h3 style={{ margin: "0 0 10px", fontSize: 18, fontWeight: 800, color: "#0F172A" }}>Delete Invoice?</h3>
+        <p style={{ color: "#64748B", fontSize: 14, margin: "0 0 24px", lineHeight: 1.5 }}>
           Are you sure you want to delete <strong style={{ color: "var(--app-accent)" }}>{invoiceNo}</strong>?
         </p>
         <div style={{ display: "flex", gap: 12 }}>
-          <button onClick={onCancel} style={{ flex: 1, padding: "12px", background: "var(--app-surface)", border: "1px solid var(--app-border)", borderRadius: 12, fontSize: 14, fontWeight: 700, color: "#0f172a", cursor: "pointer", fontFamily: "inherit" }}>Cancel</button>
-          <button onClick={onConfirm} style={{ flex: 1, padding: "12px", background: "#ef4444", border: "none", borderRadius: 12, fontSize: 14, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Delete</button>
+          <button onClick={onCancel} style={{ flex: 1, padding: "12px", background: "var(--app-surface)", border: "1px solid var(--app-border)", borderRadius: 12, fontSize: 14, fontWeight: 700, color: "#0F172A", cursor: "pointer", fontFamily: "inherit" }}>Cancel</button>
+          <button onClick={onConfirm} style={{ flex: 1, padding: "12px", background: "#64748B", border: "none", borderRadius: 12, fontSize: 14, fontWeight: 700, color: "#FFFFFF", cursor: "pointer", fontFamily: "inherit" }}>Delete</button>
         </div>
       </div>
     </div>
@@ -114,7 +114,7 @@ function ConfirmModal({ invoiceNo, onConfirm, onCancel }) {
 function Toast({ msg }) {
   if (!msg) return null;
   return (
-    <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "var(--app-card)", border: "2px solid #22c55e", borderRadius: 16, padding: "14px 24px", fontSize: 14, fontWeight: 800, color: "#22c55e", boxShadow: "var(--app-shadow)", display: "flex", alignItems: "center", gap: 10, animation: "fadeInUp 0.3s ease-out" }}>
+    <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "var(--app-card)", border: "2px solid #16A34A", borderRadius: 16, padding: "14px 24px", fontSize: 14, fontWeight: 800, color: "#16A34A", boxShadow: "var(--app-shadow)", display: "flex", alignItems: "center", gap: 10, animation: "fadeInUp 0.3s ease-out" }}>
       <span></span>
       {msg}
     </div>
@@ -158,7 +158,7 @@ function deleteDraftLocal(invoiceNo) {
   localStorage.setItem(DRAFTS_KEY, JSON.stringify(drafts));
 }
 
-const T = { primary: "var(--app-sidebar)", sidebar: "#0f172a", accent: "var(--app-accent)", bg: "var(--app-bg)", card: "var(--app-card)", text: "#0f172a", muted: "#64748b", border: "var(--app-border)" };
+const T = { primary: "var(--app-sidebar)", sidebar: "#0F172A", accent: "var(--app-accent)", bg: "var(--app-bg)", card: "var(--app-card)", text: "#0F172A", muted: "#64748B", border: "var(--app-border)" };
 
 function CompanyDropdown({ clients, value, onChange, error, onAddCompany }) {
   const [search, setSearch] = useState("");
@@ -167,17 +167,17 @@ function CompanyDropdown({ clients, value, onChange, error, onAddCompany }) {
   const selected = clients.find(c => (c.clientName || c.name) === value);
   return (
     <div style={{ position: "relative", zIndex: open ? 1000 : 1 }}>
-      <div onClick={() => setOpen(!open)} style={{ width: "100%", border: `1.5px solid ${error ? "#EF4444" : open ? "var(--app-accent)" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 36px 10px 14px", fontSize: 13, color: value ? T.text : "#64748b", background: "var(--app-bg)", cursor: "pointer", userSelect: "none", boxSizing: "border-box", position: "relative", minHeight: 42 }}>
-        {value ? (<div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{value[0].toUpperCase()}</div><span>{value}</span>{selected?.companyName && <span style={{ fontSize: 11, color: "#64748b" }}>({selected.companyName})</span>}</div>) : "-- Select Company Name --"}
-        <span style={{ position: "absolute", right: 12, top: "50%", transform: `translateY(-50%) rotate(${open ? 180 : 0}deg)`, fontSize: 10, color: "#64748b", transition: "0.2s" }}>▼</span>
+      <div onClick={() => setOpen(!open)} style={{ width: "100%", border: `1.5px solid ${error ? "#64748B" : open ? "var(--app-accent)" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 36px 10px 14px", fontSize: 13, color: value ? T.text : "#64748B", background: "var(--app-bg)", cursor: "pointer", userSelect: "none", boxSizing: "border-box", position: "relative", minHeight: 42 }}>
+        {value ? (<div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{value[0].toUpperCase()}</div><span>{value}</span>{selected?.companyName && <span style={{ fontSize: 11, color: "#64748B" }}>({selected.companyName})</span>}</div>) : "-- Select Company Name --"}
+        <span style={{ position: "absolute", right: 12, top: "50%", transform: `translateY(-50%) rotate(${open ? 180 : 0}deg)`, fontSize: 10, color: "#64748B", transition: "0.2s" }}>▼</span>
       </div>
       {open && (
         <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "var(--app-card)", border: "1.5px solid var(--app-border)", borderRadius: 12, boxShadow: "var(--app-shadow)", zIndex: 999, overflow: "hidden" }}>
           <div style={{ padding: "10px 10px 6px" }}><div style={{ position: "relative" }}><span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12 }}></span><input autoFocus placeholder="Search company name..." value={search} onChange={e => setSearch(e.target.value)} onClick={e => e.stopPropagation()} style={{ width: "100%", padding: "7px 10px 7px 30px", border: "1.5px solid var(--app-border)", borderRadius: 8, fontSize: 12, background: "var(--app-bg)", color: T.text, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} /></div></div>
-          {onAddCompany && <div onClick={() => { setOpen(false); setSearch(""); onAddCompany(); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: "var(--app-surface)", borderBottom: "2px solid var(--app-border)" }}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 17, fontWeight: 700, flexShrink: 0 }}>+</div><div><div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>Add New Company Name</div></div></div>}
+          {onAddCompany && <div onClick={() => { setOpen(false); setSearch(""); onAddCompany(); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: "var(--app-surface)", borderBottom: "2px solid var(--app-border)" }}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 17, fontWeight: 700, flexShrink: 0 }}>+</div><div><div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>Add New Company Name</div></div></div>}
           <div style={{ maxHeight: 180, overflowY: "auto" }}>
-            {filtered.length === 0 ? <div style={{ padding: 14, textAlign: "center", color: "#64748b", fontSize: 13 }}>No companies found</div>
-              : filtered.map((c, i) => { const name = c.clientName || c.name || ""; const company = c.companyName || c.company || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "var(--app-surface)" : "transparent", borderBottom: "1px solid var(--app-border)" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-surface)"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "var(--app-surface)" : "transparent"}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0, overflow: "hidden" }}>{name[0]?.toUpperCase() || "?"}</div><div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</div>{company && <div style={{ fontSize: 11, color: "#64748b" }}>{company}</div>}</div></div>); })}
+            {filtered.length === 0 ? <div style={{ padding: 14, textAlign: "center", color: "#64748B", fontSize: 13 }}>No companies found</div>
+              : filtered.map((c, i) => { const name = c.clientName || c.name || ""; const company = c.companyName || c.company || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "var(--app-surface)" : "transparent", borderBottom: "1px solid var(--app-border)" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-surface)"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "var(--app-surface)" : "transparent"}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 11, fontWeight: 700, flexShrink: 0, overflow: "hidden" }}>{name[0]?.toUpperCase() || "?"}</div><div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</div>{company && <div style={{ fontSize: 11, color: "#64748B" }}>{company}</div>}</div></div>); })}
           </div>
         </div>
       )}
@@ -192,17 +192,17 @@ function ProjectDropdown({ projects, value, onChange, onAddProject, disabled }) 
   const filtered = projects.filter(p => (p.name || "").toLowerCase().includes(search.toLowerCase()));
   return (
     <div style={{ position: "relative", zIndex: open ? 1000 : 1 }}>
-      <div onClick={() => { if (!disabled) setOpen(!open) }} style={{ width: "100%", border: `1.5px solid ${open ? "var(--app-accent)" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 36px 10px 14px", fontSize: 13, color: value ? T.text : "#64748b", background: "var(--app-bg)", cursor: disabled ? "not-allowed" : "pointer", userSelect: "none", boxSizing: "border-box", position: "relative", minHeight: 42, opacity: disabled ? 0.5 : 1 }}>
-        {value ? (<div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{value[0].toUpperCase()}</div><span>{value}</span></div>) : "-- Select Project --"}
-        <span style={{ position: "absolute", right: 12, top: "50%", transform: `translateY(-50%) rotate(${open ? 180 : 0}deg)`, fontSize: 10, color: "#64748b", transition: "0.2s" }}>▼</span>
+      <div onClick={() => { if (!disabled) setOpen(!open) }} style={{ width: "100%", border: `1.5px solid ${open ? "var(--app-accent)" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 36px 10px 14px", fontSize: 13, color: value ? T.text : "#64748B", background: "var(--app-bg)", cursor: disabled ? "not-allowed" : "pointer", userSelect: "none", boxSizing: "border-box", position: "relative", minHeight: 42, opacity: disabled ? 0.5 : 1 }}>
+        {value ? (<div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{value[0].toUpperCase()}</div><span>{value}</span></div>) : "-- Select Project --"}
+        <span style={{ position: "absolute", right: 12, top: "50%", transform: `translateY(-50%) rotate(${open ? 180 : 0}deg)`, fontSize: 10, color: "#64748B", transition: "0.2s" }}>▼</span>
       </div>
       {open && (
         <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "var(--app-card)", border: "1.5px solid var(--app-border)", borderRadius: 12, boxShadow: "var(--app-shadow)", zIndex: 999, overflow: "hidden" }}>
           <div style={{ padding: "10px 10px 6px" }}><div style={{ position: "relative" }}><span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12 }}></span><input autoFocus placeholder="Search project..." value={search} onChange={e => setSearch(e.target.value)} onClick={e => e.stopPropagation()} style={{ width: "100%", padding: "7px 10px 7px 30px", border: "1.5px solid var(--app-border)", borderRadius: 8, fontSize: 12, background: "var(--app-bg)", color: T.text, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} /></div></div>
-          {onAddProject && <div onClick={() => { setOpen(false); setSearch(""); onAddProject(); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: "var(--app-surface)", borderBottom: "2px solid var(--app-border)" }}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 17, fontWeight: 700, flexShrink: 0 }}>+</div><div><div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>Add New Project</div></div></div>}
+          {onAddProject && <div onClick={() => { setOpen(false); setSearch(""); onAddProject(); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: "var(--app-surface)", borderBottom: "2px solid var(--app-border)" }}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 17, fontWeight: 700, flexShrink: 0 }}>+</div><div><div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>Add New Project</div></div></div>}
           <div style={{ maxHeight: 180, overflowY: "auto" }}>
-            {filtered.length === 0 ? <div style={{ padding: 14, textAlign: "center", color: "#64748b", fontSize: 13 }}>No projects found</div>
-              : filtered.map((p, i) => { const name = p.name || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "var(--app-surface)" : "transparent", borderBottom: "1px solid var(--app-border)" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-surface)"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "var(--app-surface)" : "transparent"}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0, overflow: "hidden" }}>{name[0]?.toUpperCase() || "?"}</div><div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</div></div></div>); })}
+            {filtered.length === 0 ? <div style={{ padding: 14, textAlign: "center", color: "#64748B", fontSize: 13 }}>No projects found</div>
+              : filtered.map((p, i) => { const name = p.name || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "var(--app-surface)" : "transparent", borderBottom: "1px solid var(--app-border)" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-surface)"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "var(--app-surface)" : "transparent"}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 11, fontWeight: 700, flexShrink: 0, overflow: "hidden" }}>{name[0]?.toUpperCase() || "?"}</div><div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</div></div></div>); })}
           </div>
         </div>
       )}
@@ -232,8 +232,8 @@ function CanvasSignature({ onSave }) {
     const ctx = canvas.getContext("2d");
     ctx.scale(dpr, dpr);
 
-    ctx.strokeStyle = "#1e293b";
-    ctx.fillStyle = "#1e293b";
+    ctx.strokeStyle = "#1E293B";
+    ctx.fillStyle = "#1E293B";
     ctx.lineWidth = 3.5;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
@@ -334,7 +334,7 @@ function CanvasSignature({ onSave }) {
         ref={canvasRef}
         width={340}
         height={150}
-        style={{ border: "1.5px dashed #E2E8F0", borderRadius: 8, background: "#fff", cursor: "crosshair", width: "100%", height: 150, display: "block" }}
+        style={{ border: "1.5px dashed #E2E8F0", borderRadius: 8, background: "#FFFFFF", cursor: "crosshair", width: "100%", height: 150, display: "block" }}
         onMouseDown={startDrawing}
         onMouseMove={draw}
         onMouseUp={stopDrawing}
@@ -344,8 +344,8 @@ function CanvasSignature({ onSave }) {
         onTouchEnd={stopDrawing}
       />
       <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
-        <button type="button" onClick={clear} style={{ padding: "5px 12px", fontSize: 11, background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 6, cursor: "pointer", fontWeight: "700", color: "#374151" }}>Clear</button>
-        <button type="button" onClick={save} style={{ padding: "5px 12px", fontSize: 11, background: "var(--teal)", color: "#fff", border: "none", borderRadius: 6, cursor: "pointer", fontWeight: "800" }}>Apply Signature</button>
+        <button type="button" onClick={clear} style={{ padding: "5px 12px", fontSize: 11, background: "#FFFFFF", border: "1.5px solid #E2E8F0", borderRadius: 6, cursor: "pointer", fontWeight: "700", color: "#1E293B" }}>Clear</button>
+        <button type="button" onClick={save} style={{ padding: "5px 12px", fontSize: 11, background: "var(--teal)", color: "#FFFFFF", border: "none", borderRadius: 6, cursor: "pointer", fontWeight: "800" }}>Apply Signature</button>
       </div>
     </div>
   );
@@ -364,7 +364,7 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
       <style>{`
      @media print {
           @page { size: A4 portrait; margin: 6mm; }
-          html, body { margin: 0 !important; padding: 0 !important; height: auto !important; overflow: visible !important; background: #fff !important; }
+          html, body { margin: 0 !important; padding: 0 !important; height: auto !important; overflow: visible !important; background: #FFFFFF !important; }
           .invoice-preview-modal-wrap {
             max-height: none !important;
             overflow: visible !important;
@@ -393,7 +393,7 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
         const isLastPage = pageIdx === pages.length - 1;
         const startIndex = pageIdx * INVOICE_ROWS_PER_PAGE;
         return (
-          <div key={pageIdx} className="invoice-preview invoice-paper" style={{ padding: "48px", fontFamily: currentT.fontFamily, fontSize: "13px", color: "#1E293B", background: "#fff", display: "flex", flexDirection: "column", marginBottom: isLastPage ? 0 : 20, "--live-preview-padding": "48px" }}>
+          <div key={pageIdx} className="invoice-preview invoice-paper" style={{ padding: "48px", fontFamily: currentT.fontFamily, fontSize: "13px", color: "#1E293B", background: "#FFFFFF", display: "flex", flexDirection: "column", marginBottom: isLastPage ? 0 : 20, "--live-preview-padding": "48px" }}>
 
             {isFirstPage ? (
               <>
@@ -402,14 +402,14 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
                     {effectiveLogo ? (
                       <img src={effectiveLogo} alt="logo" style={{ height: 72, maxWidth: "180px", width: "auto", borderRadius: 6, objectFit: "contain", display: "block" }} />
                     ) : (
-                      <div className="inv-logo-box" style={{ width: "72px", height: "72px", borderRadius: "8px", background: currentT.logoColor, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "26px", fontWeight: "900", color: "#fff" }}>
+                      <div className="inv-logo-box" style={{ width: "72px", height: "72px", borderRadius: "8px", background: currentT.logoColor, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "26px", fontWeight: "900", color: "#FFFFFF" }}>
                         {effectiveCompanyName ? effectiveCompanyName[0].toUpperCase() : "YT"}
                       </div>
                     )}
                   </div>
                   <div className="inv-title-area" style={{ textAlign: "right" }}>
-                    <div className="inv-company-name" style={{ fontSize: "12px", fontWeight: "700", color: "#0f172a", textTransform: "uppercase", letterSpacing: 0.5 }}>{inv.companyName || effectiveCompanyName}</div>
-                    <div className="inv-company-details" style={{ fontSize: "12px", fontWeight: "700", color: "#0f172a", lineHeight: "1.6", marginTop: "3px" }}>
+                    <div className="inv-company-name" style={{ fontSize: "12px", fontWeight: "700", color: "#0F172A", textTransform: "uppercase", letterSpacing: 0.5 }}>{inv.companyName || effectiveCompanyName}</div>
+                    <div className="inv-company-details" style={{ fontSize: "12px", fontWeight: "700", color: "#0F172A", lineHeight: "1.6", marginTop: "3px" }}>
                       {inv.companyAddress && <div>{inv.companyAddress}</div>}
                       {inv.fromGST && <div>GSTIN: {inv.fromGST}</div>}
                     </div>
@@ -417,68 +417,68 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
                 </div>
                 <div className="inv-title-word" id="inv-title-anchor" style={{ fontSize: "28px", fontWeight: "600", color: currentT.primaryColor, letterSpacing: "-.5px", textAlign: "center", marginTop: 2, marginBottom: 2, transform: "translateX(-30px)" }}>INVOICE</div>
                 {/* BILL TO + INVOICE DETAILS BOX */}
-                <div className="inv-parties" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px", padding: "14px 18px", border: "1.5px solid #000000", marginBottom: "24px", alignItems: "start" }}>
+                <div className="inv-parties" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px", padding: "14px 18px", border: "1.5px solid #0F172A", marginBottom: "24px", alignItems: "start" }}>
                   <div>
-                    <div className="inv-party-label" style={{ fontSize: "12px", fontWeight: "700", color: "#0f172a", letterSpacing: ".8px", marginBottom: "5px" }}>Bill To</div>
-                    <div className="inv-party-name" style={{ fontSize: "12px", fontWeight: "700", color: "#0f172a", textTransform: "uppercase", }}>{inv.client || "— Client Name —"}</div>
-                    <div className="inv-party-detail" style={{ fontSize: "12px", color: "#0f172a", lineHeight: "1.5", marginTop: "3px" }}>
+                    <div className="inv-party-label" style={{ fontSize: "12px", fontWeight: "700", color: "#0F172A", letterSpacing: ".8px", marginBottom: "5px" }}>Bill To</div>
+                    <div className="inv-party-name" style={{ fontSize: "12px", fontWeight: "700", color: "#0F172A", textTransform: "uppercase", }}>{inv.client || "— Client Name —"}</div>
+                    <div className="inv-party-detail" style={{ fontSize: "12px", color: "#0F172A", lineHeight: "1.5", marginTop: "3px" }}>
 
-                      {selectedClient?.address && <div style={{ color: "#0f172a", fontSize: "12px" }}>{selectedClient.address}</div>}
-                      {inv.fromGST && <div style={{ color: "#0f172a", fontSize: "12px" }}>GSTIN: {inv.fromGST}</div>}
+                      {selectedClient?.address && <div style={{ color: "#0F172A", fontSize: "12px" }}>{selectedClient.address}</div>}
+                      {inv.fromGST && <div style={{ color: "#0F172A", fontSize: "12px" }}>GSTIN: {inv.fromGST}</div>}
                     </div>           {inv.project && (
                       <div style={{ marginTop: 8 }}>
-                        <div className="inv-party-label" style={{ fontSize: "12px", fontWeight: "700", color: "#0f172a", letterSpacing: ".8px", marginBottom: "3px" }}>Project</div>
-                        <div className="inv-party-name" style={{ fontSize: "12px", fontWeight: "700", color: "#0f172a" }}>{inv.project}</div>
+                        <div className="inv-party-label" style={{ fontSize: "12px", fontWeight: "700", color: "#0F172A", letterSpacing: ".8px", marginBottom: "3px" }}>Project</div>
+                        <div className="inv-party-name" style={{ fontSize: "12px", fontWeight: "700", color: "#0F172A" }}>{inv.project}</div>
                       </div>
                     )}
                   </div>
-                  <div style={{ fontSize: "13px", color: "#0f172a", display: "flex", flexDirection: "column", textAlign: "left", alignSelf: "start", marginLeft: 80, width: "fit-content" }}>
-                    <div><strong style={{ color: "#0f172a" }}>Invoice No:</strong> {inv.invoiceNo}</div>
-                    <div><strong style={{ color: "#0f172a" }}>Invoice Date:</strong> {inv.date ? new Date(inv.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : "—"}</div>
-                    <div><strong style={{ color: "#0f172a" }}>Place of Supply:</strong> {inv.placeOfSupply || "—"}</div>
-                    <div><strong style={{ color: "#0f172a" }}>Due Date:</strong> {inv.dueDate ? new Date(inv.dueDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : "—"}</div>
+                  <div style={{ fontSize: "13px", color: "#0F172A", display: "flex", flexDirection: "column", textAlign: "left", alignSelf: "start", marginLeft: 80, width: "fit-content" }}>
+                    <div><strong style={{ color: "#0F172A" }}>Invoice No:</strong> {inv.invoiceNo}</div>
+                    <div><strong style={{ color: "#0F172A" }}>Invoice Date:</strong> {inv.date ? new Date(inv.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : "—"}</div>
+                    <div><strong style={{ color: "#0F172A" }}>Place of Supply:</strong> {inv.placeOfSupply || "—"}</div>
+                    <div><strong style={{ color: "#0F172A" }}>Due Date:</strong> {inv.dueDate ? new Date(inv.dueDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : "—"}</div>
                   </div>
                 </div>
               </>
             ) : (
               /* CONTINUATION PAGES: minimal identifier only, no logo/Bill To/invoice meta repeated */
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", paddingBottom: "10px", borderBottom: "1px solid var(--app-border)" }}>
-                <div style={{ fontSize: "12px", fontWeight: "800", color: "#0f172a" }}>Invoice #{inv.invoiceNo}</div>
+                <div style={{ fontSize: "12px", fontWeight: "800", color: "#0F172A" }}>Invoice #{inv.invoiceNo}</div>
 
               </div>
             )}
 
             {/* ITEMS TABLE */}
-            <table className="inv-items-table" style={{ width: "100%", borderCollapse: "collapse", marginBottom: "24px", border: "1px solid #cbd5e1" }}>
+            <table className="inv-items-table" style={{ width: "100%", borderCollapse: "collapse", marginBottom: "24px", border: "1px solid #E2E8F0" }}>
               <thead>
                 <tr>
-                  <th style={{ padding: "10px 14px", fontSize: "11px", fontWeight: "700", color: "#fff", textAlign: "center", width: "5%", background: currentT.primaryColor, border: "1px solid rgba(255,255,255,0.3)" }}>S.No</th>
-                  <th style={{ padding: "10px 14px", fontSize: "11px", fontWeight: "700", color: "#fff", textAlign: "left", width: "40%", background: currentT.primaryColor, border: "1px solid rgba(255,255,255,0.3)" }}>Description</th>
-                  <th style={{ padding: "10px 14px", fontSize: "11px", fontWeight: "700", color: "#fff", textAlign: "center", width: "10%", background: currentT.primaryColor, border: "1px solid rgba(255,255,255,0.3)" }}>Qty</th>
-                  <th style={{ padding: "10px 14px", fontSize: "11px", fontWeight: "700", color: "#fff", textAlign: "center", width: "20%", background: currentT.primaryColor, border: "1px solid rgba(255,255,255,0.3)" }}>Rate</th>
-                  <th style={{ padding: "10px 14px", fontSize: "11px", fontWeight: "700", color: "#fff", textAlign: "center", width: "20%", background: currentT.primaryColor, border: "1px solid rgba(255,255,255,0.3)" }}>Amount</th>
+                  <th style={{ padding: "10px 14px", fontSize: "11px", fontWeight: "700", color: "#FFFFFF", textAlign: "center", width: "5%", background: currentT.primaryColor, border: "1px solid rgba(255,255,255,0.3)" }}>S.No</th>
+                  <th style={{ padding: "10px 14px", fontSize: "11px", fontWeight: "700", color: "#FFFFFF", textAlign: "left", width: "40%", background: currentT.primaryColor, border: "1px solid rgba(255,255,255,0.3)" }}>Description</th>
+                  <th style={{ padding: "10px 14px", fontSize: "11px", fontWeight: "700", color: "#FFFFFF", textAlign: "center", width: "10%", background: currentT.primaryColor, border: "1px solid rgba(255,255,255,0.3)" }}>Qty</th>
+                  <th style={{ padding: "10px 14px", fontSize: "11px", fontWeight: "700", color: "#FFFFFF", textAlign: "center", width: "20%", background: currentT.primaryColor, border: "1px solid rgba(255,255,255,0.3)" }}>Rate</th>
+                  <th style={{ padding: "10px 14px", fontSize: "11px", fontWeight: "700", color: "#FFFFFF", textAlign: "center", width: "20%", background: currentT.primaryColor, border: "1px solid rgba(255,255,255,0.3)" }}>Amount</th>
                 </tr>
               </thead>   <tbody>
                 {pageItems.map((item, idx) => {
                   const rateGst = item.gstRate !== undefined ? parseFloat(item.gstRate) : (parseFloat(inv.gstRate) || 18);
                   const isIncl = item.isGstIncluded !== undefined ? item.isGstIncluded : (inv.isGstIncluded || false);
                   return (
-                    <tr key={item.id} style={{ background: (startIndex + idx) % 2 === 1 ? "#f8fafc" : "#fff" }}>
-                      <td style={{ padding: isFirstPage ? "7px 14px" : "14px", fontSize: isFirstPage ? "11px" : "13px", color: "#0f172a", textAlign: "center", verticalAlign: "top", border: "1px solid #cbd5e1" }}>{startIndex + idx + 1}</td>
-                      <td style={{ padding: isFirstPage ? "7px 14px" : "14px", fontSize: isFirstPage ? "11px" : "13px", color: "#0f172a", verticalAlign: "top", border: "1px solid #cbd5e1" }}>
+                    <tr key={item.id} style={{ background: (startIndex + idx) % 2 === 1 ? "#F8FAFC" : "#FFFFFF" }}>
+                      <td style={{ padding: isFirstPage ? "7px 14px" : "14px", fontSize: isFirstPage ? "11px" : "13px", color: "#0F172A", textAlign: "center", verticalAlign: "top", border: "1px solid #E2E8F0" }}>{startIndex + idx + 1}</td>
+                      <td style={{ padding: isFirstPage ? "7px 14px" : "14px", fontSize: isFirstPage ? "11px" : "13px", color: "#0F172A", verticalAlign: "top", border: "1px solid #E2E8F0" }}>
                         <div style={{ fontWeight: "700" }}>{item.description || "—"}</div>
-                        {rateGst ? <div style={{ fontSize: "10px", color: "#64748b", marginTop: "2px" }}>Tax {rateGst}% {isIncl ? "(Incl)" : ""}</div> : null}
+                        {rateGst ? <div style={{ fontSize: "10px", color: "#64748B", marginTop: "2px" }}>Tax {rateGst}% {isIncl ? "(Incl)" : ""}</div> : null}
                       </td>
-                      <td style={{ padding: isFirstPage ? "7px 14px" : "14px", fontSize: isFirstPage ? "11px" : "13px", color: "#0f172a", textAlign: "center", verticalAlign: "top", border: "1px solid #cbd5e1" }}>{item.quantity}</td>
-                      <td style={{ padding: isFirstPage ? "7px 14px" : "14px", fontSize: isFirstPage ? "11px" : "13px", color: "#0f172a", textAlign: "center", verticalAlign: "top", border: "1px solid #cbd5e1" }}>{formatCurrency(item.rate, inv.currency, false, false, inv.customCurrencySymbol)}</td>
-                      <td style={{ padding: isFirstPage ? "7px 14px" : "14px", fontSize: isFirstPage ? "11px" : "13px", color: "#0f172a", textAlign: "center", fontWeight: "700", verticalAlign: "top", border: "1px solid #cbd5e1" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), inv.currency, false, false, inv.customCurrencySymbol)}</td>
+                      <td style={{ padding: isFirstPage ? "7px 14px" : "14px", fontSize: isFirstPage ? "11px" : "13px", color: "#0F172A", textAlign: "center", verticalAlign: "top", border: "1px solid #E2E8F0" }}>{item.quantity}</td>
+                      <td style={{ padding: isFirstPage ? "7px 14px" : "14px", fontSize: isFirstPage ? "11px" : "13px", color: "#0F172A", textAlign: "center", verticalAlign: "top", border: "1px solid #E2E8F0" }}>{formatCurrency(item.rate, inv.currency, false, false, inv.customCurrencySymbol)}</td>
+                      <td style={{ padding: isFirstPage ? "7px 14px" : "14px", fontSize: isFirstPage ? "11px" : "13px", color: "#0F172A", textAlign: "center", fontWeight: "700", verticalAlign: "top", border: "1px solid #E2E8F0" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), inv.currency, false, false, inv.customCurrencySymbol)}</td>
                     </tr>);
                 })}
               </tbody>
             </table>
 
             {!isLastPage && (
-              <div style={{ marginTop: "auto", paddingTop: 16, textAlign: "center", fontSize: "9px", color: "#94a3b8", fontStyle: "italic" }}>
+              <div style={{ marginTop: "auto", paddingTop: 16, textAlign: "center", fontSize: "9px", color: "#64748B", fontStyle: "italic" }}>
                 Continued on next page…
               </div>
             )}
@@ -489,15 +489,15 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
                 <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px", marginBottom: "16px" }}>
                   <div className="inv-totals" style={{ width: "200px" }}>
                     <div className="inv-total-row" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "4px 0", fontSize: "12px" }}>
-                      <span className="lbl" style={{ color: "#0f172a" }}>Subtotal</span>
+                      <span className="lbl" style={{ color: "#0F172A" }}>Subtotal</span>
                       <span className="val" style={{ fontWeight: "700", textAlign: "right", minWidth: "90px" }}>{formatCurrency(subtotal, inv.currency, false, false, inv.customCurrencySymbol)}</span>
                     </div>
-                    <div className="inv-total-row" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "4px 0", fontSize: "12px", borderBottom: "1px solid #000000" }}>
-                      <span className="lbl" style={{ color: "#0f172a" }}>GST / Tax ({inv.gstRate}%)</span>
+                    <div className="inv-total-row" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "4px 0", fontSize: "12px", borderBottom: "1px solid #0F172A" }}>
+                      <span className="lbl" style={{ color: "#0F172A" }}>GST / Tax ({inv.gstRate}%)</span>
                       <span className="val" style={{ fontWeight: "700", textAlign: "right", minWidth: "90px" }}>{formatCurrency(gstAmt, inv.currency, false, false, inv.customCurrencySymbol)}</span>
                     </div>
 
-                    <div className="inv-grand-row" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "6px 0", borderRadius: "6px", marginTop: "4px", color: "#0f172a" }}>
+                    <div className="inv-grand-row" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "6px 0", borderRadius: "6px", marginTop: "4px", color: "#0F172A" }}>
                       <span className="lbl" style={{ fontSize: "12px", fontWeight: "800" }}>Balance Due</span>
                       <span className="val" style={{ fontSize: "12px", fontWeight: "800", textAlign: "right", minWidth: "90px" }}>{formatCurrency(balanceDue, inv.currency, false, false, inv.customCurrencySymbol)}</span>
                     </div>
@@ -507,21 +507,21 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
                 {/* STACKED SECTIONS: Scan Invoice → Amount in Words → Payment Details */}
                 <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "center", background: "var(--app-bg)", borderRadius: 8, padding: "8px", border: "1px solid var(--app-border)", width: "fit-content" }}>
-                    <div style={{ fontSize: "8px", color: "#0f172a", fontWeight: 700, letterSpacing: 1, marginBottom: 4 }}>SCAN INVOICE</div>
-                    <div style={{ background: "#fff", padding: 5, borderRadius: 4, border: "1px solid var(--app-border)" }}>
-                      <QRCodeSVG value={qrData} size={80} bgColor="#ffffff" fgColor="#0f172a" />
+                    <div style={{ fontSize: "8px", color: "#0F172A", fontWeight: 700, letterSpacing: 1, marginBottom: 4 }}>SCAN INVOICE</div>
+                    <div style={{ background: "#FFFFFF", padding: 5, borderRadius: 4, border: "1px solid var(--app-border)" }}>
+                      <QRCodeSVG value={qrData} size={80} bgColor="#FFFFFF" fgColor="#0F172A" />
                     </div>
                   </div>
 
-                  <div style={{ padding: "7px 12px", background: "#f8fafc", border: "1px dashed #CBD5E1", borderRadius: "6px" }}>
-                    <span style={{ fontSize: "12px", fontWeight: "700", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.6px" }}>Amount in Words: </span>
-                    <span style={{ fontSize: "12px", fontWeight: "800", color: "#0f172a" }}>{inv.currency === 'INR' ? 'INR ' : (inv.currency || 'INR') + ' '}{numberToWords(Math.round(balanceDue))}</span>
+                  <div style={{ padding: "7px 12px", background: "#F8FAFC", border: "1px dashed #E2E8F0", borderRadius: "6px" }}>
+                    <span style={{ fontSize: "12px", fontWeight: "700", color: "#64748B", textTransform: "uppercase", letterSpacing: "0.6px" }}>Amount in Words: </span>
+                    <span style={{ fontSize: "12px", fontWeight: "800", color: "#0F172A" }}>{inv.currency === 'INR' ? 'INR ' : (inv.currency || 'INR') + ' '}{numberToWords(Math.round(balanceDue))}</span>
                   </div>
 
                   {(inv.bankName || inv.accountNumber || inv.ifscCode || inv.upiId) && (
                     <div className="inv-bank" style={{ padding: "8px 10px", background: currentT.primaryBg, borderRadius: "6px", borderLeft: `3px solid ${currentT.primaryColor}`, width: "100%" }}>
                       <div className="inv-bank-title" style={{ fontSize: "9px", fontWeight: "700", color: currentT.primaryColor, marginBottom: "3px" }}>Payment Details</div>
-                      <div className="inv-bank-detail" style={{ fontSize: "9px", color: "#0f172a", lineHeight: "1.5" }}>
+                      <div className="inv-bank-detail" style={{ fontSize: "9px", color: "#0F172A", lineHeight: "1.5" }}>
                         {inv.bankName && <span>Bank: {inv.bankName} &nbsp;|&nbsp; </span>}
                         {inv.accountNumber && <span>A/C: {inv.accountNumber} &nbsp;|&nbsp; </span>}
                         {inv.ifscCode && <span>IFSC: {inv.ifscCode}</span>}
@@ -537,13 +537,13 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
                     {inv.notes && (
                       <div>
                         <div className="inv-notes-title" style={{ fontSize: "11px", fontWeight: "700", color: currentT.primaryColor, textTransform: "uppercase", letterSpacing: ".6px", marginBottom: "2px" }}>Notes</div>
-                        <div className="inv-notes-text" style={{ fontSize: "11px", color: "#64748b", lineHeight: "1.5" }}>{inv.notes}</div>
+                        <div className="inv-notes-text" style={{ fontSize: "11px", color: "#64748B", lineHeight: "1.5" }}>{inv.notes}</div>
                       </div>
                     )}
                     {inv.terms && (
                       <div>
                         <div className="inv-notes-title" style={{ fontSize: "11px", fontWeight: "700", color: currentT.primaryColor, textTransform: "uppercase", letterSpacing: ".6px", marginBottom: "2px" }}>Terms & Conditions</div>
-                        <div className="inv-notes-text" style={{ fontSize: "11px", color: "#64748b", lineHeight: "1.5" }}>{inv.terms}</div>
+                        <div className="inv-notes-text" style={{ fontSize: "11px", color: "#64748B", lineHeight: "1.5" }}>{inv.terms}</div>
                       </div>
                     )}
                   </div>      <div className="inv-sig" style={{ textAlign: "right", minWidth: "120px" }}>
@@ -552,13 +552,13 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
                         inv.signatureType === "image" ? (
                           <img src={inv.signature} alt="Signature" style={{ maxHeight: "30px", maxWidth: "120px", objectFit: "contain" }} />
                         ) : (
-                          <div style={{ fontFamily: "'Dancing Script', cursive", fontSize: "16px", fontWeight: "bold", color: "#1e293b" }}>{inv.signature}</div>
+                          <div style={{ fontFamily: "'Dancing Script', cursive", fontSize: "16px", fontWeight: "bold", color: "#1E293B" }}>{inv.signature}</div>
                         )
                       ) : null}
                     </div>
 
-                    <div className="inv-sig-name" style={{ fontSize: "9px", fontWeight: "700", color: "#0f172a" }}></div>
-                    <div className="inv-sig-role" style={{ fontSize: "8px", color: "#64748b" }}>Authorized Signatory</div>
+                    <div className="inv-sig-name" style={{ fontSize: "9px", fontWeight: "700", color: "#0F172A" }}></div>
+                    <div className="inv-sig-role" style={{ fontSize: "8px", color: "#64748B" }}>Authorized Signatory</div>
                   </div>
                 </div>
               </>
@@ -907,11 +907,11 @@ const [sortOrder, setSortOrder] = useState("desc");
     switch (templateName) {
       case "Minimal":
         return {
-          primaryColor: "#111827",
-          primaryBg: "#F3F4F6",
-          logoColor: "linear-gradient(135deg, #374151, #111827)",
-          borderStyle: "1px solid #E5E7EB",
-          headerUnderline: "1px solid #E5E7EB",
+          primaryColor: "#0F172A",
+          primaryBg: "#F8FAFC",
+          logoColor: "linear-gradient(135deg, #1E293B, #0F172A)",
+          borderStyle: "1px solid #E2E8F0",
+          headerUnderline: "1px solid #E2E8F0",
           fontFamily: "'Plus Jakarta Sans', sans-serif"
         };
       case "Classic":
@@ -926,11 +926,11 @@ const [sortOrder, setSortOrder] = useState("desc");
       case "Modern":
       default:
         return {
-          primaryColor: "#7C5CFC",
-          primaryBg: "#EEE9FF",
-          logoColor: "linear-gradient(135deg, #7C5CFC, #0F172A)",
-          borderStyle: "1px solid #E5E7EB",
-          headerUnderline: "3px solid #7C5CFC",
+          primaryColor: "#2563EB",
+          primaryBg: "#EFF6FF",
+          logoColor: "linear-gradient(135deg, #2563EB, #0F172A)",
+          borderStyle: "1px solid #E2E8F0",
+          headerUnderline: "3px solid #2563EB",
           fontFamily: "'Plus Jakarta Sans', sans-serif"
         };
     }
@@ -1418,55 +1418,55 @@ const [sortOrder, setSortOrder] = useState("desc");
     const entryItems = entry.items || items;
 
     const container = document.createElement("div");
-    container.style.cssText = "position:fixed;top:0;left:0;width:794px;opacity:0;pointer-events:none;z-index:-1;background:#fff;";
+    container.style.cssText = "position:fixed;top:0;left:0;width:794px;opacity:0;pointer-events:none;z-index:-1;background:#FFFFFF;";
     document.body.appendChild(container);
     const root = createRoot(container);
 
     await new Promise((resolve) => {
       root.render(
         <div className="print-wrapper">
-          <div className="invoice-paper" style={{ position: "relative", maxWidth: 794, margin: "0 auto", background: "#fff", borderRadius: 0, boxShadow: "none", display: "flex", flexDirection: "column", minHeight: 1122, width: "100%" }}>
-            <div style={{ background: "#f8fafc", padding: "28px 32px", position: "relative", overflow: "visible", flexShrink: 0, borderBottom: "1px solid var(--app-border)" }}>
+          <div className="invoice-paper" style={{ position: "relative", maxWidth: 794, margin: "0 auto", background: "#FFFFFF", borderRadius: 0, boxShadow: "none", display: "flex", flexDirection: "column", minHeight: 1122, width: "100%" }}>
+            <div style={{ background: "#F8FAFC", padding: "28px 32px", position: "relative", overflow: "visible", flexShrink: 0, borderBottom: "1px solid var(--app-border)" }}>
               <div className="inv-hgrid" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", position: "relative", gap: 20 }}>
                 <div>
                   {effectiveLogo ? (
                     <img src={effectiveLogo} alt="logo" style={{ height: 85, maxWidth: "100%", borderRadius: 10, marginBottom: 12, objectFit: "contain" }} />
                   ) : (
-                    <div style={{ height: 60, width: 60, background: currentT.logoColor || "var(--app-accent)", borderRadius: 10, marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, fontWeight: 900, color: "#fff" }}>
+                    <div style={{ height: 60, width: 60, background: currentT.logoColor || "var(--app-accent)", borderRadius: 10, marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, fontWeight: 900, color: "#FFFFFF" }}>
                       {(entryInv.companyName || effectiveCompanyName)[0] || "?"}
                     </div>
                   )}
-                  <div style={{ fontSize: 24, fontWeight: 900, color: "#0f172a", textTransform: "uppercase", letterSpacing: 1 }}>{entryInv.companyName || effectiveCompanyName}</div>
-                  {entryInv.companyEmail && <div style={{ fontSize: 11, color: "#6b7280", marginTop: 3 }}>{entryInv.companyEmail}</div>}
-                  {entryInv.companyPhone && <div style={{ fontSize: 11, color: "#6b7280", marginTop: 2 }}>{entryInv.companyPhone}</div>}
-                  {entryInv.companyAddress && <div style={{ fontSize: 11, color: "#6b7280", marginTop: 2 }}>{entryInv.companyAddress}</div>}
+                  <div style={{ fontSize: 24, fontWeight: 900, color: "#0F172A", textTransform: "uppercase", letterSpacing: 1 }}>{entryInv.companyName || effectiveCompanyName}</div>
+                  {entryInv.companyEmail && <div style={{ fontSize: 11, color: "#64748B", marginTop: 3 }}>{entryInv.companyEmail}</div>}
+                  {entryInv.companyPhone && <div style={{ fontSize: 11, color: "#64748B", marginTop: 2 }}>{entryInv.companyPhone}</div>}
+                  {entryInv.companyAddress && <div style={{ fontSize: 11, color: "#64748B", marginTop: 2 }}>{entryInv.companyAddress}</div>}
                 </div>
                 <div style={{ textAlign: "right" }}>
                   <div style={{ fontSize: 36, fontWeight: 900, color: `${currentT.primaryColor}1a`, letterSpacing: -2, lineHeight: 1, marginBottom: 4 }}>INVOICE</div>
                   <div style={{ fontSize: 16, fontWeight: 800, color: currentT.primaryColor || "var(--app-accent)" }}>{entryInv.invoiceNo || entry.invoiceNo}</div>
                   <div style={{ marginTop: 14, display: "flex", gap: 20, justifyContent: "flex-end" }}>
                     <div style={{ textAlign: "right" }}>
-                      <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>DATE</div>
-                      <div style={{ fontSize: 12, color: "#0f172a", fontWeight: 700 }}>{formatDate(entryInv.date)}</div>
+                      <div style={{ fontSize: 9, color: "#64748B", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>DATE</div>
+                      <div style={{ fontSize: 12, color: "#0F172A", fontWeight: 700 }}>{formatDate(entryInv.date)}</div>
                     </div>
                     <div style={{ textAlign: "right" }}>
-                      <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>DUE DATE</div>
-                      <div style={{ fontSize: 12, color: "#ea580c", fontWeight: 700 }}>{formatDate(entryInv.dueDate)}</div>
+                      <div style={{ fontSize: 9, color: "#64748B", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>DUE DATE</div>
+                      <div style={{ fontSize: 12, color: "#64748B", fontWeight: 700 }}>{formatDate(entryInv.dueDate)}</div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
             <div style={{ padding: "20px 32px", borderBottom: "2px solid var(--app-border)" }}>
-              <div style={{ fontSize: 9, color: "#64748b", fontWeight: 700, letterSpacing: 2, marginBottom: 10 }}>BILL TO</div>
-              <div style={{ fontSize: 17, fontWeight: 800, color: "#0f172a" }}>{entryInv.client || entry.client || "—"}</div>
+              <div style={{ fontSize: 9, color: "#64748B", fontWeight: 700, letterSpacing: 2, marginBottom: 10 }}>BILL TO</div>
+              <div style={{ fontSize: 17, fontWeight: 800, color: "#0F172A" }}>{entryInv.client || entry.client || "—"}</div>
             </div>
             <div style={{ padding: "22px 32px", flexShrink: 0 }}>
               <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 360 }}>
                 <thead>
-                  <tr style={{ background: "#f8fafc" }}>
+                  <tr style={{ background: "#F8FAFC" }}>
                     {["S.No", "Description", "Qty", "Unit Rate", "Tax Rate", "Amount"].map((h, i) => (
-                      <th key={i} style={{ padding: "9px 11px", fontSize: 9, fontWeight: 800, color: "#64748b", letterSpacing: 1.5, borderBottom: "2px solid var(--app-border)", textAlign: ["Amount", "Unit Rate", "Qty", "Tax Rate"].includes(h) ? "right" : "left" }}>{h.toUpperCase()}</th>
+                      <th key={i} style={{ padding: "9px 11px", fontSize: 9, fontWeight: 800, color: "#64748B", letterSpacing: 1.5, borderBottom: "2px solid var(--app-border)", textAlign: ["Amount", "Unit Rate", "Qty", "Tax Rate"].includes(h) ? "right" : "left" }}>{h.toUpperCase()}</th>
                     ))}
                   </tr>
                 </thead>
@@ -1476,12 +1476,12 @@ const [sortOrder, setSortOrder] = useState("desc");
                     const isIncl = item.isGstIncluded !== undefined ? item.isGstIncluded : (entryInv.isGstIncluded || false);
                     return (
                       <tr key={item.id || idx} style={{ borderBottom: "1px solid var(--app-border)" }}>
-                        <td style={{ padding: "12px 11px", color: "#64748b", fontWeight: 700, fontSize: 12 }}>{String(idx + 1).padStart(2, "0")}</td>
-                        <td style={{ padding: "12px 11px", fontSize: 13, fontWeight: 600, color: "#0f172a" }}>{item.description || "—"}</td>
-                        <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#0f172a" }}>{item.quantity}</td>
-                        <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#0f172a" }}>{formatCurrency(item.rate, entryInv.currency)}</td>
-                        <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#6b7280" }}>{rateGst}% {isIncl ? "(Incl)" : ""}</td>
-                        <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 14, fontWeight: 700, color: "#0f172a" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), entryInv.currency)}</td>
+                        <td style={{ padding: "12px 11px", color: "#64748B", fontWeight: 700, fontSize: 12 }}>{String(idx + 1).padStart(2, "0")}</td>
+                        <td style={{ padding: "12px 11px", fontSize: 13, fontWeight: 600, color: "#0F172A" }}>{item.description || "—"}</td>
+                        <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#0F172A" }}>{item.quantity}</td>
+                        <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#0F172A" }}>{formatCurrency(item.rate, entryInv.currency)}</td>
+                        <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#64748B" }}>{rateGst}% {isIncl ? "(Incl)" : ""}</td>
+                        <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 14, fontWeight: 700, color: "#0F172A" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), entryInv.currency)}</td>
                       </tr>
                     );
                   })}
@@ -1489,17 +1489,17 @@ const [sortOrder, setSortOrder] = useState("desc");
               </table>
               <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 20 }}>
                 <div style={{ width: 200 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 8px", background: "#0f172a", borderRadius: 6, marginTop: 4, color: "#fff" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 8px", background: "#0F172A", borderRadius: 6, marginTop: 4, color: "#FFFFFF" }}>
                     <span style={{ fontSize: 10, fontWeight: 800 }}>Total</span>
                     <span style={{ fontSize: 12, fontWeight: 900 }}>{formatCurrency(entry.total, entryInv.currency)}</span>
                   </div>
                 </div>
               </div>
             </div>
-            <div style={{ background: "#ffffff", borderTop: "2px solid #f1f5f9", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
-              <div style={{ fontSize: 11, color: "#6b7280", fontWeight: 600 }}>{effectiveCompanyName}</div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: currentT.primaryColor || "#2563eb" }}>{entryInv.footerMessage}</div>
-              <div style={{ fontSize: 11, color: "#6b7280", fontWeight: 600 }}>{entryInv.invoiceNo || entry.invoiceNo}</div>
+            <div style={{ background: "#FFFFFF", borderTop: "2px solid #EFF6FF", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
+              <div style={{ fontSize: 11, color: "#64748B", fontWeight: 600 }}>{effectiveCompanyName}</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: currentT.primaryColor || "#2563EB" }}>{entryInv.footerMessage}</div>
+              <div style={{ fontSize: 11, color: "#64748B", fontWeight: 600 }}>{entryInv.invoiceNo || entry.invoiceNo}</div>
             </div>
           </div>
         </div>
@@ -1559,14 +1559,14 @@ const [sortOrder, setSortOrder] = useState("desc");
 
   // ── Shared styles --------------------------------------------
   const inp = (err) => ({
-    width: "100%", border: `1.5px solid ${err ? "#ef4444" : "var(--app-border)"}`, borderRadius: 10,
-    padding: "10px 12px", fontSize: 14, color: "#0f172a", background: err ? "#fff5f5" : "var(--app-surface)",
+    width: "100%", border: `1.5px solid ${err ? "#64748B" : "var(--app-border)"}`, borderRadius: 10,
+    padding: "10px 12px", fontSize: 14, color: "#0F172A", background: err ? "#F8FAFC" : "var(--app-surface)",
     boxSizing: "border-box", outline: "none", fontFamily: "inherit", transition: "all 0.2s",
   });
-  const lbl = { display: "block", fontSize: 12, color: "#64748b", fontWeight: 700, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.5px" };
+  const lbl = { display: "block", fontSize: 12, color: "#64748B", fontWeight: 700, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.5px" };
 
   const statusColor = {
-    paid: "#16a34a", unpaid: "#ea580c", overdue: "#dc2626", draft: "#6b7280", sent: "#2563eb", part_paid: "var(--app-accent)",
+    paid: "#16A34A", unpaid: "#64748B", overdue: "#64748B", draft: "#64748B", sent: "#2563EB", part_paid: "var(--app-accent)",
   };
 
   // ------------------------------------------------------------
@@ -1582,7 +1582,7 @@ const [sortOrder, setSortOrder] = useState("desc");
       <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "var(--app-bg)", minHeight: "100vh", padding: "40px 20px" }}>
 
         <div className="no-print" style={{ display: "flex", gap: 12, justifyContent: "center", marginBottom: 30 }}>
-        <button onClick={() => jumpInvoice ? onBack() : (setEditingReceipt(false), setStep("list"))} style={{ padding: "12px 24px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>{jumpInvoice ? " Back to Dashboard" : " Back to List"}</button>
+        <button onClick={() => jumpInvoice ? onBack() : (setEditingReceipt(false), setStep("list"))} style={{ padding: "12px 24px", background: "#FFFFFF", border: "1.5px solid #E2E8F0", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#1E293B", fontFamily: "inherit" }}>{jumpInvoice ? " Back to Dashboard" : " Back to List"}</button>
 
 {!editingReceipt && (
   <button
@@ -1591,16 +1591,16 @@ const [sortOrder, setSortOrder] = useState("desc");
       loadEntry(entry, "form");
       window.scrollTo(0, 0);
     }}
-    style={{ padding: "12px 24px", background: "#eef2ff", border: "1.5px solid #c7d2fe", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#4338ca", fontFamily: "inherit" }}
+    style={{ padding: "12px 24px", background: "#EFF6FF", border: "1.5px solid #E2E8F0", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#2563EB", fontFamily: "inherit" }}
   >
     Edit Invoice
   </button>
-)}  {!editingReceipt && <button onClick={() => window.print()} style={{ padding: "12px 28px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#fff", fontFamily: "inherit", boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237),0.3)" }}>Print Receipt</button>}
+)}  {!editingReceipt && <button onClick={() => window.print()} style={{ padding: "12px 28px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#FFFFFF", fontFamily: "inherit", boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237),0.3)" }}>Print Receipt</button>}
         </div>
 
         <div className="receipt-paper" style={{ maxWidth: 500, margin: "0 auto", background: "var(--app-card)", borderRadius: 24, boxShadow: "var(--app-shadow)", overflow: "hidden", border: "1px solid var(--app-border)" }}>
           {/* Header */}
-          <div style={{ background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", padding: "40px 32px", textAlign: "center", color: "#fff" }}>
+          <div style={{ background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", padding: "40px 32px", textAlign: "center", color: "#FFFFFF" }}>
             <div style={{ width: 64, height: 64, background: "rgba(255,255,255,0.2)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", fontSize: 32 }}>Payment</div>
             <h2 style={{ margin: 0, fontSize: 24, fontWeight: 900, letterSpacing: 1 }}>{r.status === "part_paid" ? "PART PAYMENT RECEIPT" : "PAYMENT RECEIPT"}</h2>
             <div style={{ fontSize: 13, opacity: 0.8, marginTop: 4, fontWeight: 600 }}>{receiptNo}</div>
@@ -1615,7 +1615,7 @@ const [sortOrder, setSortOrder] = useState("desc");
               )}
             </div>
             <div style={{ textAlign: "center", marginBottom: 32 }}>
-              <div style={{ fontSize: 36, fontWeight: 900, color: "#0f172a" }}>{formatCurrency(pd.amountPaid, invData.currency)}</div>
+              <div style={{ fontSize: 36, fontWeight: 900, color: "#0F172A" }}>{formatCurrency(pd.amountPaid, invData.currency)}</div>
               <div style={{ fontSize: 12, color: "var(--app-accent)", fontWeight: 700, marginTop: 4, textTransform: "uppercase", letterSpacing: 1 }}>Amount Received</div>
             </div>
 
@@ -1641,42 +1641,42 @@ const [sortOrder, setSortOrder] = useState("desc");
                     <input type="text" value={pd.transactionId} onChange={e => setReceiptEntry(prev => ({ ...prev, paymentData: { ...prev.paymentData, transactionId: e.target.value } }))} style={inp()} />
                   </div>
                   <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
-                    <button onClick={() => setEditingReceipt(false)} style={{ flex: 1, padding: "10px", background: "#f3f4f6", border: "none", borderRadius: 10, fontWeight: 700, cursor: "pointer" }}>Cancel</button>
+                    <button onClick={() => setEditingReceipt(false)} style={{ flex: 1, padding: "10px", background: "#F8FAFC", border: "none", borderRadius: 10, fontWeight: 700, cursor: "pointer" }}>Cancel</button>
                     <button onClick={async () => {
                       await updateStatusBackend(r, r.status, receiptEntry.paymentData);
                       setEditingReceipt(false);
                       showToast("Success Receipt updated!");
-                    }} style={{ flex: 1, padding: "10px", background: "#0f172a", color: "#fff", border: "none", borderRadius: 10, fontWeight: 700, cursor: "pointer" }}>Save Changes</button>
+                    }} style={{ flex: 1, padding: "10px", background: "#0F172A", color: "#FFFFFF", border: "none", borderRadius: 10, fontWeight: 700, cursor: "pointer" }}>Save Changes</button>
                   </div>
                 </>
               ) : (
                 <>
                   <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: 12, borderBottom: "1px dashed var(--app-border)" }}>
-                    <span style={{ fontSize: 13, color: "#6b7280", fontWeight: 600 }}>Received From</span>
-                    <span style={{ fontSize: 13, color: "#0f172a", fontWeight: 700 }}>{r.client}</span>
+                    <span style={{ fontSize: 13, color: "#64748B", fontWeight: 600 }}>Received From</span>
+                    <span style={{ fontSize: 13, color: "#0F172A", fontWeight: 700 }}>{r.client}</span>
                   </div>
                   <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: 12, borderBottom: "1px dashed var(--app-border)" }}>
-                    <span style={{ fontSize: 13, color: "#6b7280", fontWeight: 600 }}>Payment Date</span>
-                    <span style={{ fontSize: 13, color: "#0f172a", fontWeight: 700 }}>{formatDate(pd.paymentDate)}</span>
+                    <span style={{ fontSize: 13, color: "#64748B", fontWeight: 600 }}>Payment Date</span>
+                    <span style={{ fontSize: 13, color: "#0F172A", fontWeight: 700 }}>{formatDate(pd.paymentDate)}</span>
                   </div>
                   <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: 12, borderBottom: "1px dashed var(--app-border)" }}>
-                    <span style={{ fontSize: 13, color: "#6b7280", fontWeight: 600 }}>Payment Mode</span>
-                    <span style={{ fontSize: 13, color: "#0f172a", fontWeight: 700 }}>{pd.paymentMode}</span>
+                    <span style={{ fontSize: 13, color: "#64748B", fontWeight: 600 }}>Payment Mode</span>
+                    <span style={{ fontSize: 13, color: "#0F172A", fontWeight: 700 }}>{pd.paymentMode}</span>
                   </div>
                   {pd.transactionId && (
                     <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: 12, borderBottom: "1px dashed var(--app-border)" }}>
-                      <span style={{ fontSize: 13, color: "#6b7280", fontWeight: 600 }}>Transaction ID</span>
-                      <span style={{ fontSize: 13, color: "#0f172a", fontWeight: 700, fontFamily: "monospace" }}>{pd.transactionId}</span>
+                      <span style={{ fontSize: 13, color: "#64748B", fontWeight: 600 }}>Transaction ID</span>
+                      <span style={{ fontSize: 13, color: "#0F172A", fontWeight: 700, fontFamily: "monospace" }}>{pd.transactionId}</span>
                     </div>
                   )}
                   <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: 12, borderBottom: "1px dashed var(--app-border)" }}>
-                    <span style={{ fontSize: 13, color: "#6b7280", fontWeight: 600 }}>Invoice Number</span>
-                    <span style={{ fontSize: 13, color: "#0f172a", fontWeight: 700 }}>{r.invoiceNo}</span>
+                    <span style={{ fontSize: 13, color: "#64748B", fontWeight: 600 }}>Invoice Number</span>
+                    <span style={{ fontSize: 13, color: "#0F172A", fontWeight: 700 }}>{r.invoiceNo}</span>
                   </div>
                   {r.status === "part_paid" && (
                     <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: 12, borderBottom: "1px dashed var(--app-border)" }}>
-                      <span style={{ fontSize: 13, color: "#ea580c", fontWeight: 700 }}>Remaining Balance</span>
-                      <span style={{ fontSize: 13, color: "#ea580c", fontWeight: 800 }}>{formatCurrency((r.total || 0) - (pd.amountPaid || 0), invData.currency)}</span>
+                      <span style={{ fontSize: 13, color: "#64748B", fontWeight: 700 }}>Remaining Balance</span>
+                      <span style={{ fontSize: 13, color: "#64748B", fontWeight: 800 }}>{formatCurrency((r.total || 0) - (pd.amountPaid || 0), invData.currency)}</span>
                     </div>
                   )}
                 </>
@@ -1689,14 +1689,14 @@ const [sortOrder, setSortOrder] = useState("desc");
             </div>
 
             <div style={{ marginTop: 32, textAlign: "center" }}>
-              <div style={{ fontSize: 13, fontWeight: 800, color: "#0f172a" }}>{invData.companyName || "M Business"}</div>
-              {invData.companyEmail && <div style={{ fontSize: 11, color: "#6b7280", marginTop: 2 }}>{invData.companyEmail}</div>}
-              {invData.companyPhone && <div style={{ fontSize: 11, color: "#6b7280", marginTop: 2 }}>{invData.companyPhone}</div>}
+              <div style={{ fontSize: 13, fontWeight: 800, color: "#0F172A" }}>{invData.companyName || "M Business"}</div>
+              {invData.companyEmail && <div style={{ fontSize: 11, color: "#64748B", marginTop: 2 }}>{invData.companyEmail}</div>}
+              {invData.companyPhone && <div style={{ fontSize: 11, color: "#64748B", marginTop: 2 }}>{invData.companyPhone}</div>}
             </div>
           </div>
 
           <div style={{ background: "var(--app-bg)", padding: "16px", textAlign: "center", borderTop: "1px solid var(--app-border)" }}>
-            <div style={{ fontSize: 10, color: "#d1d5db", fontWeight: 700, letterSpacing: 1 }}>COMPUTER GENERATED RECEIPT</div>
+            <div style={{ fontSize: 10, color: "#E2E8F0", fontWeight: 700, letterSpacing: 1 }}>COMPUTER GENERATED RECEIPT</div>
           </div>
         </div>
       </div>
@@ -1731,17 +1731,17 @@ const [sortOrder, setSortOrder] = useState("desc");
 
         {shareModalEntry && (
           <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }} onClick={() => { setShareModalEntry(null); setShareSelectedClientId(""); }}>
-            <div style={{ background: "#fff", borderRadius: 14, width: "100%", maxWidth: 360, display: "flex", flexDirection: "column", overflow: "hidden" }} onClick={(e) => e.stopPropagation()}>
-              <div style={{ padding: "16px 18px", borderBottom: "1.5px solid #e5e7eb", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div style={{ fontWeight: 800, fontSize: 15, color: "#0f172a" }}>Share with client</div>
-                <button onClick={() => { setShareModalEntry(null); setShareSelectedClientId(""); }} style={{ background: "none", border: "none", fontSize: 18, cursor: "pointer", color: "#6b7280" }}>✕</button>
+            <div style={{ background: "#FFFFFF", borderRadius: 14, width: "100%", maxWidth: 360, display: "flex", flexDirection: "column", overflow: "hidden" }} onClick={(e) => e.stopPropagation()}>
+              <div style={{ padding: "16px 18px", borderBottom: "1.5px solid #E2E8F0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div style={{ fontWeight: 800, fontSize: 15, color: "#0F172A" }}>Share with client</div>
+                <button onClick={() => { setShareModalEntry(null); setShareSelectedClientId(""); }} style={{ background: "none", border: "none", fontSize: 18, cursor: "pointer", color: "#64748B" }}>✕</button>
               </div>
               <div style={{ padding: 18 }}>
-                <label style={{ display: "block", fontSize: 12, color: "#64748b", fontWeight: 700, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.5px" }}>Select Client</label>
+                <label style={{ display: "block", fontSize: 12, color: "#64748B", fontWeight: 700, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.5px" }}>Select Client</label>
                 <select
                   value={shareSelectedClientId}
                   onChange={(e) => setShareSelectedClientId(e.target.value)}
-                  style={{ width: "100%", border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px 12px", fontSize: 14, color: "#0f172a", background: "var(--app-surface)", boxSizing: "border-box", outline: "none", fontFamily: "inherit" }}
+                  style={{ width: "100%", border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px 12px", fontSize: 14, color: "#0F172A", background: "var(--app-surface)", boxSizing: "border-box", outline: "none", fontFamily: "inherit" }}
                 >
                   <option value="">-- Select a client --</option>
                   {clients && clients.length > 0 ? clients.map((c, idx) => {
@@ -1754,7 +1754,7 @@ const [sortOrder, setSortOrder] = useState("desc");
                   }) : null}
                 </select>
                 {(!clients || clients.length === 0) && (
-                  <div style={{ marginTop: 10, fontSize: 13, color: "#6b7280", textAlign: "center" }}>No clients found</div>
+                  <div style={{ marginTop: 10, fontSize: 13, color: "#64748B", textAlign: "center" }}>No clients found</div>
                 )}
                 <button
                   disabled={!shareSelectedClientId}
@@ -1765,7 +1765,7 @@ const [sortOrder, setSortOrder] = useState("desc");
                       setShareSelectedClientId("");
                     }
                   }}
-                  style={{ width: "100%", marginTop: 16, padding: "12px", background: shareSelectedClientId ? "linear-gradient(135deg,var(--app-accent),var(--app-accent))" : "#e5e7eb", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 14, color: shareSelectedClientId ? "#fff" : "#9ca3af", cursor: shareSelectedClientId ? "pointer" : "not-allowed", fontFamily: "inherit" }}
+                  style={{ width: "100%", marginTop: 16, padding: "12px", background: shareSelectedClientId ? "linear-gradient(135deg,var(--app-accent),var(--app-accent))" : "#E2E8F0", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 14, color: shareSelectedClientId ? "#FFFFFF" : "#64748B", cursor: shareSelectedClientId ? "pointer" : "not-allowed", fontFamily: "inherit" }}
                 >
                   Send
                 </button>
@@ -1779,39 +1779,39 @@ const [sortOrder, setSortOrder] = useState("desc");
           <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(8px)", zIndex: 2000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
             <div style={{ background: "var(--app-card)", borderRadius: 24, width: "100%", maxWidth: 400, padding: "32px", boxShadow: "var(--app-shadow)", border: "1px solid var(--app-border)" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-                <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#0f172a" }}>Payment Information</h3>
+                <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#0F172A" }}>Payment Information</h3>
                 <button onClick={() => setPaymentModalEntry(null)} style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "var(--app-accent)", padding: "4px 8px" }}>✕</button>
               </div>
 
               <div style={{ background: "var(--app-bg)", borderRadius: 12, padding: "14px", marginBottom: 20, border: "1.5px solid var(--app-border)" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-                  <span style={{ fontSize: 12, color: "#6b7280", fontWeight: 600 }}>Total Amount:</span>
-                  <span style={{ fontSize: 13, fontWeight: 800, color: "#0f172a" }}>{formatCurrency(paymentModalEntry.total, paymentModalEntry.currency || inv.currency)}</span>
+                  <span style={{ fontSize: 12, color: "#64748B", fontWeight: 600 }}>Total Amount:</span>
+                  <span style={{ fontSize: 13, fontWeight: 800, color: "#0F172A" }}>{formatCurrency(paymentModalEntry.total, paymentModalEntry.currency || inv.currency)}</span>
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-                  <span style={{ fontSize: 12, color: "#6b7280", fontWeight: 600 }}>Previously Paid:</span>
-                  <span style={{ fontSize: 13, fontWeight: 800, color: "#16a34a" }}>{formatCurrency(paymentModalEntry.amountPaid || 0, paymentModalEntry.currency || inv.currency)}</span>
+                  <span style={{ fontSize: 12, color: "#64748B", fontWeight: 600 }}>Previously Paid:</span>
+                  <span style={{ fontSize: 13, fontWeight: 800, color: "#16A34A" }}>{formatCurrency(paymentModalEntry.amountPaid || 0, paymentModalEntry.currency || inv.currency)}</span>
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between", paddingTop: 8, borderTop: "1px dashed var(--app-border)" }}>
-                  <span style={{ fontSize: 12, color: "#ea580c", fontWeight: 700 }}>Balance Due:</span>
-                  <span style={{ fontSize: 14, fontWeight: 900, color: "#ea580c" }}>{formatCurrency(Math.max(0, (paymentModalEntry.total || 0) - (paymentModalEntry.amountPaid || 0)), paymentModalEntry.currency || inv.currency)}</span>
+                  <span style={{ fontSize: 12, color: "#64748B", fontWeight: 700 }}>Balance Due:</span>
+                  <span style={{ fontSize: 14, fontWeight: 900, color: "#64748B" }}>{formatCurrency(Math.max(0, (paymentModalEntry.total || 0) - (paymentModalEntry.amountPaid || 0)), paymentModalEntry.currency || inv.currency)}</span>
                 </div>
               </div>
 
               <div style={{ marginBottom: 16 }}>
                 <label style={lbl}>
                   {paymentModalStatus === "paid" ? "Final Payment Amount" : "New Payment Amount (Advance)"}
-                  <span style={{ color: "#ef4444" }}> *</span>
+                  <span style={{ color: "#64748B" }}> *</span>
                 </label>
                 <div style={{ position: "relative" }}>
-                  <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "#6b7280", fontSize: 14, fontWeight: 600, pointerEvents: "none" }}>{paymentModalEntry.currency || inv.currency}</span>
+                  <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "#64748B", fontSize: 14, fontWeight: 600, pointerEvents: "none" }}>{paymentModalEntry.currency || inv.currency}</span>
                   <input type="number"
                     value={paymentData.amountPaid === 0 ? "" : paymentData.amountPaid}
                     onChange={e => setPaymentData(p => ({ ...p, amountPaid: e.target.value === "" ? 0 : Number(e.target.value) }))}
                     placeholder="Enter amount"
                     style={{ ...inp(), paddingLeft: 52, fontWeight: 700, fontSize: 16 }} />
                 </div>
-                <p style={{ fontSize: 10, color: "#9ca3af", marginTop: 4 }}>This amount will be added to the total paid.</p>
+                <p style={{ fontSize: 10, color: "#64748B", marginTop: 4 }}>This amount will be added to the total paid.</p>
               </div>
 
               <div style={{ marginBottom: 16 }}>
@@ -1839,10 +1839,10 @@ const [sortOrder, setSortOrder] = useState("desc");
               </div>
 
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, padding: "0 4px" }}>
-                <span style={{ fontSize: 13, fontWeight: 600, color: "#0f172a" }}>Send a receipt</span>
+                <span style={{ fontSize: 13, fontWeight: 600, color: "#0F172A" }}>Send a receipt</span>
                 <label style={{ position: "relative", display: "inline-block", width: 42, height: 22 }}>
                   <input type="checkbox" checked={sendReceipt} onChange={e => setSendReceipt(e.target.checked)} style={{ opacity: 0, width: 0, height: 0 }} />
-                  <span style={{ position: "absolute", cursor: "pointer", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: sendReceipt ? "#16a34a" : "#ccc", transition: ".4s", borderRadius: 34 }}>
+                  <span style={{ position: "absolute", cursor: "pointer", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: sendReceipt ? "#16A34A" : "#E2E8F0", transition: ".4s", borderRadius: 34 }}>
                     <span style={{ position: "absolute", height: 16, width: 16, left: sendReceipt ? 20 : 4, bottom: 3, backgroundColor: "white", transition: ".4s", borderRadius: "50%" }}></span>
                   </span>
                 </label>
@@ -1857,7 +1857,7 @@ const [sortOrder, setSortOrder] = useState("desc");
                     setStep("receipt");
                   }
                   setPaymentModalEntry(null);
-                }} style={{ flex: 1, padding: "12px", background: paymentModalStatus === "paid" ? "linear-gradient(135deg,#16a34a,#15803d)" : "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>
+                }} style={{ flex: 1, padding: "12px", background: paymentModalStatus === "paid" ? "linear-gradient(135deg,#16A34A,#16A34A)" : "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#FFFFFF", cursor: "pointer", fontFamily: "inherit" }}>
                   {paymentModalStatus === "paid" ? "Confirm Full Payment" : "Confirm Part Payment"}
                 </button>
               </div>
@@ -1897,7 +1897,7 @@ const [sortOrder, setSortOrder] = useState("desc");
           </div>
           <div className="stat-card">
             <div className="stat-card-inner">
-              <div className="stat-icon" style={{ background: "var(--green-bg)", color: "var(--green)" }}><i className="ti ti-circle-check"></i></div>
+              <div className="stat-icon" style={{ background: "var(--app-accent-light)", color: "var(--green)" }}><i className="ti ti-circle-check"></i></div>
               <div>
                 <div className="stat-num">{enriched.filter(e => e.status === "paid" || e.status === "part_paid").length}</div>
                 <div className="stat-label">Paid</div>
@@ -1908,25 +1908,25 @@ const [sortOrder, setSortOrder] = useState("desc");
           </div>
           <div className="stat-card">
             <div className="stat-card-inner">
-              <div className="stat-icon" style={{ background: "var(--amber-bg)", color: "var(--amber)" }}><i className="ti ti-clock"></i></div>
+              <div className="stat-icon" style={{ background: "var(--app-accent-light)", color: "var(--app-muted)" }}><i className="ti ti-clock"></i></div>
               <div>
                 <div className="stat-num">{unpaidCnt}</div>
                 <div className="stat-label">Pending</div>
-                <div className="stat-amount" style={{ color: "var(--amber)" }}>{formatCurrency(Math.max(0, totalAmt - paidAmt), inv.currency)} due</div>
+                <div className="stat-amount" style={{ color: "var(--app-muted)" }}>{formatCurrency(Math.max(0, totalAmt - paidAmt), inv.currency)} due</div>
               </div>
             </div>
-            <div className="stat-bar-wrap"><div className="stat-bar-fill" style={{ width: (totalAmt > 0 ? (Math.max(0, totalAmt - paidAmt) / totalAmt) * 100 : 0) + "%", background: "var(--amber)" }}></div></div>
+            <div className="stat-bar-wrap"><div className="stat-bar-fill" style={{ width: (totalAmt > 0 ? (Math.max(0, totalAmt - paidAmt) / totalAmt) * 100 : 0) + "%", background: "var(--app-muted)" }}></div></div>
           </div>
           <div className="stat-card">
             <div className="stat-card-inner">
-              <div className="stat-icon" style={{ background: "var(--red-bg)", color: "var(--red)" }}><i className="ti ti-alert-circle"></i></div>
+              <div className="stat-icon" style={{ background: "var(--app-accent-light)", color: "var(--app-text)" }}><i className="ti ti-alert-circle"></i></div>
               <div>
                 <div className="stat-num">{enriched.filter(e => e.status === "overdue").length}</div>
                 <div className="stat-label">Overdue</div>
-                <div className="stat-amount" style={{ color: "var(--red)" }}>Action needed</div>
+                <div className="stat-amount" style={{ color: "var(--app-text)" }}>Action needed</div>
               </div>
             </div>
-            <div className="stat-bar-wrap"><div className="stat-bar-fill" style={{ width: "11%", background: "var(--red)" }}></div></div>
+            <div className="stat-bar-wrap"><div className="stat-bar-fill" style={{ width: "11%", background: "var(--app-text)" }}></div></div>
           </div>
         </div>
 <div className="tabs-row-mobile-fix" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20, gap: 10 }}></div>
@@ -1936,7 +1936,7 @@ const [sortOrder, setSortOrder] = useState("desc");
     <select
       value={filterTab}
       onChange={e => setFilterTab(e.target.value)}
-      style={{ flex: 1, padding: "10px 32px 10px 14px", borderRadius: 10, border: "1.5px solid var(--app-border)", background: "#fff", fontSize: 13, fontWeight: 700, color: "var(--app-accent, #2563EB)", outline: "none", WebkitAppearance: "none", backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2300BCD4' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 14px center" }}
+      style={{ flex: 1, padding: "10px 32px 10px 14px", borderRadius: 10, border: "1.5px solid var(--app-border)", background: "#FFFFFF", fontSize: 13, fontWeight: 700, color: "var(--app-accent, #2563EB)", outline: "none", WebkitAppearance: "none", backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2300BCD4' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 14px center" }}
     >
       {["all", "paid", "part_paid", "pending", "overdue", "draft"].map(t => (
         <option key={t} value={t}>{t === "part_paid" ? "Part Paid" : t === "all" ? "All" : t.charAt(0).toUpperCase() + t.slice(1)}</option>
@@ -1949,7 +1949,7 @@ const [sortOrder, setSortOrder] = useState("desc");
       ))}
     </div>
   )}
-  <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (typeof e.nativeEvent?.stopImmediatePropagation === 'function') e.nativeEvent.stopImmediatePropagation(); if (onOpenNewInvoiceModal) { onOpenNewInvoiceModal(); return; } clearForm(); setStep("form"); setInternalNav(true); }} type="button" style={{ padding: "8px 16px", background: "var(--teal)", color: "#fff", border: "none", borderRadius: 8, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
+  <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (typeof e.nativeEvent?.stopImmediatePropagation === 'function') e.nativeEvent.stopImmediatePropagation(); if (onOpenNewInvoiceModal) { onOpenNewInvoiceModal(); return; } clearForm(); setStep("form"); setInternalNav(true); }} type="button" style={{ padding: "8px 16px", background: "var(--teal)", color: "#FFFFFF", border: "none", borderRadius: 8, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
     <i className="ti ti-plus"></i> New Invoice
   </button>
 </div>
@@ -2058,13 +2058,13 @@ const [sortOrder, setSortOrder] = useState("desc");
                       <td>
                         {isPaid ? <span className="badge advance">Advance</span> :
                           isDraft ? <span className="badge draft">Draft</span> :
-                            <span className="badge" style={{ background: "var(--purple-bg)", color: "var(--purple)" }}>Milestone</span>}
+                            <span className="badge" style={{ background: "var(--app-accent-light)", color: "var(--app-accent)" }}>Milestone</span>}
                       </td>
                       <td style={{ color: "var(--text2)" }}>{invD.fromGST || entry.fromGST || "—"}</td>
                       <td style={{ color: "var(--text2)" }}>{invD.placeOfSupply || entry.placeOfSupply || "—"}</td>
                       <td className={isPaid || isPartPaid ? "amount-pos" : ""}>{formatCurrency(entry.total, entry.inv?.currency || inv.currency)}</td>
                       <td style={{ color: "var(--text2)" }}>{formatDate(invD.date || entry.date)}</td>
-                      <td style={{ color: isOverdue ? "var(--red)" : isPending ? "var(--amber)" : "var(--text2)", fontWeight: isOverdue || isPending ? 700 : 400 }}>
+                      <td style={{ color: isOverdue ? "var(--app-text)" : isPending ? "var(--app-muted)" : "var(--text2)", fontWeight: isOverdue || isPending ? 700 : 400 }}>
                         {formatDate(invD.dueDate || entry.dueDate)}
                       </td>
                       <td onClick={e => e.stopPropagation()}>
@@ -2075,7 +2075,7 @@ const [sortOrder, setSortOrder] = useState("desc");
                           style={{
                             background: "transparent", border: "none", fontSize: 10, fontWeight: 700,
                             cursor: "pointer", outline: "none", fontFamily: "inherit",
-                            color: isPaid ? "var(--green)" : isOverdue ? "var(--red)" : isPending ? "var(--amber)" : "var(--text3)"
+                            color: isPaid ? "var(--green)" : isOverdue ? "var(--app-text)" : isPending ? "var(--app-muted)" : "var(--text3)"
                           }}>
 
                           <option value="unpaid">Pending</option>
@@ -2118,7 +2118,7 @@ const [sortOrder, setSortOrder] = useState("desc");
             <div className="summary-title">Invoice Summary</div>
             <div className="summary-item">
               <div className="si-left">
-                <div className="si-icon" style={{ background: "var(--green-bg)", color: "var(--green)" }}><i className="ti ti-circle-check"></i></div>
+                <div className="si-icon" style={{ background: "var(--app-accent-light)", color: "var(--green)" }}><i className="ti ti-circle-check"></i></div>
                 <div>
                   <div className="si-label">Total Collected</div>
                   <div className="si-count">{enriched.filter(e => e.status === "paid" || e.status === "part_paid").length} invoices paid</div>
@@ -2128,23 +2128,23 @@ const [sortOrder, setSortOrder] = useState("desc");
             </div>
             <div className="summary-item">
               <div className="si-left">
-                <div className="si-icon" style={{ background: "var(--amber-bg)", color: "var(--amber)" }}><i className="ti ti-clock"></i></div>
+                <div className="si-icon" style={{ background: "var(--app-accent-light)", color: "var(--app-muted)" }}><i className="ti ti-clock"></i></div>
                 <div>
                   <div className="si-label">Awaiting Payment</div>
                   <div className="si-count">{unpaidCnt} invoices pending</div>
                 </div>
               </div>
-              <div className="si-amount" style={{ color: "var(--amber)" }}>{formatCurrency(Math.max(0, totalAmt - paidAmt), inv.currency)}</div>
+              <div className="si-amount" style={{ color: "var(--app-muted)" }}>{formatCurrency(Math.max(0, totalAmt - paidAmt), inv.currency)}</div>
             </div>
             <div className="summary-item">
               <div className="si-left">
-                <div className="si-icon" style={{ background: "var(--red-bg)", color: "var(--red)" }}><i className="ti ti-alert-circle"></i></div>
+                <div className="si-icon" style={{ background: "var(--app-accent-light)", color: "var(--app-text)" }}><i className="ti ti-alert-circle"></i></div>
                 <div>
                   <div className="si-label">Overdue Amount</div>
                   <div className="si-count">{enriched.filter(e => e.status === "overdue").length} invoice overdue</div>
                 </div>
               </div>
-              <div className="si-amount" style={{ color: "var(--red)" }}>{formatCurrency(enriched.filter(e => e.status === "overdue").reduce((s, e) => s + (parseFloat(e.total) || 0), 0), inv.currency)}</div>
+              <div className="si-amount" style={{ color: "var(--app-text)" }}>{formatCurrency(enriched.filter(e => e.status === "overdue").reduce((s, e) => s + (parseFloat(e.total) || 0), 0), inv.currency)}</div>
             </div>
             <div className="summary-item">
               <div className="si-left">
@@ -2203,7 +2203,7 @@ const [sortOrder, setSortOrder] = useState("desc");
                 const isPartPaid = entry.status === "part_paid";
                 const isOverdue = entry.status === "overdue";
                 const isDraft = entry.status === "draft";
-                const dotColor = isPaid || isPartPaid ? "var(--green)" : isOverdue ? "var(--red)" : isDraft ? "var(--text3)" : "var(--amber)";
+                const dotColor = isPaid || isPartPaid ? "var(--green)" : isOverdue ? "var(--app-text)" : isDraft ? "var(--text3)" : "var(--app-muted)";
                 const statusStr = isPaid ? "Paid" : isPartPaid ? "Part Paid" : isOverdue ? "Overdue" : isDraft ? "Draft" : "Sent";
                 return (
                   <div className="activity-item" key={entry.id || i}>
@@ -2224,19 +2224,19 @@ const [sortOrder, setSortOrder] = useState("desc");
         </div>
 
         {step === "preview" && viewAsModal && (
-          <div style={{ position: "fixed", inset: 0, zIndex: 999999, background: "rgba(15,28,46,0.55)", overflowY: "auto", padding: "20px 12px" }} onClick={() => { if (onBack) { onBack(); } else { setStep("list"); } }}>
+          <div style={{ position: "fixed", inset: 0, zIndex: 999999, background: "rgba(15, 23, 42, 0.55)", overflowY: "auto", padding: "20px 12px" }} onClick={() => { if (onBack) { onBack(); } else { setStep("list"); } }}>
             <div className="invoice-preview-modal-wrap" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 830, margin: "0 auto", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
               <div className="no-print" style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 4, flexWrap: "wrap" }}>
-              <button onClick={() => { if (onBack) { onBack(); } else { setStep("list"); } }} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>Close</button>
+              <button onClick={() => { if (onBack) { onBack(); } else { setStep("list"); } }} style={{ padding: "10px 18px", background: "#FFFFFF", border: "1.5px solid #E2E8F0", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#1E293B", fontFamily: "inherit" }}>Close</button>
 <button
   onClick={() => {
     const entry = invoiceList.find(e => (e._id || e.id) === editingId) || { inv, items };
     loadEntry(entry, "form");
     window.scrollTo(0, 0);
   }}
-  style={{ padding: "10px 22px", background: "#fff7ed", border: "1.5px solid #fed7aa", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#ea580c", fontFamily: "inherit" }}
+  style={{ padding: "10px 22px", background: "#F8FAFC", border: "1.5px solid #E2E8F0", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#64748B", fontFamily: "inherit" }}
 >Edit</button>
-<button onClick={() => setShareModalEntry({ id: editingId, invoiceNo: inv.invoiceNo, total: total })} style={{ padding: "10px 22px", background: "#eff6ff", border: "1.5px solid #bfdbfe", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#2563eb", fontFamily: "inherit" }}>Share</button>  <button onClick={() => triggerPDFShare({ id: editingId, invoiceNo: inv.invoiceNo, total: total }, "print")} style={{ padding: "10px 22px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>Print / PDF</button>
+<button onClick={() => setShareModalEntry({ id: editingId, invoiceNo: inv.invoiceNo, total: total })} style={{ padding: "10px 22px", background: "#EFF6FF", border: "1.5px solid #E2E8F0", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#2563EB", fontFamily: "inherit" }}>Share</button>  <button onClick={() => triggerPDFShare({ id: editingId, invoiceNo: inv.invoiceNo, total: total }, "print")} style={{ padding: "10px 22px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#FFFFFF", fontFamily: "inherit" }}>Print / PDF</button>
               </div>
               <InvoiceLivePreview
                 inv={inv} items={items} effectiveLogo={effectiveLogo} effectiveCompanyName={effectiveCompanyName}
@@ -2256,7 +2256,7 @@ const [sortOrder, setSortOrder] = useState("desc");
   // ------------------------------------------------------------
   if (step === "preview" && !viewAsModal) {
     const ModalOuter = React.Fragment;
-    const modalOuterProps = viewAsModal ? { ref: modalScrollRef, style: { position: "fixed", inset: 0, zIndex: 9998, background: "rgba(15,28,46,0.55)", overflowY: "auto", padding: "20px 12px" }, onClick: () => setStep("list") } : {};
+    const modalOuterProps = viewAsModal ? { ref: modalScrollRef, style: { position: "fixed", inset: 0, zIndex: 9998, background: "rgba(15, 23, 42, 0.55)", overflowY: "auto", padding: "20px 12px" }, onClick: () => setStep("list") } : {};
     const ModalInner = viewAsModal ? "div" : React.Fragment;
     const modalInnerProps = viewAsModal ? { onClick: (e) => e.stopPropagation(), style: { maxWidth: 830, margin: "0 auto", fontFamily: "'Plus Jakarta Sans', sans-serif" } } : {};
     return (
@@ -2268,17 +2268,17 @@ const [sortOrder, setSortOrder] = useState("desc");
 
           {shareModalEntry && (
             <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }} onClick={() => { setShareModalEntry(null); setShareSelectedClientId(""); }}>
-              <div style={{ background: "#fff", borderRadius: 14, width: "100%", maxWidth: 360, display: "flex", flexDirection: "column", overflow: "hidden" }} onClick={(e) => e.stopPropagation()}>
-                <div style={{ padding: "16px 18px", borderBottom: "1.5px solid #e5e7eb", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <div style={{ fontWeight: 800, fontSize: 15, color: "#0f172a" }}>Share with client</div>
-                  <button onClick={() => { setShareModalEntry(null); setShareSelectedClientId(""); }} style={{ background: "none", border: "none", fontSize: 18, cursor: "pointer", color: "#6b7280" }}>✕</button>
+              <div style={{ background: "#FFFFFF", borderRadius: 14, width: "100%", maxWidth: 360, display: "flex", flexDirection: "column", overflow: "hidden" }} onClick={(e) => e.stopPropagation()}>
+                <div style={{ padding: "16px 18px", borderBottom: "1.5px solid #E2E8F0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div style={{ fontWeight: 800, fontSize: 15, color: "#0F172A" }}>Share with client</div>
+                  <button onClick={() => { setShareModalEntry(null); setShareSelectedClientId(""); }} style={{ background: "none", border: "none", fontSize: 18, cursor: "pointer", color: "#64748B" }}>✕</button>
                 </div>
                 <div style={{ padding: 18 }}>
-                  <label style={{ display: "block", fontSize: 12, color: "#64748b", fontWeight: 700, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.5px" }}>Select Client</label>
+                  <label style={{ display: "block", fontSize: 12, color: "#64748B", fontWeight: 700, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.5px" }}>Select Client</label>
                   <select
                     value={shareSelectedClientId}
                     onChange={(e) => setShareSelectedClientId(e.target.value)}
-                    style={{ width: "100%", border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px 12px", fontSize: 14, color: "#0f172a", background: "var(--app-surface)", boxSizing: "border-box", outline: "none", fontFamily: "inherit" }}
+                    style={{ width: "100%", border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px 12px", fontSize: 14, color: "#0F172A", background: "var(--app-surface)", boxSizing: "border-box", outline: "none", fontFamily: "inherit" }}
                   >
                     <option value="">-- Select a client --</option>
                     {clients && clients.length > 0 ? clients.map((c, idx) => {
@@ -2291,7 +2291,7 @@ const [sortOrder, setSortOrder] = useState("desc");
                     }) : null}
                   </select>
                   {(!clients || clients.length === 0) && (
-                    <div style={{ marginTop: 10, fontSize: 13, color: "#6b7280", textAlign: "center" }}>No clients found</div>
+                    <div style={{ marginTop: 10, fontSize: 13, color: "#64748B", textAlign: "center" }}>No clients found</div>
                   )}
                   <button
                     disabled={!shareSelectedClientId}
@@ -2302,7 +2302,7 @@ const [sortOrder, setSortOrder] = useState("desc");
                         setShareSelectedClientId("");
                       }
                     }}
-                    style={{ width: "100%", marginTop: 16, padding: "12px", background: shareSelectedClientId ? "linear-gradient(135deg,var(--app-accent),var(--app-accent))" : "#e5e7eb", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 14, color: shareSelectedClientId ? "#fff" : "#9ca3af", cursor: shareSelectedClientId ? "pointer" : "not-allowed", fontFamily: "inherit" }}
+                    style={{ width: "100%", marginTop: 16, padding: "12px", background: shareSelectedClientId ? "linear-gradient(135deg,var(--app-accent),var(--app-accent))" : "#E2E8F0", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 14, color: shareSelectedClientId ? "#FFFFFF" : "#64748B", cursor: shareSelectedClientId ? "pointer" : "not-allowed", fontFamily: "inherit" }}
                   >
                     Send
                   </button>
@@ -2313,11 +2313,11 @@ const [sortOrder, setSortOrder] = useState("desc");
 
           {/* Toolbar */}
           <div className="no-print" style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 4, flexWrap: "wrap" }}>
-            <button onClick={() => { if ((jumpInvoice || newInvoicePrefill) && onBack) { onBack(); } else { setStep("list"); } }} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>Close</button>
+            <button onClick={() => { if ((jumpInvoice || newInvoicePrefill) && onBack) { onBack(); } else { setStep("list"); } }} style={{ padding: "10px 18px", background: "#FFFFFF", border: "1.5px solid #E2E8F0", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#1E293B", fontFamily: "inherit" }}>Close</button>
 
-            <button onClick={() => setShareModalEntry({ id: editingId, invoiceNo: inv.invoiceNo, total: total })} style={{ padding: "10px 22px", background: "#eff6ff", border: "1.5px solid #bfdbfe", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#2563eb", fontFamily: "inherit" }}>Share</button>
+            <button onClick={() => setShareModalEntry({ id: editingId, invoiceNo: inv.invoiceNo, total: total })} style={{ padding: "10px 22px", background: "#EFF6FF", border: "1.5px solid #E2E8F0", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#2563EB", fontFamily: "inherit" }}>Share</button>
 
-            <button onClick={() => triggerPDFShare({ id: editingId, invoiceNo: inv.invoiceNo, total: total }, "print")} style={{ padding: "10px 22px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>Print / PDF</button>
+            <button onClick={() => triggerPDFShare({ id: editingId, invoiceNo: inv.invoiceNo, total: total }, "print")} style={{ padding: "10px 22px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#FFFFFF", fontFamily: "inherit" }}>Print / PDF</button>
           </div>
 
           {/* LIVE INVOICE PREVIEW (matches Document Live Preview exactly) */}
@@ -2339,7 +2339,7 @@ const [sortOrder, setSortOrder] = useState("desc");
     return (
       <div style={{ width: "100%", height: "80vh", display: "flex", flexDirection: "column" }}>
         <div style={{ padding: "10px 0", display: "flex", gap: 10, alignItems: "center" }}>
-          <button onClick={() => (jumpInvoice || newInvoicePrefill) ? onBack() : setStep("list")} style={{ padding: "8px 14px", background: "var(--app-bg)", border: "1.5px solid var(--app-border)", borderRadius: 8, cursor: "pointer", fontWeight: 700, color: "#64748b" }}>{(jumpInvoice || newInvoicePrefill) ? " Back to Dashboard" : " Back to List"}</button>
+          <button onClick={() => (jumpInvoice || newInvoicePrefill) ? onBack() : setStep("list")} style={{ padding: "8px 14px", background: "var(--app-bg)", border: "1.5px solid var(--app-border)", borderRadius: 8, cursor: "pointer", fontWeight: 700, color: "#64748B" }}>{(jumpInvoice || newInvoicePrefill) ? " Back to Dashboard" : " Back to List"}</button>
         </div>
         <div style={{ flex: 1, overflow: "hidden", borderRadius: 16 }}>
           <iframe src="/template-designer.html#inv" ref={iframeRef} onLoad={sendThemeToIframe} style={{ width: "100%", height: "100%", border: "none" }} title="Template Designer" />
@@ -2360,7 +2360,7 @@ const [sortOrder, setSortOrder] = useState("desc");
           <button onClick={() => { if (onBack && (jumpInvoice || newInvoicePrefill) && !internalNav) { onBack(); return; } setStep("list"); }} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 13, color: "var(--app-accent)", fontWeight: 700, padding: 0, fontFamily: "inherit", display: "flex", alignItems: "center", gap: 4 }}>
             Back
           </button>
-          <span style={{ fontSize: 13, fontWeight: 700, color: "#0f172a" }}>
+          <span style={{ fontSize: 13, fontWeight: 700, color: "#0F172A" }}>
 
           </span>
           {editingId && (
@@ -2370,7 +2370,7 @@ const [sortOrder, setSortOrder] = useState("desc");
           )}
         </div>
         {onBack && (
-          <button onClick={onBack} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 20, color: "#64748b", padding: 0, lineHeight: 1, display: "flex", alignItems: "center", justifyContent: "center", width: 28, height: 28 }}>
+          <button onClick={onBack} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 20, color: "#64748B", padding: 0, lineHeight: 1, display: "flex", alignItems: "center", justifyContent: "center", width: 28, height: 28 }}>
             ✕
           </button>
         )}
@@ -2388,7 +2388,7 @@ const [sortOrder, setSortOrder] = useState("desc");
           {/* TEMPLATE */}
           <div className="inv-creator-card">
             <div className="inv-creator-card-header">
-              <div className="inv-creator-card-icon" style={{ background: "var(--purple-bg)", color: "var(--purple)" }}><i className="ti ti-layout-grid"></i></div>
+              <div className="inv-creator-card-icon" style={{ background: "var(--app-accent-light)", color: "var(--app-accent)" }}><i className="ti ti-layout-grid"></i></div>
               <div className="inv-creator-card-title">Invoice Template</div>
             </div>
             <div className="inv-creator-card-body">
@@ -2479,14 +2479,14 @@ const [sortOrder, setSortOrder] = useState("desc");
           {/* BILL TO (CLIENT) */}
           <div className="inv-creator-card">
             <div className="inv-creator-card-header">
-              <div className="inv-creator-card-icon" style={{ background: "var(--amber-bg)", color: "var(--amber)" }}><i className="ti ti-user-circle"></i></div>
+              <div className="inv-creator-card-icon" style={{ background: "var(--app-accent-light)", color: "var(--app-muted)" }}><i className="ti ti-user-circle"></i></div>
               <div className="inv-creator-card-title">Bill To (Client)</div>
 
             </div>
             <div className="inv-creator-card-body">
               <div className="inv-creator-form-row">
                 <div className="inv-creator-form-group" id="field-client" style={{ marginBottom: 0 }}>
-                  <label className="inv-creator-form-label" style={{ color: errors.client ? "#ef4444" : "var(--text2)" }}>Company / Client Name *</label>
+                  <label className="inv-creator-form-label" style={{ color: errors.client ? "#64748B" : "var(--text2)" }}>Company / Client Name *</label>
                   <CompanyDropdown
                     clients={clients}
                     value={inv.client}
@@ -2494,7 +2494,7 @@ const [sortOrder, setSortOrder] = useState("desc");
                     error={errors.client}
                     onAddCompany={() => setShowAddClient(true)}
                   />
-                  {errors.client && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4, fontWeight: 600 }}>Warning {errors.client}</div>}
+                  {errors.client && <div style={{ fontSize: 11, color: "#64748B", marginTop: 4, fontWeight: 600 }}>Warning {errors.client}</div>}
                   {showAddClient && (
                     <AddClientView
                       onBack={() => setShowAddClient(false)}
@@ -2522,9 +2522,9 @@ const [sortOrder, setSortOrder] = useState("desc");
                 </div>
               </div>
               {selectedClient && (
-                <div style={{ marginTop: 14, padding: "8px 12px", background: "#f9fafb", borderRadius: 8, display: "flex", gap: 16, flexWrap: "wrap" }}>
+                <div style={{ marginTop: 14, padding: "8px 12px", background: "#F8FAFC", borderRadius: 8, display: "flex", gap: 16, flexWrap: "wrap" }}>
                   {[["", selectedClient.email], ["", selectedClient.phone], ["Location", selectedClient.address], ["", selectedClient.gstNumber]].filter(([, v]) => v).map(([icon, val], i) => (
-                    <span key={i} style={{ fontSize: 12, color: "#6b7280" }}>{icon} {val}</span>
+                    <span key={i} style={{ fontSize: 12, color: "#64748B" }}>{icon} {val}</span>
                   ))}
                 </div>
               )}
@@ -2586,14 +2586,14 @@ const [sortOrder, setSortOrder] = useState("desc");
                       <tr key={item.id}>
                         <td>
                           <input type="text" id={`item_${item.id}_description`} className="inv-creator-item-input desc" placeholder="Item description" value={item.description || ""} onChange={(e) => updItem(item.id, "description", e.target.value)} />
-                          {dErr && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 2 }}>Warning Required</div>}
+                          {dErr && <div style={{ fontSize: 11, color: "#64748B", marginTop: 2 }}>Warning Required</div>}
                         </td>
                         <td>
                           <input type="number" className="inv-creator-item-input num" value={item.quantity === 0 ? "" : item.quantity} onChange={(e) => updItem(item.id, "quantity", e.target.value === "" ? 0 : Number(e.target.value))} onWheel={(e) => e.target.blur()} />
                         </td>
                         <td>
                           <input type="number" id={`item_${item.id}_rate`} className="inv-creator-item-input num" value={item.rate === 0 ? "" : item.rate} onChange={(e) => updItem(item.id, "rate", e.target.value === "" ? 0 : Number(e.target.value))} onWheel={(e) => e.target.blur()} style={{ width: "90px" }} />
-                          {rErr && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 2 }}>Warning Required</div>}
+                          {rErr && <div style={{ fontSize: 11, color: "#64748B", marginTop: 2 }}>Warning Required</div>}
                         </td>
                         <td>
                           <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
@@ -2679,7 +2679,7 @@ const [sortOrder, setSortOrder] = useState("desc");
           {/* PAYMENT TERMS */}
           <div className="inv-creator-card">
             <div className="inv-creator-card-header">
-              <div className="inv-creator-card-icon" style={{ background: "var(--green-bg)", color: "var(--green)" }}><i className="ti ti-clock"></i></div>
+              <div className="inv-creator-card-icon" style={{ background: "var(--app-accent-light)", color: "var(--green)" }}><i className="ti ti-clock"></i></div>
               <div className="inv-creator-card-title">Payment Terms & Bank Details</div>
             </div>
             <div className="inv-creator-card-body">
@@ -2773,7 +2773,7 @@ const [sortOrder, setSortOrder] = useState("desc");
                           </div>
                         ) : null}
                         {inv.currency && inv.currency !== '' && (
-                          <div style={{ fontSize: 10, color: "#64748b", fontWeight: 600, display: "flex", gap: 12 }}>
+                          <div style={{ fontSize: 10, color: "#64748B", fontWeight: 600, display: "flex", gap: 12 }}>
                             <span>Code: <span style={{ color: "var(--teal)", fontWeight: 800 }}>{inv.currency}</span></span>
                             <span>Symbol: <span style={{ color: "var(--teal)", fontWeight: 800 }}>{getCurrencySymbol(inv.currency) !== inv.currency ? getCurrencySymbol(inv.currency) : (inv.customCurrencySymbol || inv.currency)}</span></span>
                           </div>
@@ -2809,7 +2809,7 @@ const [sortOrder, setSortOrder] = useState("desc");
           {/* NOTES & TERMS */}
           <div className="inv-creator-card">
             <div className="inv-creator-card-header">
-              <div className="inv-creator-card-icon" style={{ background: "var(--amber-bg)", color: "var(--amber)" }}><i className="ti ti-notes"></i></div>
+              <div className="inv-creator-card-icon" style={{ background: "var(--app-accent-light)", color: "var(--app-muted)" }}><i className="ti ti-notes"></i></div>
               <div className="inv-creator-card-title">Notes, Terms & Signature</div>
             </div>
             <div className="inv-creator-card-body">
@@ -2824,13 +2824,13 @@ const [sortOrder, setSortOrder] = useState("desc");
               <div className="inv-creator-form-group">
                 <label className="inv-creator-form-label">Authorised Signature</label>
                 {inv.signature ? (
-                  <div style={{ background: "#fff", border: "1.5px solid #E2E8F0", borderRadius: 12, padding: "14px 18px", display: "flex", flexDirection: "column", alignItems: "center", position: "relative" }}>
-                    <button type="button" onClick={() => { upd("signature", ""); upd("signatureType", "text"); setTypedSig(""); }} style={{ position: "absolute", top: 10, right: 10, border: "none", background: "none", color: "#ef4444", fontSize: 12, cursor: "pointer", fontWeight: "800" }}>CloseClear Signature</button>
+                  <div style={{ background: "#FFFFFF", border: "1.5px solid #E2E8F0", borderRadius: 12, padding: "14px 18px", display: "flex", flexDirection: "column", alignItems: "center", position: "relative" }}>
+                    <button type="button" onClick={() => { upd("signature", ""); upd("signatureType", "text"); setTypedSig(""); }} style={{ position: "absolute", top: 10, right: 10, border: "none", background: "none", color: "#64748B", fontSize: 12, cursor: "pointer", fontWeight: "800" }}>CloseClear Signature</button>
                     <div style={{ minHeight: 60, display: "flex", alignItems: "center", justifyContent: "center", width: "100%", marginTop: 12 }}>
                       {inv.signatureType === "image" ? (
                         <img src={inv.signature} alt="Signature Preview" style={{ maxHeight: 50, maxWidth: "100%", objectFit: "contain" }} />
                       ) : (
-                        <div style={{ fontFamily: "'Dancing Script', cursive", fontSize: 28, fontWeight: "bold", color: "#1e293b" }}>{inv.signature}</div>
+                        <div style={{ fontFamily: "'Dancing Script', cursive", fontSize: 28, fontWeight: "bold", color: "#1E293B" }}>{inv.signature}</div>
                       )}
                     </div>
                   </div>
@@ -2888,7 +2888,7 @@ const [sortOrder, setSortOrder] = useState("desc");
                               background: "var(--teal)",
                               border: "none",
                               borderRadius: 10,
-                              color: "#fff",
+                              color: "#FFFFFF",
                               fontSize: 12,
                               fontWeight: "800",
                               cursor: "pointer",
@@ -2899,9 +2899,9 @@ const [sortOrder, setSortOrder] = useState("desc");
                           </button>
                         </div>
                         {typedSig && (
-                          <div style={{ fontSize: 11, color: "#64748b", display: "flex", alignItems: "center", gap: 8 }}>
+                          <div style={{ fontSize: 11, color: "#64748B", display: "flex", alignItems: "center", gap: 8 }}>
                             <span>Preview:</span>
-                            <span style={{ fontFamily: "'Dancing Script', cursive", fontSize: 22, color: "#1e293b", fontWeight: "bold" }}>{typedSig}</span>
+                            <span style={{ fontFamily: "'Dancing Script', cursive", fontSize: 22, color: "#1E293B", fontWeight: "bold" }}>{typedSig}</span>
                           </div>
                         )}
                       </div>
@@ -2941,9 +2941,9 @@ const [sortOrder, setSortOrder] = useState("desc");
           <div style={{ position: "sticky", top: "0px", display: "flex", flexDirection: "column", gap: 12 }}>
             <div className="preview-card" style={{ background: "var(--app-card)", border: "1.5px solid var(--app-border)", borderRadius: "14px", overflow: "hidden", boxShadow: "0 4px 20px rgba(0,0,0,0.06)" }}>
               <div className="preview-toolbar" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", borderBottom: "1.5px solid var(--app-border)", background: "var(--app-surface-variant)" }}>
-                <div style={{ fontSize: "12px", fontWeight: "800", color: "#0f172a" }}>Document Live Preview</div>
+                <div style={{ fontSize: "12px", fontWeight: "800", color: "#0F172A" }}>Document Live Preview</div>
                 <div style={{ display: "flex", gap: "6px" }}>
-                  <button onClick={handleSavePreview} style={{ display: "flex", alignItems: "center", gap: "4px", padding: "6px 10px", background: "#fff", border: "1.5px solid var(--app-border)", borderRadius: "8px", fontSize: "10px", fontWeight: "700", color: "#0f172a", cursor: "pointer", fontFamily: "inherit" }}>
+                  <button onClick={handleSavePreview} style={{ display: "flex", alignItems: "center", gap: "4px", padding: "6px 10px", background: "#FFFFFF", border: "1.5px solid var(--app-border)", borderRadius: "8px", fontSize: "10px", fontWeight: "700", color: "#0F172A", cursor: "pointer", fontFamily: "inherit" }}>
                     Print / PDF
                   </button>
                 </div>
@@ -2962,18 +2962,18 @@ const [sortOrder, setSortOrder] = useState("desc");
       {/* Bottom save buttons */}
       <div style={{ display: "flex", gap: 10, marginBottom: 32 }}>
         <button onClick={handleSaveDraft} disabled={!!saving}
-          style={{ padding: "13px", background: draftSaved ? "#22c55e" : "#fff", border: `1.5px solid ${draftSaved ? "#22c55e" : "#e5e7eb"}`, borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: saving ? "not-allowed" : "pointer", color: draftSaved ? "#fff" : "#374151", fontFamily: "inherit", transition: "all 0.3s" }}>
+          style={{ padding: "13px", background: draftSaved ? "#16A34A" : "#FFFFFF", border: `1.5px solid ${draftSaved ? "#16A34A" : "#E2E8F0"}`, borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: saving ? "not-allowed" : "pointer", color: draftSaved ? "#FFFFFF" : "#1E293B", fontFamily: "inherit", transition: "all 0.3s" }}>
           {saving === "draft" ? "Saving…" : draftSaved ? "Success Saved as Draft!" : " Save Draft"}
         </button>
 
         {editingId && (
           <>
-            <button onClick={() => shareInvoice({ id: editingId, invoiceNo: inv.invoiceNo, total: total })} style={{ padding: "13px 18px", background: "#eff6ff", border: "1.5px solid #bfdbfe", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#2563eb", fontFamily: "inherit" }} title="Share Link"> Share</button>
+            <button onClick={() => shareInvoice({ id: editingId, invoiceNo: inv.invoiceNo, total: total })} style={{ padding: "13px 18px", background: "#EFF6FF", border: "1.5px solid #E2E8F0", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#2563EB", fontFamily: "inherit" }} title="Share Link"> Share</button>
           </>
         )}
 
         <button onClick={handleSavePreview} disabled={!!saving}
-          style={{ padding: "13px", background: saving === "preview" ? "#9ca3af" : "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 12, fontWeight: 800, fontSize: 15, cursor: saving ? "not-allowed" : "pointer", color: "#fff", fontFamily: "inherit" }}>
+          style={{ padding: "13px", background: saving === "preview" ? "#64748B" : "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 12, fontWeight: 800, fontSize: 15, cursor: saving ? "not-allowed" : "pointer", color: "#FFFFFF", fontFamily: "inherit" }}>
           {saving === "preview" ? "Saving…" : "Preview & Print "}
         </button>
       </div>

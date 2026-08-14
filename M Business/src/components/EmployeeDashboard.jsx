@@ -20,21 +20,21 @@ const BASE = "/api/employee-dashboard";
 // ── DESIGN TOKENS --------------------------------------------
 const T = {
   // ── BACKGROUNDS ------------------------------------------
-  bg: "var(--app-bg, #f8fafc)",
-  surface: "#ffffff",
+  bg: "var(--app-bg, #F8FAFC)",
+  surface: "#FFFFFF",
   sidebar: "linear-gradient(180deg, var(--app-accent, #2563EB) 0%, var(--app-accent2, #2563EB) 100%)",
   sidebarActive: "rgba(255,255,255,0.22)",
   sidebarText: "rgba(255,255,255,0.65)",
-  sidebarTextActive: "#ffffff",
+  sidebarTextActive: "#FFFFFF",
 
   // ── BORDERS ----------------------------------------------
-  border: "var(--app-border, #e2e8f0)",
-  borderDark: "var(--app-border, #cbd5e1)",
+  border: "var(--app-border, #E2E8F0)",
+  borderDark: "var(--app-border, #E2E8F0)",
 
   // ── TEXT -------------------------------------------------
-  text: "var(--app-text, #1e293b)",
-  textMuted: "var(--app-muted, #64748b)",
-  textFaint: "var(--app-muted, #94a3b8)",
+  text: "var(--app-text, #1E293B)",
+  textMuted: "var(--app-muted, #64748B)",
+  textFaint: "var(--app-muted, #64748B)",
 
   // ── ACCENT -----------------------------------------------
   accent: "var(--app-accent, #2563EB)",
@@ -42,18 +42,18 @@ const T = {
   accentRgb: "var(--app-accent-rgb, 0,188,212)",
 
   // ── STATUS (semantic — intentionally not tied to theme) ---
-  success: "#16a34a",
-  successBg: "#f0fdf4",
-  successBorder: "#bbf7d0",
-  warning: "#b45309",
-  warningBg: "#fffbeb",
-  warningBorder: "#fde68a",
-  danger: "#dc2626",
-  dangerBg: "#fef2f2",
-  dangerBorder: "#fecaca",
-  info: "#2563eb",
-  infoBg: "#eff6ff",
-  infoBorder: "#bfdbfe",
+  success: "#16A34A",
+  successBg: "#F8FAFC",
+  successBorder: "#E2E8F0",
+  warning: "#64748B",
+  warningBg: "#F8FAFC",
+  warningBorder: "#E2E8F0",
+  danger: "#64748B",
+  dangerBg: "#F8FAFC",
+  dangerBorder: "#E2E8F0",
+  info: "#2563EB",
+  infoBg: "#EFF6FF",
+  infoBorder: "#E2E8F0",
 
   // ── SHAPE ------------------------------------------------
   radius: "14px",
@@ -66,10 +66,10 @@ const T = {
 
 const sc = (s) => ({
   active: T.accent, "in progress": T.accent,
-  review: "#b45309", "in review": "#b45309", pending: "#b45309",
+  review: "#64748B", "in review": "#64748B", pending: "#64748B",
   done: T.success, completed: T.success,
-  high: T.danger, medium: "#b45309", low: T.success,
-  present: T.success, absent: T.danger, leave: "#b45309", holiday: T.textMuted,
+  high: T.danger, medium: "#64748B", low: T.success,
+  present: T.success, absent: T.danger, leave: "#64748B", holiday: T.textMuted,
   approved: T.success, rejected: T.danger, overdue: T.danger,
   cancelled: T.textMuted,
 }[(s || "").toLowerCase()] || T.accent);
@@ -79,9 +79,9 @@ const scBg = (s) => ({
   review: T.warningBg, "in review": T.warningBg, pending: T.warningBg,
   done: T.successBg, completed: T.successBg,
   high: T.dangerBg, medium: T.warningBg, low: T.successBg,
-  present: T.successBg, absent: T.dangerBg, leave: T.warningBg, holiday: "#f5f5f5",
+  present: T.successBg, absent: T.dangerBg, leave: T.warningBg, holiday: "#F8FAFC",
   approved: T.successBg, rejected: T.dangerBg, overdue: T.dangerBg,
-  cancelled: "#f5f5f5",
+  cancelled: "#F8FAFC",
 }[(s || "").toLowerCase()] || T.accentLight);
 
 const NAV = [
@@ -127,7 +127,7 @@ function Badge({ label }) {
 function ProgressBar({ pct }) {
   const p = pct || 0, c = p === 100 ? T.success : T.accent;
   return (
-    <div style={{ background: "#ebebeb", borderRadius: 99, height: 5, overflow: "hidden", minWidth: 80 }}>
+    <div style={{ background: "#E2E8F0", borderRadius: 99, height: 5, overflow: "hidden", minWidth: 80 }}>
       <div style={{ width: `${p}%`, background: c, height: "100%", borderRadius: 99, transition: "width 1s cubic-bezier(0.4,0,0.2,1)" }} />
     </div>
   );
@@ -143,7 +143,7 @@ function StatCard({ icon, label, value, sub, color, onClick, dark }) {
         <span style={{ filter: dark ? "brightness(0) invert(1)" : "none" }}>{icon}</span>
       </div>
       <div style={{ fontSize: 10, color: dark ? "rgba(255,255,255,0.5)" : T.textMuted, fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 5 }}>{label}</div>
-      <div style={{ fontSize: 26, fontWeight: 900, color: dark ? "#fff" : T.text, lineHeight: 1, letterSpacing: "-0.5px" }}>{value}</div>
+      <div style={{ fontSize: 26, fontWeight: 900, color: dark ? "#FFFFFF" : T.text, lineHeight: 1, letterSpacing: "-0.5px" }}>{value}</div>
       {sub && <div style={{ fontSize: 11, color: dark ? "rgba(255,255,255,0.4)" : T.textFaint, marginTop: 6, fontWeight: 500 }}>{sub}</div>}
     </div>
   );
@@ -170,7 +170,7 @@ function TabBar({ tabs, active, onChange }) {
         const on = active === t.key;
         return (
           <button key={t.key} onClick={() => onChange(t.key)}
-            style={{ padding: "7px 15px", fontSize: 12, cursor: "pointer", background: on ? T.accent : "transparent", border: "none", borderRadius: 7, color: on ? "#fff" : T.textMuted, fontWeight: on ? 800 : 500, fontFamily: "inherit", whiteSpace: "nowrap", transition: "all 0.18s" }}>
+            style={{ padding: "7px 15px", fontSize: 12, cursor: "pointer", background: on ? T.accent : "transparent", border: "none", borderRadius: 7, color: on ? "#FFFFFF" : T.textMuted, fontWeight: on ? 800 : 500, fontFamily: "inherit", whiteSpace: "nowrap", transition: "all 0.18s" }}>
             {t.label}
           </button>
         );
@@ -182,7 +182,7 @@ function TabBar({ tabs, active, onChange }) {
 function Toast({ msg, type }) {
   const c = type === "error" ? T.danger : T.accent;
   return (
-    <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: T.text, border: `1px solid ${c}50`, borderRadius: T.radiusSm, padding: "10px 18px", fontSize: 13, color: "#fff", opacity: msg ? 1 : 0, transition: "opacity 0.3s", pointerEvents: "none" }}>
+    <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: T.text, border: `1px solid ${c}50`, borderRadius: T.radiusSm, padding: "10px 18px", fontSize: 13, color: "#FFFFFF", opacity: msg ? 1 : 0, transition: "opacity 0.3s", pointerEvents: "none" }}>
       {msg}
     </div>
   );
@@ -209,11 +209,11 @@ function Sidebar({ active, setActive, open, onClose, onLogout, user, navItems })
       {open && <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", backdropFilter: "blur(3px)", zIndex: 998 }} />}
       <style>{`
         .emp-nav-item:hover:not(.emp-nav-active) { background: rgba(255,255,255,0.09) !important; }
-        .emp-logout-btn:hover { background: rgba(239,68,68,0.22) !important; transform: translateY(-1px); }
+        .emp-logout-btn:hover { background: rgba(100, 116, 139, 0.22) !important; transform: translateY(-1px); }
         .emp-sidebar nav::-webkit-scrollbar { width: 4px; }
         .emp-sidebar nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
       `}</style>
-      <div className="emp-sidebar" style={{ width: 252, background: T.sidebar, color: "#fff", display: "flex", flexDirection: "column", height: "100vh", position: "fixed", top: 0, left: 0, zIndex: 999, transform: open ? "translateX(0)" : "translateX(-100%)", transition: "transform 0.35s cubic-bezier(0.4,0,0.2,1)", borderRight: "1px solid rgba(255,255,255,0.06)", boxShadow: "6px 0 28px rgba(0,60,70,0.2)", overflow: "hidden" }}>
+      <div className="emp-sidebar" style={{ width: 252, background: T.sidebar, color: "#FFFFFF", display: "flex", flexDirection: "column", height: "100vh", position: "fixed", top: 0, left: 0, zIndex: 999, transform: open ? "translateX(0)" : "translateX(-100%)", transition: "transform 0.35s cubic-bezier(0.4,0,0.2,1)", borderRight: "1px solid rgba(255,255,255,0.06)", boxShadow: "6px 0 28px rgba(30, 41, 59, 0.2)", overflow: "hidden" }}>
 
         {/* ambient glow */}
         <div style={{ position: "absolute", top: -70, right: -60, width: 190, height: 190, borderRadius: "50%", background: "radial-gradient(circle,rgba(255,255,255,0.16),transparent 70%)", pointerEvents: "none" }} />
@@ -226,12 +226,12 @@ function Sidebar({ active, setActive, open, onClose, onLogout, user, navItems })
                 <img src={user.logoUrl} alt="logo" style={{ maxHeight: "100%", maxWidth: "100%", objectFit: "contain" }} />
               </div>
             ) : (
-              <div style={{ width: 42, height: 42, background: "linear-gradient(135deg,#ffffff,#f1f5f9)", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 900, color: "var(--app-accent, #2563EB)", boxShadow: "0 6px 16px rgba(0,0,0,0.18), 0 0 0 1px rgba(255,255,255,0.2)" }}>
+              <div style={{ width: 42, height: 42, background: "linear-gradient(135deg,#FFFFFF,#EFF6FF)", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 900, color: "var(--app-accent, #2563EB)", boxShadow: "0 6px 16px rgba(0,0,0,0.18), 0 0 0 1px rgba(255,255,255,0.2)" }}>
                 {initials[0]}
               </div>
             )}
             <div>
-              <div style={{ fontWeight: 800, fontSize: 14, color: "#fff", letterSpacing: "-0.3px" }}>{displayName}</div>
+              <div style={{ fontWeight: 800, fontSize: 14, color: "#FFFFFF", letterSpacing: "-0.3px" }}>{displayName}</div>
               <div style={{ fontSize: 9, color: "rgba(255,255,255,0.75)", letterSpacing: 1.5, fontWeight: 700, textTransform: "uppercase", marginTop: 2 }}>{user?.role || "EMPLOYEE"}</div>
             </div>
           </div>
@@ -249,11 +249,11 @@ function Sidebar({ active, setActive, open, onClose, onLogout, user, navItems })
                 style={{
                   position: "relative", width: "100%", display: "flex", alignItems: "center", gap: 11, padding: "9px 11px",
                   background: on ? "linear-gradient(135deg,rgba(255,255,255,0.24),rgba(255,255,255,0.08))" : "transparent",
-                  border: "none", borderRadius: 11, color: "#ffffff", fontWeight: on ? 800 : 600, fontSize: 13, cursor: "pointer",
+                  border: "none", borderRadius: 11, color: "#FFFFFF", fontWeight: on ? 800 : 600, fontSize: 13, cursor: "pointer",
                   marginBottom: 3, textAlign: "left", fontFamily: "inherit", transition: "background 0.18s ease",
                   boxShadow: on ? "0 4px 14px rgba(0,0,0,0.12), inset 0 0 0 1px rgba(255,255,255,0.18)" : "none"
                 }}>
-                {on && <span style={{ position: "absolute", left: -8, top: "50%", transform: "translateY(-50%)", width: 4, height: 16, borderRadius: 4, background: "#fff", boxShadow: "0 0 8px rgba(255,255,255,0.8)" }} />}
+                {on && <span style={{ position: "absolute", left: -8, top: "50%", transform: "translateY(-50%)", width: 4, height: 16, borderRadius: 4, background: "#FFFFFF", boxShadow: "0 0 8px rgba(255,255,255,0.8)" }} />}
                 <span style={{
                   width: 28, height: 28, borderRadius: 8, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center",
                   fontSize: 14, background: on ? "rgba(255,255,255,0.22)" : "rgba(255,255,255,0.1)", opacity: on ? 1 : 0.85
@@ -266,7 +266,7 @@ function Sidebar({ active, setActive, open, onClose, onLogout, user, navItems })
 
         {/* Bottom */}
         <div style={{ padding: "14px", borderTop: "1px solid rgba(255,255,255,0.12)", position: "relative", zIndex: 1 }}>
-          <button onClick={onLogout} className="emp-logout-btn" style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "11px", background: "rgba(239,68,68,0.16)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: T.radiusSm, color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all 0.18s" }}>
+          <button onClick={onLogout} className="emp-logout-btn" style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "11px", background: "rgba(100, 116, 139, 0.16)", border: "1px solid rgba(100, 116, 139, 0.3)", borderRadius: T.radiusSm, color: "#FFFFFF", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all 0.18s" }}>
             <i className="ti ti-logout" style={{ fontSize: 15 }}></i> Logout
           </button>
         </div>
@@ -304,7 +304,7 @@ function DocumentsCard({ docStatus, onOpenProfile }) {
           const hasDoc = !!doc;
           return (
             <div key={dt.key}
-              style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap", padding: "10px 12px", borderRadius: T.radiusSm, background: hasDoc ? "#fafafa" : T.bg, border: `1px solid ${hasDoc ? T.border : T.border}`, transition: "all 0.18s" }}
+              style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap", padding: "10px 12px", borderRadius: T.radiusSm, background: hasDoc ? "#F8FAFC" : T.bg, border: `1px solid ${hasDoc ? T.border : T.border}`, transition: "all 0.18s" }}
               onMouseEnter={e => { e.currentTarget.style.borderColor = T.accent; }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = T.border; }}>
               <div style={{ width: 36, height: 36, borderRadius: 9, background: T.accentLight, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0, border: `1px solid ${T.border}`, color: T.accent }}><i className={`ti ${dt.icon}`}></i></div>
@@ -409,7 +409,7 @@ function EmployeeDocumentsPage({ user, notifications = [], onAcknowledge }) {
             .map(f => ({
               _id: f._id || f.url,
               docType: f.name || 'File',
-              htmlContent: `<div style="padding:20px"><h3>${f.name}</h3><p>From Project: <strong>${p.name}</strong></p><a href="${f.url}" target="_blank" style="color:#9b6fd4;font-weight:700">Attach Open / Download File</a></div>`,
+              htmlContent: `<div style="padding:20px"><h3>${f.name}</h3><p>From Project: <strong>${p.name}</strong></p><a href="${f.url}" target="_blank" style="color:#64748B;font-weight:700">Attach Open / Download File</a></div>`,
               client: empName,
               fromProject: p.name,
               dateSent: f.uploadedAt,
@@ -437,9 +437,9 @@ function EmployeeDocumentsPage({ user, notifications = [], onAcknowledge }) {
           </button>
           <div style={{ fontSize: 16, fontWeight: 700, color: T.text }}>{selectedDoc.docType.toUpperCase()} Document</div>
         </div>
-        <div style={{ flex: 1, background: "#f3f4f6", borderRadius: 12, padding: "20px", overflowY: "auto" }}>
+        <div style={{ flex: 1, background: "#F8FAFC", borderRadius: 12, padding: "20px", overflowY: "auto" }}>
           <style>{`
-            .emp-doc-view .lh-wrap { max-width: 760px; margin: 0 auto; background: #fff; box-shadow: 0 8px 30px rgba(0,0,0,0.12); border-radius: 4px; display: flex; flex-direction: column; border: 1px solid #eaeaea; font-family: 'Nunito', sans-serif; overflow: hidden; }
+            .emp-doc-view .lh-wrap { max-width: 760px; margin: 0 auto; background: #FFFFFF; box-shadow: 0 8px 30px rgba(0,0,0,0.12); border-radius: 4px; display: flex; flex-direction: column; border: 1px solid #E2E8F0; font-family: 'Nunito', sans-serif; overflow: hidden; }
             .emp-doc-view .lb-editor { min-height: 0 !important; }
             .emp-doc-view .doc-body { padding: 28px 40px; font-size: 12.5px; line-height: 1.8; color: #1E293B; flex: 1; }
             .emp-doc-view .lb-editor { white-space: pre-wrap; word-wrap: break-word; }
@@ -474,30 +474,30 @@ function EmployeeDocumentsPage({ user, notifications = [], onAcknowledge }) {
               alignItems: "center",
               flexWrap: "wrap",
               gap: 14,
-              boxShadow: "0 4px 12px rgba(180, 83, 9, 0.05)"
+              boxShadow: "0 4px 12px rgba(100, 116, 139, 0.05)"
             }}>
               <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                 <div style={{
                   width: 42,
                   height: 42,
                   borderRadius: 10,
-                  background: "#FEF3C7",
+                  background: "#E2E8F0",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   fontSize: 20,
-                  color: "#D97706"
+                  color: "#64748B"
                 }}>
                   <i className="ti ti-folder"></i>
                 </div>
                 <div>
-                  <div style={{ fontSize: 14, fontWeight: 800, color: "#92400E" }}>{req.documentName}</div>
-                  <div style={{ fontSize: 12.5, color: "#B45309", marginTop: 2, fontWeight: 500 }}>{req.documentType} · Requested {new Date(req.requestedAt).toLocaleDateString("en-IN")}</div>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: "#1E293B" }}>{req.documentName}</div>
+                  <div style={{ fontSize: 12.5, color: "#64748B", marginTop: 2, fontWeight: 500 }}>{req.documentType} · Requested {new Date(req.requestedAt).toLocaleDateString("en-IN")}</div>
                 </div>
               </div>
               <label style={{
-                background: uploadingId === req._id ? "#f5c98a" : "#D97706",
-                color: "#fff",
+                background: uploadingId === req._id ? "#E2E8F0" : "#64748B",
+                color: "#FFFFFF",
                 border: "none",
                 borderRadius: T.radiusSm,
                 padding: "8px 16px",
@@ -505,7 +505,7 @@ function EmployeeDocumentsPage({ user, notifications = [], onAcknowledge }) {
                 fontWeight: 800,
                 cursor: uploadingId === req._id ? "not-allowed" : "pointer",
                 fontFamily: "inherit",
-                boxShadow: "0 2px 6px rgba(217, 119, 6, 0.2)",
+                boxShadow: "0 2px 6px rgba(100, 116, 139, 0.2)",
                 display: "flex",
                 alignItems: "center",
                 gap: 6
@@ -540,7 +540,7 @@ function EmployeeDocumentsPage({ user, notifications = [], onAcknowledge }) {
               gap: 12,
             }}>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <div style={{ width: 36, height: 36, borderRadius: 9, background: "#DCFCE7", display: "flex", alignItems: "center", justifyContent: "center", color: T.success, fontSize: 16 }}>
+                <div style={{ width: 36, height: 36, borderRadius: 9, background: "#E2E8F0", display: "flex", alignItems: "center", justifyContent: "center", color: T.success, fontSize: 16 }}>
                   <i className="ti ti-check"></i>
                 </div>
                 <div>
@@ -614,25 +614,25 @@ function DashboardPage({ user, projects, tasks, proposals, attendance, salary, s
         display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap",
         boxShadow: T.shadowLg, position: "relative", overflow: "hidden"
       }}>
-        <div style={{ width: 62, height: 62, borderRadius: "50%", background: "#fff", color: T.accent, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, fontWeight: 900, border: "3px solid rgba(255,255,255,0.4)", flexShrink: 0, zIndex: 1 }}>{initials}</div>
+        <div style={{ width: 62, height: 62, borderRadius: "50%", background: "#FFFFFF", color: T.accent, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, fontWeight: 900, border: "3px solid rgba(255,255,255,0.4)", flexShrink: 0, zIndex: 1 }}>{initials}</div>
         <div style={{ flex: 1, minWidth: 220, zIndex: 1 }}>
           <div style={{ fontSize: 12, color: "rgba(255,255,255,0.75)", fontWeight: 600, marginBottom: 3 }}>{greeting}</div>
-          <div style={{ fontSize: 21, fontWeight: 900, color: "#fff", marginBottom: 3 }}>{name} 👋</div>
+          <div style={{ fontSize: 21, fontWeight: 900, color: "#FFFFFF", marginBottom: 3 }}>{name} 👋</div>
           <div style={{ fontSize: 13, color: "rgba(255,255,255,0.8)" }}>{user?.role || "Employee"} · {user?.department || user?.dept || "—"}</div>
         </div>
         <div style={{ textAlign: "right", zIndex: 1 }}>
           {!todayAtt ? (
-            <button onClick={() => setPage("attendance")} style={{ background: "#fff", color: T.accent, border: "none", borderRadius: 99, padding: "8px 16px", fontSize: 12, fontWeight: 800, cursor: "pointer", fontFamily: "inherit" }}>
+            <button onClick={() => setPage("attendance")} style={{ background: "#FFFFFF", color: T.accent, border: "none", borderRadius: 99, padding: "8px 16px", fontSize: 12, fontWeight: 800, cursor: "pointer", fontFamily: "inherit" }}>
               Mark Today's Attendance
             </button>
           ) : (
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(255,255,255,0.18)", border: "1px solid rgba(255,255,255,0.3)", borderRadius: 99, padding: "5px 14px", fontSize: 11, fontWeight: 800, color: "#fff" }}>
-              <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#fff" }} />
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(255,255,255,0.18)", border: "1px solid rgba(255,255,255,0.3)", borderRadius: 99, padding: "5px 14px", fontSize: 11, fontWeight: 800, color: "#FFFFFF" }}>
+              <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#FFFFFF" }} />
               Today: {todayAtt.status.toUpperCase()}
             </div>
           )}
           <div style={{ marginTop: 8 }}>
-            <button onClick={() => setPage("attendance")} style={{ background: "none", border: "1px solid rgba(255,255,255,0.4)", borderRadius: 99, padding: "7px 14px", fontSize: 11, fontWeight: 800, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>
+            <button onClick={() => setPage("attendance")} style={{ background: "none", border: "1px solid rgba(255,255,255,0.4)", borderRadius: 99, padding: "7px 14px", fontSize: 11, fontWeight: 800, color: "#FFFFFF", cursor: "pointer", fontFamily: "inherit" }}>
               Apply Leave
             </button>
           </div>
@@ -791,14 +791,14 @@ function MyProfilePage({ user, projects, tasks, attendance, onBack }) {
   const leaveHistory = attendance.filter(a => a.status === "leave" || a.status === "absent").slice(0, 3);
   const initials = name.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
 
-  const TC = { teal: " var(--app-accent, var(--app-accent, #2563EB))", bg: "#f0f4f8", card: "#fff", border: "#e5eaf0", text: "#0f172a", textMid: "#4a5568", textSoft: "#94a3b8", green: "#16a34a", amber: "#d97706", red: "#dc2626", blue: "#2563eb" };
+  const TC = { teal: " var(--app-accent, var(--app-accent, #2563EB))", bg: "#EFF6FF", card: "#FFFFFF", border: "#E2E8F0", text: "#0F172A", textMid: "#64748B", textSoft: "#64748B", green: "#16A34A", amber: "#64748B", red: "#64748B", blue: "#2563EB" };
 
   const docItems = [
-    { name: "Offer Letter", meta: "Jan 2024 · PDF", icon: "📄", color: "#6366F1" },
-    { name: "Aadhaar Card", meta: "ID Proof · PDF", icon: "🪪", color: "#0ea5e9" },
-    { name: "Contract", meta: "Signed · PDF", icon: "📄", color: "#f59e0b" },
-    { name: "Degree Cert", meta: "Education · PDF", icon: "🎓", color: "#8b5cf6" },
-    { name: "Resume", meta: "Latest · PDF", icon: "📝", color: "#ef4444" },
+    { name: "Offer Letter", meta: "Jan 2024 · PDF", icon: "📄", color: "#2563EB" },
+    { name: "Aadhaar Card", meta: "ID Proof · PDF", icon: "🪪", color: "#2563EB" },
+    { name: "Contract", meta: "Signed · PDF", icon: "📄", color: "#64748B" },
+    { name: "Degree Cert", meta: "Education · PDF", icon: "🎓", color: "#2563EB" },
+    { name: "Resume", meta: "Latest · PDF", icon: "📝", color: "#64748B" },
   ];
 
   const cardStyle = { background: TC.card, borderRadius: 16, border: `1px solid ${TC.border}`, overflow: "hidden" };
@@ -814,7 +814,7 @@ function MyProfilePage({ user, projects, tasks, attendance, onBack }) {
 
 
       {/* Hero */}
-      <div style={{ background: "linear-gradient(135deg,#0f9baa, var(--app-accent, var(--app-accent, #2563EB)),#26c6da)", borderRadius: 18, padding: "24px 28px", display: "flex", alignItems: "center", gap: 18, color: "#fff", position: "relative", overflow: "hidden" }}>
+      <div style={{ background: "linear-gradient(135deg,#2563EB, var(--app-accent, var(--app-accent, #2563EB)),#2563EB)", borderRadius: 18, padding: "24px 28px", display: "flex", alignItems: "center", gap: 18, color: "#FFFFFF", position: "relative", overflow: "hidden" }}>
         <div style={{ width: 56, height: 56, borderRadius: 16, background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, fontWeight: 900, border: "2px solid rgba(255,255,255,0.3)", flexShrink: 0 }}>{initials}</div>
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: 12, opacity: 0.7, fontWeight: 600 }}>My Profile</div>
@@ -825,7 +825,7 @@ function MyProfilePage({ user, projects, tasks, attendance, onBack }) {
           <div style={{ fontSize: 14, fontWeight: 800 }}>{empId}</div>
           <div style={{ fontSize: 10, opacity: 0.6 }}>Employee ID</div>
           <div style={{ marginTop: 8, background: "rgba(255,255,255,0.2)", borderRadius: 20, padding: "4px 14px", fontSize: 11, fontWeight: 700, display: "inline-flex", alignItems: "center", gap: 5 }}>
-            <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#fff" }} /> Active Employee
+            <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#FFFFFF" }} /> Active Employee
           </div>
         </div>
       </div>
@@ -833,10 +833,10 @@ function MyProfilePage({ user, projects, tasks, attendance, onBack }) {
       {/* Quick Stats */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14 }}>
         {[
-          { icon: "📅", val: presentDays, lbl: "Days Present", bg: "#eff6ff", ic: TC.teal },
-          { icon: "💼", val: activeProj, lbl: "Active Projects", bg: "#dcfce7", ic: TC.green },
-          { icon: "✅", val: pendingTasks, lbl: "Tasks Pending", bg: "#fef3c7", ic: TC.amber },
-          { icon: "🌴", val: leaveTotal - leaveUsed, lbl: "Leave Days Left", bg: "#dbeafe", ic: TC.blue },
+          { icon: "📅", val: presentDays, lbl: "Days Present", bg: "#EFF6FF", ic: TC.teal },
+          { icon: "💼", val: activeProj, lbl: "Active Projects", bg: "#E2E8F0", ic: TC.green },
+          { icon: "✅", val: pendingTasks, lbl: "Tasks Pending", bg: "#E2E8F0", ic: TC.amber },
+          { icon: "🌴", val: leaveTotal - leaveUsed, lbl: "Leave Days Left", bg: "#E2E8F0", ic: TC.blue },
         ].map((s, i) => (
           <div key={i} style={{ ...cardStyle, padding: "16px 18px", display: "flex", alignItems: "center", gap: 12 }}>
             <div style={{ width: 40, height: 40, borderRadius: 10, background: s.bg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{s.icon}</div>
@@ -872,7 +872,7 @@ function MyProfilePage({ user, projects, tasks, attendance, onBack }) {
             {[["Attendance Rate", attRate + "%", attRate, TC.green], ["Leave Used", `${leaveUsed} / ${leaveTotal} days`, Math.round((leaveUsed / leaveTotal) * 100), TC.amber]].map(([l, r, pct, c], i) => (
               <div key={i} style={{ marginBottom: 10 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, fontWeight: 700, color: TC.textMid, marginBottom: 4 }}><span>{l}</span><span>{r}</span></div>
-                <div style={{ height: 5, borderRadius: 99, background: "#e5eaf0" }}><div style={{ height: "100%", borderRadius: 99, background: c, width: `${pct}%`, transition: "width 0.5s" }} /></div>
+                <div style={{ height: 5, borderRadius: 99, background: "#E2E8F0" }}><div style={{ height: "100%", borderRadius: 99, background: c, width: `${pct}%`, transition: "width 0.5s" }} /></div>
               </div>
             ))}
             <div style={{ marginTop: 14 }}>
@@ -911,7 +911,7 @@ function MyProfilePage({ user, projects, tasks, attendance, onBack }) {
                   <div style={{ textAlign: "right" }}>
                     <div style={{ fontSize: 12, fontWeight: 800, color: TC.teal }}>{pct}%</div>
                     <div style={{ fontSize: 10, color: TC.textSoft }}>{p.status || "Pending"}</div>
-                    <div style={{ width: 50, height: 3, borderRadius: 99, background: "#e5eaf0", marginTop: 3 }}><div style={{ height: "100%", borderRadius: 99, background: TC.teal, width: `${pct}%` }} /></div>
+                    <div style={{ width: 50, height: 3, borderRadius: 99, background: "#E2E8F0", marginTop: 3 }}><div style={{ height: "100%", borderRadius: 99, background: TC.teal, width: `${pct}%` }} /></div>
                   </div>
                 </div>
               );
@@ -930,10 +930,10 @@ function MyProfilePage({ user, projects, tasks, attendance, onBack }) {
             {tasks.slice(0, 5).map((t, i, arr) => {
               const isDone = ["done", "completed"].includes((t.status || "").toLowerCase());
               const pri = (t.priority || "low").toLowerCase();
-              const priColor = pri === "high" ? "#dc2626" : pri === "medium" || pri === "mid" ? "#d97706" : "#16a34a";
+              const priColor = pri === "high" ? "#64748B" : pri === "medium" || pri === "mid" ? "#64748B" : "#16A34A";
               return (
                 <div key={t._id || i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 0", borderBottom: i < arr.length - 1 ? `1px solid ${TC.border}` : "none" }}>
-                  <div style={{ width: 16, height: 16, borderRadius: 4, border: `1.5px solid ${isDone ? TC.green : TC.border}`, background: isDone ? TC.green : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{isDone && <span style={{ color: "#fff", fontSize: 9 }}>Yes</span>}</div>
+                  <div style={{ width: 16, height: 16, borderRadius: 4, border: `1.5px solid ${isDone ? TC.green : TC.border}`, background: isDone ? TC.green : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{isDone && <span style={{ color: "#FFFFFF", fontSize: 9 }}>Yes</span>}</div>
                   <div style={{ flex: 1 }}><div style={{ fontSize: 12, fontWeight: 600, color: isDone ? TC.textSoft : TC.text, textDecoration: isDone ? "line-through" : "none" }}>{t.title}</div><div style={{ fontSize: 10, color: TC.textSoft }}>{t.date || t.dueDate ? `Due: ${t.date || t.dueDate}` : ""}</div></div>
                   <span style={{ background: priColor + "15", color: priColor, padding: "2px 8px", borderRadius: 10, fontSize: 10, fontWeight: 700 }}>{pri.charAt(0).toUpperCase() + pri.slice(1)}</span>
                 </div>
@@ -952,8 +952,8 @@ function MyProfilePage({ user, projects, tasks, attendance, onBack }) {
                 <span style={{ fontSize: 16 }}>{d.icon}</span>
                 <div style={{ flex: 1 }}><div style={{ fontSize: 12, fontWeight: 700, color: TC.text }}>{d.name}</div><div style={{ fontSize: 10, color: TC.textSoft }}>{d.meta}</div></div>
                 <div style={{ display: "flex", gap: 4 }}>
-                  <button style={{ background: "#f0f4f8", border: `1px solid ${TC.border}`, borderRadius: 6, padding: "4px 8px", cursor: "pointer", fontSize: 10, fontWeight: 700, color: TC.textMid, fontFamily: "inherit" }}>View View</button>
-                  <button style={{ background: TC.teal, border: "none", borderRadius: 6, padding: "4px 8px", cursor: "pointer", color: "#fff", fontSize: 10, fontFamily: "inherit" }}></button>
+                  <button style={{ background: "#EFF6FF", border: `1px solid ${TC.border}`, borderRadius: 6, padding: "4px 8px", cursor: "pointer", fontSize: 10, fontWeight: 700, color: TC.textMid, fontFamily: "inherit" }}>View View</button>
+                  <button style={{ background: TC.teal, border: "none", borderRadius: 6, padding: "4px 8px", cursor: "pointer", color: "#FFFFFF", fontSize: 10, fontFamily: "inherit" }}></button>
                 </div>
               </div>
             ))}
@@ -1065,7 +1065,7 @@ function ProjectsPage({ projects, tasks }) {
           {list.map((p, i) => (
             <div key={p._id || i} onClick={() => setSelected(p)}
               style={{ background: T.bg, borderRadius: T.radiusSm, border: `1px solid ${T.border}`, padding: "15px 16px", cursor: "pointer", transition: "all 0.18s" }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = T.accent; e.currentTarget.style.background = "#fff"; }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = T.accent; e.currentTarget.style.background = "#FFFFFF"; }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = T.border; e.currentTarget.style.background = T.bg; }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 }}>
                 <div>
@@ -1153,7 +1153,7 @@ function TasksPage({ tasks, onToggle }) {
                   <div
                     onClick={(e) => { e.stopPropagation(); if (onToggle) onToggle(t); }}
                     style={{ width: 18, height: 18, borderRadius: 5, border: `2px solid ${t._isDone ? T.success : T.borderDark}`, background: t._isDone ? T.success : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 1, cursor: "pointer", transition: "all 0.2s" }}>
-                    {t._isDone && <span style={{ color: "#fff", fontSize: 10, fontWeight: 900 }}>Yes</span>}
+                    {t._isDone && <span style={{ color: "#FFFFFF", fontSize: 10, fontWeight: 900 }}>Yes</span>}
                   </div>
                   <div onClick={() => setExpanded(isOpen ? null : t._id)} style={{ flex: 1, minWidth: 0, cursor: "pointer" }}>
                     <div style={{ fontSize: 13, fontWeight: 700, color: t._isDone ? T.textFaint : T.text, textDecoration: t._isDone ? "line-through" : "none" }}>{t.title}</div>
@@ -1336,7 +1336,7 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
     { key: "all", label: "All", color: T.accent, count: attendance.length },
     { key: "present", label: "Present", color: T.success, count: attendance.filter(a => a.status === "present").length },
     { key: "absent", label: "Absent", color: T.danger, count: attendance.filter(a => a.status === "absent").length },
-    { key: "leave", label: "Leave", color: "#b45309", count: attendance.filter(a => a.status === "leave").length },
+    { key: "leave", label: "Leave", color: "#64748B", count: attendance.filter(a => a.status === "leave").length },
     { key: "holiday", label: "Holiday", color: T.textMuted, count: attendance.filter(a => a.status === "holiday").length },
   ];
 
@@ -1350,7 +1350,7 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
           <p style={{ fontSize: 12, color: T.textMuted, marginTop: 4 }}>Track attendance, apply leave & permission requests</p>
         </div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          <button onClick={() => { setAddForm(v => !v); setPermForm(false); setLeaveForm(false); setActiveTab("attendance"); }} style={{ background: T.accent, color: "#fff", border: "none", borderRadius: T.radiusSm, padding: "9px 16px", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>+ Add Attendance</button>
+          <button onClick={() => { setAddForm(v => !v); setPermForm(false); setLeaveForm(false); setActiveTab("attendance"); }} style={{ background: T.accent, color: "#FFFFFF", border: "none", borderRadius: T.radiusSm, padding: "9px 16px", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>+ Add Attendance</button>
           <button onClick={() => { setPermForm(v => !v); setLeaveForm(false); setAddForm(false); setActiveTab("attendance"); }} style={{ background: T.surface, color: T.text, border: `1px solid ${T.border}`, borderRadius: T.radiusSm, padding: "9px 16px", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Key Permission</button>
           <button onClick={() => { setLeaveForm(v => !v); setPermForm(false); setAddForm(false); setActiveTab("attendance"); }} style={{ background: T.surface, color: T.text, border: `1px solid ${T.border}`, borderRadius: T.radiusSm, padding: "9px 16px", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Holiday Apply Leave</button>
         </div>
@@ -1362,7 +1362,7 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
             <InputField label="Date *"><input type="date" value={addDate} onChange={e => setAddDate(e.target.value)} style={inputStyle} /></InputField>
             <InputField label="Status">
               <div style={{ display: "flex", gap: 6 }}>
-                {[{ val: "present", label: "Present", color: T.success }, { val: "absent", label: "Absent", color: T.danger }, { val: "leave", label: "Leave", color: "#b45309" }, { val: "holiday", label: "Holiday", color: T.textMuted }].map(opt => (
+                {[{ val: "present", label: "Present", color: T.success }, { val: "absent", label: "Absent", color: T.danger }, { val: "leave", label: "Leave", color: "#64748B" }, { val: "holiday", label: "Holiday", color: T.textMuted }].map(opt => (
                   <button key={opt.val} onClick={() => setAddStatus(opt.val)}
                     style={{ flex: 1, padding: "7px 4px", borderRadius: T.radiusSm, border: `1.5px solid ${addStatus === opt.val ? opt.color : T.border}`, background: addStatus === opt.val ? `${opt.color}12` : T.bg, color: addStatus === opt.val ? opt.color : T.textFaint, fontSize: 10, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
                     {opt.label}
@@ -1374,7 +1374,7 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
           </div>
           <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
             <button onClick={() => { setAddForm(false); setAddDate(todayStr()); setAddStatus("present"); setAddNote(""); }} style={{ padding: "8px 18px", border: `1px solid ${T.border}`, borderRadius: T.radiusSm, background: T.surface, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", color: T.text }}>Cancel</button>
-            <button onClick={addAttendance} disabled={addSaving} style={{ padding: "8px 20px", background: T.accent, border: "none", borderRadius: T.radiusSm, color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", opacity: addSaving ? 0.7 : 1 }}>
+            <button onClick={addAttendance} disabled={addSaving} style={{ padding: "8px 20px", background: T.accent, border: "none", borderRadius: T.radiusSm, color: "#FFFFFF", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", opacity: addSaving ? 0.7 : 1 }}>
               {addSaving ? "Saving…" : "Save"}
             </button>
           </div>
@@ -1404,7 +1404,7 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
           <InputField label="Reason *"><textarea value={permReason} onChange={e => setPermReason(e.target.value)} rows={3} placeholder="Briefly explain your reason…" style={{ ...inputStyle, resize: "vertical" }} /></InputField>
           <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 14 }}>
             <button onClick={() => setPermForm(false)} style={{ padding: "8px 18px", border: `1px solid ${T.border}`, borderRadius: T.radiusSm, background: T.surface, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", color: T.text }}>Cancel</button>
-            <button onClick={submitPermission} disabled={permSubmitting} style={{ padding: "8px 20px", background: T.accent, border: "none", borderRadius: T.radiusSm, color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", opacity: permSubmitting ? 0.7 : 1 }}>
+            <button onClick={submitPermission} disabled={permSubmitting} style={{ padding: "8px 20px", background: T.accent, border: "none", borderRadius: T.radiusSm, color: "#FFFFFF", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", opacity: permSubmitting ? 0.7 : 1 }}>
               {permSubmitting ? "Submitting…" : "Submit"}
             </button>
           </div>
@@ -1428,7 +1428,7 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
           </div>
           <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 14 }}>
             <button onClick={() => setLeaveForm(false)} style={{ padding: "8px 18px", border: `1px solid ${T.border}`, borderRadius: T.radiusSm, background: T.surface, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", color: T.text }}>Cancel</button>
-            <button onClick={submitLeave} disabled={leaveSubmitting} style={{ padding: "8px 20px", background: T.accent, border: "none", borderRadius: T.radiusSm, color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", opacity: leaveSubmitting ? 0.7 : 1 }}>
+            <button onClick={submitLeave} disabled={leaveSubmitting} style={{ padding: "8px 20px", background: T.accent, border: "none", borderRadius: T.radiusSm, color: "#FFFFFF", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", opacity: leaveSubmitting ? 0.7 : 1 }}>
               {leaveSubmitting ? "Submitting…" : "Submit"}
             </button>
           </div>
@@ -1475,7 +1475,7 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
                     const rec = cell.curr ? attendance.find(a => a.date === ds) : null;
                     const isToday = ds === today, isSelected = ds === selectedDate;
                     const bg = isSelected ? T.accent : isToday ? T.accentLight : rec ? scBg(rec.status) : T.surface;
-                    const textColor = isSelected ? "#fff" : isToday ? T.text : rec ? sc(rec.status) : cell.curr ? T.text : T.textFaint;
+                    const textColor = isSelected ? "#FFFFFF" : isToday ? T.text : rec ? sc(rec.status) : cell.curr ? T.text : T.textFaint;
                     return (
                       <div key={idx} onClick={() => { if (!cell.curr) return; setSelectedDate(prev => prev === ds ? null : ds); }}
                         style={{ aspectRatio: "1", borderRadius: 6, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: bg, border: isSelected ? `1.5px solid ${T.accent}` : isToday ? `1.5px solid ${T.borderDark}` : rec ? `1px solid ${sc(rec.status)}20` : `1px solid transparent`, cursor: cell.curr ? "pointer" : "default", opacity: cell.curr ? 1 : 0.25, fontSize: 10, fontWeight: isToday || isSelected ? 800 : 600, color: textColor, position: "relative" }}>
@@ -1486,7 +1486,7 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
                   })}
                 </div>
                 <div style={{ display: "flex", gap: 8, marginTop: 12, flexWrap: "wrap" }}>
-                  {[[T.success, "Present"], [T.danger, "Absent"], ["#b45309", "Leave"], [T.textMuted, "Holiday"]].map(([c, l]) => (
+                  {[[T.success, "Present"], [T.danger, "Absent"], ["#64748B", "Leave"], [T.textMuted, "Holiday"]].map(([c, l]) => (
                     <div key={l} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 9, color: T.textFaint }}><div style={{ width: 7, height: 7, borderRadius: 2, background: c }} />{l}</div>
                   ))}
                 </div>
@@ -1574,7 +1574,7 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
         {activeTab === "leaves" && (
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              {[{ label: "Total", val: leaveHistory.length, color: T.accent }, { label: "Pending", val: leaveHistory.filter(l => (l.status || "pending").toLowerCase() === "pending").length, color: "#b45309" }, { label: "Approved", val: leaveHistory.filter(l => (l.status || "").toLowerCase() === "approved").length, color: T.success }, { label: "Rejected", val: leaveHistory.filter(l => (l.status || "").toLowerCase() === "rejected").length, color: T.danger }].map(({ label, val, color }) => (
+              {[{ label: "Total", val: leaveHistory.length, color: T.accent }, { label: "Pending", val: leaveHistory.filter(l => (l.status || "pending").toLowerCase() === "pending").length, color: "#64748B" }, { label: "Approved", val: leaveHistory.filter(l => (l.status || "").toLowerCase() === "approved").length, color: T.success }, { label: "Rejected", val: leaveHistory.filter(l => (l.status || "").toLowerCase() === "rejected").length, color: T.danger }].map(({ label, val, color }) => (
                 <div key={label} style={{ background: scBg(label.toLowerCase()) || T.accentLight, border: `1px solid ${color}20`, borderRadius: T.radiusSm, padding: "10px 16px", minWidth: 80 }}>
                   <div style={{ fontSize: 20, fontWeight: 900, color }}>{val}</div>
                   <div style={{ fontSize: 10, color: T.textMuted, fontWeight: 600, marginTop: 2 }}>{label}</div>
@@ -1619,7 +1619,7 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
         {activeTab === "permissions" && (
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              {[{ label: "Total", val: permHistory.length, color: T.accent }, { label: "Pending", val: permHistory.filter(p => (p.status || "pending").toLowerCase() === "pending").length, color: "#b45309" }, { label: "Approved", val: permHistory.filter(p => (p.status || "").toLowerCase() === "approved").length, color: T.success }, { label: "Rejected", val: permHistory.filter(p => (p.status || "").toLowerCase() === "rejected").length, color: T.danger }].map(({ label, val, color }) => (
+              {[{ label: "Total", val: permHistory.length, color: T.accent }, { label: "Pending", val: permHistory.filter(p => (p.status || "pending").toLowerCase() === "pending").length, color: "#64748B" }, { label: "Approved", val: permHistory.filter(p => (p.status || "").toLowerCase() === "approved").length, color: T.success }, { label: "Rejected", val: permHistory.filter(p => (p.status || "").toLowerCase() === "rejected").length, color: T.danger }].map(({ label, val, color }) => (
                 <div key={label} style={{ background: T.accentLight, border: `1px solid ${color}20`, borderRadius: T.radiusSm, padding: "10px 16px", minWidth: 80 }}>
                   <div style={{ fontSize: 20, fontWeight: 900, color }}>{val}</div>
                   <div style={{ fontSize: 10, color: T.textMuted, fontWeight: 600, marginTop: 2 }}>{label}</div>
@@ -2037,7 +2037,7 @@ export default function EmployeeDashboard({ user, setUser }) {
     if (dob) {
       const td = new Date(), bd = new Date(dob);
       if (td.getDate() === bd.getDate() && td.getMonth() === bd.getMonth()) {
-        addNotification({ id: `birthday_${empName}_${td.getFullYear()}`, type: 'birthday', title: 'Happy Birthday! ', msg: `Wishing you a fantastic day, ${resolvedUser.name}!`, icon: 'Celebration', color: '#ec4899', time: new Date().toISOString() });
+        addNotification({ id: `birthday_${empName}_${td.getFullYear()}`, type: 'birthday', title: 'Happy Birthday! ', msg: `Wishing you a fantastic day, ${resolvedUser.name}!`, icon: 'Celebration', color: '#64748B', time: new Date().toISOString() });
       }
     }
   }, [resolvedUser, empName, hasNotifiedLogin, addNotification]);
@@ -2135,9 +2135,9 @@ export default function EmployeeDashboard({ user, setUser }) {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800;900&display=swap');
         *{box-sizing:border-box;margin:0;padding:0;}
-        ::-webkit-scrollbar{width:4px;} ::-webkit-scrollbar-thumb{background:#ddd;border-radius:4px;}
+        ::-webkit-scrollbar{width:4px;} ::-webkit-scrollbar-thumb{background:#E2E8F0;border-radius:4px;}
         button,input,select,textarea{font-family:inherit;}
-        input:focus,textarea:focus,select:focus{border-color:#111!important;outline:none;}
+        input:focus,textarea:focus,select:focus{border-color:#0F172A!important;outline:none;}
         @media(min-width:769px){
           .emp-sidebar{transform:translateX(0)!important;position:sticky!important;top:0!important;height:100vh!important;}
           .emp-sb-close{display:none!important;} .emp-sb-spacer{display:none!important;} .emp-mob-bar{display:none!important;}
@@ -2180,7 +2180,7 @@ export default function EmployeeDashboard({ user, setUser }) {
                   onMouseEnter={e => e.currentTarget.style.borderColor = T.accent}
                   onMouseLeave={e => e.currentTarget.style.borderColor = T.border}>
                   <i className="ti ti-bell"></i>
-                  {unreadCount > 0 && <span style={{ position: "absolute", top: -3, right: -3, background: T.danger, color: "#fff", borderRadius: "50%", width: 16, height: 16, fontSize: 9, fontWeight: 900, display: "flex", alignItems: "center", justifyContent: "center", border: "2px solid #fff" }}>{unreadCount}</span>}
+                  {unreadCount > 0 && <span style={{ position: "absolute", top: -3, right: -3, background: T.danger, color: "#FFFFFF", borderRadius: "50%", width: 16, height: 16, fontSize: 9, fontWeight: 900, display: "flex", alignItems: "center", justifyContent: "center", border: "2px solid #FFFFFF" }}>{unreadCount}</span>}
                 </button>
                 {notifDropdownOpen && <NotifDropdown />}
               </div>
@@ -2196,7 +2196,7 @@ export default function EmployeeDashboard({ user, setUser }) {
                   <div style={{ fontSize: 12, fontWeight: 800, color: T.text }}>{resolvedUser?.name || "Employee"}</div>
                   <div style={{ fontSize: 9, color: T.textFaint, fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.8 }}>{resolvedUser?.role || "Employee"}</div>
                 </div>
-                <div style={{ width: 36, height: 36, borderRadius: 10, background: T.accent, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 13, border: `2px solid ${T.border}` }}>
+                <div style={{ width: 36, height: 36, borderRadius: 10, background: T.accent, display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontWeight: 800, fontSize: 13, border: `2px solid ${T.border}` }}>
                   {(empName || "E").slice(0, 2).toUpperCase()}
                 </div>
               </div>
@@ -2210,11 +2210,11 @@ export default function EmployeeDashboard({ user, setUser }) {
               <div style={{ position: "relative" }} data-notif-anchor="true">
                 <button onClick={() => setNotifDropdownOpen(!notifDropdownOpen)} style={{ background: "none", border: "none", fontSize: 18, cursor: "pointer", color: T.text, position: "relative" }}>
                   <i className="ti ti-bell"></i>
-                  {unreadCount > 0 && <span style={{ position: "absolute", top: -2, right: -2, background: T.danger, color: "#fff", borderRadius: "50%", width: 15, height: 15, fontSize: 9, fontWeight: 900, display: "flex", alignItems: "center", justifyContent: "center" }}>{unreadCount}</span>}
+                  {unreadCount > 0 && <span style={{ position: "absolute", top: -2, right: -2, background: T.danger, color: "#FFFFFF", borderRadius: "50%", width: 15, height: 15, fontSize: 9, fontWeight: 900, display: "flex", alignItems: "center", justifyContent: "center" }}>{unreadCount}</span>}
                 </button>
                 {notifDropdownOpen && <NotifDropdown />}
               </div>
-              <div data-profile-anchor="true" onClick={e => { e.stopPropagation(); setProfileDropdownOpen(v => !v); }} style={{ width: 32, height: 32, borderRadius: 9, background: T.accent, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 12, cursor: "pointer" }}>
+              <div data-profile-anchor="true" onClick={e => { e.stopPropagation(); setProfileDropdownOpen(v => !v); }} style={{ width: 32, height: 32, borderRadius: 9, background: T.accent, display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontWeight: 800, fontSize: 12, cursor: "pointer" }}>
                 {(empName || "E").slice(0, 2).toUpperCase()}
               </div>
             </div>
@@ -2225,7 +2225,7 @@ export default function EmployeeDashboard({ user, setUser }) {
             <div data-profile-menu="true" style={{ position: "fixed", top: 58, right: 16, zIndex: 1000, background: T.surface, border: `1px solid ${T.border}`, borderRadius: T.radius, boxShadow: T.shadowLg, overflow: "hidden", minWidth: 210 }}>
               <div style={{ padding: "12px 14px", borderBottom: `1px solid ${T.border}`, background: T.bg }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <div style={{ width: 34, height: 34, borderRadius: 9, background: T.accent, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 13 }}>{(empName || "E").slice(0, 2).toUpperCase()}</div>
+                  <div style={{ width: 34, height: 34, borderRadius: 9, background: T.accent, display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontWeight: 800, fontSize: 13 }}>{(empName || "E").slice(0, 2).toUpperCase()}</div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 13, fontWeight: 700, color: T.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{resolvedUser?.name || "Employee"}</div>
                     <div style={{ fontSize: 11, color: T.textMuted, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{resolvedUser?.email}</div>

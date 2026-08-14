@@ -30,24 +30,24 @@ export default function EmployeeSubscriptionWarning({ user, onRenew, trigger }) 
   if (status?.isHidden || status?.notification?.type === "hidden") {
     return (
       <div style={{
-        background: "linear-gradient(135deg,#1e293b,#334155)",
-        border: "2px solid #475569", borderRadius: 14, padding: "18px 22px",
+        background: "linear-gradient(135deg,#1E293B,#1E293B)",
+        border: "2px solid #64748B", borderRadius: 14, padding: "18px 22px",
         marginBottom: 18, display: "flex", alignItems: "center", gap: 14,
         flexWrap: "wrap"
       }}>
         <div style={{ fontSize: 28 }}>Secure</div>
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 14, fontWeight: 800, color: "#f1f5f9", marginBottom: 4 }}>Access Restricted</div>
-          <div style={{ fontSize: 13, color: "#cbd5e1", wordBreak: "break-word" }}>
+          <div style={{ fontSize: 14, fontWeight: 800, color: "#EFF6FF", marginBottom: 4 }}>Access Restricted</div>
+          <div style={{ fontSize: 13, color: "#E2E8F0", wordBreak: "break-word" }}>
             {onRenew
               ? "Your subscription has expired. Please renew your plan to restore access."
               : "Your company's subscription has expired. Please contact your administrator to restore access."}
           </div>
         </div>
         {onRenew ? (
-          <button onClick={onRenew} style={{ background: "linear-gradient(135deg,#3b82f6,#2563eb)", color: "#fff", border: "none", padding: "8px 16px", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Renew Now</button>
+          <button onClick={onRenew} style={{ background: "linear-gradient(135deg,#2563EB,#2563EB)", color: "#FFFFFF", border: "none", padding: "8px 16px", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Renew Now</button>
         ) : (
-          <span style={{ background: "#ef444418", color: "#ef4444", border: "1px solid #ef444433", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>LOCKED</span>
+          <span style={{ background: "#64748B18", color: "#64748B", border: "1px solid #64748B33", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>LOCKED</span>
         )}
       </div>
     );
@@ -59,22 +59,22 @@ export default function EmployeeSubscriptionWarning({ user, onRenew, trigger }) 
     if (status?.notification?.type === "expired") {
       return (
         <div style={{
-          background: "linear-gradient(135deg,#fef2f2,#fee2e2)",
-          border: "2px solid #fecaca", borderRadius: 14, padding: "16px 20px",
+          background: "linear-gradient(135deg,#F8FAFC,#E2E8F0)",
+          border: "2px solid #E2E8F0", borderRadius: 14, padding: "16px 20px",
           marginBottom: 16, display: "flex", alignItems: "center", gap: 12,
           flexWrap: "wrap"
         }}>
           <div style={{ fontSize: 22 }}>🚫</div>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 14, fontWeight: 700, color: "#991b1b", marginBottom: 3 }}>Subscription Expired</div>
-            <div style={{ fontSize: 13, color: "#7f1d1d", wordBreak: "break-word" }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: "#1E293B", marginBottom: 3 }}>Subscription Expired</div>
+            <div style={{ fontSize: 13, color: "#1E293B", wordBreak: "break-word" }}>
               {onRenew
                 ? "Please renew your subscription to continue using all features."
                 : "Contact your administrator to renew the company subscription."}
             </div>
           </div>
           {onRenew && (
-            <button onClick={onRenew} style={{ background: "linear-gradient(135deg,#ef4444,#dc2626)", color: "#fff", border: "none", padding: "8px 16px", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Renew Now</button>
+            <button onClick={onRenew} style={{ background: "linear-gradient(135deg,#64748B,#64748B)", color: "#FFFFFF", border: "none", padding: "8px 16px", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Renew Now</button>
           )}
         </div>
       );
@@ -89,25 +89,25 @@ export default function EmployeeSubscriptionWarning({ user, onRenew, trigger }) 
   if (notification.type === "renewal") {
     return (
       <div style={{
-        background: "linear-gradient(135deg,#fef3c7,#fde68a)",
-        border: "2px solid #f59e0b", borderRadius: 14, padding: "16px 22px",
+        background: "linear-gradient(135deg,#E2E8F0,#E2E8F0)",
+        border: "2px solid #64748B", borderRadius: 14, padding: "16px 22px",
         marginBottom: 18, display: "flex", alignItems: "center", gap: 14,
-        boxShadow: "0 4px 16px rgba(245,158,11,0.15)", flexWrap: "wrap"
+        boxShadow: "0 4px 16px rgba(100, 116, 139, 0.15)", flexWrap: "wrap"
       }}>
         <div style={{ fontSize: 28 }}>⏰</div>
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 14, fontWeight: 800, color: "#92400e", marginBottom: 4 }}>
+          <div style={{ fontSize: 14, fontWeight: 800, color: "#1E293B", marginBottom: 4 }}>
             Subscription Renewal Required
           </div>
-          <div style={{ fontSize: 13, color: "#78350f", lineHeight: 1.5, wordBreak: "break-word" }}>
+          <div style={{ fontSize: 13, color: "#1E293B", lineHeight: 1.5, wordBreak: "break-word" }}>
             {notification.message}
           </div>
           {notification.daysLeft !== undefined && (
             <div style={{ marginTop: 8, display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-              <div style={{ background: "#fde68a", border: "1px solid #f59e0b", borderRadius: 20, padding: "2px 10px", fontSize: 12, fontWeight: 800, color: "#92400e" }}>
+              <div style={{ background: "#E2E8F0", border: "1px solid #64748B", borderRadius: 20, padding: "2px 10px", fontSize: 12, fontWeight: 800, color: "#1E293B" }}>
                 {notification.daysLeft} day{notification.daysLeft === 1 ? "" : "s"} remaining
               </div>
-              <span style={{ fontSize: 12, color: "#78350f" }}>
+              <span style={{ fontSize: 12, color: "#1E293B" }}>
                 {onRenew
                   ? "Please renew your subscription soon."
                   : "Please contact your administrator to renew."}
@@ -116,9 +116,9 @@ export default function EmployeeSubscriptionWarning({ user, onRenew, trigger }) 
           )}
         </div>
         {onRenew ? (
-          <button onClick={onRenew} style={{ background: "linear-gradient(135deg,#f59e0b,#d97706)", color: "#fff", border: "none", padding: "8px 16px", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Renew Now</button>
+          <button onClick={onRenew} style={{ background: "linear-gradient(135deg,#64748B,#64748B)", color: "#FFFFFF", border: "none", padding: "8px 16px", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Renew Now</button>
         ) : (
-          <span style={{ background: "#f59e0b18", color: "#92400e", border: "1px solid #f59e0b33", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>WARNING</span>
+          <span style={{ background: "#64748B18", color: "#1E293B", border: "1px solid #64748B33", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>WARNING</span>
         )}
       </div>
     );

@@ -67,7 +67,7 @@ export function up() {
   // Cover
   const t = getEl('propTitle').value;
   getEl('pv-title').textContent = t || '— Proposal Title —';
-  getEl('pv-title').style.color = t ? '#fff' : 'rgba(255,255,255,.45)';
+  getEl('pv-title').style.color = t ? '#FFFFFF' : 'rgba(255,255,255,.45)';
   const tc = getEl('toComp').value;
   getEl('pv-sub').textContent = tc ? 'Prepared for ' + tc + ' by Your Company Name' : 'Prepared by Your Company Name';
   getEl('pv-date').textContent = fmtDate(getEl('propDate').value);
@@ -250,7 +250,7 @@ export function addValue() {
   const c = getEl('valueList');
   const d = document.createElement('div');
   d.className = 'dv-item';
-  d.innerHTML = `<div class="dv-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ti ti-trending-up"></i></div>
+  d.innerHTML = `<div class="dv-icon" style="background:var(--app-accent-light);color:var(--app-muted)"><i class="ti ti-trending-up"></i></div>
     <input type="text" class="dv-input" placeholder="Value point or ROI…" oninput="up()">
     <i class="ti ti-x dv-del" onclick="this.parentElement.remove();up()"></i>`;
   c.appendChild(d);
@@ -324,7 +324,7 @@ export function addWhyUs() {
   const c = getEl('whyList');
   const d = document.createElement('div');
   d.className = 'dv-item';
-  d.innerHTML = `<div class="dv-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ti ti-star"></i></div>
+  d.innerHTML = `<div class="dv-icon" style="background:var(--app-accent-light);color:var(--app-muted)"><i class="ti ti-star"></i></div>
 <input type="text" class="dv-input" placeholder="Why choose us…">
     <i class="ti ti-x dv-del" onclick="this.parentElement.remove()"></i>`;
   c.appendChild(d);
@@ -356,7 +356,7 @@ export function saveTeamMember(btn) {
   const role = card.querySelector('.tm-role-inp').value.trim() || 'Team Member';
   const exp = card.querySelector('.tm-exp-inp').value.trim();
   const skills = card.querySelector('.tm-skills-inp').value.trim();
-  const colors = ['linear-gradient(135deg,var(--teal),var(--teal4))', 'linear-gradient(135deg,var(--purple),#4E35B0)', 'linear-gradient(135deg,var(--amber),#D4880A)', 'linear-gradient(135deg,var(--blue),#1A4DB5)'];
+  const colors = ['linear-gradient(135deg,var(--teal),var(--app-primary))', 'linear-gradient(135deg,var(--app-accent),#64748B)', 'linear-gradient(135deg,var(--app-muted),#64748B)', 'linear-gradient(135deg,var(--blue),#2563EB)'];
   const col = colors[Math.floor(Math.random() * colors.length)];
   const init = name.trim().split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
   const skillTags = skills ? skills.split(',').map(s => `<span class="tc-skill">${s.trim()}</span>`).join('') : '';
@@ -563,7 +563,7 @@ export function openSignatureModal() {
     canvas.width = rect.width || 420;
     canvas.height = 160;
     const ctx = canvas.getContext('2d');
-    ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 3.5; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.strokeStyle = '#1E293B'; ctx.lineWidth = 3.5; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
     let isDrawing = false; let points = [];
     function getPos(e) {
       const r = canvas.getBoundingClientRect();
@@ -605,7 +605,7 @@ function _applySignatureToBox(value, type) {
     if (type === 'image') {
       box.innerHTML = `<img src="${value}" style="max-height:50px;max-width:100%;object-fit:contain;" /><div style="font-size:10px;color:var(--teal);font-weight:700;margin-top:2px;">${name} — Signed</div>`;
     } else {
-      box.innerHTML = `<span style="font-family:'Dancing Script',cursive;font-size:22px;color:#1e293b;font-weight:bold;">${value}</span><div style="font-size:10px;color:var(--teal);font-weight:700;margin-top:2px;">${name} — Signed</div>`;
+      box.innerHTML = `<span style="font-family:'Dancing Script',cursive;font-size:22px;color:#1E293B;font-weight:bold;">${value}</span><div style="font-size:10px;color:var(--teal);font-weight:700;margin-top:2px;">${name} — Signed</div>`;
     }
     box.style.borderColor = 'var(--teal)';
     box.style.background = 'var(--teal-lighter)';

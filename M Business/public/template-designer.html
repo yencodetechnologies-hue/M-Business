@@ -25,29 +25,29 @@
     :root {
       --teal: var(--app-accent, #2563EB);
       --teal2: var(--app-accent2, var(--app-accent2, #2563EB));
-      --teal3: #26D0CE;
-      --teal4: #006E7F;
+      --teal3: #2563EB;
+      --teal4: #16A34A;
       --teal-light: var(--teal-light, #EFF6FF);
       --teal-lighter: var(--teal-lighter, #EFF6FF);
       --bg: #F8FAFC;
       --surface: #FFFFFF;
-      --surface2: #F8FAFB;
+      --surface2: #F8FAFC;
       --border: #E2E8F0;
       --border2: #E2E8F0;
       --text: #1E293B;
       --text2: #64748B;
       --text3: #64748B;
       --green: #16A34A;
-      --green-bg: #E8FAF3;
-      --amber: #F5A623;
-      --amber-bg: #FEF5E6;
-      --red: #F05C5C;
-      --red-bg: #FEF2F2;
-      --purple: #7C5CFC;
-      --purple-bg: #EEE9FF;
+      --green-bg: #EFF6FF;
+      --amber: #64748B;
+      --amber-bg: #F8FAFC;
+      --red: #64748B;
+      --red-bg: #F8FAFC;
+      --purple: #2563EB;
+      --purple-bg: #EFF6FF;
       --blue: #2563EB;
-      --blue-bg: #EFF4FF;
-      --sidebar-grad: linear-gradient(180deg, #26D0CE 0%, var(--teal) 35%, var(--app-accent2, #2563EB) 65%, #006E7F 100%);
+      --blue-bg: #EFF6FF;
+      --sidebar-grad: linear-gradient(180deg, #2563EB 0%, var(--teal) 35%, var(--app-accent2, #2563EB) 65%, #16A34A 100%);
       --lh-color: var(--teal);
       --font: 'Nunito', sans-serif;
     }
@@ -90,7 +90,7 @@
       justify-content: center;
       font-size: 12px;
       font-weight: 900;
-      color: #fff;
+      color: #FFFFFF;
       margin-bottom: 16px;
       border: 1.5px solid rgba(255, 255, 255, .25)
     }
@@ -111,12 +111,12 @@
 
     .ns-item:hover {
       background: rgba(255, 255, 255, .15);
-      color: #fff
+      color: #FFFFFF
     }
 
     .ns-item.active {
       background: rgba(255, 255, 255, .25);
-      color: #fff
+      color: #FFFFFF
     }
 
     .ns-item title {
@@ -127,7 +127,7 @@
       position: absolute;
       left: 48px;
       background: #1E293B;
-      color: #fff;
+      color: #FFFFFF;
       font-size: 10px;
       font-weight: 700;
       padding: 4px 8px;
@@ -459,8 +459,8 @@
       width: 18px;
       height: 18px;
       border-radius: 50%;
-      background: var(--red);
-      color: #fff;
+      background: var(--app-text);
+      color: #FFFFFF;
       font-size: 10px;
       display: none;
       align-items: center;
@@ -518,7 +518,7 @@
       height: 13px;
       border-radius: 50%;
       background: var(--teal);
-      color: #fff;
+      color: #FFFFFF;
       font-size: 7px;
       display: none;
       align-items: center;
@@ -719,7 +719,7 @@
     }
 
     .di-del:hover {
-      color: var(--red)
+      color: var(--app-text)
     }
 
     .add-dyn-btn {
@@ -751,7 +751,7 @@
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      background: #E8EFF0;
+      background: #E2E8F0;
       min-width: 0
     }
 
@@ -814,7 +814,7 @@
 
     .btn-sm.solid {
       background: var(--teal);
-      color: #fff;
+      color: #FFFFFF;
       border: none;
       box-shadow: 0 2px 8px rgba(37, 99, 235, .25)
     }
@@ -836,7 +836,7 @@
     /* DOCUMENT PAPER */
     .paper {
       width: 660px;
-      background: #fff;
+      background: #FFFFFF;
       box-shadow: 0 6px 40px rgba(0, 0, 0, .12);
       border-radius: 4px;
       overflow: hidden;
@@ -968,7 +968,7 @@
       font-family: var(--font);
       font-size: 12px;
       color: #1E293B;
-      background: #fff;
+      background: #FFFFFF;
       min-height: 600px
     }
 
@@ -985,13 +985,13 @@
       width: 40px;
       height: 40px;
       border-radius: 10px;
-      background: linear-gradient(135deg, var(--teal), var(--teal4));
+      background: linear-gradient(135deg, var(--teal), var(--app-primary));
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 14px;
       font-weight: 900;
-      color: #fff;
+      color: #FFFFFF;
       margin-bottom: 7px
     }
 
@@ -1055,13 +1055,13 @@
     }
 
     .quo-badge.accepted {
-      background: var(--green-bg);
+      background: var(--app-accent-light);
       color: var(--green)
     }
 
     .quo-badge.negotiation {
-      background: var(--purple-bg);
-      color: var(--purple)
+      background: var(--app-accent-light);
+      color: var(--app-accent)
     }
 
     .quo-parties {
@@ -1133,14 +1133,14 @@
     }
 
     .quo-items-table thead tr {
-      background: linear-gradient(135deg, var(--teal), var(--teal4))
+      background: linear-gradient(135deg, var(--teal), var(--app-primary))
     }
 
     .quo-items-table thead th {
       padding: 7px 9px;
       font-size: 10px;
       font-weight: 700;
-      color: #fff;
+      color: #FFFFFF;
       text-align: left;
       letter-spacing: .3px
     }
@@ -1199,7 +1199,7 @@
       display: flex;
       justify-content: space-between;
       padding: 7px 10px;
-      background: linear-gradient(135deg, var(--teal), var(--teal4));
+      background: linear-gradient(135deg, var(--teal), var(--app-primary));
       border-radius: 7px;
       margin-top: 5px
     }
@@ -1207,26 +1207,26 @@
     .quo-grand-row .lbl {
       font-size: 11px;
       font-weight: 800;
-      color: #fff
+      color: #FFFFFF
     }
 
     .quo-grand-row .val {
       font-size: 13px;
       font-weight: 900;
-      color: #fff
+      color: #FFFFFF
     }
 
     .quo-validity {
       padding: 8px 10px;
-      background: var(--amber-bg);
+      background: var(--app-accent-light);
       border-radius: 8px;
-      border-left: 3px solid var(--amber);
+      border-left: 3px solid var(--app-muted);
       margin-bottom: 12px
     }
 
     .quo-validity-text {
       font-size: 10px;
-      color: var(--amber);
+      color: var(--app-muted);
       font-weight: 700
     }
 
@@ -1308,14 +1308,14 @@
 
     .quo-cta-btn.accept {
       background: var(--green);
-      color: #fff;
+      color: #FFFFFF;
       border: none
     }
 
     .quo-cta-btn.negotiate {
       background: none;
-      border: 1.5px solid var(--purple);
-      color: var(--purple)
+      border: 1.5px solid var(--app-accent);
+      color: var(--app-accent)
     }
 
 
@@ -1325,7 +1325,7 @@
       font-family: var(--font);
       font-size: 12px;
       color: #1E293B;
-      background: #fff;
+      background: #FFFFFF;
       min-height: 560px
     }
 
@@ -1343,13 +1343,13 @@
       width: 44px;
       height: 44px;
       border-radius: 10px;
-      background: linear-gradient(135deg, var(--teal), var(--teal4));
+      background: linear-gradient(135deg, var(--teal), var(--app-primary));
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 16px;
       font-weight: 900;
-      color: #fff;
+      color: #FFFFFF;
       margin-bottom: 8px
     }
 
@@ -1413,7 +1413,7 @@
     }
 
     .inv-status.paid {
-      background: var(--green-bg);
+      background: var(--app-accent-light);
       color: var(--green)
     }
 
@@ -1453,14 +1453,14 @@
     }
 
     .inv-items-table thead tr {
-      background: linear-gradient(135deg, var(--teal), var(--teal4))
+      background: linear-gradient(135deg, var(--teal), var(--app-primary))
     }
 
     .inv-items-table thead th {
       padding: 8px 10px;
       font-size: 10px;
       font-weight: 700;
-      color: #fff;
+      color: #FFFFFF;
       text-align: left;
       letter-spacing: .4px
     }
@@ -1518,7 +1518,7 @@
       display: flex;
       justify-content: space-between;
       padding: 8px 10px;
-      background: linear-gradient(135deg, var(--teal), var(--teal4));
+      background: linear-gradient(135deg, var(--teal), var(--app-primary));
       border-radius: 8px;
       margin-top: 6px
     }
@@ -1526,13 +1526,13 @@
     .inv-grand-row .lbl {
       font-size: 12px;
       font-weight: 800;
-      color: #fff
+      color: #FFFFFF
     }
 
     .inv-grand-row .val {
       font-size: 14px;
       font-weight: 900;
-      color: #fff
+      color: #FFFFFF
     }
 
     .inv-footer {
@@ -1621,7 +1621,7 @@
 
     /* COVER */
     .p-cover {
-      background: linear-gradient(135deg, #003E4E 0%, #005F73 35%, #0096B4 70%, #26D0CE 100%);
+      background: linear-gradient(135deg, #1E293B 0%, #16A34A 35%, #2563EB 70%, #2563EB 100%);
       padding: 26px 22px;
       position: relative;
       overflow: hidden;
@@ -1661,7 +1661,7 @@
       justify-content: center;
       font-size: 14px;
       font-weight: 900;
-      color: #fff;
+      color: #FFFFFF;
       margin-bottom: 14px;
       position: relative;
       z-index: 1
@@ -1681,7 +1681,7 @@
     .p-title {
       font-size: 17px;
       font-weight: 900;
-      color: #fff;
+      color: #FFFFFF;
       letter-spacing: -.3px;
       line-height: 1.25;
       margin-bottom: 5px;
@@ -1722,7 +1722,7 @@
       font-size: 10px;
       font-weight: 700;
       background: rgba(255, 255, 255, .15);
-      color: #fff;
+      color: #FFFFFF;
       border: 1px solid rgba(255, 255, 255, .2);
       margin-top: 9px;
       position: relative;
@@ -1800,8 +1800,8 @@
     }
 
     .exec-block.problem {
-      border-left-color: var(--red);
-      background: var(--red-bg)
+      border-left-color: var(--app-text);
+      background: var(--app-accent-light)
     }
 
     .exec-block.solution {
@@ -1811,7 +1811,7 @@
 
     .exec-block.whyus {
       border-left-color: var(--green);
-      background: var(--green-bg)
+      background: var(--app-accent-light)
     }
 
     .eb-lbl {
@@ -1824,7 +1824,7 @@
     }
 
     .exec-block.problem .eb-lbl {
-      color: var(--red)
+      color: var(--app-text)
     }
 
     .exec-block.solution .eb-lbl {
@@ -1891,7 +1891,7 @@
       justify-content: center;
       font-size: 8px;
       font-weight: 800;
-      color: #fff;
+      color: #FFFFFF;
       flex-shrink: 0
     }
 
@@ -1949,7 +1949,7 @@
       justify-content: center;
       font-size: 8px;
       font-weight: 800;
-      color: #fff;
+      color: #FFFFFF;
       flex-shrink: 0
     }
 
@@ -1971,14 +1971,14 @@
     }
 
     .pricing-tbl thead tr {
-      background: linear-gradient(135deg, var(--teal), var(--teal4))
+      background: linear-gradient(135deg, var(--teal), var(--app-primary))
     }
 
     .pricing-tbl thead th {
       padding: 6px 8px;
       font-size: 9px;
       font-weight: 700;
-      color: #fff;
+      color: #FFFFFF;
       text-align: left
     }
 
@@ -2009,7 +2009,7 @@
       display: flex;
       justify-content: space-between;
       padding: 6px 8px;
-      background: linear-gradient(135deg, var(--teal), var(--teal4));
+      background: linear-gradient(135deg, var(--teal), var(--app-primary));
       border-radius: 6px;
       margin-top: 5px
     }
@@ -2017,13 +2017,13 @@
     .pricing-grand span:first-child {
       font-size: 10px;
       font-weight: 800;
-      color: #fff
+      color: #FFFFFF
     }
 
     .pricing-grand span:last-child {
       font-size: 12px;
       font-weight: 900;
-      color: #fff
+      color: #FFFFFF
     }
 
     /* VALUE PREVIEW */
@@ -2043,7 +2043,7 @@
 
     .val-pi::before {
       content: '→';
-      color: var(--amber);
+      color: var(--app-muted);
       font-weight: 800;
       font-size: 11px;
       flex-shrink: 0
@@ -2127,17 +2127,17 @@
     }
 
     .risk-badge-p.h {
-      background: var(--red-bg);
-      color: var(--red)
+      background: var(--app-accent-light);
+      color: var(--app-text)
     }
 
     .risk-badge-p.m {
-      background: var(--amber-bg);
-      color: var(--amber)
+      background: var(--app-accent-light);
+      color: var(--app-muted)
     }
 
     .risk-badge-p.l {
-      background: var(--green-bg);
+      background: var(--app-accent-light);
       color: var(--green)
     }
 
@@ -2256,7 +2256,7 @@
       justify-content: center;
       font-size: 8px;
       font-weight: 800;
-      color: #fff;
+      color: #FFFFFF;
       flex-shrink: 0
     }
 
@@ -2294,7 +2294,7 @@
     }
 
     .pricing-tbl thead tr {
-      color: #fff
+      color: #FFFFFF
     }
 
     .pricing-tbl thead th {
@@ -2313,7 +2313,7 @@
     }
 
     .pricing-tbl tbody tr:nth-child(even) {
-      background: #F8FAFB
+      background: #F8FAFC
     }
 
     .pricing-tbl tbody td {
@@ -2335,7 +2335,7 @@
 
     .sob {
       padding: 10px;
-      background: #F8FAFB;
+      background: #F8FAFC;
       border-radius: 8px;
       border: 1px solid #E2E8F0;
       text-align: center
@@ -2550,7 +2550,7 @@
           <!-- COLOR & FONT -->
           <div class="acc-item">
             <div class="acc-hdr" onclick="toggleAcc(this)">
-              <div class="acc-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ti ti-palette"></i>
+              <div class="acc-icon" style="background:var(--app-accent-light);color:var(--app-muted)"><i class="ti ti-palette"></i>
               </div>
               <div class="acc-title">Colors & Fonts</div>
               <i class="ti ti-chevron-up acc-arrow open"></i>
@@ -2560,13 +2560,13 @@
                 <label class="fl">Brand Color</label>
                 <div class="cswatches" id="cswatches">
                   <div class="csw sel" style="background:#2563EB" data-c="#2563EB" onclick="pickColor(this)"></div>
-                  <div class="csw" style="background:#006E7F" data-c="#006E7F" onclick="pickColor(this)"></div>
                   <div class="csw" style="background:#16A34A" data-c="#16A34A" onclick="pickColor(this)"></div>
-                  <div class="csw" style="background:#7C5CFC" data-c="#7C5CFC" onclick="pickColor(this)"></div>
+                  <div class="csw" style="background:#16A34A" data-c="#16A34A" onclick="pickColor(this)"></div>
                   <div class="csw" style="background:#2563EB" data-c="#2563EB" onclick="pickColor(this)"></div>
-                  <div class="csw" style="background:#F5A623" data-c="#F5A623" onclick="pickColor(this)"></div>
-                  <div class="csw" style="background:#F05C5C" data-c="#F05C5C" onclick="pickColor(this)"></div>
-                  <div class="csw" style="background:#EC407A" data-c="#EC407A" onclick="pickColor(this)"></div>
+                  <div class="csw" style="background:#2563EB" data-c="#2563EB" onclick="pickColor(this)"></div>
+                  <div class="csw" style="background:#64748B" data-c="#64748B" onclick="pickColor(this)"></div>
+                  <div class="csw" style="background:#64748B" data-c="#64748B" onclick="pickColor(this)"></div>
+                  <div class="csw" style="background:#64748B" data-c="#64748B" onclick="pickColor(this)"></div>
                   <div class="csw" style="background:#1E293B" data-c="#1E293B" onclick="pickColor(this)"></div>
                   <div class="csw" style="background:#64748B" data-c="#64748B" onclick="pickColor(this)"></div>
                 </div>
@@ -2607,7 +2607,7 @@
         <div id="ctrl-lh">
           <div class="acc-item">
             <div class="acc-hdr" onclick="toggleAcc(this)">
-              <div class="acc-icon" style="background:var(--purple-bg);color:var(--purple)"><i
+              <div class="acc-icon" style="background:var(--app-accent-light);color:var(--app-accent)"><i
                   class="ti ti-layout-columns"></i></div>
               <div class="acc-title">Header Layout</div>
               <i class="ti ti-chevron-up acc-arrow open"></i>
@@ -2720,7 +2720,7 @@
           <!-- SHOW/HIDE -->
           <div class="acc-item">
             <div class="acc-hdr" onclick="toggleAcc(this)">
-              <div class="acc-icon" style="background:var(--green-bg);color:var(--green)"><i class="ti ti-eye"></i>
+              <div class="acc-icon" style="background:var(--app-accent-light);color:var(--green)"><i class="ti ti-eye"></i>
               </div>
               <div class="acc-title">Show / Hide Elements</div>
               <i class="ti ti-chevron-up acc-arrow open"></i>
@@ -2748,7 +2748,7 @@
           <!-- LETTER CONTENT -->
           <div class="acc-item">
             <div class="acc-hdr" onclick="toggleAcc(this)">
-              <div class="acc-icon" style="background:var(--purple-bg);color:var(--purple)"><i
+              <div class="acc-icon" style="background:var(--app-accent-light);color:var(--app-accent)"><i
                   class="ti ti-writing"></i></div>
               <div class="acc-title">Letter Details</div>
               <i class="ti ti-chevron-up acc-arrow open"></i>
@@ -2875,7 +2875,7 @@
           <!-- CLIENT DETAILS -->
           <div class="acc-item">
             <div class="acc-hdr" onclick="toggleAcc(this)">
-              <div class="acc-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ti ti-user"></i>
+              <div class="acc-icon" style="background:var(--app-accent-light);color:var(--app-muted)"><i class="ti ti-user"></i>
               </div>
               <div class="acc-title">Client Details</div>
               <i class="ti ti-chevron-up acc-arrow open"></i>
@@ -2901,7 +2901,7 @@
           <!-- LINE ITEMS -->
           <div class="acc-item">
             <div class="acc-hdr" onclick="toggleAcc(this)">
-              <div class="acc-icon" style="background:var(--green-bg);color:var(--green)"><i
+              <div class="acc-icon" style="background:var(--app-accent-light);color:var(--green)"><i
                   class="ti ti-list-details"></i></div>
               <div class="acc-title">Line Items & Pricing</div>
               <i class="ti ti-chevron-up acc-arrow open"></i>
@@ -2944,7 +2944,7 @@
           <!-- SCOPE TAGS -->
           <div class="acc-item">
             <div class="acc-hdr" onclick="toggleAcc(this)">
-              <div class="acc-icon" style="background:var(--purple-bg);color:var(--purple)"><i class="ti ti-tags"></i>
+              <div class="acc-icon" style="background:var(--app-accent-light);color:var(--app-accent)"><i class="ti ti-tags"></i>
               </div>
               <div class="acc-title">Scope Tags</div>
               <i class="ti ti-chevron-up acc-arrow open"></i>
@@ -2986,7 +2986,7 @@
                   <div class="lo-prev" style="background:transparent"><svg width="80" height="48" viewBox="0 0 80 48">
                       <defs>
                         <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
-                          <stop offset="0%" stop-color="#004D5E" />
+                          <stop offset="0%" stop-color="#1E293B" />
                           <stop offset="100%" stop-color=" var(--teal)" />
                         </linearGradient>
                       </defs>
@@ -3061,7 +3061,7 @@
           <!-- EXEC SUMMARY -->
           <div class="acc-item">
             <div class="acc-hdr" onclick="toggleAcc(this)">
-              <div class="acc-icon" style="background:var(--purple-bg);color:var(--purple)"><i
+              <div class="acc-icon" style="background:var(--app-accent-light);color:var(--app-accent)"><i
                   class="ti ti-align-left"></i></div>
               <div class="acc-title">Executive Summary</div>
               <i class="ti ti-chevron-up acc-arrow open"></i>
@@ -3077,7 +3077,7 @@
           <!-- DELIVERABLES -->
           <div class="acc-item">
             <div class="acc-hdr" onclick="toggleAcc(this)">
-              <div class="acc-icon" style="background:var(--green-bg);color:var(--green)"><i
+              <div class="acc-icon" style="background:var(--app-accent-light);color:var(--green)"><i
                   class="ti ti-checklist"></i></div>
               <div class="acc-title">Deliverables</div>
               <i class="ti ti-chevron-up acc-arrow open"></i>
@@ -3114,7 +3114,7 @@
 
           <div class="acc-item">
             <div class="acc-hdr" onclick="toggleAcc(this)">
-              <div class="acc-icon" style="background:#E8F5E9;color:#2E7D32"><i class="ti ti-calendar-event"></i></div>
+              <div class="acc-icon" style="background:#E2E8F0;color:#16A34A"><i class="ti ti-calendar-event"></i></div>
               <div class="acc-title">Timeline & Terms</div>
               <i class="ti ti-chevron-up acc-arrow open"></i>
             </div>
@@ -3145,7 +3145,7 @@
           </div>
           <div class="acc-item">
             <div class="acc-hdr" onclick="toggleAcc(this)">
-              <div class="acc-icon" style="background:#FFF3E0;color:#E65100"><i class="ti ti-user-check"></i></div>
+              <div class="acc-icon" style="background:#F8FAFC;color:#64748B"><i class="ti ti-user-check"></i></div>
               <div class="acc-title">Client Details</div>
               <i class="ti ti-chevron-up acc-arrow open"></i>
             </div>
@@ -3162,7 +3162,7 @@
           </div>
           <div class="acc-item">
             <div class="acc-hdr" onclick="toggleAcc(this)">
-              <div class="acc-icon" style="background:#EDE7F6;color:#4527A0"><i class="ti ti-file-description"></i>
+              <div class="acc-icon" style="background:#E2E8F0;color:#64748B"><i class="ti ti-file-description"></i>
               </div>
               <div class="acc-title">Closing & Terms</div>
               <i class="ti ti-chevron-up acc-arrow open"></i>
@@ -3217,7 +3217,7 @@
           <!-- OUR TEAM (PORTED) -->
           <div class="acc-item">
             <div class="acc-hdr" onclick="toggleAcc(this)">
-              <div class="acc-icon" style="background:var(--green-bg);color:var(--green)"><i class="ti ti-users"></i>
+              <div class="acc-icon" style="background:var(--app-accent-light);color:var(--green)"><i class="ti ti-users"></i>
               </div>
               <div class="acc-title">Team Members</div>
               <i class="ti ti-chevron-up acc-arrow"></i>
@@ -3225,7 +3225,7 @@
             <div class="acc-body" style="display:none">
               <div id="td-teamList" class="dyn-items">
                 <div class="team-card">
-                  <div class="tc-av" style="background:linear-gradient(135deg,var(--teal),var(--teal4))">PR</div>
+                  <div class="tc-av" style="background:linear-gradient(135deg,var(--teal),var(--app-primary))">PR</div>
                   <div style="flex:1;min-width:0">
                     <div class="tc-name">Your Name</div>
                     <div class="tc-role">Lead Developer & Project Manager</div>
@@ -3244,7 +3244,7 @@
           <!-- VALUE PROPOSITION (PORTED) -->
           <div class="acc-item">
             <div class="acc-hdr" onclick="toggleAcc(this)">
-              <div class="acc-icon" style="background:var(--amber-bg);color:var(--amber)"><i
+              <div class="acc-icon" style="background:var(--app-accent-light);color:var(--app-muted)"><i
                   class="ti ti-trending-up"></i></div>
               <div class="acc-title">Value Propositions</div>
               <i class="ti ti-chevron-up acc-arrow"></i>
@@ -3252,7 +3252,7 @@
             <div class="acc-body" style="display:none">
               <div id="td-valueList" class="dyn-items">
                 <div class="dv-item">
-                  <div class="dv-icon" style="background:var(--amber-bg);color:var(--amber)"><i
+                  <div class="dv-icon" style="background:var(--app-accent-light);color:var(--app-muted)"><i
                       class="ti ti-trending-up"></i></div><input type="text" class="dv-input"
                     value="300% increase in organic traffic within 6 months" oninput="propUp()"><i
                     class="ti ti-x dv-del" onclick="this.parentElement.remove();propUp()"></i>
@@ -3266,7 +3266,7 @@
           <!-- RISKS & MITIGATION (PORTED) -->
           <div class="acc-item">
             <div class="acc-hdr" onclick="toggleAcc(this)">
-              <div class="acc-icon" style="background:var(--red-bg);color:var(--red)"><i
+              <div class="acc-icon" style="background:var(--app-accent-light);color:var(--app-text)"><i
                   class="ti ti-shield-exclamation"></i></div>
               <div class="acc-title">Risks & Mitigation</div>
               <i class="ti ti-chevron-up acc-arrow"></i>
@@ -3293,7 +3293,7 @@
           <!-- PRICING -->
           <div class="acc-item">
             <div class="acc-hdr" onclick="toggleAcc(this)">
-              <div class="acc-icon" style="background:var(--green-bg);color:var(--green)"><i
+              <div class="acc-icon" style="background:var(--app-accent-light);color:var(--green)"><i
                   class="ti ti-currency-rupee"></i></div>
               <div class="acc-title">Investment</div>
               <i class="ti ti-chevron-up acc-arrow open"></i>
@@ -3334,7 +3334,7 @@
                   <span>Subtotal</span><span id="propSub">₹0</span>
                 </div>
                 <div class="grand-box"
-                  style="display:flex;justify-content:space-between;padding:6px 8px;background:var(--teal);border-radius:6px;color:#fff;font-weight:bold;font-size:12px;margin-top:6px">
+                  style="display:flex;justify-content:space-between;padding:6px 8px;background:var(--teal);border-radius:6px;color:#FFFFFF;font-weight:bold;font-size:12px;margin-top:6px">
                   <span>Total Investment</span><span id="propGrand">₹0</span>
                 </div>
               </div>
@@ -3440,7 +3440,7 @@
           <!-- INVOICE DETAILS -->
           <div class="acc-item">
             <div class="acc-hdr" onclick="toggleAcc(this)">
-              <div class="acc-icon" style="background:var(--green-bg);color:var(--green)"><i
+              <div class="acc-icon" style="background:var(--app-accent-light);color:var(--green)"><i
                   class="ti ti-receipt-2"></i></div>
               <div class="acc-title">Invoice Details</div>
               <i class="ti ti-chevron-up acc-arrow open"></i>
@@ -3478,7 +3478,7 @@
           <!-- BILL TO -->
           <div class="acc-item">
             <div class="acc-hdr" onclick="toggleAcc(this)">
-              <div class="acc-icon" style="background:var(--amber-bg);color:var(--amber)"><i
+              <div class="acc-icon" style="background:var(--app-accent-light);color:var(--app-muted)"><i
                   class="ti ti-user-circle"></i></div>
               <div class="acc-title">Bill To (Client)</div>
               <i class="ti ti-chevron-up acc-arrow open"></i>
@@ -3553,7 +3553,7 @@
           <!-- ITEMS TABLE (dynamic) -->
           <div class="acc-item">
             <div class="acc-hdr" onclick="toggleAcc(this)">
-              <div class="acc-icon" style="background:#FFF3E0;color:#F57C00"><i class="ti ti-list-details"></i></div>
+              <div class="acc-icon" style="background:#F8FAFC;color:#64748B"><i class="ti ti-list-details"></i></div>
               <div class="acc-title">Invoice Items</div>
               <i class="ti ti-chevron-up acc-arrow open"></i>
             </div>
@@ -3628,7 +3628,7 @@
           </div>
           <div class="acc-item">
             <div class="acc-hdr" onclick="toggleAcc(this)">
-              <div class="acc-icon" style="background:#FFF3E0;color:#F57C00"><i class="ti ti-calculator"></i></div>
+              <div class="acc-icon" style="background:#F8FAFC;color:#64748B"><i class="ti ti-calculator"></i></div>
               <div class="acc-title">Totals & Discount</div>
               <i class="ti ti-chevron-up acc-arrow open"></i>
             </div>
@@ -3643,7 +3643,7 @@
           </div>
           <div class="acc-item">
             <div class="acc-hdr" onclick="toggleAcc(this)">
-              <div class="acc-icon" style="background:var(--green-bg);color:var(--green)"><i
+              <div class="acc-icon" style="background:var(--app-accent-light);color:var(--green)"><i
                   class="ti ti-credit-card"></i></div>
               <div class="acc-title">Payment & Bank Details</div>
               <i class="ti ti-chevron-up acc-arrow open"></i>
@@ -3722,7 +3722,7 @@
             Clear</button>
           <button class="btn-sm outline"><i class="ti ti-download" style="font-size:12px"></i> PDF</button>
           <button class="btn-sm" onclick="saveQuotationToApp()" id="btn-save-quo"
-            style="display:none;background:#2ecc71;color:#fff;border:none"><i class="ti ti-device-floppy"
+            style="display:none;background:#16A34A;color:#FFFFFF;border:none"><i class="ti ti-device-floppy"
               style="font-size:12px"></i> Save</button>
           <button class="btn-sm" onclick="sendDoc()"><i class="ti ti-send" style="font-size:12px"></i>
             Send</button>
@@ -3899,7 +3899,7 @@
       if (logoUrl) return `<img src="${logoUrl}" style="height:${s}px;max-width:${s * 3}px;object-fit:contain;display:block" alt="Logo">`;
       const init = v('f-init') || 'YT';
       const bSize = Math.round(s * 0.7);
-      return `<div style="width:${bSize}px;height:${bSize}px;border-radius:${Math.round(bSize * .15)}px;background:${color};display:flex;align-items:center;justify-content:center;font-size:${Math.round(bSize * .28)}px;font-weight:900;color:#fff;flex-shrink:0">${init}</div>`;
+      return `<div style="width:${bSize}px;height:${bSize}px;border-radius:${Math.round(bSize * .15)}px;background:${color};display:flex;align-items:center;justify-content:center;font-size:${Math.round(bSize * .28)}px;font-weight:900;color:#FFFFFF;flex-shrink:0">${init}</div>`;
     }
 
     // ── CONTACT BLOCK ──
@@ -3916,10 +3916,10 @@
     // ── BG CONFIG ──
     function bgCfg(bgKey) {
       const map = {
-        white: { bg: '#ffffff', text: '#1E293B', sub: '#64748B' },
-        color: { bg: color, text: '#ffffff', sub: 'rgba(255,255,255,.7)' },
+        white: { bg: '#FFFFFF', text: '#1E293B', sub: '#64748B' },
+        color: { bg: color, text: '#FFFFFF', sub: 'rgba(255,255,255,.7)' },
         light: { bg: h2r(color, .08), text: '#1E293B', sub: '#64748B' },
-        dark: { bg: '#1E293B', text: '#ffffff', sub: 'rgba(255,255,255,.65)' }
+        dark: { bg: '#1E293B', text: '#FFFFFF', sub: 'rgba(255,255,255,.65)' }
       };
       return map[bgKey] || map.white;
     }
@@ -3927,7 +3927,7 @@
     function h2r(hex, alpha) {
       if (!hex || typeof hex !== 'string' || !hex.startsWith('#')) {
         // fallback for CSS var() strings or invalid input
-        return `rgba(37, 99, 235,${alpha})`;
+        return `rgba(37, 99, 235, ${alpha})`;
       }
       let c = hex.substring(1);
       if (c.length === 3) c = c.split('').map(x => x + x).join('');
@@ -3977,9 +3977,9 @@
         hdr = `<div style="background:${bg.bg};padding:${pad}px ${pad + 14}px;text-align:center"><div style="margin-bottom:10px;display:flex;justify-content:center">${logo}</div>${compHtml}<div style="margin-top:6px">${contactBlock(bg.sub)}</div></div>${div}`;
       } else if (lhLayout === 'banner') {
         const bBg = bgCfg('color');
-        hdr = `<div style="background:${color};padding:${pad}px ${pad + 14}px;display:flex;align-items:center;justify-content:space-between;gap:14px"><div style="display:flex;align-items:center;gap:12px">${logo}<div style="font-size:${nameSz}px;font-weight:900;color:#fff">${co}${tl ? `<div style="font-size:10px;color:rgba(255,255,255,.65);margin-top:1px;font-weight:600">${tl}</div>` : ''}</div></div>${contactBlock('rgba(255,255,255,.8)')}</div>`;
+        hdr = `<div style="background:${color};padding:${pad}px ${pad + 14}px;display:flex;align-items:center;justify-content:space-between;gap:14px"><div style="display:flex;align-items:center;gap:12px">${logo}<div style="font-size:${nameSz}px;font-weight:900;color:#FFFFFF">${co}${tl ? `<div style="font-size:10px;color:rgba(255,255,255,.65);margin-top:1px;font-weight:600">${tl}</div>` : ''}</div></div>${contactBlock('rgba(255,255,255,.8)')}</div>`;
       } else if (lhLayout === 'split') {
-        hdr = `<div style="display:flex;min-height:86px"><div style="background:${color};width:42%;padding:${Math.round(pad * .8)}px;display:flex;flex-direction:column;justify-content:center">${logo}<div style="margin-top:8px;font-size:${nameSz}px;font-weight:900;color:#fff">${co}</div>${tl ? `<div style="font-size:10px;color:rgba(255,255,255,.65);margin-top:2px">${tl}</div>` : ''}</div><div style="flex:1;padding:${Math.round(pad * .8)}px;background:#F8FAFB;display:flex;flex-direction:column;justify-content:center">${contactBlock('#64748B')}</div></div>${div}`;
+        hdr = `<div style="display:flex;min-height:86px"><div style="background:${color};width:42%;padding:${Math.round(pad * .8)}px;display:flex;flex-direction:column;justify-content:center">${logo}<div style="margin-top:8px;font-size:${nameSz}px;font-weight:900;color:#FFFFFF">${co}</div>${tl ? `<div style="font-size:10px;color:rgba(255,255,255,.65);margin-top:2px">${tl}</div>` : ''}</div><div style="flex:1;padding:${Math.round(pad * .8)}px;background:#F8FAFC;display:flex;flex-direction:column;justify-content:center">${contactBlock('#64748B')}</div></div>${div}`;
       } else if (lhLayout === 'top-bar') {
         hdr = `<div style="height:5px;background:${color}"></div><div style="background:${bg.bg};padding:${Math.round(pad * .7)}px ${pad + 14}px"><div style="display:flex;align-items:center;justify-content:space-between;gap:14px"><div style="display:flex;align-items:center;gap:10px">${logo}<div>${compHtml}</div></div>${contact}</div></div><div style="height:1px;background:#E2E8F0"></div>`;
       }
@@ -3989,7 +3989,7 @@
 
       const showFooter = chk('show-footer');
       document.getElementById('docFooterZone').innerHTML = showFooter
-        ? `<div style="height:3px;background:${color}"></div><div style="padding:8px 40px;background:#F8FAFB;display:flex;justify-content:space-between;font-size:9px;color:#64748B;border-top:1px solid #E2E8F0"><span style="font-weight:700">${co}</span><span>${v('f-web') || v('f-email')}</span><span>${v('f-phone')}</span></div>`
+        ? `<div style="height:3px;background:${color}"></div><div style="padding:8px 40px;background:#F8FAFC;display:flex;justify-content:space-between;font-size:9px;color:#64748B;border-top:1px solid #E2E8F0"><span style="font-weight:700">${co}</span><span>${v('f-web') || v('f-email')}</span><span>${v('f-phone')}</span></div>`
         : '';
     }
 
@@ -4084,7 +4084,7 @@
               <div class="quo-id" id="pQuoNum">#${v("f-quo-num")}</div>
               <div class="quo-dates">
                 <span id="pQuoDate">Date: ${fmtDate(v("f-quo-date"))}</span><br>
-                <span id="pValidity" style="color:var(--amber)">Valid until: ${validDate}</span>
+                <span id="pValidity" style="color:var(--app-muted)">Valid until: ${validDate}</span>
               </div>
               <div class="quo-badge draft" id="pStatus">DRAFT</div>
             </div>
@@ -4133,7 +4133,7 @@
           <!-- TOTALS -->
           <div class="quo-totals">
             <div class="quo-tot-row"><span class="lbl">Subtotal</span><span class="val" id="quoSub">₹40,000</span></div>
-            <div class="quo-tot-row"><span class="lbl">GST (18%)</span><span class="val" id="quoTax" style="color:var(--amber)">₹7,200</span></div>
+            <div class="quo-tot-row"><span class="lbl">GST (18%)</span><span class="val" id="quoTax" style="color:var(--app-muted)">₹7,200</span></div>
             <div class="quo-tot-row" id="quoDiscRow" style="display:none"><span class="lbl">Discount</span><span class="val" id="quoDisc" style="color:var(--green)">-₹0</span></div>
             <div class="quo-grand-row"><span class="lbl">Total Quoted</span><span class="val" id="quoGrand">₹47,200</span></div>
           </div>
@@ -4182,11 +4182,11 @@
       // COVER
       let coverHtml = '';
       if (propLayout === 'gradient-cover') {
-        coverHtml = `<div style="background:linear-gradient(135deg,#003E4E 0%,#005F73 35%,${color} 100%);padding:28px 36px;position:relative;overflow:hidden">
+        coverHtml = `<div style="background:linear-gradient(135deg,#1E293B 0%,#16A34A 35%,${color} 100%);padding:28px 36px;position:relative;overflow:hidden">
       <div style="position:absolute;right:-40px;top:-40px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.06)"></div>
       ${logo}
       <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:1px;margin:14px 0 5px">Project Proposal</div>
-      <div style="font-size:18px;font-weight:900;color:#fff;letter-spacing:-.3px;line-height:1.2">${title}</div>
+      <div style="font-size:18px;font-weight:900;color:#FFFFFF;letter-spacing:-.3px;line-height:1.2">${title}</div>
       ${client ? `<div style="font-size:11px;color:rgba(255,255,255,.65);margin-top:5px">Prepared for ${client}</div>` : ''}
       <div style="display:flex;gap:14px;margin-top:14px">
         <div style="font-size:10px;color:rgba(255,255,255,.65);display:flex;align-items:center;gap:4px"><span style="font-weight:700">Date:</span> ${fmtDate(v('f-prop-date'))}</div>
@@ -4196,7 +4196,7 @@
     </div>`;
       } else if (propLayout === 'clean-cover') {
         coverHtml = `<div style="height:5px;background:${color}"></div>
-      <div style="padding:26px 36px;background:#fff">
+      <div style="padding:26px 36px;background:#FFFFFF">
         ${logo}
         <div style="font-size:10px;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:1px;margin:12px 0 4px">Project Proposal</div>
         <div style="font-size:18px;font-weight:900;color:#1E293B;letter-spacing:-.3px">${title}</div>
@@ -4207,13 +4207,13 @@
         coverHtml = `<div style="display:flex;min-height:130px">
       <div style="background:${color};width:45%;padding:24px;display:flex;flex-direction:column;justify-content:space-between">
         ${logo}
-        <div><div style="font-size:${nameSz}px;font-weight:900;color:#fff;line-height:1.2">${co}</div>${v('f-tagline') ? `<div style="font-size:10px;color:rgba(255,255,255,.65);margin-top:3px">${v('f-tagline')}</div>` : ''}</div>
+        <div><div style="font-size:${nameSz}px;font-weight:900;color:#FFFFFF;line-height:1.2">${co}</div>${v('f-tagline') ? `<div style="font-size:10px;color:rgba(255,255,255,.65);margin-top:3px">${v('f-tagline')}</div>` : ''}</div>
       </div>
-      <div style="flex:1;padding:24px;background:#F8FAFB;display:flex;flex-direction:column;justify-content:center">
+      <div style="flex:1;padding:24px;background:#F8FAFC;display:flex;flex-direction:column;justify-content:center">
         <div style="font-size:10px;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:1px;margin-bottom:5px">Project Proposal</div>
         <div style="font-size:15px;font-weight:900;color:#1E293B;line-height:1.3">${title}</div>
         ${client ? `<div style="font-size:11px;color:#64748B;margin-top:5px">For: ${client}</div>` : ''}
-        <div style="margin-top:12px;padding:7px 11px;background:${color};border-radius:20px;display:inline-flex;align-items:center;gap:5px;width:fit-content"><span style="font-size:10px;font-weight:700;color:#fff">${v('f-prop-type')} · ${fmtDate(v('f-prop-date'))}</span></div>
+        <div style="margin-top:12px;padding:7px 11px;background:${color};border-radius:20px;display:inline-flex;align-items:center;gap:5px;width:fit-content"><span style="font-size:10px;font-weight:700;color:#FFFFFF">${v('f-prop-type')} · ${fmtDate(v('f-prop-date'))}</span></div>
       </div>
     </div>`;
       }
@@ -4328,14 +4328,14 @@
         <!-- OUR TEAM (PORTED) -->
         <div class="acc-item">
           <div class="acc-hdr" onclick="toggleAcc(this)">
-            <div class="acc-icon" style="background:var(--green-bg);color:var(--green)"><i class="ti ti-users"></i></div>
+            <div class="acc-icon" style="background:var(--app-accent-light);color:var(--green)"><i class="ti ti-users"></i></div>
             <div class="acc-title">Team Members</div>
             <i class="ti ti-chevron-up acc-arrow"></i>
           </div>
           <div class="acc-body" style="display:none">
             <div id="td-teamList" class="dyn-items">
               <div class="team-card">
-                <div class="tc-av" style="background:linear-gradient(135deg,var(--teal),var(--teal4))">PR</div>
+                <div class="tc-av" style="background:linear-gradient(135deg,var(--teal),var(--app-primary))">PR</div>
                 <div style="flex:1;min-width:0">
                   <div class="tc-name">Your Name</div>
                   <div class="tc-role">Lead Developer & Project Manager</div>
@@ -4352,13 +4352,13 @@
         <!-- VALUE PROPOSITION (PORTED) -->
         <div class="acc-item">
           <div class="acc-hdr" onclick="toggleAcc(this)">
-            <div class="acc-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ti ti-trending-up"></i></div>
+            <div class="acc-icon" style="background:var(--app-accent-light);color:var(--app-muted)"><i class="ti ti-trending-up"></i></div>
             <div class="acc-title">Value Propositions</div>
             <i class="ti ti-chevron-up acc-arrow"></i>
           </div>
           <div class="acc-body" style="display:none">
             <div id="td-valueList" class="dyn-items">
-              <div class="dv-item"><div class="dv-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ti ti-trending-up"></i></div><input type="text" class="dv-input" value="300% increase in organic traffic within 6 months" oninput="propUp()"><i class="ti ti-x dv-del" onclick="this.parentElement.remove();propUp()"></i></div>
+              <div class="dv-item"><div class="dv-icon" style="background:var(--app-accent-light);color:var(--app-muted)"><i class="ti ti-trending-up"></i></div><input type="text" class="dv-input" value="300% increase in organic traffic within 6 months" oninput="propUp()"><i class="ti ti-x dv-del" onclick="this.parentElement.remove();propUp()"></i></div>
             </div>
             <button class="add-dyn-btn" onclick="addValue()"><i class="ti ti-plus" style="font-size:12px"></i>Add Point</button>
           </div>
@@ -4367,7 +4367,7 @@
         <!-- RISKS & MITIGATION (PORTED) -->
         <div class="acc-item">
           <div class="acc-hdr" onclick="toggleAcc(this)">
-            <div class="acc-icon" style="background:var(--red-bg);color:var(--red)"><i class="ti ti-shield-exclamation"></i></div>
+            <div class="acc-icon" style="background:var(--app-accent-light);color:var(--app-text)"><i class="ti ti-shield-exclamation"></i></div>
             <div class="acc-title">Risks & Mitigation</div>
             <i class="ti ti-chevron-up acc-arrow"></i>
           </div>
@@ -4492,7 +4492,7 @@
       wcUpdate();
     }
     function insertTable() {
-      const t = `<table style="width:100%;border-collapse:collapse;font-size:12px;margin:12px 0"><thead><tr style="background:${color};color:#fff"><th style="padding:6px 9px;text-align:left">Item</th><th style="padding:6px 9px;text-align:left">Description</th><th style="padding:6px 9px;text-align:right">Amount</th></tr></thead><tbody><tr><td style="padding:6px 9px;border:1px solid #E2E8F0">1</td><td style="padding:6px 9px;border:1px solid #E2E8F0">—</td><td style="padding:6px 9px;border:1px solid #E2E8F0;text-align:right">—</td></tr></tbody></table>`;
+      const t = `<table style="width:100%;border-collapse:collapse;font-size:12px;margin:12px 0"><thead><tr style="background:${color};color:#FFFFFF"><th style="padding:6px 9px;text-align:left">Item</th><th style="padding:6px 9px;text-align:left">Description</th><th style="padding:6px 9px;text-align:right">Amount</th></tr></thead><tbody><tr><td style="padding:6px 9px;border:1px solid #E2E8F0">1</td><td style="padding:6px 9px;border:1px solid #E2E8F0">—</td><td style="padding:6px 9px;border:1px solid #E2E8F0;text-align:right">—</td></tr></tbody></table>`;
       ec('insertHTML', t);
     }
     function wcUpdate() {
@@ -4569,7 +4569,7 @@
       const recipientId = selectedOpt ? (selectedOpt.dataset.recipientId || '') : '';
 
       if (!clientName) {
-        nameEl.style.borderColor = '#F05C5C';
+        nameEl.style.borderColor = '#64748B';
         nameEl.focus();
         setTimeout(() => nameEl.style.borderColor = '', 2000);
         return;
@@ -4594,7 +4594,7 @@
 
       // Show toast
       const t = document.createElement('div');
-      t.style.cssText = "position:fixed;bottom:24px;right:24px;background:linear-gradient(135deg,#16A34A, var(--teal));color:#fff;padding:14px 22px;border-radius:12px;font-weight:700;z-index:99999;box-shadow:0 8px 24px rgba(0,0,0,0.15);font-size:13px;display:flex;align-items:center;gap:8px;";
+      t.style.cssText = "position:fixed;bottom:24px;right:24px;background:linear-gradient(135deg,#16A34A, var(--teal));color:#FFFFFF;padding:14px 22px;border-radius:12px;font-weight:700;z-index:99999;box-shadow:0 8px 24px rgba(0,0,0,0.15);font-size:13px;display:flex;align-items:center;gap:8px;";
       t.innerHTML = '<i class="ti ti-circle-check" style="font-size:18px;"></i> Document sent to ' + clientName + '!';
       document.body.appendChild(t);
       setTimeout(() => { t.style.transition = 'opacity 0.4s'; t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 3000);
@@ -4624,7 +4624,7 @@
       }).join('\n');
       const printOverrides = `
     *{box-sizing:border-box}
-    body{margin:0;padding:0;font-family:${font};background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    body{margin:0;padding:0;font-family:${font};background:#FFFFFF;-webkit-print-color-adjust:exact;print-color-adjust:exact}
     .paper{width:100%;box-shadow:none;border-radius:0;margin:0;min-height:100vh}
     .doc-body{font-family:${font}}
     .lb-editor:empty::before{content:none}
@@ -4696,10 +4696,10 @@
 
       // STATUS badge
       const statusMap = {
-        draft: { bg: '#F8FAFB', color: '#64748B', border: '#E2E8F0', text: 'DRAFT' },
-        sent: { bg: '#EFF4FF', color: '#2563EB', border: '#BFDBFE', text: 'SENT' },
-        paid: { bg: '#E8FAF3', color: '#16A34A', border: '#A7F3D0', text: 'PAID' },
-        overdue: { bg: '#FEF2F2', color: '#F05C5C', border: '#FECACA', text: 'OVERDUE' }
+        draft: { bg: '#F8FAFC', color: '#64748B', border: '#E2E8F0', text: 'DRAFT' },
+        sent: { bg: '#EFF6FF', color: '#2563EB', border: '#E2E8F0', text: 'SENT' },
+        paid: { bg: '#EFF6FF', color: '#16A34A', border: '#E2E8F0', text: 'PAID' },
+        overdue: { bg: '#F8FAFC', color: '#64748B', border: '#E2E8F0', text: 'OVERDUE' }
       };
       const st = statusMap[status] || statusMap.draft;
       const statusBadge = `<span style="display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:800;background:${st.bg};color:${st.color};border:1.5px solid ${st.border}">${st.text}</span>`;
@@ -4721,7 +4721,7 @@
       let hdr = '';
 
       if (invLayout === 'classic') {
-        hdr = `<div style="padding:${pad}px ${pad + 16}px;background:#fff">
+        hdr = `<div style="padding:${pad}px ${pad + 16}px;background:#FFFFFF">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
         <div style="display:flex;align-items:center;gap:12px">${logo}<div>
           <div style="font-size:${nameSz}px;font-weight:900;color:#1E293B">${co}</div>
@@ -4734,11 +4734,11 @@
       } else if (invLayout === 'modern-banner') {
         hdr = `<div style="background:${color};padding:${pad}px ${pad + 16}px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
       <div style="display:flex;align-items:center;gap:12px">${logo}<div>
-        <div style="font-size:${nameSz}px;font-weight:900;color:#fff">${co}</div>
+        <div style="font-size:${nameSz}px;font-weight:900;color:#FFFFFF">${co}</div>
         ${v('f-tagline') ? `<div style="font-size:10px;color:rgba(255,255,255,.65)">${v('f-tagline')}</div>` : ''}
       </div></div>
       <div style="text-align:right">
-        <div style="font-size:24px;font-weight:900;color:#fff;letter-spacing:-.5px">INVOICE</div>
+        <div style="font-size:24px;font-weight:900;color:#FFFFFF;letter-spacing:-.5px">INVOICE</div>
         <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.8);margin-top:3px">#${invNum}</div>
         <div style="font-size:10px;color:rgba(255,255,255,.65);margin-top:2px;line-height:1.8">
           ${invDate ? 'Issue: ' + invDate : ''}${dueDate ? '<br>Due: ' + dueDate : ''}
@@ -4749,7 +4749,7 @@
 
       } else if (invLayout === 'minimal') {
         hdr = `<div style="height:4px;background:${color}"></div>
-    <div style="padding:${pad}px ${pad + 16}px;background:#fff;display:flex;align-items:center;justify-content:space-between;gap:16px">
+    <div style="padding:${pad}px ${pad + 16}px;background:#FFFFFF;display:flex;align-items:center;justify-content:space-between;gap:16px">
       <div style="display:flex;align-items:center;gap:10px">${logo}
         <div style="font-size:${nameSz}px;font-weight:900;color:#1E293B">${co}</div>
       </div>
@@ -4761,7 +4761,7 @@
     </div><div style="height:1px;background:#E2E8F0"></div>`;
 
       } else if (invLayout === 'right-align') {
-        hdr = `<div style="padding:${pad}px ${pad + 16}px;background:#fff;display:flex;align-items:stretch;gap:16px">
+        hdr = `<div style="padding:${pad}px ${pad + 16}px;background:#FFFFFF;display:flex;align-items:stretch;gap:16px">
       <div style="flex:1">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">${logo}
           <div style="font-size:${nameSz}px;font-weight:900;color:#1E293B">${co}</div>
@@ -4777,7 +4777,7 @@
     </div><div style="height:3px;background:${color}"></div>`;
 
       } else if (invLayout === 'centered') {
-        hdr = `<div style="padding:${pad}px ${pad + 16}px;background:#fff;text-align:center">
+        hdr = `<div style="padding:${pad}px ${pad + 16}px;background:#FFFFFF;text-align:center">
       <div style="display:flex;justify-content:center;margin-bottom:10px">${logo}</div>
       <div style="font-size:${nameSz}px;font-weight:900;color:#1E293B">${co}</div>
       ${v('f-tagline') ? `<div style="font-size:10px;color:#64748B;margin-top:2px">${v('f-tagline')}</div>` : ''}
@@ -4789,7 +4789,7 @@
       } else if (invLayout === 'dark-header') {
         hdr = `<div style="background:#1E293B;padding:${pad}px ${pad + 16}px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
       <div style="display:flex;align-items:center;gap:12px">${logo}<div>
-        <div style="font-size:${nameSz}px;font-weight:900;color:#fff">${co}</div>
+        <div style="font-size:${nameSz}px;font-weight:900;color:#FFFFFF">${co}</div>
         ${v('f-tagline') ? `<div style="font-size:10px;color:rgba(255,255,255,.5)">${v('f-tagline')}</div>` : ''}
       </div></div>
       <div style="text-align:right">
@@ -5172,7 +5172,7 @@
 
       if (!name) {
         const nameEl = document.getElementById('lh-recipient-name');
-        if (nameEl) { nameEl.style.borderColor = '#F05C5C'; nameEl.focus(); setTimeout(() => nameEl.style.borderColor = '', 2000); }
+        if (nameEl) { nameEl.style.borderColor = '#64748B'; nameEl.focus(); setTimeout(() => nameEl.style.borderColor = '', 2000); }
         return;
       }
 
@@ -5192,7 +5192,7 @@
       const styleTag = document.createElement('style');
       styleTag.textContent = `
     @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
-    .lh-wrap { max-width: 760px; margin: 0 auto; background: #fff; box-shadow: 0 8px 30px rgba(0,0,0,0.12); border-radius: 4px; display: flex; flex-direction: column; min-height: 900px; border: 1px solid #eaeaea; font-family: 'Nunito', sans-serif; overflow: hidden; }
+    .lh-wrap { max-width: 760px; margin: 0 auto; background: #FFFFFF; box-shadow: 0 8px 30px rgba(0,0,0,0.12); border-radius: 4px; display: flex; flex-direction: column; min-height: 900px; border: 1px solid #E2E8F0; font-family: 'Nunito', sans-serif; overflow: hidden; }
     .lh-wrap * { box-sizing: border-box; }
     .lh-wrap .doc-body { padding: 28px 40px; font-size: 12.5px; line-height: 1.8; color: #1E293B; flex: 1; }
     .lh-wrap .lb-date{color:#64748B;margin-bottom:14px;font-size:11.5px}
@@ -5235,7 +5235,7 @@
       window.parent.postMessage({ type: 'SEND_DOCUMENT', payload: data }, '*');
 
       const t = document.createElement('div');
-      t.style.cssText = "position:fixed;bottom:24px;right:24px;background:linear-gradient(135deg,#16A34A, var(--teal));color:#fff;padding:14px 22px;border-radius:12px;font-weight:700;z-index:99999;box-shadow:0 8px 24px rgba(0,0,0,0.15);font-size:13px;display:flex;align-items:center;gap:8px;";
+      t.style.cssText = "position:fixed;bottom:24px;right:24px;background:linear-gradient(135deg,#16A34A, var(--teal));color:#FFFFFF;padding:14px 22px;border-radius:12px;font-weight:700;z-index:99999;box-shadow:0 8px 24px rgba(0,0,0,0.15);font-size:13px;display:flex;align-items:center;gap:8px;";
       t.innerHTML = '<i class="ti ti-circle-check" style="font-size:18px;"></i> Letterhead sent to ' + name + '!';
       document.body.appendChild(t);
       setTimeout(() => { t.style.transition = 'opacity 0.4s'; t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 3000);
@@ -5415,7 +5415,7 @@
       // Cover
       const t = window._tdv('f-prop-title');
       document.getElementById('pv-title').textContent = t || '— Proposal Title —';
-      document.getElementById('pv-title').style.color = t ? '#fff' : 'rgba(255,255,255,.45)';
+      document.getElementById('pv-title').style.color = t ? '#FFFFFF' : 'rgba(255,255,255,.45)';
       const tc = window._tdv('f-prop-client');
       document.getElementById('pv-sub').textContent = tc ? 'Prepared for ' + tc + ' by Your Company' : 'Prepared by Your Company';
       document.getElementById('pv-date').textContent = fmtDate(window._tdv('f-prop-date'));
@@ -5614,7 +5614,7 @@
       const c = document.getElementById('td-valueList');
       const d = document.createElement('div');
       d.className = 'dv-item';
-      d.innerHTML = `<div class="dv-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ti ti-trending-up"></i></div>
+      d.innerHTML = `<div class="dv-icon" style="background:var(--app-accent-light);color:var(--app-muted)"><i class="ti ti-trending-up"></i></div>
     <input type="text" class="dv-input" placeholder="Value point or ROI…" oninput="propUp()">
     <i class="ti ti-x dv-del" onclick="this.parentElement.remove();propUp()"></i>`;
       c.appendChild(d);
@@ -5688,7 +5688,7 @@
       const c = document.getElementById('td-whyList');
       const d = document.createElement('div');
       d.className = 'dv-item';
-      d.innerHTML = `<div class="dv-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ti ti-star"></i></div>
+      d.innerHTML = `<div class="dv-icon" style="background:var(--app-accent-light);color:var(--app-muted)"><i class="ti ti-star"></i></div>
     <input type="text" class="dv-input" placeholder="Why choose YENCODE…">
     <i class="ti ti-x dv-del" onclick="this.parentElement.remove()"></i>`;
       c.appendChild(d);
@@ -5702,7 +5702,7 @@
       const exp = prompt('Years of experience (e.g. 5+ years · Web Dev):') || '';
       const skills = prompt('Skills (comma-separated):') || '';
       const c = document.getElementById('td-teamList');
-      const colors = ['linear-gradient(135deg,var(--teal),var(--teal4))', 'linear-gradient(135deg,var(--purple),#4E35B0)', 'linear-gradient(135deg,var(--amber),#D4880A)', 'linear-gradient(135deg,var(--blue),#1A4DB5)'];
+      const colors = ['linear-gradient(135deg,var(--teal),var(--app-primary))', 'linear-gradient(135deg,var(--app-accent),#64748B)', 'linear-gradient(135deg,var(--app-muted),#64748B)', 'linear-gradient(135deg,var(--blue),#2563EB)'];
       const col = colors[Math.floor(Math.random() * colors.length)];
       const init = name.trim().split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
       const skillTags = skills ? skills.split(',').map(s => `<span class="tc-skill">${s.trim()}</span>`).join('') : '';
@@ -5755,7 +5755,7 @@
   <div id="sendModal"
     style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.45);backdrop-filter:blur(4px);align-items:center;justify-content:center;">
     <div
-      style="background:#fff;border-radius:18px;padding:32px;width:360px;box-shadow:0 20px 60px rgba(0,0,0,0.25);position:relative;">
+      style="background:#FFFFFF;border-radius:18px;padding:32px;width:360px;box-shadow:0 20px 60px rgba(0,0,0,0.25);position:relative;">
       <div style="font-size:17px;font-weight:800;color:#1E293B;margin-bottom:6px;">Send Document</div>
       <div style="font-size:12px;color:#64748B;margin-bottom:20px;">Choose who to send this document to</div>
 
@@ -5764,7 +5764,7 @@
           style="font-size:10px;font-weight:700;color:#1E293B;text-transform:uppercase;letter-spacing:.7px;display:block;margin-bottom:6px;">Send
           To</label>
         <select id="sendModalType" onchange="updateSendModalRecipients()"
-          style="width:100%;padding:9px 12px;border:1.5px solid #E2E8F0;border-radius:8px;font-size:13px;font-family:inherit;color:#1E293B;background:#fff;outline:none;">
+          style="width:100%;padding:9px 12px;border:1.5px solid #E2E8F0;border-radius:8px;font-size:13px;font-family:inherit;color:#1E293B;background:#FFFFFF;outline:none;">
           <option value="client">Client</option>
           <option value="employee">Employee</option>
         </select>
@@ -5775,15 +5775,15 @@
           style="font-size:10px;font-weight:700;color:#1E293B;text-transform:uppercase;letter-spacing:.7px;display:block;margin-bottom:6px;">Recipient
           Name</label>
         <select id="sendModalName"
-          style="width:100%;padding:9px 12px;border:1.5px solid #E2E8F0;border-radius:8px;font-size:13px;font-family:inherit;color:#1E293B;outline:none;background:#fff;">
+          style="width:100%;padding:9px 12px;border:1.5px solid #E2E8F0;border-radius:8px;font-size:13px;font-family:inherit;color:#1E293B;outline:none;background:#FFFFFF;">
         </select>
       </div>
 
       <div style="display:flex;gap:10px;">
         <button onclick="closeSendModal()"
-          style="flex:1;padding:10px;border:1.5px solid #E2E8F0;border-radius:8px;background:#fff;font-size:13px;font-weight:600;color:#64748B;cursor:pointer;font-family:inherit;">Cancel</button>
+          style="flex:1;padding:10px;border:1.5px solid #E2E8F0;border-radius:8px;background:#FFFFFF;font-size:13px;font-weight:600;color:#64748B;cursor:pointer;font-family:inherit;">Cancel</button>
         <button onclick="confirmSendFromModal()"
-          style="flex:2;padding:10px;border:none;border-radius:8px;background:linear-gradient(135deg, var(--teal),var(--app-accent2, #2563EB));font-size:13px;font-weight:700;color:#fff;cursor:pointer;font-family:inherit;">
+          style="flex:2;padding:10px;border:none;border-radius:8px;background:linear-gradient(135deg, var(--teal),var(--app-accent2, #2563EB));font-size:13px;font-weight:700;color:#FFFFFF;cursor:pointer;font-family:inherit;">
           <i class="ti ti-send" style="margin-right:6px;"></i>Send Now
         </button>
       </div>

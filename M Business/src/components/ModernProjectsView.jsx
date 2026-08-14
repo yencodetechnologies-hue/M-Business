@@ -6,25 +6,25 @@ const P = {
   primary: ' var(--app-accent, var(--app-accent, #2563EB))',
   primaryDark: '#2563EB',
   primaryLight: 'var(--teal-light, var(--teal-light, #EFF6FF))',
-  primaryMid: '#B2EBF2',
-  textDark: '#1A2332',
-  textMid: '#4A5568',
-  textLight: '#718096',
-  bg: '#F0F4F8',
+  primaryMid: '#E2E8F0',
+  textDark: '#1E293B',
+  textMid: '#64748B',
+  textLight: '#64748B',
+  bg: '#EFF6FF',
   white: '#FFFFFF',
   border: '#E2E8F0',
   green: '#16A34A',
-  greenLight: '#D1FAE5',
-  orange: '#F59E0B',
-  orangeLight: '#FEF3C7',
-  red: '#FF6B6B',
-  redLight: '#FEE2E2',
-  purple: '#8B5CF6',
+  greenLight: '#E2E8F0',
+  orange: '#64748B',
+  orangeLight: '#E2E8F0',
+  red: '#64748B',
+  redLight: '#E2E8F0',
+  purple: '#2563EB',
   purpleLight: '#EFF6FF',
 };
 
 // Avatar colour palette
-const AV_COLORS = [' var(--app-accent, var(--app-accent, #2563EB))', '#8B5CF6', '#F59E0B', '#16A34A', '#EC4899', '#3B82F6', '#EF4444', '#10B981'];
+const AV_COLORS = [' var(--app-accent, var(--app-accent, #2563EB))', '#2563EB', '#64748B', '#16A34A', '#64748B', '#2563EB', '#64748B', '#16A34A'];
 
 function getAvColor(name, idx) {
   if (!name) return AV_COLORS[idx % AV_COLORS.length];
@@ -50,15 +50,15 @@ function normaliseStatus(raw) {
 
 // Progress bar colour
 function progColor(statusCls) {
-  if (statusCls === 'completed') return `linear-gradient(90deg,${P.green},#059669)`;
-  if (statusCls === 'overdue') return `linear-gradient(90deg,${P.red},#DC2626)`;
+  if (statusCls === 'completed') return `linear-gradient(90deg,${P.green},#16A34A)`;
+  if (statusCls === 'overdue') return `linear-gradient(90deg,${P.red},#64748B)`;
   if (statusCls === 'hold') return `linear-gradient(90deg,${P.purple},#2563EB)`;
   return `linear-gradient(90deg,${P.primary},${P.primaryDark})`;
 }
 
 // Deadline colour
 function deadlineColor(dateStr, statusCls) {
-  if (statusCls === 'overdue' || statusCls === 'completed') return statusCls === 'completed' ? '#059669' : P.red;
+  if (statusCls === 'overdue' || statusCls === 'completed') return statusCls === 'completed' ? '#16A34A' : P.red;
   if (!dateStr) return P.textMid;
   const d = new Date(dateStr);
   const diff = (d - Date.now()) / (1000 * 60 * 60 * 24);
@@ -86,7 +86,7 @@ const CSS = `
   gap:14px;
   margin-bottom:22px;
 }
-.mpv-kpi { background:#fff; border-radius:14px; padding:16px 18px; box-shadow:0 2px 12px rgba(37, 99, 235,.08);
+.mpv-kpi { background:#FFFFFF; border-radius:14px; padding:16px 18px; box-shadow:0 2px 12px rgba(37, 99, 235, .08);
   display:flex; align-items:center; gap:12px; cursor:pointer; transition:all .18s;
   border:2px solid transparent; }
 .mpv-kpi { border-color:transparent; }
@@ -97,17 +97,17 @@ const CSS = `
 
 /* Toolbar */
 .mpv-toolbar { display:flex; align-items:center; gap:10px; margin-bottom:18px; flex-wrap:wrap; }
-.mpv-search { display:flex; align-items:center; gap:8px; background:#fff; border:1.5px solid ${P.border};
+.mpv-search { display:flex; align-items:center; gap:8px; background:#FFFFFF; border:1.5px solid ${P.border};
   border-radius:10px; padding:9px 14px; flex:1; min-width:200px; max-width:340px; transition:border .15s; }
 .mpv-search:focus-within { border-color:${P.border}; }
 .mpv-search i { color:${P.textLight}; font-size:17px; }
-.mpv-search input { border:none; outline:none; box-shadow:none; background:#fff; -webkit-appearance:none; appearance:none; font-family:'Nunito',sans-serif; font-size:14px; width:100%; color:${P.textDark}; }
-.mpv-search input:focus { border:none; outline:none; box-shadow:none; background:#fff; }
-.mpv-search input:-webkit-autofill { -webkit-box-shadow:0 0 0 30px #fff inset !important; box-shadow:0 0 0 30px #fff inset !important; }
+.mpv-search input { border:none; outline:none; box-shadow:none; background:#FFFFFF; -webkit-appearance:none; appearance:none; font-family:'Nunito',sans-serif; font-size:14px; width:100%; color:${P.textDark}; }
+.mpv-search input:focus { border:none; outline:none; box-shadow:none; background:#FFFFFF; }
+.mpv-search input:-webkit-autofill { -webkit-box-shadow:0 0 0 30px #FFFFFF inset !important; box-shadow:0 0 0 30px #FFFFFF inset !important; }
 .mpv-sel { padding:9px 14px; border:1.5px solid ${P.border}; border-radius:10px; font-family:'Nunito',sans-serif;
-  font-size:13px; font-weight:600; color:${P.textMid}; background:#fff; outline:none; cursor:pointer; }
+  font-size:13px; font-weight:600; color:${P.textMid}; background:#FFFFFF; outline:none; cursor:pointer; }
 .mpv-sel:focus { border-color:${P.primary}; }
-.mpv-view-btns { display:flex; border:1.5px solid ${P.border}; border-radius:10px; overflow:hidden; background:#fff; }
+.mpv-view-btns { display:flex; border:1.5px solid ${P.border}; border-radius:10px; overflow:hidden; background:#FFFFFF; }
 .mpv-vb { padding:8px 11px; cursor:pointer; background:transparent; border:none; font-size:17px; color:${P.textLight}; transition:all .15s; }
 .mpv-vb.on,.mpv-vb:hover { background:${P.primaryLight}; color:${P.primary}; }
 
@@ -122,16 +122,16 @@ const CSS = `
 
 /* Project Card */
 .mpv-card {
-  background:#fff;
+  background:#FFFFFF;
   border-radius:14px;
-  box-shadow:0 2px 12px rgba(37, 99, 235,.08);
+  box-shadow:0 2px 12px rgba(37, 99, 235, .08);
   overflow:visible;
   position:relative;
   cursor:pointer;
   border:2px solid transparent;
   transition:all .2s;
 }
-.mpv-card:hover { transform:translateY(-3px); box-shadow:0 8px 32px rgba(37, 99, 235,.14); border-color:${P.primaryMid}; }
+.mpv-card:hover { transform:translateY(-3px); box-shadow:0 8px 32px rgba(37, 99, 235, .14); border-color:${P.primaryMid}; }
 .mpv-card-top { padding:18px 18px 0; }
 .mpv-card-row1 { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
 .mpv-card-title { font-size:15px; font-weight:800; color:${P.textDark}; margin-bottom:5px; line-height:1.3; }
@@ -147,14 +147,14 @@ const CSS = `
 .mpv-card-meta { display:flex; flex-direction:column; gap:6px; min-width:0; }
 .mpv-card-meta-row { display:flex; align-items:center; gap:4px; font-size:10px; color:${P.textLight}; font-weight:600; white-space:nowrap; }
 .mpv-card-meta-row i { color:${P.primary}; font-size:12px; flex-shrink:0; }
-.mpv-card-budget { color:#059669 !important; font-weight:700 !important; }
-.mpv-card-budget i { color:#059669 !important; }
+.mpv-card-budget { color:#16A34A !important; font-weight:700 !important; }
+.mpv-card-budget i { color:#16A34A !important; }
 .mpv-date-row { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; width:100%; }
 .mpv-date-col { display:flex; flex-direction:column; gap:2px; min-width:0; }
 .mpv-date-col-right { text-align:right; flex-shrink:0; margin-left:auto; }
 .mpv-team-stack { display:flex; }
-.mpv-team-stack .mpv-av { border:2px solid #fff; margin-right:-8px; }
-.mpv-av-extra { width:26px; height:26px; border-radius:50%; border:2px solid #fff;
+.mpv-team-stack .mpv-av { border:2px solid #FFFFFF; margin-right:-8px; }
+.mpv-av-extra { width:26px; height:26px; border-radius:50%; border:2px solid #FFFFFF;
   background:${P.bg}; font-size:9px; font-weight:800; color:${P.textMid};
   display:flex; align-items:center; justify-content:center; }
 .mpv-deadline { text-align:right; flex-shrink:0; }
@@ -166,20 +166,20 @@ const CSS = `
 /* Status badges */
 .mpv-badge { display:inline-flex; align-items:center; gap:5px; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:700; }
 .mpv-badge::before { content:''; width:6px; height:6px; border-radius:50%; background:currentColor; }
-.mpv-badge.active { background:${P.greenLight}; color:#065F46; }
-.mpv-badge.hold { background:${P.orangeLight}; color:#92400E; }
-.mpv-badge.completed { background:#DBEAFE; color:#1E40AF; }
-.mpv-badge.overdue { background:${P.redLight}; color:#991B1B; }
+.mpv-badge.active { background:${P.greenLight}; color:#1E293B; }
+.mpv-badge.hold { background:${P.orangeLight}; color:#1E293B; }
+.mpv-badge.completed { background:#E2E8F0; color:#2563EB; }
+.mpv-badge.overdue { background:${P.redLight}; color:#1E293B; }
 
 /* Priority badges */
 .mpv-prio { padding:3px 10px; border-radius:20px; font-size:11px; font-weight:700; }
-.mpv-prio.high { background:${P.redLight}; color:#DC2626; }
-.mpv-prio.medium { background:${P.orangeLight}; color:#D97706; }
-.mpv-prio.low { background:${P.greenLight}; color:#059669; }
+.mpv-prio.high { background:${P.redLight}; color:#64748B; }
+.mpv-prio.medium { background:${P.orangeLight}; color:#64748B; }
+.mpv-prio.low { background:${P.greenLight}; color:#16A34A; }
 
 /* Avatar */
 .mpv-av { width:26px; height:26px; border-radius:50%; display:flex; align-items:center;
-  justify-content:center; font-size:9px; font-weight:800; color:#fff; flex-shrink:0; }
+  justify-content:center; font-size:9px; font-weight:800; color:#FFFFFF; flex-shrink:0; }
 
 /* Action menu */
 .mpv-more-btn { background:none; border:none; cursor:pointer; color:${P.textLight}; font-size:18px;
@@ -190,7 +190,7 @@ const CSS = `
   right:0;
   left:auto;
   top:35px;
-  background:#fff;
+  background:#FFFFFF;
   border:1.5px solid ${P.border};
   border-radius:10px;
   box-shadow:0 8px 24px rgba(0,0,0,.1);
@@ -384,7 +384,7 @@ export default function ModernProjectsView({
     { key: 'all', label: 'All Projects', count: counts.all, icon: 'ti-layout-kanban', iconBg: P.primaryLight, iconColor: P.primary },
     { key: 'active', label: 'Ongoing', count: counts.active, icon: 'ti-player-play', iconBg: P.greenLight, iconColor: P.green },
     { key: 'hold', label: 'On Hold', count: counts.hold, icon: 'ti-player-pause', iconBg: P.orangeLight, iconColor: P.orange },
-    { key: 'completed', label: 'Completed', count: counts.completed, icon: 'ti-circle-check', iconBg: '#DBEAFE', iconColor: '#2563EB' },
+    { key: 'completed', label: 'Completed', count: counts.completed, icon: 'ti-circle-check', iconBg: '#E2E8F0', iconColor: '#2563EB' },
     { key: 'budget', label: 'Overall Value', budgetByCurrency: counts.budgetByCurrency, icon: 'ti-currency-rupee', iconBg: P.purpleLight, iconColor: P.purple, isCurrency: true },
   ];
 
@@ -473,7 +473,7 @@ export default function ModernProjectsView({
           {onAddProject && (
             <button
               onClick={onAddProject}
-              style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'var(--app-accent, #2563EB)', color: '#fff', border: 'none', borderRadius: 10, padding: '9px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
+              style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'var(--app-accent, #2563EB)', color: '#FFFFFF', border: 'none', borderRadius: 10, padding: '9px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
             >
               <i className="ti ti-plus" style={{ fontSize: 14 }} /> New Project
             </button>
@@ -482,10 +482,10 @@ export default function ModernProjectsView({
 
       {/* ── Project Cards ── */}
       {view === 'list' ? (
-        <div className="mpv-table-wrap" style={{ overflow: "auto", maxWidth: "100%", background: "#fff", borderRadius: 14, border: "1px solid #EEF2F4" }}>
+        <div className="mpv-table-wrap" style={{ overflow: "auto", maxWidth: "100%", background: "#FFFFFF", borderRadius: 14, border: "1px solid #EFF6FF" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 0, fontFamily: "'Nunito',sans-serif" }}>
             <thead>
-              <tr style={{ background: "#FAFBFC" }}>
+              <tr style={{ background: "#F8FAFC" }}>
                 {["Project", "Client", "Status", "Priority", "Progress", "Deadline", ""].map(h => (
                   <th key={h} style={{ padding: "10px 14px", textAlign: "left", color: "var(--app-muted)", fontWeight: 700, fontSize: 11, fontFamily: "'Nunito',sans-serif", borderBottom: "2px solid var(--app-border)", whiteSpace: "nowrap", width: h === "" ? "5%" : "15.8%" }}>{h.toUpperCase()}</th>
                 ))}
@@ -503,12 +503,12 @@ export default function ModernProjectsView({
                 const prioLabel = prio.charAt(0).toUpperCase() + prio.slice(1);
                 const isMenuOpen = openMenu === (p._id || p.id);
                 return (
-                  <tr key={p._id || p.id || Math.random()} onClick={(e) => { e.stopPropagation(); if (onClickProject) onClickProject(p); }} style={{ borderBottom: "1px solid #F3F4F6", cursor: "pointer", fontFamily: "'Nunito',sans-serif" }} onMouseEnter={e => e.currentTarget.style.background = "#FAFBFC"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                  <tr key={p._id || p.id || Math.random()} onClick={(e) => { e.stopPropagation(); if (onClickProject) onClickProject(p); }} style={{ borderBottom: "1px solid #F8FAFC", cursor: "pointer", fontFamily: "'Nunito',sans-serif" }} onMouseEnter={e => e.currentTarget.style.background = "#F8FAFC"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
                     <td style={{ padding: "16px 18px" }}>
-                      <div style={{ fontWeight: 700, color: "#1A2332", fontSize: 14 }}>{p.name}</div>
-                      <div style={{ color: "#94A3B8", fontSize: 12, marginTop: 2 }}>{p.category || "Web development"}</div>
+                      <div style={{ fontWeight: 700, color: "#1E293B", fontSize: 14 }}>{p.name}</div>
+                      <div style={{ color: "#64748B", fontSize: 12, marginTop: 2 }}>{p.category || "Web development"}</div>
                     </td>
-                    <td style={{ padding: "16px 18px", color: "#4A5568" }}>
+                    <td style={{ padding: "16px 18px", color: "#64748B" }}>
                       <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><i className="ti ti-building" style={{ fontSize: 14 }} />{p.client || "Internal"}</span>
                     </td>
                     <td style={{ padding: "16px 18px" }}>
@@ -519,10 +519,10 @@ export default function ModernProjectsView({
                     </td>
                     <td style={{ padding: "16px 18px", minWidth: 140 }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                        <div style={{ flex: 1, height: 6, borderRadius: 4, background: "#EEF2F4", overflow: "hidden" }}>
+                        <div style={{ flex: 1, height: 6, borderRadius: 4, background: "#EFF6FF", overflow: "hidden" }}>
                           <div style={{ width: `${pct}%`, height: "100%", background: progColor(statusCls) }} />
                         </div>
-                        <span style={{ fontWeight: 700, fontSize: 12, color: "#1A2332" }}>{pct}%</span>
+                        <span style={{ fontWeight: 700, fontSize: 12, color: "#1E293B" }}>{pct}%</span>
                       </div>
                     </td>
                     <td style={{ padding: "16px 18px", fontWeight: 700, color: dlColor }}>
@@ -555,8 +555,8 @@ export default function ModernProjectsView({
         </div>
       ) : (
         displayed.length === 0 ? (
-          <div style={{ background: "#fff", borderRadius: 14, border: "1px solid #EEF2F4", overflow: "hidden", fontFamily: "'Nunito',sans-serif" }}>
-            <div style={{ display: "flex", background: "#FAFBFC" }}>
+          <div style={{ background: "#FFFFFF", borderRadius: 14, border: "1px solid #EFF6FF", overflow: "hidden", fontFamily: "'Nunito',sans-serif" }}>
+            <div style={{ display: "flex", background: "#F8FAFC" }}>
               {["Project", "Client", "Status", "Priority", "Progress", "Deadline", ""].map(h => (
                 <div key={h} style={{ flex: h === "" ? "0 0 5%" : "1", padding: "10px 14px", color: "var(--app-muted)", fontWeight: 700, fontSize: 11, fontFamily: "'Nunito',sans-serif", borderBottom: "2px solid var(--app-border)", whiteSpace: "nowrap" }}>{h.toUpperCase()}</div>
               ))}
@@ -770,13 +770,13 @@ export default function ModernProjectsView({
           <button
             onClick={() => setPage(p => Math.max(1, p - 1))}
             disabled={page === 1}
-            style={{ padding: '6px 14px', borderRadius: 8, border: `1.5px solid ${P.border}`, background: page === 1 ? P.bg : '#fff', color: page === 1 ? P.textLight : P.textDark, cursor: page === 1 ? 'not-allowed' : 'pointer', fontSize: 12, fontWeight: 700, fontFamily: "'Nunito',sans-serif" }}
+            style={{ padding: '6px 14px', borderRadius: 8, border: `1.5px solid ${P.border}`, background: page === 1 ? P.bg : '#FFFFFF', color: page === 1 ? P.textLight : P.textDark, cursor: page === 1 ? 'not-allowed' : 'pointer', fontSize: 12, fontWeight: 700, fontFamily: "'Nunito',sans-serif" }}
           > Prev</button>
           <span style={{ fontSize: 12, color: P.textLight, fontWeight: 700 }}>Page {page} of {totalPages}</span>
           <button
             onClick={() => setPage(p => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
-            style={{ padding: '6px 14px', borderRadius: 8, border: `1.5px solid ${P.border}`, background: page === totalPages ? P.bg : '#fff', color: page === totalPages ? P.textLight : P.textDark, cursor: page === totalPages ? 'not-allowed' : 'pointer', fontSize: 12, fontWeight: 700, fontFamily: "'Nunito',sans-serif" }}
+            style={{ padding: '6px 14px', borderRadius: 8, border: `1.5px solid ${P.border}`, background: page === totalPages ? P.bg : '#FFFFFF', color: page === totalPages ? P.textLight : P.textDark, cursor: page === totalPages ? 'not-allowed' : 'pointer', fontSize: 12, fontWeight: 700, fontFamily: "'Nunito',sans-serif" }}
           >Next </button>
         </div>
       )}

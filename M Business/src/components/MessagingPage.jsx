@@ -120,7 +120,7 @@ export default function MessagingPage({ user }) {
         </div>
 
         <div className="conv-tabs">
-          <button className={`ctab ${convFilter === "all" ? "active" : ""}`} onClick={() => setConvFilter("all")}>All <span style={{ background: "var(--teal)", color: "#fff", fontSize: 9, padding: "1px 5px", borderRadius: 20, marginLeft: 4 }}>{users.length}</span></button>
+          <button className={`ctab ${convFilter === "all" ? "active" : ""}`} onClick={() => setConvFilter("all")}>All <span style={{ background: "var(--teal)", color: "#FFFFFF", fontSize: 9, padding: "1px 5px", borderRadius: 20, marginLeft: 4 }}>{users.length}</span></button>
           <button className={`ctab ${convFilter === "internal" ? "active" : ""}`} onClick={() => setConvFilter("internal")}>Internal</button>
           <button className={`ctab ${convFilter === "clients" ? "active" : ""}`} onClick={() => setConvFilter("clients")}>Clients</button>
 
@@ -128,7 +128,7 @@ export default function MessagingPage({ user }) {
 
         <div className="conv-list">
           {convFilter === "groups" ? (
-            <div style={{ padding: "30px 16px", textAlign: "center", color: "var(--app-muted, #94A3B0)", fontSize: 13 }}>
+            <div style={{ padding: "30px 16px", textAlign: "center", color: "var(--app-muted, #64748B)", fontSize: 13 }}>
        
             </div>
           ) : users.filter(u => {
@@ -175,7 +175,7 @@ export default function MessagingPage({ user }) {
             <div className="chat-header">
               <div className="ch-avatar" style={{ background: "var(--teal)" }}>
                 {selectedUser.name ? selectedUser.name.substring(0, 2).toUpperCase() : "U"}
-                <div className="online-dot" style={{ position: "absolute", bottom: 1, right: 1, width: 10, height: 10, borderRadius: "50%", background: "var(--green)", border: "2px solid #fff" }}></div>
+                <div className="online-dot" style={{ position: "absolute", bottom: 1, right: 1, width: 10, height: 10, borderRadius: "50%", background: "var(--green)", border: "2px solid #FFFFFF" }}></div>
               </div>
               <div>
                 <div className="ch-name">{selectedUser.name}</div>
@@ -202,7 +202,7 @@ export default function MessagingPage({ user }) {
                   const isMe = m.senderId === (user.id || user._id);
                   return (
                     <div key={i} className={`msg-row ${isMe ? "mine" : ""}`}>
-                      <div className="msg-avatar" style={{ background: isMe ? "var(--teal)" : "linear-gradient(135deg,var(--amber),#D4880A)" }}>
+                      <div className="msg-avatar" style={{ background: isMe ? "var(--teal)" : "linear-gradient(135deg,var(--app-muted),#64748B)" }}>
                         {isMe ? (user.name ? user.name.substring(0, 1).toUpperCase() : "U") : (selectedUser.name ? selectedUser.name.substring(0, 2).toUpperCase() : "U")}
                       </div>
                       <div className="msg-group">
@@ -240,7 +240,7 @@ export default function MessagingPage({ user }) {
                     bottom: "100%",
                     left: 10,
                     marginBottom: 8,
-                    background: "#fff",
+                    background: "#FFFFFF",
                     border: "1px solid var(--border, #E2E8F0)",
                     borderRadius: 10,
                     padding: 8,

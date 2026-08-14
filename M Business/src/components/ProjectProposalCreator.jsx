@@ -13,13 +13,13 @@ const pid = () => `PROP-${new Date().getFullYear()}-${String(Math.floor(Math.ran
 // ─── THEMES -------------------------------------------------------------------
 const THEMES = [
   { name: "Violet", p: "var(--app-accent)", g: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", l: "var(--app-border)", t: "var(--app-accent)1d95" },
-  { name: "Cobalt", p: "#1d4ed8", g: "linear-gradient(135deg,#1e40af,#3b82f6)", l: "var(--app-border)", t: "#1e3a8a" },
-  { name: "Emerald", p: "#059669", g: "linear-gradient(135deg,#065f46,#10b981)", l: "var(--app-border)", t: "#064e3b" },
-  { name: "Rose", p: "#e11d48", g: "linear-gradient(135deg,#9f1239,#f43f5e)", l: "var(--app-border)", t: "#881337" },
-  { name: "Amber", p: "#d97706", g: "linear-gradient(135deg,#92400e,#fbbf24)", l: "var(--app-border)", t: "#78350f" },
-  { name: "Slate", p: "#334155", g: "linear-gradient(135deg,#0f172a,#475569)", l: "var(--app-border)", t: "#0f172a" },
-  { name: "Teal", p: "#2563eb", g: "linear-gradient(135deg,#134e4a,#2dd4bf)", l: "var(--app-border)", t: "#134e4a" },
-  { name: "Fuchsia", p: "var(--app-accent)", g: "linear-gradient(135deg,#701a75,#e879f9)", l: "var(--app-border)", t: "#4a044e" },
+  { name: "Cobalt", p: "#2563EB", g: "linear-gradient(135deg,#2563EB,#2563EB)", l: "var(--app-border)", t: "#1E293B" },
+  { name: "Emerald", p: "#16A34A", g: "linear-gradient(135deg,#1E293B,#16A34A)", l: "var(--app-border)", t: "#1E293B" },
+  { name: "Rose", p: "#64748B", g: "linear-gradient(135deg,#1E293B,#64748B)", l: "var(--app-border)", t: "#1E293B" },
+  { name: "Amber", p: "#64748B", g: "linear-gradient(135deg,#1E293B,#64748B)", l: "var(--app-border)", t: "#1E293B" },
+  { name: "Slate", p: "#1E293B", g: "linear-gradient(135deg,#0F172A,#64748B)", l: "var(--app-border)", t: "#0F172A" },
+  { name: "Teal", p: "#2563EB", g: "linear-gradient(135deg,#1E293B,#2563EB)", l: "var(--app-border)", t: "#1E293B" },
+  { name: "Fuchsia", p: "var(--app-accent)", g: "linear-gradient(135deg,#64748B,#E2E8F0)", l: "var(--app-border)", t: "#1E293B" },
 ];
 // ─── COVERS -------------------------------------------------------------------
 const COVERS = [
@@ -103,10 +103,10 @@ function makeInitialProposal(theme = "Violet", companyName = "") {
 
 // ─── STATUS -------------------------------------------------------------------
 const STATUS = {
-  draft: { label: "Draft", icon: "Edit", bg: "#f8fafc", fg: "#475569", br: "#cbd5e1" },
-  pending: { label: "Pending Approval", icon: "Pending", bg: "#fffbeb", fg: "#92400e", br: "#fcd34d" },
-  approved: { label: "Approved", icon: "Success", bg: "#f0fdf4", fg: "#14532d", br: "#86efac" },
-  rejected: { label: "Rejected", icon: "Error", bg: "#fff1f2", fg: "#9f1239", br: "#fda4af" },
+  draft: { label: "Draft", icon: "Edit", bg: "#F8FAFC", fg: "#64748B", br: "#E2E8F0" },
+  pending: { label: "Pending Approval", icon: "Pending", bg: "#F8FAFC", fg: "#1E293B", br: "#E2E8F0" },
+  approved: { label: "Approved", icon: "Success", bg: "#F8FAFC", fg: "#1E293B", br: "#E2E8F0" },
+  rejected: { label: "Rejected", icon: "Error", bg: "#F8FAFC", fg: "#1E293B", br: "#E2E8F0" },
 };
 
 function formatCurrency(val, symbol = "INR", compact = false, disableCompact = false) {
@@ -144,7 +144,7 @@ function Confetti({ active }) {
     const c = ref.current; if (!c) return;
     c.width = window.innerWidth; c.height = window.innerHeight;
     const ctx = c.getContext("2d");
-    const colors = ["var(--app-accent)", "var(--app-accent)", "#22c55e", "#f59e0b", "#3b82f6", "#ec4899", "#14b8a6", "#f97316"];
+    const colors = ["var(--app-accent)", "var(--app-accent)", "#16A34A", "#64748B", "#2563EB", "#64748B", "#16A34A", "#64748B"];
     const parts = Array.from({ length: 150 }, () => ({ x: Math.random() * c.width, y: -20, vx: (Math.random() - .5) * 5, vy: Math.random() * 4 + 2, col: colors[Math.floor(Math.random() * colors.length)], w: Math.random() * 10 + 4, h: Math.random() * 6 + 3, rot: Math.random() * 360, rv: (Math.random() - .5) * 8 }));
     let fr; const draw = () => { ctx.clearRect(0, 0, c.width, c.height); parts.forEach(p => { p.x += p.vx; p.y += p.vy; p.rot += p.rv; if (p.y > c.height) { p.y = -10; p.x = Math.random() * c.width; } ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot * Math.PI / 180); ctx.fillStyle = p.col; ctx.beginPath(); ctx.ellipse(0, 0, p.w / 2, p.h / 2, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore(); }); fr = requestAnimationFrame(draw); };
     draw(); const t = setTimeout(() => cancelAnimationFrame(fr), 4000);
@@ -240,7 +240,7 @@ function DraggableElement({ element, selected, onSelect, onUpdate, onDelete, chi
     };
   }, [dragging, resizing, offset, canvasRef, element, onUpdate, slideH]); // added slideH dependency
 
-  const handleStyle = { position: "absolute", width: 14, height: 14, borderRadius: "50%", background: "#fff", border: "2px solid var(--app-accent)", zIndex: 2, boxShadow: "0 2px 4px rgba(0,0,0,0.2)" };
+  const handleStyle = { position: "absolute", width: 14, height: 14, borderRadius: "50%", background: "#FFFFFF", border: "2px solid var(--app-accent)", zIndex: 2, boxShadow: "0 2px 4px rgba(0,0,0,0.2)" };
 
   return (
     <div
@@ -289,14 +289,14 @@ function DraggableElement({ element, selected, onSelect, onUpdate, onDelete, chi
                 top: -85, // Moved up slightly for larger buttons
                 left: "50%",
                 transform: "translateX(-50%)",
-                background: "#fff",
+                background: "#FFFFFF",
                 boxShadow: "0 12px 48px rgba(0,0,0,0.3)",
                 borderRadius: 18,
                 display: "flex",
                 gap: 8,
                 padding: 8,
                 zIndex: 1000,
-                border: "1px solid #e5e7eb",
+                border: "1px solid #E2E8F0",
                 pointerEvents: "auto",
                 opacity: 1,
                 visibility: "visible"
@@ -306,13 +306,13 @@ function DraggableElement({ element, selected, onSelect, onUpdate, onDelete, chi
                 onPointerDown={(e) => { e.stopPropagation(); setDragging(true); onSelect(element.id); }}
                 style={{ border: "none", background: "none", padding: "14px 22px", fontSize: 26, cursor: "move", color: "var(--app-accent)", transition: "all .2s", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center" }}
                 title="Drag to Move" className="hb"></button>
-              <div style={{ width: 1, height: 44, background: "#e5e7eb", alignSelf: "center" }} />
+              <div style={{ width: 1, height: 44, background: "#E2E8F0", alignSelf: "center" }} />
               <button onClick={(e) => { e.stopPropagation(); onDelete(element.id); }}
-                style={{ border: "none", background: "none", padding: "14px 22px", fontSize: 28, cursor: "pointer", color: "#ef4444", transition: "all .2s", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center" }}
+                style={{ border: "none", background: "none", padding: "14px 22px", fontSize: 28, cursor: "pointer", color: "#64748B", transition: "all .2s", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center" }}
                 title="Delete" className="hb"> Delete</button>
-              <div style={{ width: 1, height: 44, background: "#e5e7eb", alignSelf: "center" }} />
+              <div style={{ width: 1, height: 44, background: "#E2E8F0", alignSelf: "center" }} />
               <button onClick={(e) => { e.stopPropagation(); onUpdate({ fontWeight: (element.fontWeight === 800 ? 400 : 800) }); }}
-                style={{ border: "none", background: "none", padding: "14px 22px", fontSize: 26, fontWeight: 900, cursor: "pointer", color: element.fontWeight === 800 ? "var(--app-accent)" : "#374151", transition: "all .2s", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center" }}
+                style={{ border: "none", background: "none", padding: "14px 22px", fontSize: 26, fontWeight: 900, cursor: "pointer", color: element.fontWeight === 800 ? "var(--app-accent)" : "#1E293B", transition: "all .2s", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center" }}
                 title="Bold" className="hb">B</button>
             </div>
           )}
@@ -342,7 +342,7 @@ function Slide({ slide, theme: tn, docFormat, editing, onChange, selectedId, onS
   const slideH = isPortrait ? 1273 : isLandscape ? 637 : 506;
   const W = { width: 900, minHeight: slideH, background: "var(--app-bg)ff", fontFamily: "'DM Sans',sans-serif", position: "relative", overflow: "hidden", flexShrink: 0 };
   const accent = { width: 56, height: 6, background: t.g, borderRadius: 3, marginBottom: 20 };
-  const h1 = { fontSize: 36, fontWeight: 800, color: "#0f172a", marginBottom: 24, letterSpacing: -0.5, lineHeight: 1.1 };
+  const h1 = { fontSize: 36, fontWeight: 800, color: "#0F172A", marginBottom: 24, letterSpacing: -0.5, lineHeight: 1.1 };
 
   const Txt = ({ val, onCh, big, center, white, weight, size, numeric }) => {
     const s = { background: "transparent", border: "none", borderRadius: 4, padding: "2px 4px", outline: "none", fontSize: size || "inherit", color: white ? "rgba(255,255,255,0.9)" : "inherit", fontWeight: weight || "inherit", fontFamily: "inherit", lineHeight: "inherit", width: "100%", boxSizing: "border-box", textAlign: center ? "center" : "left", resize: "none", transition: "background .15s" };
@@ -353,8 +353,8 @@ function Slide({ slide, theme: tn, docFormat, editing, onChange, selectedId, onS
       onCh(v);
     };
     return big
-      ? <textarea value={val} onChange={onInputChange} rows={4} style={s} onFocus={e => e.target.style.background = "rgba(37, 99, 235,0.05)"} onBlur={e => e.target.style.background = "transparent"} />
-      : <input value={val} onChange={onInputChange} style={s} onFocus={e => e.target.style.background = "rgba(37, 99, 235,0.05)"} onBlur={e => e.target.style.background = "transparent"} />;
+      ? <textarea value={val} onChange={onInputChange} rows={4} style={s} onFocus={e => e.target.style.background = "rgba(37, 99, 235, 0.05)"} onBlur={e => e.target.style.background = "transparent"} />
+      : <input value={val} onChange={onInputChange} style={s} onFocus={e => e.target.style.background = "rgba(37, 99, 235, 0.05)"} onBlur={e => e.target.style.background = "transparent"} />;
   };
 
   const elementsOverlay = (
@@ -365,7 +365,7 @@ function Slide({ slide, theme: tn, docFormat, editing, onChange, selectedId, onS
             <div style={{
               fontSize: el.fontSize,
               fontWeight: el.fontWeight || 400,
-              color: el.color || "#000",
+              color: el.color || "#0F172A",
               width: "100%",
               height: "100%",
               display: "flex",
@@ -438,18 +438,18 @@ function Slide({ slide, theme: tn, docFormat, editing, onChange, selectedId, onS
           <div style={{ display: "flex", gap: 8, marginBottom: 20, flexWrap: "wrap" }}>
             {COVERS.map((c, i) => (
               <img key={i} src={c} alt="" onClick={() => upd({ coverImage: c })}
-                style={{ width: 56, height: 36, objectFit: "cover", borderRadius: 6, cursor: "pointer", border: slide.coverImage === c ? "3px solid #fff" : "2px solid rgba(255,255,255,0.2)", transition: "all 0.15s", opacity: slide.coverImage === c ? 1 : 0.5 }} />
+                style={{ width: 56, height: 36, objectFit: "cover", borderRadius: 6, cursor: "pointer", border: slide.coverImage === c ? "3px solid #FFFFFF" : "2px solid rgba(255,255,255,0.2)", transition: "all 0.15s", opacity: slide.coverImage === c ? 1 : 0.5 }} />
             ))}
           </div>
         )}
-        <div style={{ fontSize: 48, fontWeight: 900, color: "#fff", lineHeight: 1.05, marginBottom: 16 }}>
+        <div style={{ fontSize: 48, fontWeight: 900, color: "#FFFFFF", lineHeight: 1.05, marginBottom: 16 }}>
           <Txt val={slide.title} onCh={v => upd({ title: v })} white weight={900} size={48} />
         </div>
         <div style={{ fontSize: 16, color: "rgba(255,255,255,0.7)", fontWeight: 400 }}>
           <Txt val={slide.subtitle} onCh={v => upd({ subtitle: v })} white size={16} />
         </div>
         <div style={{ marginTop: 28, display: "flex", gap: 4, alignItems: "center" }}>
-          <div style={{ width: 40, height: 3, background: "#fff", borderRadius: 2, opacity: 0.6 }} />
+          <div style={{ width: 40, height: 3, background: "#FFFFFF", borderRadius: 2, opacity: 0.6 }} />
           <div style={{ width: 8, height: 3, background: t.p, borderRadius: 2 }} />
         </div>
       </div>
@@ -464,21 +464,21 @@ function Slide({ slide, theme: tn, docFormat, editing, onChange, selectedId, onS
       <div style={{ position: "absolute", bottom: 0, left: 0, width: "100%", height: 4, background: t.g }} />
       <div style={accent} />
       <div style={h1}><Txt val={slide.heading} onCh={v => upd({ heading: v })} /></div>
-      <div style={{ fontSize: 15, color: "#4b5563", lineHeight: 1.9, maxWidth: 620 }}>
+      <div style={{ fontSize: 15, color: "#64748B", lineHeight: 1.9, maxWidth: 620 }}>
         <Txt val={slide.body} onCh={v => upd({ body: v })} big />
       </div>
       {slide.type === "closing" && (
         <div style={{ marginTop: 40 }}>
-          <div style={{ display: "inline-block", background: t.g, color: "#fff", borderRadius: 14, padding: "15px 36px", fontSize: 16, fontWeight: 700, cursor: "pointer", boxShadow: `0 8px 24px ${t.p}40` }}>
+          <div style={{ display: "inline-block", background: t.g, color: "#FFFFFF", borderRadius: 14, padding: "15px 36px", fontSize: 16, fontWeight: 700, cursor: "pointer", boxShadow: `0 8px 24px ${t.p}40` }}>
             <Txt val={slide.cta} onCh={v => upd({ cta: v })} white weight={700} size={16} />
           </div>
         </div>
       )}
 
       {/* Footer Element */}
-      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "linear-gradient(135deg,#020617,#1e293b)", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
+      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "linear-gradient(135deg,#0F172A,#1E293B)", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
         <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>{slide.companyName || companyName}</div>
-        <div style={{ fontSize: 12, fontWeight: 700, color: "#6ee7b7" }}>{footerMessage || slide.footerMessage || " Thank you for considering us!"}</div>
+        <div style={{ fontSize: 12, fontWeight: 700, color: "#64748B" }}>{footerMessage || slide.footerMessage || " Thank you for considering us!"}</div>
         <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>{slide.id}</div>
       </div>
 
@@ -494,11 +494,11 @@ function Slide({ slide, theme: tn, docFormat, editing, onChange, selectedId, onS
       <div style={{ display: "flex", flexDirection: "column", gap: 14, position: "relative" }}>
         {(slide.items || []).map((item, i) => (
           <div key={i} style={{ display: "flex", gap: 18, alignItems: "flex-start", padding: "16px 22px", background: t.l, borderRadius: 14, border: `1px solid ${t.p}20`, position: "relative" }}>
-            <div style={{ width: 36, height: 36, borderRadius: "50%", background: t.g, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900, fontSize: 15, flexShrink: 0 }}>{i + 1}</div>
-            <div style={{ flex: 1, fontSize: 14, color: "#1e293b", fontWeight: 600, paddingTop: 6 }}>
+            <div style={{ width: 36, height: 36, borderRadius: "50%", background: t.g, color: "#FFFFFF", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900, fontSize: 15, flexShrink: 0 }}>{i + 1}</div>
+            <div style={{ flex: 1, fontSize: 14, color: "#1E293B", fontWeight: 600, paddingTop: 6 }}>
               <Txt val={item} onCh={v => { const a = [...slide.items]; a[i] = v; upd({ items: a }); }} />
             </div>
-            {editing && slide.items.length > 1 && <button onClick={() => upd({ items: slide.items.filter((_, j) => j !== i) })} style={{ background: "none", border: "none", color: "#94a3b8", cursor: "pointer", fontSize: 16, position: "absolute", top: 8, right: 10 }}>✕</button>}
+            {editing && slide.items.length > 1 && <button onClick={() => upd({ items: slide.items.filter((_, j) => j !== i) })} style={{ background: "none", border: "none", color: "#64748B", cursor: "pointer", fontSize: 16, position: "absolute", top: 8, right: 10 }}>✕</button>}
           </div>
         ))}
         {editing && <button onClick={() => upd({ items: [...slide.items, "New objective here"] })} style={{ background: "none", border: `1.5px dashed ${t.p}50`, borderRadius: 12, padding: 12, fontSize: 13, color: t.p, cursor: "pointer", fontWeight: 700, fontFamily: "inherit" }}>+ Add Objective</button>}
@@ -516,12 +516,12 @@ function Slide({ slide, theme: tn, docFormat, editing, onChange, selectedId, onS
         <div style={{ position: "absolute", top: 20, left: "12.5%", right: "12.5%", height: 3, background: t.g, borderRadius: 2, zIndex: 0 }} />
         {(slide.phases || []).map((ph, i) => (
           <div key={i} style={{ textAlign: "center", position: "relative", zIndex: 1 }}>
-            <div style={{ width: 42, height: 42, borderRadius: "50%", background: i < 2 ? t.g : "#fff", border: `3px solid ${t.p}`, margin: "0 auto 16px", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 14, color: i < 2 ? "#fff" : t.p, boxShadow: `0 0 0 4px ${t.l}` }}>{i + 1}</div>
+            <div style={{ width: 42, height: 42, borderRadius: "50%", background: i < 2 ? t.g : "#FFFFFF", border: `3px solid ${t.p}`, margin: "0 auto 16px", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 14, color: i < 2 ? "#FFFFFF" : t.p, boxShadow: `0 0 0 4px ${t.l}` }}>{i + 1}</div>
             <div style={{ background: t.l, borderRadius: 12, padding: "12px 10px", border: `1px solid ${t.p}20` }}>
               <div style={{ fontSize: 12, fontWeight: 800, color: t.t, marginBottom: 6 }}>
                 <Txt val={ph.label} onCh={v => { const a = [...slide.phases]; a[i] = { ...a[i], label: v }; upd({ phases: a }); }} size={12} />
               </div>
-              <div style={{ display: "inline-block", background: t.g, color: "#fff", borderRadius: 20, padding: "3px 12px", fontSize: 11, fontWeight: 700 }}>
+              <div style={{ display: "inline-block", background: t.g, color: "#FFFFFF", borderRadius: 20, padding: "3px 12px", fontSize: 11, fontWeight: 700 }}>
                 <Txt val={ph.dur} onCh={v => { const a = [...slide.phases]; a[i] = { ...a[i], dur: v }; upd({ phases: a }); }} white size={11} />
               </div>
             </div>
@@ -538,20 +538,20 @@ function Slide({ slide, theme: tn, docFormat, editing, onChange, selectedId, onS
       <div style={accent} /><div style={h1}><Txt val={slide.heading} onCh={v => upd({ heading: v })} /></div>
       <table style={{ width: "100%", borderCollapse: "collapse" }}>
         <thead><tr style={{ background: t.g }}>
-          <th style={{ padding: "13px 22px", textAlign: "left", color: "#fff", fontSize: 13, fontWeight: 700, borderRadius: "10px 0 0 10px" }}>Item</th>
-          <th style={{ padding: "13px 22px", textAlign: "right", color: "#fff", fontSize: 13, fontWeight: 700, borderRadius: "0 10px 10px 0" }}>Cost</th>
+          <th style={{ padding: "13px 22px", textAlign: "left", color: "#FFFFFF", fontSize: 13, fontWeight: 700, borderRadius: "10px 0 0 10px" }}>Item</th>
+          <th style={{ padding: "13px 22px", textAlign: "right", color: "#FFFFFF", fontSize: 13, fontWeight: 700, borderRadius: "0 10px 10px 0" }}>Cost</th>
         </tr></thead>
         <tbody>
           {(slide.rows || []).map((r, i) => (
-            <tr key={i} style={{ borderBottom: `1px solid ${t.p}12`, background: i % 2 ? "var(--app-bg)" : "#fff" }}>
-              <td style={{ padding: "12px 22px", fontSize: 14, color: "#374151" }}><Txt val={r.item} onCh={v => { const a = [...slide.rows]; a[i] = { ...a[i], item: v }; upd({ rows: a }); }} /></td>
-              <td style={{ padding: "12px 22px", textAlign: "right", fontSize: 14, fontWeight: 700, color: "#1e293b" }}><Txt val={r.cost} onCh={v => { const a = [...slide.rows]; a[i] = { ...a[i], cost: v }; upd({ rows: a }); }} /></td>
+            <tr key={i} style={{ borderBottom: `1px solid ${t.p}12`, background: i % 2 ? "var(--app-bg)" : "#FFFFFF" }}>
+              <td style={{ padding: "12px 22px", fontSize: 14, color: "#1E293B" }}><Txt val={r.item} onCh={v => { const a = [...slide.rows]; a[i] = { ...a[i], item: v }; upd({ rows: a }); }} /></td>
+              <td style={{ padding: "12px 22px", textAlign: "right", fontSize: 14, fontWeight: 700, color: "#1E293B" }}><Txt val={r.cost} onCh={v => { const a = [...slide.rows]; a[i] = { ...a[i], cost: v }; upd({ rows: a }); }} /></td>
             </tr>
           ))}
         </tbody>
       </table>
       <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 16, padding: "16px 22px", background: t.g, borderRadius: 12 }}>
-        <span style={{ color: "#fff", fontWeight: 900, fontSize: 20 }}>Total: <Txt val={slide.total} onCh={v => upd({ total: v })} white weight={900} size={20} /></span>
+        <span style={{ color: "#FFFFFF", fontWeight: 900, fontSize: 20 }}>Total: <Txt val={slide.total} onCh={v => upd({ total: v })} white weight={900} size={20} /></span>
       </div>
       {elementsOverlay}
     </div>
@@ -564,10 +564,10 @@ function Slide({ slide, theme: tn, docFormat, editing, onChange, selectedId, onS
       <div style={{ display: "flex", gap: 18, flexWrap: "wrap" }}>
         {(slide.members || []).map((m, i) => (
           <div key={i} style={{ flex: "1 1 170px", padding: "24px 18px", background: t.l, borderRadius: 16, border: `1px solid ${t.p}22`, textAlign: "center", position: "relative" }}>
-            <div style={{ width: 56, height: 56, borderRadius: "50%", background: t.g, margin: "0 auto 14px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, color: "#fff", fontWeight: 900 }}>{m.avatar || m.name[0]}</div>
-            <div style={{ fontSize: 14, fontWeight: 800, color: "#0f172a", marginBottom: 4 }}><Txt val={m.name} onCh={v => { const a = [...slide.members]; a[i] = { ...a[i], name: v, avatar: (v[0] || "?").toUpperCase() + (v.split(" ")[1]?.[0] || "") }; upd({ members: a }); }} /></div>
+            <div style={{ width: 56, height: 56, borderRadius: "50%", background: t.g, margin: "0 auto 14px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, color: "#FFFFFF", fontWeight: 900 }}>{m.avatar || m.name[0]}</div>
+            <div style={{ fontSize: 14, fontWeight: 800, color: "#0F172A", marginBottom: 4 }}><Txt val={m.name} onCh={v => { const a = [...slide.members]; a[i] = { ...a[i], name: v, avatar: (v[0] || "?").toUpperCase() + (v.split(" ")[1]?.[0] || "") }; upd({ members: a }); }} /></div>
             <div style={{ fontSize: 12, color: t.p, fontWeight: 600 }}><Txt val={m.role} onCh={v => { const a = [...slide.members]; a[i] = { ...a[i], role: v }; upd({ members: a }); }} /></div>
-            {editing && <button onClick={() => upd({ members: slide.members.filter((_, j) => j !== i) })} style={{ position: "absolute", top: 8, right: 8, background: "rgba(239,68,68,0.1)", border: "none", color: "#ef4444", borderRadius: 6, width: 22, height: 22, cursor: "pointer", fontSize: 11 }}>✕</button>}
+            {editing && <button onClick={() => upd({ members: slide.members.filter((_, j) => j !== i) })} style={{ position: "absolute", top: 8, right: 8, background: "rgba(100, 116, 139, 0.1)", border: "none", color: "#64748B", borderRadius: 6, width: 22, height: 22, cursor: "pointer", fontSize: 11 }}>✕</button>}
           </div>
         ))}
         {editing && <div onClick={() => upd({ members: [...slide.members, { name: "New Member", role: "Role", avatar: "NM" }] })} style={{ flex: "1 1 170px", padding: "24px 18px", borderRadius: 16, border: `2px dashed ${t.p}40`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", color: t.p, gap: 8 }}>
@@ -588,7 +588,7 @@ function Slide({ slide, theme: tn, docFormat, editing, onChange, selectedId, onS
             {i < slide.steps.length - 1 && <div style={{ position: "absolute", right: -12, top: "50%", transform: "translateY(-50%)", color: t.p, fontSize: 18, zIndex: 2 }}>›</div>}
             <div style={{ fontSize: 32, marginBottom: 12 }}>{s.icon}</div>
             <div style={{ fontSize: 14, fontWeight: 800, color: t.t, marginBottom: 6 }}><Txt val={s.label} onCh={v => { const a = [...slide.steps]; a[i] = { ...a[i], label: v }; upd({ steps: a }); }} /></div>
-            <div style={{ fontSize: 12, color: "#64748b" }}><Txt val={s.desc} onCh={v => { const a = [...slide.steps]; a[i] = { ...a[i], desc: v }; upd({ steps: a }); }} /></div>
+            <div style={{ fontSize: 12, color: "#64748B" }}><Txt val={s.desc} onCh={v => { const a = [...slide.steps]; a[i] = { ...a[i], desc: v }; upd({ steps: a }); }} /></div>
           </div>
         ))}
       </div>
@@ -599,7 +599,7 @@ function Slide({ slide, theme: tn, docFormat, editing, onChange, selectedId, onS
   // BLANK FIRST PAGE - A4 Format Document
   if (slide.type === "blank_first_page") return (
     <>
-      <div className="blank-page-content" style={{ ...W, padding: "40px 60px", background: "#fff", fontSize: "14px", lineHeight: "1.5", color: "#000", position: "relative", minHeight: "1273px" }}>
+      <div className="blank-page-content" style={{ ...W, padding: "40px 60px", background: "#FFFFFF", fontSize: "14px", lineHeight: "1.5", color: "#0F172A", position: "relative", minHeight: "1273px" }}>
         {/* Print Button - Only show when not editing */}
         {!editing && (
           <button
@@ -609,7 +609,7 @@ function Slide({ slide, theme: tn, docFormat, editing, onChange, selectedId, onS
               position: "absolute",
               top: "10px",
               right: "10px",
-              background: "#007bff",
+              background: "#2563EB",
               color: "white",
               border: "none",
               borderRadius: "5px",
@@ -635,7 +635,7 @@ function Slide({ slide, theme: tn, docFormat, editing, onChange, selectedId, onS
   // PROPOSAL - A4 Format Document
   if (slide.type === "proposal") return (
     <>
-      <div className="proposal-content" style={{ ...W, padding: "40px 60px", background: "#fff", fontSize: "14px", lineHeight: "1.5", color: "#000", position: "relative" }}>
+      <div className="proposal-content" style={{ ...W, padding: "40px 60px", background: "#FFFFFF", fontSize: "14px", lineHeight: "1.5", color: "#0F172A", position: "relative" }}>
         {/* Truly empty page container */}
         <div style={{ height: "100%" }}>
           {elementsOverlay}
@@ -647,13 +647,13 @@ function Slide({ slide, theme: tn, docFormat, editing, onChange, selectedId, onS
   // PROPOSAL PAGE 2 - A4 Format Document
   if (slide.type === "proposal_page2") return (
     <>
-      <div className="proposal-content" style={{ ...W, padding: "40px 60px", background: "#fff", fontSize: "14px", lineHeight: "1.5", color: "#000", position: "relative" }}>
+      <div className="proposal-content" style={{ ...W, padding: "40px 60px", background: "#FFFFFF", fontSize: "14px", lineHeight: "1.5", color: "#0F172A", position: "relative" }}>
         {/* Redundant Print Button Hidden */}
 
         {/* Header with Logo minimized */}
         <div style={{ textAlign: "center", marginBottom: "30px" }}>
           {companyLogo && <img src={companyLogo} alt="logo" style={{ height: 40, marginBottom: 8, objectFit: "contain" }} />}
-          <div style={{ fontSize: "18px", fontWeight: "bold", color: "#ff0000" }}>{slide.companyName || companyName}</div>
+          <div style={{ fontSize: "18px", fontWeight: "bold", color: "#1E293B" }}>{slide.companyName || companyName}</div>
         </div>
 
         {/* Site Visits */}
@@ -695,7 +695,7 @@ function Slide({ slide, theme: tn, docFormat, editing, onChange, selectedId, onS
 
 
         {/* Footer */}
-        <div style={{ position: "absolute", bottom: "40px", left: "60px", right: "60px", textAlign: "center", fontSize: "10px", color: "#666", borderTop: "2px solid #ff0000", paddingTop: "10px" }}>
+        <div style={{ position: "absolute", bottom: "40px", left: "60px", right: "60px", textAlign: "center", fontSize: "10px", color: "#64748B", borderTop: "2px solid #1E293B", paddingTop: "10px" }}>
           <div style={{ fontWeight: "bold", color: "var(--app-accent)", marginBottom: 4 }}>{footerMessage || slide.footerMessage || " Thank you for considering us!"}</div>
           <Txt val={slide.companyAddress} onCh={v => upd({ companyAddress: v })} />
         </div>
@@ -708,12 +708,12 @@ function Slide({ slide, theme: tn, docFormat, editing, onChange, selectedId, onS
   // PORTRAIT PAGE
   if (slide.type === "portrait") return (
     <>
-      <div className="portrait-content" style={{ ...W, padding: "40px", background: "#fff", fontSize: "14px", lineHeight: "1.5", color: "#000", position: "relative", aspectRatio: "210/297" }}>
+      <div className="portrait-content" style={{ ...W, padding: "40px", background: "#FFFFFF", fontSize: "14px", lineHeight: "1.5", color: "#0F172A", position: "relative", aspectRatio: "210/297" }}>
         {/* Print Button */}
         {/* Redundant Print Button Hidden */}
 
         <div style={h1}><Txt val={slide.heading} onCh={v => upd({ heading: v })} /></div>
-        <div style={{ fontSize: 15, color: "#4b5563", lineHeight: 1.9, maxWidth: 620, marginTop: 20 }}>
+        <div style={{ fontSize: 15, color: "#64748B", lineHeight: 1.9, maxWidth: 620, marginTop: 20 }}>
           <Txt val={slide.body} onCh={v => upd({ body: v })} big />
         </div>
 
@@ -725,12 +725,12 @@ function Slide({ slide, theme: tn, docFormat, editing, onChange, selectedId, onS
   // LANDSCAPE PAGE
   if (slide.type === "landscape") return (
     <>
-      <div className="landscape-content" style={{ ...W, padding: "40px", background: "#fff", fontSize: "14px", lineHeight: "1.5", color: "#000", position: "relative", aspectRatio: "297/210" }}>
+      <div className="landscape-content" style={{ ...W, padding: "40px", background: "#FFFFFF", fontSize: "14px", lineHeight: "1.5", color: "#0F172A", position: "relative", aspectRatio: "297/210" }}>
         {/* Print Button */}
         {/* Redundant Print Button Hidden */}
 
         <div style={h1}><Txt val={slide.heading} onCh={v => upd({ heading: v })} /></div>
-        <div style={{ fontSize: 15, color: "#4b5563", lineHeight: 1.9, maxWidth: 800, marginTop: 20 }}>
+        <div style={{ fontSize: 15, color: "#64748B", lineHeight: 1.9, maxWidth: 800, marginTop: 20 }}>
           <Txt val={slide.body} onCh={v => upd({ body: v })} big />
         </div>
 
@@ -743,11 +743,11 @@ function Slide({ slide, theme: tn, docFormat, editing, onChange, selectedId, onS
     <div style={W}>
       {/* Default/Blank Slide content */}
       {slide.type === "blank" ? (
-        <div style={{ padding: 56, height: "100%", display: "flex", alignItems: "center", justifyContent: "center", border: "2px dashed #e5e7eb", margin: 20, borderRadius: 12, color: "#94a3b8" }}>
+        <div style={{ padding: 56, height: "100%", display: "flex", alignItems: "center", justifyContent: "center", border: "2px dashed #E2E8F0", margin: 20, borderRadius: 12, color: "#64748B" }}>
           Click to add elements or text
         </div>
       ) : (
-        <div style={{ ...W, display: "flex", alignItems: "center", justifyContent: "center" }}><span style={{ fontSize: 24, color: "#94a3b8" }}>{slide.type}</span></div>
+        <div style={{ ...W, display: "flex", alignItems: "center", justifyContent: "center" }}><span style={{ fontSize: 24, color: "#64748B" }}>{slide.type}</span></div>
       )}
 
       {elementsOverlay}
@@ -768,14 +768,14 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
   const st = (prop.status || "draft").toLowerCase();
 
   const statusMap = {
-    draft: { bg: "#f8fafc", color: "#475569", label: "Draft" },
-    sent: { bg: "#EFF4FF", color: "#2563EB", label: "Sent" },
-    pending: { bg: "#fffbeb", color: "#92400e", label: "Pending" },
-    approved: { bg: "#f0fdf4", color: "#14532d", label: "Approved" },
-    rejected: { bg: "#fff1f2", color: "#9f1239", label: "Rejected" },
-    negotiation: { bg: "#EEE9FF", color: "#7C5CFC", label: "Negotiation" },
-    won: { bg: "#f0fdf4", color: "#14532d", label: "Won" },
-    lost: { bg: "#fff1f2", color: "#9f1239", label: "Lost" },
+    draft: { bg: "#F8FAFC", color: "#64748B", label: "Draft" },
+    sent: { bg: "#EFF6FF", color: "#2563EB", label: "Sent" },
+    pending: { bg: "#F8FAFC", color: "#1E293B", label: "Pending" },
+    approved: { bg: "#F8FAFC", color: "#1E293B", label: "Approved" },
+    rejected: { bg: "#F8FAFC", color: "#1E293B", label: "Rejected" },
+    negotiation: { bg: "#EFF6FF", color: "#2563EB", label: "Negotiation" },
+    won: { bg: "#F8FAFC", color: "#1E293B", label: "Won" },
+    lost: { bg: "#F8FAFC", color: "#1E293B", label: "Lost" },
   };
   const badge = statusMap[st] || statusMap.draft;
 
@@ -790,7 +790,7 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div style={{
-        background: "#fff",
+        background: "#FFFFFF",
         borderRadius: 20,
         width: "100%",
         maxWidth: 820,
@@ -803,12 +803,12 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
       }}>
       {/* ── Top Bar ── */}
       <div style={{
-        background: "#fff", borderBottom: "1px solid #e2e8f0",
+        background: "#FFFFFF", borderBottom: "1px solid #E2E8F0",
         padding: "12px 24px", display: "flex", alignItems: "center",
         flexWrap: "wrap", gap: 10, flexShrink: 0, boxShadow: "0 2px 12px rgba(0,0,0,0.08)"
       }}>
         <button onClick={onClose} style={{
-          background: "#eff6ff", border: "1.5px solid #e2e8f0",
+          background: "#EFF6FF", border: "1.5px solid #E2E8F0",
           borderRadius: 8, padding: "5px 10px", fontSize: 11,
           fontWeight: 700, cursor: "pointer", color: " var(--app-accent, var(--app-accent, #2563EB))",
           display: "flex", alignItems: "center", gap: 4, flexShrink: 0
@@ -818,12 +818,12 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
 
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{
-            fontSize: 12.5, fontWeight: 800, color: "#0D2027",
+            fontSize: 12.5, fontWeight: 800, color: "#0F172A",
             whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis"
           }}>
             {prop.title || "Untitled Proposal"}
           </div>
-          <div style={{ fontSize: 9.5, color: "#96B0B8", marginTop: 1 }}>
+          <div style={{ fontSize: 9.5, color: "#64748B", marginTop: 1 }}>
             Client: {prop.client || prop.clientName || "—"} ·{" "}
             {prop.sentAt
               ? new Date(prop.sentAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })
@@ -843,7 +843,7 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
 
         {prop.clientSignature && (
           <span style={{
-            background: "#f0fdf4", color: "#15803D",
+            background: "#F8FAFC", color: "#16A34A",
             borderRadius: 20, padding: "4px 14px",
             fontSize: 11, fontWeight: 800,
             display: "flex", alignItems: "center", gap: 5, flexShrink: 0
@@ -853,7 +853,7 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
         )}
 
         <button onClick={onShare} style={{
-          background: "#eff6ff", border: "1.5px solid #e2e8f0",
+          background: "#EFF6FF", border: "1.5px solid #E2E8F0",
           borderRadius: 8, padding: "7px 14px", fontSize: 12,
           fontWeight: 700, cursor: "pointer", color: " var(--app-accent, var(--app-accent, #2563EB))",
           display: "flex", alignItems: "center", gap: 6
@@ -864,7 +864,7 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
         <button onClick={onPrint} style={{
           background: " var(--app-accent, var(--app-accent, #2563EB))", border: "none",
           borderRadius: 8, padding: "7px 16px", fontSize: 12,
-          fontWeight: 700, cursor: "pointer", color: "#fff",
+          fontWeight: 700, cursor: "pointer", color: "#FFFFFF",
           display: "flex", alignItems: "center", gap: 6
         }}>
           <i className="ti ti-printer"></i> Print / PDF
@@ -872,11 +872,11 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
       </div>
 
       {/* ── Body ── */}
-      <div style={{ flex: 1, overflowY: "auto", background: "#f8fafc", padding: "28px 24px" }}>
+      <div style={{ flex: 1, overflowY: "auto", background: "#F8FAFC", padding: "28px 24px" }}>
         <div style={{ maxWidth: 860, margin: "0 auto", display: "flex", flexDirection: "column", gap: 20 }}>
           {/* Canvas-based proposal — show read-only canvas */}
           {prop.format === "canvas" && prop.canvasElements && prop.canvasElements.length > 0 ? (
-            <div style={{ background: '#fff', borderRadius: 14, border: '1.5px solid #e2e8f0', overflow: 'hidden' }}>
+            <div style={{ background: '#FFFFFF', borderRadius: 14, border: '1.5px solid #E2E8F0', overflow: 'hidden' }}>
               <CanvasProposalEditor
                 isPreviewMode={true}
                 proposalData={prop}
@@ -890,8 +890,8 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
               <>
                 <style>{PROPOSAL_PREVIEW_CSS}</style>
                 <div className="prop-doc" style={{
-                  background: "#fff", borderRadius: 14,
-                  border: "1.5px solid #e2e8f0",
+                  background: "#FFFFFF", borderRadius: 14,
+                  border: "1.5px solid #E2E8F0",
                   boxShadow: "0 2px 14px rgba(0,0,0,0.06)",
                   maxHeight: "none", overflow: "visible"
                 }}
@@ -900,27 +900,27 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
               </>
             ) : prop.slides && prop.slides.length > 0 ? (
               <div style={{
-                background: "#fff", borderRadius: 14,
-                border: "1.5px solid #e2e8f0", padding: "36px 44px",
+                background: "#FFFFFF", borderRadius: 14,
+                border: "1.5px solid #E2E8F0", padding: "36px 44px",
                 boxShadow: "0 2px 14px rgba(0,0,0,0.06)"
               }}>
                 {/* Cover */}
                 <div style={{ textAlign: "center", marginBottom: 32, paddingBottom: 24, borderBottom: "3px solid  var(--app-accent, var(--app-accent, #2563EB))" }}>
-                  <div style={{ fontSize: 30, fontWeight: 900, color: "#0D2027", marginBottom: 8 }}>
+                  <div style={{ fontSize: 30, fontWeight: 900, color: "#0F172A", marginBottom: 8 }}>
                     {prop.title || "Project Proposal"}
                   </div>
                   <div style={{ fontSize: 14, color: "#64748B", marginBottom: 4 }}>
                     Prepared for <strong>{prop.client || prop.clientName || "—"}</strong>
                   </div>
                   {prop.sentAt && (
-                    <div style={{ fontSize: 12, color: "#96B0B8" }}>
+                    <div style={{ fontSize: 12, color: "#64748B" }}>
                       {new Date(prop.sentAt).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}
                     </div>
                   )}
                   {prop.value > 0 && (
                     <div style={{
                       display: "inline-block", marginTop: 12,
-                      background: "#eff6ff", border: "1.5px solid #e2e8f0",
+                      background: "#EFF6FF", border: "1.5px solid #E2E8F0",
                       borderRadius: 10, padding: "8px 20px",
                       fontSize: 16, fontWeight: 800, color: " var(--app-accent, var(--app-accent, #2563EB))"
                     }}>
@@ -933,8 +933,8 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
                 {prop.slides.map((slide, si) => (
                   <div key={si} style={{
                     marginBottom: 18, padding: "18px 22px",
-                    background: "#f8fafb", borderRadius: 12,
-                    border: "1.5px solid #e2e8f0"
+                    background: "#F8FAFC", borderRadius: 12,
+                    border: "1.5px solid #E2E8F0"
                   }}>
                     <div style={{
                       fontSize: 10, fontWeight: 800, color: " var(--app-accent, var(--app-accent, #2563EB))",
@@ -944,7 +944,7 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
                     </div>
 
                     {(slide.heading || slide.title) && (
-                      <div style={{ fontSize: 17, fontWeight: 800, color: "#0D2027", marginBottom: 8 }}>
+                      <div style={{ fontSize: 17, fontWeight: 800, color: "#0F172A", marginBottom: 8 }}>
                         {slide.heading || slide.title}
                       </div>
                     )}
@@ -952,15 +952,15 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
                       <div style={{ fontSize: 13, color: "#64748B", marginBottom: 6 }}>{slide.subtitle}</div>
                     )}
                     {slide.body && (
-                      <div style={{ fontSize: 13, color: "#4E6B75", lineHeight: 1.8, whiteSpace: "pre-wrap" }}>{slide.body}</div>
+                      <div style={{ fontSize: 13, color: "#64748B", lineHeight: 1.8, whiteSpace: "pre-wrap" }}>{slide.body}</div>
                     )}
                     {slide.items && slide.items.length > 0 && (
                       <div style={{ display: "flex", flexDirection: "column", gap: 6, marginTop: 8 }}>
                         {slide.items.map((item, ii) => (
                           <div key={ii} style={{
                             display: "flex", alignItems: "flex-start", gap: 10,
-                            padding: "8px 12px", background: "#fff",
-                            borderRadius: 8, border: "1px solid #e2e8f0", fontSize: 13, color: "#374151"
+                            padding: "8px 12px", background: "#FFFFFF",
+                            borderRadius: 8, border: "1px solid #E2E8F0", fontSize: 13, color: "#1E293B"
                           }}>
                             <span style={{ color: " var(--app-accent, var(--app-accent, #2563EB))", fontWeight: 900, marginTop: 1 }}>Yes</span> {item}
                           </div>
@@ -971,10 +971,10 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
                       <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 8 }}>
                         {slide.phases.map((ph, pi) => (
                           <div key={pi} style={{
-                            padding: "8px 14px", background: "#fff",
-                            borderRadius: 8, border: "1px solid #e2e8f0", fontSize: 12
+                            padding: "8px 14px", background: "#FFFFFF",
+                            borderRadius: 8, border: "1px solid #E2E8F0", fontSize: 12
                           }}>
-                            <span style={{ fontWeight: 700, color: "#0D2027" }}>Phase {pi + 1}:</span>{" "}
+                            <span style={{ fontWeight: 700, color: "#0F172A" }}>Phase {pi + 1}:</span>{" "}
                             <span style={{ color: "#64748B" }}>{ph.label}</span>{" "}
                             <span style={{ color: " var(--app-accent, var(--app-accent, #2563EB))", fontWeight: 700 }}>{ph.dur}</span>
                           </div>
@@ -985,15 +985,15 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
                       <table style={{ width: "100%", borderCollapse: "collapse", marginTop: 8 }}>
                         <thead>
                           <tr style={{ background: " var(--app-accent, var(--app-accent, #2563EB))" }}>
-                            <th style={{ padding: "8px 14px", color: "#fff", fontSize: 12, textAlign: "left", borderRadius: "6px 0 0 6px" }}>Item</th>
-                            <th style={{ padding: "8px 14px", color: "#fff", fontSize: 12, textAlign: "right", borderRadius: "0 6px 6px 0" }}>Cost</th>
+                            <th style={{ padding: "8px 14px", color: "#FFFFFF", fontSize: 12, textAlign: "left", borderRadius: "6px 0 0 6px" }}>Item</th>
+                            <th style={{ padding: "8px 14px", color: "#FFFFFF", fontSize: 12, textAlign: "right", borderRadius: "0 6px 6px 0" }}>Cost</th>
                           </tr>
                         </thead>
                         <tbody>
                           {slide.rows.map((row, ri) => (
-                            <tr key={ri} style={{ borderBottom: "1px solid #e2e8f0", background: ri % 2 ? "#f8fafb" : "#fff" }}>
-                              <td style={{ padding: "8px 14px", fontSize: 13, color: "#374151" }}>{row.item}</td>
-                              <td style={{ padding: "8px 14px", fontSize: 13, fontWeight: 700, color: "#0D2027", textAlign: "right" }}>{row.cost}</td>
+                            <tr key={ri} style={{ borderBottom: "1px solid #E2E8F0", background: ri % 2 ? "#F8FAFC" : "#FFFFFF" }}>
+                              <td style={{ padding: "8px 14px", fontSize: 13, color: "#1E293B" }}>{row.item}</td>
+                              <td style={{ padding: "8px 14px", fontSize: 13, fontWeight: 700, color: "#0F172A", textAlign: "right" }}>{row.cost}</td>
                             </tr>
                           ))}
                         </tbody>
@@ -1004,7 +1004,7 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
                         display: "flex", justifyContent: "flex-end",
                         marginTop: 10, padding: "10px 14px",
                         background: " var(--app-accent, var(--app-accent, #2563EB))", borderRadius: 8,
-                        fontSize: 15, fontWeight: 900, color: "#fff"
+                        fontSize: 15, fontWeight: 900, color: "#FFFFFF"
                       }}>
                         Total: {slide.total}
                       </div>
@@ -1013,18 +1013,18 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
                       <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 8 }}>
                         {slide.members.map((m, mi) => (
                           <div key={mi} style={{
-                            padding: "12px 16px", background: "#fff",
-                            borderRadius: 10, border: "1px solid #e2e8f0",
+                            padding: "12px 16px", background: "#FFFFFF",
+                            borderRadius: 10, border: "1px solid #E2E8F0",
                             textAlign: "center", minWidth: 110
                           }}>
                             <div style={{
                               width: 40, height: 40, borderRadius: "50%",
-                              background: " var(--app-accent, var(--app-accent, #2563EB))", color: "#fff",
+                              background: " var(--app-accent, var(--app-accent, #2563EB))", color: "#FFFFFF",
                               display: "flex", alignItems: "center", justifyContent: "center",
                               fontWeight: 800, fontSize: 14, margin: "0 auto 8px"
                             }}>{m.avatar || m.name?.[0]}</div>
-                            <div style={{ fontSize: 12, fontWeight: 700, color: "#0D2027" }}>{m.name}</div>
-                            <div style={{ fontSize: 11, color: "#96B0B8" }}>{m.role}</div>
+                            <div style={{ fontSize: 12, fontWeight: 700, color: "#0F172A" }}>{m.name}</div>
+                            <div style={{ fontSize: 11, color: "#64748B" }}>{m.role}</div>
                           </div>
                         ))}
                       </div>
@@ -1032,7 +1032,7 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
                     {slide.cta && (
                       <div style={{
                         marginTop: 16, display: "inline-block",
-                        background: " var(--app-accent, var(--app-accent, #2563EB))", color: "#fff",
+                        background: " var(--app-accent, var(--app-accent, #2563EB))", color: "#FFFFFF",
                         borderRadius: 10, padding: "12px 28px",
                         fontSize: 14, fontWeight: 700
                       }}>{slide.cta}</div>
@@ -1042,9 +1042,9 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
               </div>
             ) : (
               <div style={{
-                background: "#fff", borderRadius: 14,
-                border: "1.5px solid #e2e8f0", padding: 48,
-                textAlign: "center", color: "#96B0B8", fontSize: 14
+                background: "#FFFFFF", borderRadius: 14,
+                border: "1.5px solid #E2E8F0", padding: 48,
+                textAlign: "center", color: "#64748B", fontSize: 14
               }}>
                 No proposal content to display.
               </div>
@@ -1589,7 +1589,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
     if (!sourceEl) {
       tmp = document.createElement('div');
       tmp.id = 'propDoc';
-      tmp.style.cssText = 'position:fixed;left:-9999px;top:0;width:820px;background:#fff;';
+      tmp.style.cssText = 'position:fixed;left:-9999px;top:0;width:820px;background:#FFFFFF;';
       tmp.innerHTML = p.html && p.html.trim() ? p.html : buildProposalPreviewHTML(p);
       document.body.appendChild(tmp);
       sourceEl = tmp;
@@ -1603,7 +1603,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
     const canvas = await html2canvas(sourceEl, {
       scale: 1,
       useCORS: true,
-      backgroundColor: '#ffffff',
+      backgroundColor: '#FFFFFF',
       windowWidth: sourceEl.scrollWidth,
       windowHeight: sourceEl.scrollHeight,
       onclone: (clonedDoc) => {
@@ -1721,7 +1721,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
               const canvas = await html2canvas(node, {
                 scale: 2,
                 useCORS: true,
-                backgroundColor: '#ffffff',
+                backgroundColor: '#FFFFFF',
                 windowWidth: node.scrollWidth,
                 windowHeight: node.scrollHeight,
                 onclone: (clonedDoc) => {
@@ -1786,10 +1786,10 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
     const initials = (name) => (name || "P").trim().split(/\s+/).slice(0, 2).map(w => w[0]).join("").toUpperCase();
     const badgeCfg = (status) => {
       const ok = status === "approved" || status === "won";
-      return ok ? { bg: "#dcfce7", fg: "#16a34a" } : { bg: "#fef2f2", fg: "#dc2626" };
+      return ok ? { bg: "#E2E8F0", fg: "#16A34A" } : { bg: "#F8FAFC", fg: "#64748B" };
     };
     return (
-      <div style={{ padding: "16px 14px", background: "#F5F8FA", minHeight: "100%", boxSizing: "border-box", maxWidth: "100%", overflowX: "hidden" }}>
+      <div style={{ padding: "16px 14px", background: "#F8FAFC", minHeight: "100%", boxSizing: "border-box", maxWidth: "100%", overflowX: "hidden" }}>
         <div
           onClick={() => onBackOverride && onBackOverride()}
           style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 4px 16px", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #2563EB)" }}
@@ -1797,18 +1797,18 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
           <i className="ti ti-arrow-left" style={{ fontSize: 16 }}></i> Back to Dashboard
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #2563EB), #0891b2)", borderRadius: 16, padding: "16px 18px", marginBottom: 14, boxShadow: "0 6px 18px rgba(37, 99, 235,0.25)" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #2563EB), #2563EB)", borderRadius: 16, padding: "16px 18px", marginBottom: 14, boxShadow: "0 6px 18px rgba(37, 99, 235, 0.25)" }}>
           <div>
             <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.8)", letterSpacing: 0.5, textTransform: "uppercase" }}>Total Proposals</div>
-            <div style={{ fontSize: 26, fontWeight: 800, color: "#fff" }}>{proposals.length}</div>
+            <div style={{ fontSize: 26, fontWeight: 800, color: "#FFFFFF" }}>{proposals.length}</div>
           </div>
           <div style={{ width: 46, height: 46, borderRadius: 13, background: "rgba(255,255,255,0.18)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <i className="ti ti-clipboard-list" style={{ fontSize: 22, color: "#fff" }} />
+            <i className="ti ti-clipboard-list" style={{ fontSize: 22, color: "#FFFFFF" }} />
           </div>
         </div>
 
         {proposals.length === 0 ? (
-          <div style={{ padding: "40px 16px", textAlign: "center", color: "#64748B", fontSize: 13, fontWeight: 600, background: "#fff", borderRadius: 16, boxShadow: "0 2px 10px rgba(15,28,46,0.05)" }}>
+          <div style={{ padding: "40px 16px", textAlign: "center", color: "#64748B", fontSize: 13, fontWeight: 600, background: "#FFFFFF", borderRadius: 16, boxShadow: "0 2px 10px rgba(15, 23, 42, 0.05)" }}>
             No proposals found.
           </div>
         ) : (
@@ -1821,10 +1821,10 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                   key={p._id || i}
                   onClick={() => setViewingProposal(p)}
                   style={{
-                    background: "#fff",
+                    background: "#FFFFFF",
                     borderRadius: 16,
                     padding: "16px",
-                    boxShadow: "0 3px 14px rgba(15,28,46,0.07)",
+                    boxShadow: "0 3px 14px rgba(15, 23, 42, 0.07)",
                     cursor: "pointer",
                     boxSizing: "border-box",
                     borderLeft: `4px solid ${bc.fg}`
@@ -1834,14 +1834,14 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                     <div style={{ display: "flex", alignItems: "flex-start", gap: 10, minWidth: 0, flex: 1 }}>
                       <div style={{
                         width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
-                        background: "linear-gradient(135deg, var(--app-accent, #2563EB), #0891b2)", color: "#fff",
+                        background: "linear-gradient(135deg, var(--app-accent, #2563EB), #2563EB)", color: "#FFFFFF",
                         display: "flex", alignItems: "center", justifyContent: "center",
                         fontSize: 14, fontWeight: 800
                       }}>
                         {initials(title)}
                       </div>
                       <div style={{ minWidth: 0, flex: 1 }}>
-                        <div style={{ fontWeight: 800, color: "#0f172a", fontSize: 14.5, wordBreak: "break-word" }}>{title}</div>
+                        <div style={{ fontWeight: 800, color: "#0F172A", fontSize: 14.5, wordBreak: "break-word" }}>{title}</div>
                       </div>
                     </div>
                     <span style={{
@@ -1912,7 +1912,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
     const getVal = (p) => Number(p.value) || Number(p.total) || 0;
     const pipelineStages = [
       { label: "Won", color: "var(--green)", count: wonCount, val: wonVal },
-      { label: "Active", color: "var(--purple)", count: activeCount, val: proposals.filter(p => p.status === "pending" || p.status === "negotiation" || p.status === "sent").reduce((s, p) => s + getVal(p), 0) },
+      { label: "Active", color: "var(--app-accent)", count: activeCount, val: proposals.filter(p => p.status === "pending" || p.status === "negotiation" || p.status === "sent").reduce((s, p) => s + getVal(p), 0) },
       { label: "Draft", color: "var(--text3)", count: proposals.filter(p => !p.status || p.status === "draft").length, val: proposals.filter(p => !p.status || p.status === "draft").reduce((s, p) => s + getVal(p), 0) },
     ];
 
@@ -1924,26 +1924,26 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
     return (
       <div style={{ fontFamily: "var(--font,'Nunito',sans-serif)", minHeight: "100%", background: "var(--bg,#F8FAFC)", padding: "24px 28px 40px" }}>
         <style>{`
-          .prop-list-wrap .stat-card{background:var(--surface,#fff);border:1.5px solid var(--border,#E2E8F0);border-radius:16px;padding:18px 20px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .15s;}
+          .prop-list-wrap .stat-card{background:var(--surface,#FFFFFF);border:1.5px solid var(--border,#E2E8F0);border-radius:16px;padding:18px 20px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .15s;}
           .prop-list-wrap .stat-card:hover{border-color:var(--border,#E2E8F0);box-shadow:none;}
-          .prop-list-wrap .proposal-card{background:var(--surface,#fff);border:1.5px solid var(--border,#E2E8F0);border-radius:16px;overflow:hidden;cursor:pointer;transition:all .2s;margin-bottom:14px;}
-          .prop-list-wrap .proposal-card:hover{border-color:var(--teal, var(--app-accent, var(--app-accent, #2563EB)));box-shadow:0 6px 24px rgba(37, 99, 235,.1);}
+          .prop-list-wrap .proposal-card{background:var(--surface,#FFFFFF);border:1.5px solid var(--border,#E2E8F0);border-radius:16px;overflow:hidden;cursor:pointer;transition:all .2s;margin-bottom:14px;}
+          .prop-list-wrap .proposal-card:hover{border-color:var(--teal, var(--app-accent, var(--app-accent, #2563EB)));box-shadow:0 6px 24px rgba(37, 99, 235, .1);}
           .prop-list-wrap .prop-tab{padding:7px 18px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;color:var(--text2,#64748B);transition:all .15s;border:none;background:none;font-family:inherit;}
-          .prop-list-wrap .prop-tab.active{background:var(--teal, var(--app-accent, var(--app-accent, #2563EB)));color:#fff;box-shadow:0 2px 10px rgba(37, 99, 235,.3);}
+          .prop-list-wrap .prop-tab.active{background:var(--teal, var(--app-accent, var(--app-accent, #2563EB)));color:#FFFFFF;box-shadow:0 2px 10px rgba(37, 99, 235, .3);}
           .prop-list-wrap .prop-tab:not(.active):hover{background:var(--teal-light,var(--teal-light, var(--teal-light, #EFF6FF)));color:var(--teal, var(--app-accent, var(--app-accent, #2563EB)));}
           .prop-list-wrap .pf-btn{display:flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;border:1.5px solid var(--border,#E2E8F0);background:none;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--text2,#64748B);transition:all .15s;}
           .prop-list-wrap .pf-btn:hover{border-color:var(--teal, var(--app-accent, var(--app-accent, #2563EB)));color:var(--teal, var(--app-accent, var(--app-accent, #2563EB)));background:var(--teal-light,var(--teal-light, var(--teal-light, #EFF6FF)));}
-          .prop-list-wrap .pf-btn.primary{background:var(--teal, var(--app-accent, var(--app-accent, #2563EB)));color:#fff;border-color:var(--teal, var(--app-accent, var(--app-accent, #2563EB)));}
+          .prop-list-wrap .pf-btn.primary{background:var(--teal, var(--app-accent, var(--app-accent, #2563EB)));color:#FFFFFF;border-color:var(--teal, var(--app-accent, var(--app-accent, #2563EB)));}
           .prop-list-wrap .pf-btn.primary:hover{background:var(--teal2,var(--app-accent2, #2563EB));}
-          .prop-list-wrap .pf-btn.danger{color:var(--red,#F05C5C);border-color:var(--red-bg,#FEF2F2);}
+          .prop-list-wrap .pf-btn.danger{color:var(--red,#64748B);border-color:var(--red-bg,#F8FAFC);}
           .prop-list-wrap .badge-pill{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:700;}
           .prop-list-wrap .badge-pill::before{content:'';width:5px;height:5px;border-radius:50%;}
-          .prop-list-wrap .badge-won{background:var(--green-bg,#E8FAF3);color:var(--green,#16A34A);} .prop-list-wrap .badge-won::before{background:var(--green,#16A34A);}
-          .prop-list-wrap .badge-sent{background:var(--blue-bg,#EFF4FF);color:var(--blue,#2563EB);} .prop-list-wrap .badge-sent::before{background:var(--blue,#2563EB);}
-          .prop-list-wrap .badge-review{background:var(--amber-bg,#FEF5E6);color:var(--amber,#F5A623);} .prop-list-wrap .badge-review::before{background:var(--amber,#F5A623);}
-          .prop-list-wrap .badge-draft{background:var(--surface2,#F8FAFB);color:var(--text3,#64748B);border:1px solid var(--border,#E2E8F0);} .prop-list-wrap .badge-draft::before{background:var(--text3,#64748B);}
-          .prop-list-wrap .badge-lost{background:var(--red-bg,#FEF2F2);color:var(--red,#F05C5C);} .prop-list-wrap .badge-lost::before{background:var(--red,#F05C5C);}
-          .prop-list-wrap .badge-negotiation{background:var(--purple-bg,#EEE9FF);color:var(--purple,#7C5CFC);} .prop-list-wrap .badge-negotiation::before{background:var(--purple,#7C5CFC);}
+          .prop-list-wrap .badge-won{background:var(--green-bg,#EFF6FF);color:var(--green,#16A34A);} .prop-list-wrap .badge-won::before{background:var(--green,#16A34A);}
+          .prop-list-wrap .badge-sent{background:var(--blue-bg,#EFF6FF);color:var(--blue,#2563EB);} .prop-list-wrap .badge-sent::before{background:var(--blue,#2563EB);}
+          .prop-list-wrap .badge-review{background:var(--amber-bg,#F8FAFC);color:var(--amber,#64748B);} .prop-list-wrap .badge-review::before{background:var(--amber,#64748B);}
+          .prop-list-wrap .badge-draft{background:var(--surface2,#F8FAFC);color:var(--text3,#64748B);border:1px solid var(--border,#E2E8F0);} .prop-list-wrap .badge-draft::before{background:var(--text3,#64748B);}
+          .prop-list-wrap .badge-lost{background:var(--red-bg,#F8FAFC);color:var(--red,#64748B);} .prop-list-wrap .badge-lost::before{background:var(--red,#64748B);}
+          .prop-list-wrap .badge-negotiation{background:var(--purple-bg,#EFF6FF);color:var(--purple,#2563EB);} .prop-list-wrap .badge-negotiation::before{background:var(--purple,#2563EB);}
           .prop-list-wrap .scope-tag{padding:4px 10px;background:var(--bg,#F8FAFC);border:1.5px solid var(--border,#E2E8F0);border-radius:20px;font-size:10px;font-weight:700;color:var(--text2,#64748B);}
           .prop-list-wrap .add-card{background:var(--teal-lighter,var(--teal-lighter, #EFF6FF));border:2px dashed var(--teal, var(--app-accent, var(--app-accent, #2563EB)));border-radius:16px;padding:28px;cursor:pointer;display:flex;align-items:center;gap:18px;transition:all .2s;}
           .prop-list-wrap .add-card:hover{background:var(--teal-light,var(--teal-light, var(--teal-light, #EFF6FF)));}
@@ -1951,16 +1951,16 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
           .prop-list-wrap .tmpl-item:last-child{margin-bottom:0;}
           .prop-list-wrap .tmpl-item:hover{border-color:var(--teal, var(--app-accent, var(--app-accent, #2563EB)));background:var(--teal-lighter,var(--teal-lighter, #EFF6FF));}
           .prop-list-wrap .stage-item-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg,#F8FAFC);border-radius:10px;border:1.5px solid var(--border,#E2E8F0);margin-bottom:8px;}
-          .prop-list-wrap .filter-btn{display:flex;align-items:center;gap:6px;padding:9px 16px;background:var(--surface,#fff);border:1.5px solid var(--border,#E2E8F0);border-radius:10px;font-size:12px;font-weight:700;color:var(--text2,#64748B);cursor:pointer;font-family:inherit;transition:all .15s;}
+          .prop-list-wrap .filter-btn{display:flex;align-items:center;gap:6px;padding:9px 16px;background:var(--surface,#FFFFFF);border:1.5px solid var(--border,#E2E8F0);border-radius:10px;font-size:12px;font-weight:700;color:var(--text2,#64748B);cursor:pointer;font-family:inherit;transition:all .15s;}
           .prop-list-wrap .filter-btn:hover{border-color:var(--teal, var(--app-accent, var(--app-accent, #2563EB)));color:var(--teal, var(--app-accent, var(--app-accent, #2563EB)));}
-          .prop-list-wrap .new-prop-btn{display:flex;align-items:center;gap:7px;padding:11px 20px;background:var(--teal, var(--app-accent, var(--app-accent, #2563EB)));color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;transition:background .15s;box-shadow:0 4px 14px rgba(37, 99, 235,.25);}
+          .prop-list-wrap .new-prop-btn{display:flex;align-items:center;gap:7px;padding:11px 20px;background:var(--teal, var(--app-accent, var(--app-accent, #2563EB)));color:#FFFFFF;border:none;border-radius:12px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;transition:background .15s;box-shadow:0 4px 14px rgba(37, 99, 235, .25);}
           .prop-list-wrap .new-prop-btn:hover{background:var(--teal2,var(--app-accent2, #2563EB));}
           .prop-list-wrap .prog-bar{height:5px;background:var(--border,#E2E8F0);border-radius:3px;overflow:hidden;margin-top:8px;}
           .prop-list-wrap .prog-fill{height:100%;border-radius:3px;}
           .prop-list-wrap .search-wrap{position:relative;flex:1;max-width:320px;}
           .prop-list-wrap .search-wrap i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text3,#64748B);font-size:15px;}
-          .prop-list-wrap .search-wrap input{width:100%;padding:10px 14px 10px 36px;background:var(--surface,#fff);border:1.5px solid var(--border,#E2E8F0);border-radius:12px;font-size:13px;color:var(--text,#1E293B);font-family:inherit;outline:none;transition:all .15s;}
-      .prop-list-wrap .search-wrap input:focus{border-color:var(--teal, var(--app-accent, var(--app-accent, #2563EB)));box-shadow:0 0 0 3px rgba(37, 99, 235,.08);}
+          .prop-list-wrap .search-wrap input{width:100%;padding:10px 14px 10px 36px;background:var(--surface,#FFFFFF);border:1.5px solid var(--border,#E2E8F0);border-radius:12px;font-size:13px;color:var(--text,#1E293B);font-family:inherit;outline:none;transition:all .15s;}
+      .prop-list-wrap .search-wrap input:focus{border-color:var(--teal, var(--app-accent, var(--app-accent, #2563EB)));box-shadow:0 0 0 3px rgba(37, 99, 235, .08);}
           @media (max-width: 700px) {
             .prop-stats-row { grid-template-columns: repeat(2,1fr) !important; }
             .prop-header-row { flex-wrap: wrap !important; gap: 10px !important; }
@@ -1992,7 +1992,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                   fontSize: 13,
                   fontWeight: 600,
                   color: "var(--text,#1E293B)",
-                  background: "#fff",
+                  background: "#FFFFFF",
                   cursor: "pointer",
                   outline: "none"
                 }}
@@ -2012,7 +2012,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
               </div>
             </div>
             <div className="stat-card" style={{ border: "1.5px solid var(--border,#E2E8F0)", cursor: "default" }}>
-              <div style={{ width: 44, height: 44, borderRadius: 12, background: "var(--green-bg,#E8FAF3)", color: "var(--green,#16A34A)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}><i className="ti ti-trophy"></i></div>
+              <div style={{ width: 44, height: 44, borderRadius: 12, background: "var(--green-bg,#EFF6FF)", color: "var(--green,#16A34A)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}><i className="ti ti-trophy"></i></div>
               <div>
                 <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1E293B)", lineHeight: 1 }}>{wonCount}</div>
                 <div style={{ fontSize: 11, color: "var(--text3,#64748B)", fontWeight: 600, marginTop: 3 }}>Won</div>
@@ -2020,26 +2020,26 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
               </div>
             </div>
             <div className="stat-card" style={{ border: "1.5px solid var(--border,#E2E8F0)", cursor: "default" }}>
-              <div style={{ width: 44, height: 44, borderRadius: 12, background: "var(--purple-bg,#EEE9FF)", color: "var(--purple,#7C5CFC)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}><i className="ti ti-arrows-exchange"></i></div>
+              <div style={{ width: 44, height: 44, borderRadius: 12, background: "var(--purple-bg,#EFF6FF)", color: "var(--purple,#2563EB)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}><i className="ti ti-arrows-exchange"></i></div>
               <div>
                 <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1E293B)", lineHeight: 1 }}>{activeCount}</div>
                 <div style={{ fontSize: 11, color: "var(--text3,#64748B)", fontWeight: 600, marginTop: 3 }}>In Progress</div>
-                <div style={{ fontSize: 10, fontWeight: 700, marginTop: 4, color: "var(--purple,#7C5CFC)" }}>Active pipeline</div>
+                <div style={{ fontSize: 10, fontWeight: 700, marginTop: 4, color: "var(--purple,#2563EB)" }}>Active pipeline</div>
               </div>
             </div>
             <div className="stat-card" style={{ border: "1.5px solid var(--border,#E2E8F0)", cursor: "default" }}>
-              <div style={{ width: 44, height: 44, borderRadius: 12, background: "var(--amber-bg,#FEF5E6)", color: "var(--amber,#F5A623)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}><i className="ti ti-percentage"></i></div>
+              <div style={{ width: 44, height: 44, borderRadius: 12, background: "var(--amber-bg,#F8FAFC)", color: "var(--amber,#64748B)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}><i className="ti ti-percentage"></i></div>
               <div>
                 <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1E293B)", lineHeight: 1 }}>{successRate}%</div>
                 <div style={{ fontSize: 11, color: "var(--text3,#64748B)", fontWeight: 600, marginTop: 3 }}>Success Rate</div>
-                <div style={{ fontSize: 10, fontWeight: 700, marginTop: 4, color: "var(--amber,#F5A623)" }}>{wonCount} of {decided} decided</div>
+                <div style={{ fontSize: 10, fontWeight: 700, marginTop: 4, color: "var(--amber,#64748B)" }}>{wonCount} of {decided} decided</div>
               </div>
             </div>
           </div>
 
           {/* TABS + SEARCH */}
           <div className="prop-tabs-search-row" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
-            <div style={{ display: "flex", gap: 4, flexWrap: "wrap", background: "var(--surface,#fff)", border: "1.5px solid var(--border,#E2E8F0)", borderRadius: 12, padding: 4 }}>
+            <div style={{ display: "flex", gap: 4, flexWrap: "wrap", background: "var(--surface,#FFFFFF)", border: "1.5px solid var(--border,#E2E8F0)", borderRadius: 12, padding: 4 }}>
               {["all", "draft", "sent", "negotiation", "won", "lost"].map(t => (
                 <button key={t} className={`prop-tab${propTab === t ? " active" : ""}`} onClick={() => { setPropTab(t); setActiveCard(t === "all" ? "all" : t === "won" ? "won" : t === "negotiation" ? "inprogress" : ""); }} style={{ whiteSpace: "nowrap" }}>
                   {t.charAt(0).toUpperCase() + t.slice(1)}
@@ -2078,12 +2078,12 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                       <div key={p.id || p._id} className="proposal-card" onClick={() => { setOpenMenuId(null); openDoc(p); }}>
                         {/* Header */}
                         <div style={{ display: "flex", alignItems: "center", gap: 16, padding: "18px 20px", borderBottom: "1px solid var(--border,#E2E8F0)" }}>
-                          <div style={{ width: 48, height: 48, borderRadius: 13, background: grad, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 800, color: "#fff", flexShrink: 0 }}>{initials}</div>
+                          <div style={{ width: 48, height: 48, borderRadius: 13, background: grad, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 800, color: "#FFFFFF", flexShrink: 0 }}>{initials}</div>
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <div style={{ fontSize: 10, fontWeight: 800, color: "var(--teal, var(--app-accent, var(--app-accent, #2563EB)))", letterSpacing: 0.5, marginBottom: 2 }}>{p.id}</div>
                             <div style={{ fontSize: 14, fontWeight: 800, color: "var(--text,#1E293B)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.title || "Untitled Proposal"}</div>
                             <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 3 }}>
-                              <div style={{ width: 18, height: 18, borderRadius: "50%", background: "var(--teal, var(--app-accent, var(--app-accent, #2563EB)))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 7, fontWeight: 800, color: "#fff", flexShrink: 0 }}>{clientInitial}</div>
+                              <div style={{ width: 18, height: 18, borderRadius: "50%", background: "var(--teal, var(--app-accent, var(--app-accent, #2563EB)))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 7, fontWeight: 800, color: "#FFFFFF", flexShrink: 0 }}>{clientInitial}</div>
                               <span style={{ fontSize: 11, color: "var(--text2,#64748B)", fontWeight: 600 }}>{p.client || "No client assigned"}</span>
                             </div>
                           </div>
@@ -2101,7 +2101,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                                   console.error('Proposal status update failed:', err);
                                 }
                               }}
-                              style={{ border: '1px solid #e2e8f0', borderRadius: 6, padding: '2px 6px', fontSize: 10, fontWeight: 700, color: '#374151', background: '#fff', cursor: 'pointer', outline: 'none' }}
+                              style={{ border: '1px solid #E2E8F0', borderRadius: 6, padding: '2px 6px', fontSize: 10, fontWeight: 700, color: '#1E293B', background: '#FFFFFF', cursor: 'pointer', outline: 'none' }}
                             >
                               {['draft', 'sent', 'negotiation', 'approved', 'rejected'].map(s => (
                                 <option key={s} value={s}>{s === 'approved' ? 'Won' : s === 'rejected' ? 'Lost' : s.charAt(0).toUpperCase() + s.slice(1)}</option>
@@ -2109,12 +2109,12 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                             </select>
                             <button onClick={e => { e.stopPropagation(); setOpenMenuId(openMenuId === (p.id || p._id) ? null : (p.id || p._id)); }} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text3,#64748B)", fontSize: 17, padding: 4 }}><i className="ti ti-dots-vertical"></i></button>
                             {openMenuId === (p.id || p._id) && (
-                              <div onClick={e => e.stopPropagation()} style={{ position: "absolute", top: 28, right: 0, background: "#fff", border: "1.5px solid #e2e8f0", borderRadius: 10, boxShadow: "0 8px 24px rgba(0,0,0,0.12)", zIndex: 999, minWidth: 160, overflow: "hidden" }}>
-                                <div onClick={e => { setOpenMenuId(null); openDoc(p); }} style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "#1E293B", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid #f0f4f8" }} onMouseEnter={e => e.currentTarget.style.background = "#eff6ff"} onMouseLeave={e => e.currentTarget.style.background = ""}><i className="ti ti-eye" style={{ color: " var(--app-accent, var(--app-accent, #2563EB))" }}></i> View</div>
-                                <div onClick={e => { setOpenMenuId(null); setDoc(p); setPage(0); setView("form"); }} style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "#1E293B", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid #f0f4f8" }} onMouseEnter={e => e.currentTarget.style.background = "#eff6ff"} onMouseLeave={e => e.currentTarget.style.background = ""}><i className="ti ti-edit" style={{ color: "#F59E0B" }}></i> Edit</div>
-                                <div onClick={e => { setOpenMenuId(null); shareProposalPDF(p); }} style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "#1E293B", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid #f0f4f8" }} onMouseEnter={e => e.currentTarget.style.background = "#eff6ff"} onMouseLeave={e => e.currentTarget.style.background = ""}><i className="ti ti-share" style={{ color: "#7C5CFC" }}></i> Share</div>
-                                <div onClick={e => { setOpenMenuId(null); printProposal(p); }} style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "#1E293B", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid #f0f4f8" }} onMouseEnter={e => e.currentTarget.style.background = "#eff6ff"} onMouseLeave={e => e.currentTarget.style.background = ""}><i className="ti ti-download" style={{ color: "#2563EB" }}></i> PDF</div>
-                                <div onClick={e => { setOpenMenuId(null); deleteProposal(p.id, p._id, e); }} style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "#EF4444", cursor: "pointer", display: "flex", alignItems: "center", gap: 8 }} onMouseEnter={e => e.currentTarget.style.background = "#fff1f2"} onMouseLeave={e => e.currentTarget.style.background = ""}><i className="ti ti-trash" style={{ color: "#EF4444" }}></i> Delete</div>
+                              <div onClick={e => e.stopPropagation()} style={{ position: "absolute", top: 28, right: 0, background: "#FFFFFF", border: "1.5px solid #E2E8F0", borderRadius: 10, boxShadow: "0 8px 24px rgba(0,0,0,0.12)", zIndex: 999, minWidth: 160, overflow: "hidden" }}>
+                                <div onClick={e => { setOpenMenuId(null); openDoc(p); }} style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "#1E293B", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid #EFF6FF" }} onMouseEnter={e => e.currentTarget.style.background = "#EFF6FF"} onMouseLeave={e => e.currentTarget.style.background = ""}><i className="ti ti-eye" style={{ color: " var(--app-accent, var(--app-accent, #2563EB))" }}></i> View</div>
+                                <div onClick={e => { setOpenMenuId(null); setDoc(p); setPage(0); setView("form"); }} style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "#1E293B", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid #EFF6FF" }} onMouseEnter={e => e.currentTarget.style.background = "#EFF6FF"} onMouseLeave={e => e.currentTarget.style.background = ""}><i className="ti ti-edit" style={{ color: "#64748B" }}></i> Edit</div>
+                                <div onClick={e => { setOpenMenuId(null); shareProposalPDF(p); }} style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "#1E293B", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid #EFF6FF" }} onMouseEnter={e => e.currentTarget.style.background = "#EFF6FF"} onMouseLeave={e => e.currentTarget.style.background = ""}><i className="ti ti-share" style={{ color: "#2563EB" }}></i> Share</div>
+                                <div onClick={e => { setOpenMenuId(null); printProposal(p); }} style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "#1E293B", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid #EFF6FF" }} onMouseEnter={e => e.currentTarget.style.background = "#EFF6FF"} onMouseLeave={e => e.currentTarget.style.background = ""}><i className="ti ti-download" style={{ color: "#2563EB" }}></i> PDF</div>
+                                <div onClick={e => { setOpenMenuId(null); deleteProposal(p.id, p._id, e); }} style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "#64748B", cursor: "pointer", display: "flex", alignItems: "center", gap: 8 }} onMouseEnter={e => e.currentTarget.style.background = "#F8FAFC"} onMouseLeave={e => e.currentTarget.style.background = ""}><i className="ti ti-trash" style={{ color: "#64748B" }}></i> Delete</div>
                               </div>
                             )}
                           </div>
@@ -2159,7 +2159,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                             <span style={{ fontSize: 10, color: "var(--text3,#64748B)", fontWeight: 600 }}>{badge.label}</span>
                           </div>
                           <div className="prog-bar">
-                            <div className="prog-fill" style={{ width: badge.cls === "draft" ? "10%" : badge.cls === "sent" ? "30%" : badge.cls === "review" ? "50%" : badge.cls === "negotiation" ? "75%" : badge.cls === "won" ? "100%" : "5%", background: badge.cls === "won" ? "linear-gradient(90deg,var(--green,#16A34A),#6EE7B7)" : badge.cls === "negotiation" ? "linear-gradient(90deg,var(--purple,#7C5CFC),#B39DFF)" : badge.cls === "sent" ? "linear-gradient(90deg,var(--blue,#2563EB),#7EC8FD)" : "linear-gradient(90deg,var(--teal, var(--app-accent, var(--app-accent, #2563EB))),#26D0CE)" }}></div>
+                            <div className="prog-fill" style={{ width: badge.cls === "draft" ? "10%" : badge.cls === "sent" ? "30%" : badge.cls === "review" ? "50%" : badge.cls === "negotiation" ? "75%" : badge.cls === "won" ? "100%" : "5%", background: badge.cls === "won" ? "linear-gradient(90deg,var(--green,#16A34A),#64748B)" : badge.cls === "negotiation" ? "linear-gradient(90deg,var(--purple,#2563EB),#E2E8F0)" : badge.cls === "sent" ? "linear-gradient(90deg,var(--blue,#2563EB),#E2E8F0)" : "linear-gradient(90deg,var(--teal, var(--app-accent, var(--app-accent, #2563EB))),#2563EB)" }}></div>
                           </div>
                         </div>
 
@@ -2171,7 +2171,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                           <div style={{ fontSize: 15, fontWeight: 800, color: "var(--teal, var(--app-accent, var(--app-accent, #2563EB)))" }}>₹{value.toLocaleString("en-IN")}</div>
                           <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }} onClick={e => e.stopPropagation()}>
                             <button className="pf-btn" onClick={e => { e.stopPropagation(); openDoc(p); }}><i className="ti ti-eye" style={{ fontSize: 12 }}></i> View</button>
-                            <button className="pf-btn" style={{ background: '#22C55E', color: '#fff', borderColor: '#22C55E' }} onClick={e => { e.stopPropagation(); setSendPopupProposal(p); setTargetPortalClient(p.client || p.clientName || ''); setShowSendPopup(true); }}><i className="ti ti-send" style={{ fontSize: 12 }}></i> Send</button>
+                            <button className="pf-btn" style={{ background: '#16A34A', color: '#FFFFFF', borderColor: '#16A34A' }} onClick={e => { e.stopPropagation(); setSendPopupProposal(p); setTargetPortalClient(p.client || p.clientName || ''); setShowSendPopup(true); }}><i className="ti ti-send" style={{ fontSize: 12 }}></i> Send</button>
                             <button className="pf-btn" onClick={e => { e.stopPropagation(); shareProposalPDF(p); }}><i className="ti ti-share" style={{ fontSize: 12 }}></i> Share</button>
 
                           </div>
@@ -2189,7 +2189,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
 
               {/* PIPELINE SUMMARY */}
-              <div style={{ background: "var(--surface,#fff)", border: "1.5px solid var(--border,#E2E8F0)", borderRadius: 16, padding: 20 }}>
+              <div style={{ background: "var(--surface,#FFFFFF)", border: "1.5px solid var(--border,#E2E8F0)", borderRadius: 16, padding: 20 }}>
                 <div style={{ fontSize: 13, fontWeight: 800, color: "var(--text,#1E293B)", marginBottom: 4 }}>Pipeline Summary</div>
                 <div style={{ fontSize: 11, color: "var(--text3,#64748B)", marginBottom: 16 }}>Total value across all stages</div>
                 <div style={{ textAlign: "center", padding: 14, background: "var(--teal-lighter,var(--teal-lighter, #EFF6FF))", borderRadius: 12, border: "1.5px solid var(--teal-light,var(--teal-light, var(--teal-light, #EFF6FF)))", marginBottom: 14 }}>
@@ -2210,7 +2210,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
               </div>
 
               {/* WIN RATE DONUT */}
-              <div style={{ background: "var(--surface,#fff)", border: "1.5px solid var(--border,#E2E8F0)", borderRadius: 16, padding: 18 }}>
+              <div style={{ background: "var(--surface,#FFFFFF)", border: "1.5px solid var(--border,#E2E8F0)", borderRadius: 16, padding: 18 }}>
                 <div style={{ fontSize: 13, fontWeight: 800, color: "var(--text,#1E293B)", marginBottom: 14 }}>Win Rate</div>
                 <div style={{ position: "relative", width: 100, height: 100, margin: "0 auto 14px" }}>
                   <svg viewBox="0 0 100 100" width="100" height="100">
@@ -2232,8 +2232,8 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                   {[
                     { val: wonCount, label: "Won", color: "var(--green,#16A34A)" },
-                    { val: proposals.filter(p => p.status === "rejected" || p.status === "lost").length, label: "Lost", color: "var(--red,#F05C5C)" },
-                    { val: activeCount, label: "Active", color: "var(--amber,#F5A623)" },
+                    { val: proposals.filter(p => p.status === "rejected" || p.status === "lost").length, label: "Lost", color: "var(--red,#64748B)" },
+                    { val: activeCount, label: "Active", color: "var(--amber,#64748B)" },
                     { val: proposals.filter(p => !p.status || p.status === "draft").length, label: "Draft", color: "var(--text3,#64748B)" },
                   ].map((s, i) => (
                     <div key={i} style={{ padding: 10, background: "var(--bg,#F8FAFC)", borderRadius: 9, border: "1px solid var(--border,#E2E8F0)", textAlign: "center" }}>
@@ -2245,13 +2245,13 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
               </div>
 
               {/* PROPOSAL TEMPLATES */}
-              <div style={{ background: "var(--surface,#fff)", border: "1.5px solid var(--border,#E2E8F0)", borderRadius: 16, padding: 18 }}>
+              <div style={{ background: "var(--surface,#FFFFFF)", border: "1.5px solid var(--border,#E2E8F0)", borderRadius: 16, padding: 18 }}>
                 <div style={{ fontSize: 13, fontWeight: 800, color: "var(--text,#1E293B)", marginBottom: 12 }}>Quick Start Templates</div>
                 {[
                   { icon: "ti-world", label: "Web Development", meta: "Full-stack project template", bg: "var(--teal-light,var(--teal-light, var(--teal-light, #EFF6FF)))", color: "var(--teal, var(--app-accent, var(--app-accent, #2563EB)))" },
-                  { icon: "ti-device-mobile", label: "Mobile App", meta: "iOS / Android template", bg: "var(--purple-bg,#EEE9FF)", color: "var(--purple,#7C5CFC)" },
-                  { icon: "ti-chart-bar", label: "Digital Marketing", meta: "SEO, ads & content", bg: "var(--amber-bg,#FEF5E6)", color: "var(--amber,#F5A623)" },
-                  { icon: "ti-cpu", label: "Custom Software", meta: "Enterprise solution", bg: "var(--blue-bg,#EFF4FF)", color: "var(--blue,#2563EB)" },
+                  { icon: "ti-device-mobile", label: "Mobile App", meta: "iOS / Android template", bg: "var(--purple-bg,#EFF6FF)", color: "var(--purple,#2563EB)" },
+                  { icon: "ti-chart-bar", label: "Digital Marketing", meta: "SEO, ads & content", bg: "var(--amber-bg,#F8FAFC)", color: "var(--amber,#64748B)" },
+                  { icon: "ti-cpu", label: "Custom Software", meta: "Enterprise solution", bg: "var(--blue-bg,#EFF6FF)", color: "var(--blue,#2563EB)" },
                 ].map((tmpl, i) => (
                   <div key={i} className="tmpl-item" onClick={openNewModal}>
                     <div style={{ width: 32, height: 32, borderRadius: 8, background: tmpl.bg, color: tmpl.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, flexShrink: 0 }}><i className={`ti ${tmpl.icon}`}></i></div>
@@ -2290,21 +2290,21 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
         {/* Send to Client Portal Popup */}
         {showSendPopup && (
           <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.5)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowSendPopup(false)}>
-            <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: 16, padding: 24, width: 420, maxWidth: '92vw' }}>
+            <div onClick={e => e.stopPropagation()} style={{ background: '#FFFFFF', borderRadius: 16, padding: 24, width: 420, maxWidth: '92vw' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
                 <div style={{ fontSize: 16, fontWeight: 900, color: '#0F172A' }}>Send to Client Portal</div>
                 <i className="ti ti-x" style={{ cursor: 'pointer', fontSize: 18 }} onClick={() => setShowSendPopup(false)}></i>
               </div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: '#374151', marginBottom: 8 }}>Select Client</div>
-              <select value={targetPortalClient} onChange={e => setTargetPortalClient(e.target.value)} style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #E5E7EB', borderRadius: 8, fontSize: 13, marginBottom: 20 }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#1E293B', marginBottom: 8 }}>Select Client</div>
+              <select value={targetPortalClient} onChange={e => setTargetPortalClient(e.target.value)} style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #E2E8F0', borderRadius: 8, fontSize: 13, marginBottom: 20 }}>
                 <option value="">-- Select Client --</option>
                 {(clients || []).map(c => (
                   <option key={c._id || c.clientName || c.name} value={c.clientName || c.name}>{c.clientName || c.name}</option>
                 ))}
               </select>
               <div style={{ display: 'flex', gap: 10 }}>
-                <button onClick={() => setShowSendPopup(false)} style={{ flex: 1, padding: '10px', background: '#F3F4F6', color: '#374151', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: 'pointer' }}>Cancel</button>
-                <button onClick={() => handleSendProposalToPortal(targetPortalClient)} disabled={!targetPortalClient} style={{ flex: 1, padding: '10px', background: '#22C55E', color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: !targetPortalClient ? 'not-allowed' : 'pointer', opacity: !targetPortalClient ? 0.5 : 1 }}>Send Now</button>
+                <button onClick={() => setShowSendPopup(false)} style={{ flex: 1, padding: '10px', background: '#F8FAFC', color: '#1E293B', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: 'pointer' }}>Cancel</button>
+                <button onClick={() => handleSendProposalToPortal(targetPortalClient)} disabled={!targetPortalClient} style={{ flex: 1, padding: '10px', background: '#16A34A', color: '#FFFFFF', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: !targetPortalClient ? 'not-allowed' : 'pointer', opacity: !targetPortalClient ? 0.5 : 1 }}>Send Now</button>
               </div>
             </div>
           </div>
@@ -2312,15 +2312,15 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
         {
           shareModalProposal && (
             <div style={{ position: "fixed", inset: 0, zIndex: 100000, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center" }} onClick={() => setShareModalProposal(null)}>
-              <div onClick={e => e.stopPropagation()} style={{ background: "#fff", borderRadius: 16, padding: 24, width: 360, maxWidth: "90vw" }}>
+              <div onClick={e => e.stopPropagation()} style={{ background: "#FFFFFF", borderRadius: 16, padding: 24, width: 360, maxWidth: "90vw" }}>
                 <div style={{ fontSize: 15, fontWeight: 800, color: "#1E293B", marginBottom: 4 }}>Share Proposal</div>
                 <div style={{ fontSize: 12, color: "#64748B", marginBottom: 18 }}>{shareModalProposal.title || "Untitled Proposal"}</div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                  <button onClick={async () => { await shareProposal(shareModalProposal); setShareModalProposal(null); }} style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", borderRadius: 10, border: "1.5px solid #e2e8f0", background: "#eff6ff", cursor: "pointer", fontSize: 13, fontWeight: 700, color: " var(--app-accent, var(--app-accent, #2563EB))" }}><i className="ti ti-file-download"></i> Share as PDF</button>
-                  <button onClick={() => { shareWhatsApp(shareModalProposal); setShareModalProposal(null); }} style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", borderRadius: 10, border: "1.5px solid #e2e8f0", background: "#f0fdf4", cursor: "pointer", fontSize: 13, fontWeight: 700, color: "#15803D" }}><i className="ti ti-brand-whatsapp"></i> Share via WhatsApp</button>
-                  <button onClick={async () => { const link = `${window.location.origin}${window.location.pathname}?view=${shareModalProposal._id || shareModalProposal.id}`; try { await navigator.clipboard.writeText(link); flash("Link copied to clipboard!"); } catch { prompt("Copy this link:", link); } setShareModalProposal(null); }} style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", borderRadius: 10, border: "1.5px solid #e2e8f0", background: "#fff", cursor: "pointer", fontSize: 13, fontWeight: 700, color: "#374151" }}><i className="ti ti-link"></i> Copy Link</button>
+                  <button onClick={async () => { await shareProposal(shareModalProposal); setShareModalProposal(null); }} style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", borderRadius: 10, border: "1.5px solid #E2E8F0", background: "#EFF6FF", cursor: "pointer", fontSize: 13, fontWeight: 700, color: " var(--app-accent, var(--app-accent, #2563EB))" }}><i className="ti ti-file-download"></i> Share as PDF</button>
+                  <button onClick={() => { shareWhatsApp(shareModalProposal); setShareModalProposal(null); }} style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", borderRadius: 10, border: "1.5px solid #E2E8F0", background: "#F8FAFC", cursor: "pointer", fontSize: 13, fontWeight: 700, color: "#16A34A" }}><i className="ti ti-brand-whatsapp"></i> Share via WhatsApp</button>
+                  <button onClick={async () => { const link = `${window.location.origin}${window.location.pathname}?view=${shareModalProposal._id || shareModalProposal.id}`; try { await navigator.clipboard.writeText(link); flash("Link copied to clipboard!"); } catch { prompt("Copy this link:", link); } setShareModalProposal(null); }} style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", borderRadius: 10, border: "1.5px solid #E2E8F0", background: "#FFFFFF", cursor: "pointer", fontSize: 13, fontWeight: 700, color: "#1E293B" }}><i className="ti ti-link"></i> Copy Link</button>
                 </div>
-                <button onClick={() => setShareModalProposal(null)} style={{ marginTop: 16, width: "100%", padding: "9px", borderRadius: 10, border: "1.5px solid #e2e8f0", background: "#fff", cursor: "pointer", fontSize: 12, fontWeight: 700, color: "#64748B" }}>Cancel</button>
+                <button onClick={() => setShareModalProposal(null)} style={{ marginTop: 16, width: "100%", padding: "9px", borderRadius: 10, border: "1.5px solid #E2E8F0", background: "#FFFFFF", cursor: "pointer", fontSize: 12, fontWeight: 700, color: "#64748B" }}>Cancel</button>
               </div>
             </div>
           )

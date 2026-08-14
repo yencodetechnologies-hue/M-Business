@@ -6,7 +6,7 @@ import InvoiceCreator from './InvoiceCreator';
 import { BASE_URL } from '../config';
 import './ModernProjectsPage.css';
 // ─── Avatar helpers --------------------------------------------
-const AV_COLORS = [' var(--app-accent, var(--app-accent, #2563EB))', '#8B5CF6', '#F59E0B', '#16A34A', '#EC4899', '#3B82F6', '#EF4444', '#10B981'];
+const AV_COLORS = [' var(--app-accent, var(--app-accent, #2563EB))', '#2563EB', '#64748B', '#16A34A', '#64748B', '#2563EB', '#64748B', '#16A34A'];
 function avColor(name, i = 0) {
   if (!name) return AV_COLORS[i % AV_COLORS.length];
   return AV_COLORS[(name.charCodeAt(0) + i) % AV_COLORS.length];
@@ -43,9 +43,9 @@ function daysLeft(dateStr) {
 
 // ─── Color for progress bar ------------------------------------
 function progGradient(cls) {
-  if (cls === 'completed') return 'linear-gradient(90deg,#16A34A,#059669)';
-  if (cls === 'overdue') return 'linear-gradient(90deg,#FF6B6B,#DC2626)';
-  if (cls === 'onhold') return 'linear-gradient(90deg,#8B5CF6,#2563EB)';
+  if (cls === 'completed') return 'linear-gradient(90deg,#16A34A,#16A34A)';
+  if (cls === 'overdue') return 'linear-gradient(90deg,#64748B,#64748B)';
+  if (cls === 'onhold') return 'linear-gradient(90deg,#2563EB,#2563EB)';
   return 'linear-gradient(90deg, var(--app-accent, var(--app-accent, #2563EB)),#2563EB)';
 }
 
@@ -436,7 +436,7 @@ function openCreate() {
 
         {/* ── NEW INVOICE OVERLAY ── */}
         {showInvoiceCreator && (
-          <div style={{ position: 'fixed', inset: 0, background: '#F4F7FB', zIndex: 9999, overflowY: 'auto' }}>
+          <div style={{ position: 'fixed', inset: 0, background: '#F8FAFC', zIndex: 9999, overflowY: 'auto' }}>
             <InvoiceCreator
               user={user}
               clients={clients}
@@ -501,12 +501,12 @@ function openCreate() {
                 onClick={() => navigate(-1)}
                 style={{
                   width: 36, height: 36, borderRadius: '50%', border: 'none',
-                  background: '#fff', boxShadow: '0 2px 6px rgba(0,0,0,0.12)',
+                  background: '#FFFFFF', boxShadow: '0 2px 6px rgba(0,0,0,0.12)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   cursor: 'pointer', flexShrink: 0
                 }}
               >
-                <i className="ti ti-arrow-left" style={{ fontSize: '18px', color: '#111' }}></i>
+                <i className="ti ti-arrow-left" style={{ fontSize: '18px', color: '#0F172A' }}></i>
               </button>
               <div>
                 <div className="m-page-title">Projects</div>
@@ -520,9 +520,9 @@ function openCreate() {
 
           {/* Error */}
           {error && (
-            <div style={{ background: '#FEE2E2', color: '#DC2626', padding: '12px 18px', borderRadius: 10, marginBottom: 16, fontSize: 13, fontWeight: 700 }}>
+            <div style={{ background: '#E2E8F0', color: '#64748B', padding: '12px 18px', borderRadius: 10, marginBottom: 16, fontSize: 13, fontWeight: 700 }}>
               <i className="ti ti-alert-circle"></i> {error}
-              <button onClick={fetchAll} style={{ marginLeft: 12, background: 'none', border: 'none', color: '#DC2626', cursor: 'pointer', fontWeight: 700 }}>Retry</button>
+              <button onClick={fetchAll} style={{ marginLeft: 12, background: 'none', border: 'none', color: '#64748B', cursor: 'pointer', fontWeight: 700 }}>Retry</button>
             </div>
           )}
 
@@ -530,10 +530,10 @@ function openCreate() {
           <div className="m-stats-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 16, marginBottom: 24 }}>
             {[
               { label: 'Total Projects', value: stats.all, icon: 'ti-briefcase', bg: 'var(--teal-light, var(--teal-light, #EFF6FF))', color: ' var(--app-accent, var(--app-accent, #2563EB))', tab: 'All' },
-              { label: 'Active', value: stats.active, icon: 'ti-loader', bg: '#FEF3C7', color: '#F59E0B', tab: 'Active' },
-              { label: 'Completed', value: stats.completed, icon: 'ti-circle-check', bg: '#D1FAE5', color: '#16A34A', tab: 'Completed' },
-              { label: 'On Hold', value: stats.onhold, icon: 'ti-clock-pause', bg: '#FEE2E2', color: '#FF6B6B', tab: 'On Hold' },
-              { label: 'Overdue', value: stats.overdue, icon: 'ti-alert-triangle', bg: '#FEE2E2', color: '#DC2626', tab: 'Overdue' },
+              { label: 'Active', value: stats.active, icon: 'ti-loader', bg: '#E2E8F0', color: '#64748B', tab: 'Active' },
+              { label: 'Completed', value: stats.completed, icon: 'ti-circle-check', bg: '#E2E8F0', color: '#16A34A', tab: 'Completed' },
+              { label: 'On Hold', value: stats.onhold, icon: 'ti-clock-pause', bg: '#E2E8F0', color: '#64748B', tab: 'On Hold' },
+              { label: 'Overdue', value: stats.overdue, icon: 'ti-alert-triangle', bg: '#E2E8F0', color: '#64748B', tab: 'Overdue' },
             ].map(s => (
               <div key={s.tab} className="m-stat-card" onClick={() => setActiveTab(s.tab)} style={{ cursor: 'pointer' }}>
                 <div className="m-stat-icon" style={{ background: s.bg, color: s.color }}><i className={`ti ${s.icon}`}></i></div>
@@ -544,11 +544,11 @@ function openCreate() {
               </div>
             ))}
             <div className="m-stat-card" style={{ cursor: 'default', background: 'var(--app-accent, var(--app-accent, #2563EB))', border: 'none' }}>
-              <div className="m-stat-icon" style={{ background: 'rgba(255,255,255,0.2)', color: '#fff' }}>
+              <div className="m-stat-icon" style={{ background: 'rgba(255,255,255,0.2)', color: '#FFFFFF' }}>
                 <i className="ti ti-currency-rupee"></i>
               </div>
               <div>
-                <div className="m-stat-num" style={{ color: '#fff' }}>
+                <div className="m-stat-num" style={{ color: '#FFFFFF' }}>
                   {loading ? '…' : stats.totalValue >= 10000000
                     ? `₹${(stats.totalValue / 10000000).toFixed(2)}Cr`
                     : stats.totalValue >= 100000
@@ -578,7 +578,7 @@ function openCreate() {
           {loading && (
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 60, flexDirection: 'column', gap: 12 }}>
               <div style={{ width: 36, height: 36, borderRadius: '50%', border: '3px solid var(--teal-light, var(--teal-light, #EFF6FF))', borderTopColor: ' var(--app-accent, var(--app-accent, #2563EB))', animation: 'spin 0.8s linear infinite' }}></div>
-              <div style={{ color: '#718096', fontSize: 13, fontWeight: 600 }}>Loading projects…</div>
+              <div style={{ color: '#64748B', fontSize: 13, fontWeight: 600 }}>Loading projects…</div>
               <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
             </div>
           )}{/* Grid */}
@@ -613,23 +613,23 @@ function openCreate() {
                       <button
                         title="Log Time"
                         onClick={e => openLogTime(p, e)}
-                        style={{ background: 'rgba(37, 99, 235,.1)', border: 'none', borderRadius: 6, width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: ' var(--app-accent, var(--app-accent, #2563EB))' }}
+                        style={{ background: 'rgba(37, 99, 235, .1)', border: 'none', borderRadius: 6, width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: ' var(--app-accent, var(--app-accent, #2563EB))' }}
                       ><i className="ti ti-clock" style={{ fontSize: 13 }}></i></button>
                       <button
                         title="Edit"
                         onClick={e => { e.stopPropagation(); openEdit(p, e); }}
-                        style={{ background: 'rgba(37, 99, 235,.1)', border: 'none', borderRadius: 6, width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: ' var(--app-accent, var(--app-accent, #2563EB))' }}
+                        style={{ background: 'rgba(37, 99, 235, .1)', border: 'none', borderRadius: 6, width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: ' var(--app-accent, var(--app-accent, #2563EB))' }}
                       ><i className="ti ti-edit" style={{ fontSize: 13 }}></i></button>
                       <button
                         title="Delete"
                         onClick={e => { e.stopPropagation(); setDeleteTarget(p); }}
-                        style={{ background: 'rgba(255,107,107,.1)', border: 'none', borderRadius: 6, width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#FF6B6B' }}
+                        style={{ background: 'rgba(100, 116, 139, .1)', border: 'none', borderRadius: 6, width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#64748B' }}
                       ><i className="ti ti-trash" style={{ fontSize: 13 }}></i></button>
                     </div>
 
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, flexWrap: 'wrap' }}>
                       <span className={`m-status-badge ${statusLabel.toLowerCase().replace(' ', '')}`}>{statusLabel}</span>
-                      {p.priority && <span style={{ padding: '3px 9px', borderRadius: 20, fontSize: 11, fontWeight: 700, background: p.priority === 'high' ? '#FEE2E2' : p.priority === 'low' ? '#D1FAE5' : '#FEF3C7', color: p.priority === 'high' ? '#DC2626' : p.priority === 'low' ? '#059669' : '#D97706' }}>{p.priority.charAt(0).toUpperCase() + p.priority.slice(1)}</span>}
+                      {p.priority && <span style={{ padding: '3px 9px', borderRadius: 20, fontSize: 11, fontWeight: 700, background: p.priority === 'high' ? '#E2E8F0' : p.priority === 'low' ? '#E2E8F0' : '#E2E8F0', color: p.priority === 'high' ? '#64748B' : p.priority === 'low' ? '#16A34A' : '#64748B' }}>{p.priority.charAt(0).toUpperCase() + p.priority.slice(1)}</span>}
                       {p.category && <span style={{ padding: '3px 9px', borderRadius: 20, fontSize: 11, fontWeight: 600, background: 'var(--teal-light, var(--teal-light, #EFF6FF))', color: '#2563EB' }}>{p.category}</span>}
                     </div>
 
@@ -646,10 +646,10 @@ function openCreate() {
                           <div style={{ width: 40, height: 5, borderRadius: 3, background: '#E2E8F0', overflow: 'hidden' }}>
                             <div style={{ width: `${pct}%`, height: '100%', background: progGradient(cls) }}></div>
                           </div>
-                          <span style={{ fontSize: 10.5, fontWeight: 700, color: '#4A5568' }}>{pct}%</span>
+                          <span style={{ fontSize: 10.5, fontWeight: 700, color: '#64748B' }}>{pct}%</span>
                         </div>
                         {p.start && (
-                          <span style={{ fontSize: 10.5, color: '#718096', fontWeight: 600, whiteSpace: 'nowrap' }}>
+                          <span style={{ fontSize: 10.5, color: '#64748B', fontWeight: 600, whiteSpace: 'nowrap' }}>
                             {new Date(p.start).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
                           </span>
                         )}
@@ -658,24 +658,24 @@ function openCreate() {
                     <div className="m-pc-desc">{p.description || p.purpose || 'No description.'}</div>
 
                     <div style={{ display: 'flex', gap: 16, marginBottom: 8, flexWrap: 'wrap' }}>
-                      {p.budget && <span style={{ fontSize: 11, color: '#718096', display: 'flex', alignItems: 'center', gap: 4 }}><i className="ti ti-wallet" style={{ fontSize: 12 }}></i> Budget: <strong style={{ color: '#4A5568' }}>{p.currency || '₹'}{Number(p.budget).toLocaleString()}</strong></span>}
+                      {p.budget && <span style={{ fontSize: 11, color: '#64748B', display: 'flex', alignItems: 'center', gap: 4 }}><i className="ti ti-wallet" style={{ fontSize: 12 }}></i> Budget: <strong style={{ color: '#64748B' }}>{p.currency || '₹'}{Number(p.budget).toLocaleString()}</strong></span>}
                     </div>
 
                     <div className="m-pc-footer">
                       <div className="m-pc-avatars">
                         {team.length === 0
-                          ? <span style={{ fontSize: 11, color: '#718096' }}>Unassigned</span>
+                          ? <span style={{ fontSize: 11, color: '#64748B' }}>Unassigned</span>
                           : team.slice(0, 3).map((name, i) => (
                             <div key={i} className="m-pc-av" style={{ background: avColor(name, i) }} title={name}>{name.charAt(0).toUpperCase()}</div>
                           ))
                         }
-                        {team.length > 3 && <div className="m-pc-av" style={{ background: '#E2E8F0', color: '#4A5568', fontSize: 9 }}>+{team.length - 3}</div>}
+                        {team.length > 3 && <div className="m-pc-av" style={{ background: '#E2E8F0', color: '#64748B', fontSize: 9 }}>+{team.length - 3}</div>}
                       </div>
                       <div className="m-pc-deadline">
                         {deadline
                           ? <>
                             <i className="ti ti-calendar" style={{ fontSize: '11px' }}></i>
-                            <span style={{ color: days !== null && days < 0 ? '#FF6B6B' : days !== null && days < 7 ? '#F59E0B' : undefined }}>
+                            <span style={{ color: days !== null && days < 0 ? '#64748B' : days !== null && days < 7 ? '#64748B' : undefined }}>
                               {fmtDate(deadline)}
                               {days !== null && days >= 0 ? ` (${days}d)` : days !== null && days < 0 ? ' Overdue' : ''}
                             </span>
@@ -686,7 +686,7 @@ function openCreate() {
                     </div>
 
                     {pt.length > 0 && (
-                      <div style={{ padding: '8px 16px', borderTop: '1px solid rgba(0,0,0,.06)', fontSize: 11, color: '#718096', display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <div style={{ padding: '8px 16px', borderTop: '1px solid rgba(0,0,0,.06)', fontSize: 11, color: '#64748B', display: 'flex', alignItems: 'center', gap: 6 }}>
                         <i className="ti ti-checklist" style={{ fontSize: 13, color: ' var(--app-accent, var(--app-accent, #2563EB))' }}></i>
                         {pt.filter(t => ['done', 'completed'].includes(t.status)).length}/{pt.length} tasks done
                       </div>
@@ -699,16 +699,16 @@ function openCreate() {
                         borderRadius: 20,
                         fontSize: 12,
                         fontWeight: 800,
-                        background: cls === 'active' ? 'var(--teal-light, var(--teal-light, #EFF6FF))' : cls === 'completed' ? '#D1FAE5' : cls === 'onhold' ? '#FEF3C7' : cls === 'overdue' ? '#FEE2E2' : 'var(--teal-light, var(--teal-light, #EFF6FF))',
-                        color: cls === 'active' ? '#2563EB' : cls === 'completed' ? '#065F46' : cls === 'onhold' ? '#D97706' : cls === 'overdue' ? '#DC2626' : '#2563EB',
-                        border: `1.5px solid ${cls === 'active' ? ' var(--app-accent, var(--app-accent, #2563EB))' : cls === 'completed' ? '#16A34A' : cls === 'onhold' ? '#F59E0B' : cls === 'overdue' ? '#FF6B6B' : ' var(--app-accent, var(--app-accent, #2563EB))'}`,
+                        background: cls === 'active' ? 'var(--teal-light, var(--teal-light, #EFF6FF))' : cls === 'completed' ? '#E2E8F0' : cls === 'onhold' ? '#E2E8F0' : cls === 'overdue' ? '#E2E8F0' : 'var(--teal-light, var(--teal-light, #EFF6FF))',
+                        color: cls === 'active' ? '#2563EB' : cls === 'completed' ? '#1E293B' : cls === 'onhold' ? '#64748B' : cls === 'overdue' ? '#64748B' : '#2563EB',
+                        border: `1.5px solid ${cls === 'active' ? ' var(--app-accent, var(--app-accent, #2563EB))' : cls === 'completed' ? '#16A34A' : cls === 'onhold' ? '#64748B' : cls === 'overdue' ? '#64748B' : ' var(--app-accent, var(--app-accent, #2563EB))'}`,
                         display: 'flex',
                         alignItems: 'center',
                         gap: 6
                       }}>
                         <span style={{
                           width: 7, height: 7, borderRadius: '50%',
-                          background: cls === 'active' ? ' var(--app-accent, var(--app-accent, #2563EB))' : cls === 'completed' ? '#16A34A' : cls === 'onhold' ? '#F59E0B' : cls === 'overdue' ? '#FF6B6B' : ' var(--app-accent, var(--app-accent, #2563EB))',
+                          background: cls === 'active' ? ' var(--app-accent, var(--app-accent, #2563EB))' : cls === 'completed' ? '#16A34A' : cls === 'onhold' ? '#64748B' : cls === 'overdue' ? '#64748B' : ' var(--app-accent, var(--app-accent, #2563EB))',
                           display: 'inline-block'
                         }}></span>
                         {statusLabel}
@@ -723,8 +723,8 @@ function openCreate() {
 
               {/* Empty state */}
               {filtered.length === 0 && !loading && (
-                <div style={{ gridColumn: '1/-1', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 60, gap: 12, color: '#718096' }}>
-                  <i className="ti ti-layout-kanban" style={{ fontSize: 48, color: '#B2EBF2' }}></i>
+                <div style={{ gridColumn: '1/-1', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 60, gap: 12, color: '#64748B' }}>
+                  <i className="ti ti-layout-kanban" style={{ fontSize: 48, color: '#E2E8F0' }}></i>
                   <div style={{ fontSize: 14, fontWeight: 700 }}>No projects found</div>
                   <button className="m-create-btn" onClick={openCreate} style={{ marginTop: 8 }}><i className="ti ti-plus"></i> New Project</button>
                 </div>
@@ -743,7 +743,7 @@ function openCreate() {
       {/* ── NEW INVOICE OVERLAY ── */}
       {
         showInvoiceCreator && (
-          <div style={{ position: 'fixed', inset: 0, background: '#F4F7FB', zIndex: 9999, overflowY: 'auto' }}>
+          <div style={{ position: 'fixed', inset: 0, background: '#F8FAFC', zIndex: 9999, overflowY: 'auto' }}>
             <InvoiceCreator
               user={user}
               clients={clients}
@@ -783,7 +783,7 @@ function ProjectFormModal({ form, setForm, onSave, onClose, saving, isEdit, empl
     f('assignedTo', teamMembers.filter(m => m !== name).join(', '));
   }
 
-  const AV_COLORS = [' var(--app-accent, var(--app-accent, #2563EB))', '#8B5CF6', '#F59E0B', '#16A34A', '#EC4899', '#3B82F6'];
+  const AV_COLORS = [' var(--app-accent, var(--app-accent, #2563EB))', '#2563EB', '#64748B', '#16A34A', '#64748B', '#2563EB'];
   const avColor = (name) => AV_COLORS[(name?.charCodeAt(0) || 0) % AV_COLORS.length];
 
   return (
@@ -801,7 +801,7 @@ function ProjectFormModal({ form, setForm, onSave, onClose, saving, isEdit, empl
       <div style={{
         position: 'fixed', top: 0, right: 0, bottom: 0,
         width: '100%', maxWidth: 520,
-        background: '#fff',
+        background: '#FFFFFF',
         zIndex: 9999,
         display: 'flex', flexDirection: 'column',
         boxShadow: '-8px 0 40px rgba(0,0,0,0.15)',
@@ -817,7 +817,7 @@ function ProjectFormModal({ form, setForm, onSave, onClose, saving, isEdit, empl
           background: 'var(--app-accent, var(--app-accent, #2563EB))',
         }}>
           <div>
-            <div style={{ fontSize: 17, fontWeight: 900, color: '#fff', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ fontSize: 17, fontWeight: 900, color: '#FFFFFF', display: 'flex', alignItems: 'center', gap: 8 }}>
               <i className="ti ti-briefcase"></i>
               {isEdit ? 'Edit Project' : 'New Project'}
             </div>
@@ -827,7 +827,7 @@ function ProjectFormModal({ form, setForm, onSave, onClose, saving, isEdit, empl
           </div>
           <button onClick={onClose} style={{
             background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: 10,
-            width: 36, height: 36, cursor: 'pointer', fontSize: 18, color: '#fff',
+            width: 36, height: 36, cursor: 'pointer', fontSize: 18, color: '#FFFFFF',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}><i className="ti ti-x"></i></button>
         </div>
@@ -905,7 +905,7 @@ function ProjectFormModal({ form, setForm, onSave, onClose, saving, isEdit, empl
           </div>
 
           {/* ── ASSIGN TEAM MEMBERS ── */}
-          <div style={{ background: '#F0F9FF', border: '1.5px solid #B2EBF2', borderRadius: 12, padding: 16 }}>
+          <div style={{ background: '#EFF6FF', border: '1.5px solid #E2E8F0', borderRadius: 12, padding: 16 }}>
             <label style={{ ...LBL, color: '#2563EB', marginBottom: 10 }}>
               <i className="ti ti-users" style={{ marginRight: 5 }}></i> ASSIGN TEAM MEMBERS
             </label>
@@ -914,7 +914,7 @@ function ProjectFormModal({ form, setForm, onSave, onClose, saving, isEdit, empl
             <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
               <input
                 list="employee-name-suggestions"
-                style={{ ...INP, flex: 1, background: '#fff' }}
+                style={{ ...INP, flex: 1, background: '#FFFFFF' }}
                 value={memberInput}
                 onChange={e => setMemberInput(e.target.value)}
                 onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addMember(); } }}
@@ -928,7 +928,7 @@ function ProjectFormModal({ form, setForm, onSave, onClose, saving, isEdit, empl
                 onClick={addMember}
                 style={{
                   padding: '0 16px', borderRadius: 10, border: 'none', cursor: 'pointer',
-                  background: ' var(--app-accent, var(--app-accent, #2563EB))', color: '#fff', fontFamily: 'Nunito,sans-serif',
+                  background: ' var(--app-accent, var(--app-accent, #2563EB))', color: '#FFFFFF', fontFamily: 'Nunito,sans-serif',
                   fontSize: 13, fontWeight: 800, whiteSpace: 'nowrap',
                   display: 'flex', alignItems: 'center', gap: 5,
                 }}
@@ -939,7 +939,7 @@ function ProjectFormModal({ form, setForm, onSave, onClose, saving, isEdit, empl
 
             {/* Member chips */}
             {teamMembers.length === 0 ? (
-              <div style={{ fontSize: 12, color: '#94A3B8', textAlign: 'center', padding: '8px 0' }}>
+              <div style={{ fontSize: 12, color: '#64748B', textAlign: 'center', padding: '8px 0' }}>
                 No team members assigned yet
               </div>
             ) : (
@@ -947,25 +947,25 @@ function ProjectFormModal({ form, setForm, onSave, onClose, saving, isEdit, empl
                 {teamMembers.map((name, i) => (
                   <div key={i} style={{
                     display: 'flex', alignItems: 'center', gap: 7,
-                    background: '#fff', border: '1.5px solid #B2EBF2',
+                    background: '#FFFFFF', border: '1.5px solid #E2E8F0',
                     borderRadius: 20, padding: '5px 10px 5px 6px',
-                    boxShadow: '0 1px 4px rgba(37, 99, 235,0.08)',
+                    boxShadow: '0 1px 4px rgba(37, 99, 235, 0.08)',
                   }}>
                     <div style={{
                       width: 24, height: 24, borderRadius: '50%',
-                      background: avColor(name), color: '#fff',
+                      background: avColor(name), color: '#FFFFFF',
                       fontSize: 9, fontWeight: 800,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                     }}>
                       {name.charAt(0).toUpperCase()}
                     </div>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: '#1A2332' }}>{name}</span>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: '#1E293B' }}>{name}</span>
                     <button
                       type="button"
                       onClick={() => removeMember(name)}
                       style={{
-                        background: '#FEE2E2', border: 'none', borderRadius: '50%',
-                        width: 18, height: 18, cursor: 'pointer', color: '#DC2626',
+                        background: '#E2E8F0', border: 'none', borderRadius: '50%',
+                        width: 18, height: 18, cursor: 'pointer', color: '#64748B',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         fontSize: 10, padding: 0,
                       }}
@@ -997,7 +997,7 @@ function ProjectFormModal({ form, setForm, onSave, onClose, saving, isEdit, empl
           <div style={{
             display: 'flex', justifyContent: 'flex-end', gap: 10,
             marginTop: 8, paddingTop: 16, borderTop: '1.5px solid #E2E8F0',
-            position: 'sticky', bottom: 0, background: '#fff',
+            position: 'sticky', bottom: 0, background: '#FFFFFF',
           }}>
             <button type="button" onClick={onClose} style={BTN_OUTLINE}>Cancel</button>
             <button type="submit" disabled={saving} style={BTN_PRIMARY}>
@@ -1019,14 +1019,14 @@ function DeleteModal({ name, onConfirm, onCancel, deleting }) {
     <div style={OVERLAY}>
       <div style={{ ...MODAL, maxWidth: 400, textAlign: 'center' }}>
         <div style={{ padding: '32px 28px' }}>
-          <div style={{ width: 56, height: 56, borderRadius: '50%', background: '#FEE2E2', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
-            <i className="ti ti-trash" style={{ fontSize: 26, color: '#DC2626' }}></i>
+          <div style={{ width: 56, height: 56, borderRadius: '50%', background: '#E2E8F0', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+            <i className="ti ti-trash" style={{ fontSize: 26, color: '#64748B' }}></i>
           </div>
-          <div style={{ fontSize: 17, fontWeight: 800, color: '#1A2332', marginBottom: 8 }}>Delete Project</div>
-          <div style={{ fontSize: 13, color: '#718096', marginBottom: 24 }}>Are you sure you want to delete <strong>"{name}"</strong>?</div>
+          <div style={{ fontSize: 17, fontWeight: 800, color: '#1E293B', marginBottom: 8 }}>Delete Project</div>
+          <div style={{ fontSize: 13, color: '#64748B', marginBottom: 24 }}>Are you sure you want to delete <strong>"{name}"</strong>?</div>
           <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
             <button onClick={onCancel} style={BTN_OUTLINE}>Cancel</button>
-            <button onClick={onConfirm} disabled={deleting} style={{ ...BTN_PRIMARY, background: '#DC2626', boxShadow: '0 4px 12px rgba(220,38,38,.2)' }}>
+            <button onClick={onConfirm} disabled={deleting} style={{ ...BTN_PRIMARY, background: '#64748B', boxShadow: '0 4px 12px rgba(100, 116, 139, .2)' }}>
               {deleting ? 'Deleting…' : <><i className="ti ti-trash"></i> Delete</>}
             </button>
           </div>
@@ -1049,7 +1049,7 @@ function LogTimeModal({ form, setForm, onSave, onClose, saving, projectName }) {
           <button onClick={onClose} style={CLOSE_BTN}><i className="ti ti-x"></i></button>
         </div>
         <form onSubmit={onSave} style={{ padding: '20px 24px' }}>
-          {projectName && <div style={{ fontSize: 13, color: '#718096', marginBottom: 16, fontWeight: 600 }}>Project: <span style={{ color: '#1A2332' }}>{projectName}</span></div>}
+          {projectName && <div style={{ fontSize: 13, color: '#64748B', marginBottom: 16, fontWeight: 600 }}>Project: <span style={{ color: '#1E293B' }}>{projectName}</span></div>}
           <div style={{ marginBottom: 14 }}>
             <label style={LBL}>DATE</label>
             <input style={INP} type="date" required value={form.date} onChange={e => f('date', e.target.value)} />
@@ -1086,7 +1086,7 @@ const OVERLAY = {
   display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16,
 };
 const MODAL = {
-  background: '#fff', borderRadius: 18, boxShadow: '0 24px 64px rgba(0,0,0,.18)',
+  background: '#FFFFFF', borderRadius: 18, boxShadow: '0 24px 64px rgba(0,0,0,.18)',
   width: '100%', maxHeight: '90vh', overflowY: 'auto', fontFamily: 'Nunito,sans-serif',
 };
 const MODAL_HDR = {
@@ -1094,24 +1094,24 @@ const MODAL_HDR = {
   padding: '18px 24px', borderBottom: '1px solid #E2E8F0',
 };
 const CLOSE_BTN = {
-  background: '#F0F4F8', border: 'none', borderRadius: 8, width: 32, height: 32,
-  cursor: 'pointer', fontSize: 16, color: '#4A5568', display: 'flex', alignItems: 'center', justifyContent: 'center',
+  background: '#EFF6FF', border: 'none', borderRadius: 8, width: 32, height: 32,
+  cursor: 'pointer', fontSize: 16, color: '#64748B', display: 'flex', alignItems: 'center', justifyContent: 'center',
 };
-const LBL = { display: 'block', fontSize: 10, fontWeight: 800, color: '#718096', textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 6 };
+const LBL = { display: 'block', fontSize: 10, fontWeight: 800, color: '#64748B', textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 6 };
 const INP = {
   width: '100%', padding: '10px 14px', borderRadius: 10, border: '1.5px solid #E2E8F0',
-  fontSize: 14, fontFamily: 'Nunito,sans-serif', color: '#1A2332', outline: 'none', boxSizing: 'border-box',
-  background: '#F7FAFC', transition: 'border .15s',
+  fontSize: 14, fontFamily: 'Nunito,sans-serif', color: '#1E293B', outline: 'none', boxSizing: 'border-box',
+  background: '#F8FAFC', transition: 'border .15s',
 };
 const BTN_PRIMARY = {
   display: 'inline-flex', alignItems: 'center', gap: 6,
   padding: '10px 20px', borderRadius: 10, border: 'none', cursor: 'pointer',
-  background: ' var(--app-accent, var(--app-accent, #2563EB))', color: '#fff', fontFamily: 'Nunito,sans-serif',
-  fontSize: 13, fontWeight: 800, boxShadow: '0 4px 12px rgba(37, 99, 235,.2)',
+  background: ' var(--app-accent, var(--app-accent, #2563EB))', color: '#FFFFFF', fontFamily: 'Nunito,sans-serif',
+  fontSize: 13, fontWeight: 800, boxShadow: '0 4px 12px rgba(37, 99, 235, .2)',
 };
 const BTN_OUTLINE = {
   display: 'inline-flex', alignItems: 'center', gap: 6,
   padding: '10px 20px', borderRadius: 10, cursor: 'pointer',
   background: 'transparent', border: '1.5px solid #E2E8F0',
-  color: '#4A5568', fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 700,
+  color: '#64748B', fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 700,
 };

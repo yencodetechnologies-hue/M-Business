@@ -4,8 +4,8 @@ import { BASE_URL } from "../config";
 
 const THEMES = [
   { name: "Violet", p: "var(--app-accent)", g: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", l: "var(--app-border)", t: "var(--app-accent)" },
-  { name: "Cobalt", p: "#1d4ed8", g: "linear-gradient(135deg,#1e40af,#3b82f6)", l: "#dbeafe", t: "#1e3a8a" },
-  { name: "Emerald", p: "#059669", g: "linear-gradient(135deg,#065f46,#10b981)", l: "#d1fae5", t: "#064e3b" },
+  { name: "Cobalt", p: "#2563EB", g: "linear-gradient(135deg,#2563EB,#2563EB)", l: "#E2E8F0", t: "#1E293B" },
+  { name: "Emerald", p: "#16A34A", g: "linear-gradient(135deg,#1E293B,#16A34A)", l: "#E2E8F0", t: "#1E293B" },
 ];
 
 const T = {
@@ -22,7 +22,7 @@ const T = {
 function Fld({ label, value, onChange, type = "text", error, placeholder, disabled }) {
   const s = {
     width: "100%",
-    border: `1.5px solid ${error ? "#EF4444" : "var(--app-border)"}`,
+    border: `1.5px solid ${error ? "#64748B" : "var(--app-border)"}`,
     borderRadius: 10,
     padding: "10px 14px",
     fontSize: 13,
@@ -46,7 +46,7 @@ function Fld({ label, value, onChange, type = "text", error, placeholder, disabl
         placeholder={placeholder || ""}
         disabled={disabled}
       />
-      {error && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {error}</div>}
+      {error && <div style={{ fontSize: 11, color: "#64748B", marginTop: 4 }}>Warning {error}</div>}
     </div>
   );
 }
@@ -67,7 +67,7 @@ function ClientDropdown({ clients, value, onChange, error }) {
       </label>
       <div onClick={() => setOpen(!open)} style={{
         width: "100%",
-        border: `1.5px solid ${error ? "#EF4444" : open ? "var(--app-accent)" : "var(--app-border)"}`,
+        border: `1.5px solid ${error ? "#64748B" : open ? "var(--app-accent)" : "var(--app-border)"}`,
         borderRadius: 10,
         padding: "10px 36px 10px 14px",
         fontSize: 13,
@@ -89,7 +89,7 @@ function ClientDropdown({ clients, value, onChange, error }) {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              color: "#fff",
+              color: "#FFFFFF",
               fontSize: 10,
               fontWeight: 700,
               flexShrink: 0
@@ -118,7 +118,7 @@ function ClientDropdown({ clients, value, onChange, error }) {
           top: "calc(100% + 4px)",
           left: 0,
           right: 0,
-          background: "#fff",
+          background: "#FFFFFF",
           border: "1.5px solid var(--app-border)",
           borderRadius: 12,
           boxShadow: "0 8px 32px rgba(var(--app-accent-rgb, 124, 58, 237),0.15)",
@@ -178,11 +178,11 @@ function ClientDropdown({ clients, value, onChange, error }) {
                       gap: 10,
                       padding: "10px 14px",
                       cursor: "pointer",
-                      background: isSel ? "#eff6ff" : "transparent",
+                      background: isSel ? "#EFF6FF" : "transparent",
                       borderBottom: "1px solid var(--app-bg)"
                     }}
                     onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"}
-                    onMouseLeave={e => e.currentTarget.style.background = isSel ? "#eff6ff" : "transparent"}
+                    onMouseLeave={e => e.currentTarget.style.background = isSel ? "#EFF6FF" : "transparent"}
                   >
                     <div style={{
                       width: 28,
@@ -192,7 +192,7 @@ function ClientDropdown({ clients, value, onChange, error }) {
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      color: "#fff",
+                      color: "#FFFFFF",
                       fontSize: 11,
                       fontWeight: 700,
                       flexShrink: 0
@@ -221,7 +221,7 @@ function ClientDropdown({ clients, value, onChange, error }) {
         setOpen(false);
         setSearch("");
       }} />}
-      {error && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {error}</div>}
+      {error && <div style={{ fontSize: 11, color: "#64748B", marginTop: 4 }}>Warning {error}</div>}
     </div>
   );
 }
@@ -358,7 +358,7 @@ export default function A4ProposalForm({ clients, onSave, onCancel, initialData 
               font-family: Arial, sans-serif; 
               font-size: 14px; 
               line-height: 1.5; 
-              color: #000;
+              color: #0F172A;
               background: white;
             }
             @page { 
@@ -376,7 +376,7 @@ export default function A4ProposalForm({ clients, onSave, onCancel, initialData 
             }
             .company-tag {
               display: inline-block;
-              background: #ff0000;
+              background: #1E293B;
               color: white;
               padding: 10px 20px;
               font-weight: bold;
@@ -411,8 +411,8 @@ export default function A4ProposalForm({ clients, onSave, onCancel, initialData 
               right: 20mm;
               text-align: center;
               font-size: 10px;
-              color: #666;
-              border-top: 2px solid #ff0000;
+              color: #64748B;
+              border-top: 2px solid #1E293B;
               padding-top: 8px;
             }
             @media print {
@@ -426,7 +426,7 @@ export default function A4ProposalForm({ clients, onSave, onCancel, initialData 
         <body>
           <div class="header">
             <div class="company-name">${formData.companyName}</div>
-            <div style="font-size: 14px; color: #666;">Project Proposal</div>
+            <div style="font-size: 14px; color: #64748B;">Project Proposal</div>
           </div>
 
           <div class="ref-section">
@@ -516,7 +516,7 @@ export default function A4ProposalForm({ clients, onSave, onCancel, initialData 
 
   return (
     <div style={{
-      background: "#fff",
+      background: "#FFFFFF",
       borderRadius: 16,
       padding: 24,
       boxShadow: "0 4px 24px rgba(var(--app-accent-rgb, 124, 58, 237),0.08)",
@@ -539,9 +539,9 @@ export default function A4ProposalForm({ clients, onSave, onCancel, initialData 
           <button
             onClick={shareProposal}
             style={{
-              background: "#eff6ff",
-              color: "#2563eb",
-              border: "1px solid #bfdbfe",
+              background: "#EFF6FF",
+              color: "#2563EB",
+              border: "1px solid #E2E8F0",
               borderRadius: 8,
               padding: "8px 12px",
               fontSize: 12,
@@ -556,9 +556,9 @@ export default function A4ProposalForm({ clients, onSave, onCancel, initialData 
           <button
             onClick={shareWhatsApp}
             style={{
-              background: "#dcfce7",
-              color: "#16a34a",
-              border: "1px solid #bbf7d0",
+              background: "#E2E8F0",
+              color: "#16A34A",
+              border: "1px solid #E2E8F0",
               borderRadius: 8,
               padding: "8px 12px",
               fontSize: 12,
@@ -573,8 +573,8 @@ export default function A4ProposalForm({ clients, onSave, onCancel, initialData 
           <button
             onClick={handlePrint}
             style={{
-              background: "linear-gradient(135deg,#22c55e,#16a34a)",
-              color: "#fff",
+              background: "linear-gradient(135deg,#16A34A,#16A34A)",
+              color: "#FFFFFF",
               border: "none",
               borderRadius: 8,
               padding: "8px 16px",
@@ -687,12 +687,12 @@ export default function A4ProposalForm({ clients, onSave, onCancel, initialData 
               <button
                 onClick={() => removeScopeOfWork(index)}
                 style={{
-                  background: "#fee2e2",
-                  border: "1px solid #fecaca",
+                  background: "#E2E8F0",
+                  border: "1px solid #E2E8F0",
                   borderRadius: 6,
                   padding: "6px 12px",
                   fontSize: 11,
-                  color: "#ef4444",
+                  color: "#64748B",
                   cursor: "pointer",
                   fontWeight: 600,
                   fontFamily: "inherit"
@@ -707,7 +707,7 @@ export default function A4ProposalForm({ clients, onSave, onCancel, initialData 
           onClick={addScopeOfWork}
           style={{
             background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))",
-            color: "#fff",
+            color: "#FFFFFF",
             border: "none",
             borderRadius: 8,
             padding: "8px 16px",
@@ -757,7 +757,7 @@ export default function A4ProposalForm({ clients, onSave, onCancel, initialData 
             padding: "10px 20px",
             fontSize: 13,
             fontWeight: 700,
-            color: "#fff",
+            color: "#FFFFFF",
             cursor: saving ? "not-allowed" : "pointer",
             fontFamily: "inherit",
             opacity: saving ? 0.7 : 1

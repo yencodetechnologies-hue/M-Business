@@ -44,11 +44,11 @@ function formatDateTime(ts) {
 function StatusBadge({ status }) {
   const map = {
     draft: { bg: "var(--app-surface)", color: "var(--app-muted)", label: "Draft" },
-    sent: { bg: "#eff6ff", color: "#2563eb", label: "Sent" },
-    approved: { bg: "#dcfce7", color: "#16a34a", label: "Success Approved" },
-    rejected: { bg: "#fee2e2", color: "#dc2626", label: "Error Rejected" },
-    expired: { bg: "#fef3c7", color: "#d97706", label: "Expired" },
-    converted: { bg: "#e0e7ff", color: "#4338ca", label: "Document Invoiced" },
+    sent: { bg: "#EFF6FF", color: "#2563EB", label: "Sent" },
+    approved: { bg: "#E2E8F0", color: "#16A34A", label: "Success Approved" },
+    rejected: { bg: "#E2E8F0", color: "#64748B", label: "Error Rejected" },
+    expired: { bg: "#E2E8F0", color: "#64748B", label: "Expired" },
+    converted: { bg: "#E2E8F0", color: "#2563EB", label: "Document Invoiced" },
   };
   const s = map[(status || "draft").toLowerCase()] || map.draft;
   return <span style={{ background: s.bg, color: s.color, borderRadius: 20, padding: "3px 10px", fontSize: 11, fontWeight: 700 }}>{s.label}</span>;
@@ -78,17 +78,17 @@ function CompanyDropdown({ clients, value, onChange, error, onAddCompany }) {
   const selected = clients.find(c => (c.clientName || c.name) === value);
   return (
     <div style={{ position: "relative", zIndex: open ? 1000 : 1 }}>
-      <div onClick={() => setOpen(!open)} style={{ width: "100%", border: `1.5px solid ${error ? "#EF4444" : open ? "var(--app-accent)" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 36px 10px 14px", fontSize: 13, color: value ? T.text : "var(--app-muted)", background: "var(--app-bg)", cursor: "pointer", userSelect: "none", boxSizing: "border-box", position: "relative", minHeight: 42 }}>
-        {value ? (<div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{value[0].toUpperCase()}</div><span>{value}</span>{selected?.companyName && <span style={{ fontSize: 11, color: "var(--app-muted)" }}>({selected.companyName})</span>}</div>) : "-- Select Company Name --"}
+      <div onClick={() => setOpen(!open)} style={{ width: "100%", border: `1.5px solid ${error ? "#64748B" : open ? "var(--app-accent)" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 36px 10px 14px", fontSize: 13, color: value ? T.text : "var(--app-muted)", background: "var(--app-bg)", cursor: "pointer", userSelect: "none", boxSizing: "border-box", position: "relative", minHeight: 42 }}>
+        {value ? (<div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{value[0].toUpperCase()}</div><span>{value}</span>{selected?.companyName && <span style={{ fontSize: 11, color: "var(--app-muted)" }}>({selected.companyName})</span>}</div>) : "-- Select Company Name --"}
         <span style={{ position: "absolute", right: 12, top: "50%", transform: `translateY(-50%) rotate(${open ? 180 : 0}deg)`, fontSize: 10, color: "var(--app-muted)", transition: "0.2s" }}>▼</span>
       </div>
       {open && (
         <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "var(--app-card)", border: "1.5px solid var(--app-border)", borderRadius: 12, boxShadow: "var(--app-shadow)", zIndex: 999, overflow: "hidden" }}>
           <div style={{ padding: "10px 10px 6px" }}><div style={{ position: "relative" }}><span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12 }}>Search</span><input autoFocus placeholder="Search company name..." value={search} onChange={e => setSearch(e.target.value)} onClick={e => e.stopPropagation()} style={{ width: "100%", padding: "7px 10px 7px 30px", border: "1.5px solid var(--app-border)", borderRadius: 8, fontSize: 12, background: "var(--app-bg)", color: "var(--app-text)", outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} /></div></div>
-          {onAddCompany && <div onClick={() => { setOpen(false); setSearch(""); onAddCompany(); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: "var(--app-surface)", borderBottom: "2px solid var(--app-border)" }}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 17, fontWeight: 700, flexShrink: 0 }}>+</div><div><div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>Add New Company Name</div></div></div>}
+          {onAddCompany && <div onClick={() => { setOpen(false); setSearch(""); onAddCompany(); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: "var(--app-surface)", borderBottom: "2px solid var(--app-border)" }}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 17, fontWeight: 700, flexShrink: 0 }}>+</div><div><div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>Add New Company Name</div></div></div>}
           <div style={{ maxHeight: 180, overflowY: "auto" }}>
             {filtered.length === 0 ? <div style={{ padding: 14, textAlign: "center", color: "var(--app-muted)", fontSize: 13 }}>No companies found</div>
-              : filtered.map((c, i) => { const name = c.clientName || c.name || ""; const company = c.companyName || c.company || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "var(--app-surface)" : "transparent", borderBottom: "1px solid var(--app-border)" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-surface)"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "var(--app-surface)" : "transparent"}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0, overflow: "hidden" }}>{name[0]?.toUpperCase() || "?"}</div><div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</div>{company && <div style={{ fontSize: 11, color: "var(--app-muted)" }}>{company}</div>}</div>{isSel && <span style={{ fontSize: 14, color: "var(--app-accent)" }}>Yes</span>}</div>); })}
+              : filtered.map((c, i) => { const name = c.clientName || c.name || ""; const company = c.companyName || c.company || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "var(--app-surface)" : "transparent", borderBottom: "1px solid var(--app-border)" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-surface)"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "var(--app-surface)" : "transparent"}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 11, fontWeight: 700, flexShrink: 0, overflow: "hidden" }}>{name[0]?.toUpperCase() || "?"}</div><div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</div>{company && <div style={{ fontSize: 11, color: "var(--app-muted)" }}>{company}</div>}</div>{isSel && <span style={{ fontSize: 14, color: "var(--app-accent)" }}>Yes</span>}</div>); })}
           </div>
         </div>
       )}
@@ -104,16 +104,16 @@ function ProjectDropdown({ projects, value, onChange, onAddProject, disabled }) 
   return (
     <div style={{ position: "relative", zIndex: open ? 1000 : 1 }}>
       <div onClick={() => { if (!disabled) setOpen(!open) }} style={{ width: "100%", border: `1.5px solid ${open ? "var(--app-accent)" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 36px 10px 14px", fontSize: 13, color: value ? T.text : "var(--app-muted)", background: "var(--app-bg)", cursor: disabled ? "not-allowed" : "pointer", userSelect: "none", boxSizing: "border-box", position: "relative", minHeight: 42, opacity: disabled ? 0.5 : 1 }}>
-        {value ? (<div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{value[0].toUpperCase()}</div><span>{value}</span></div>) : "-- Select Project --"}
+        {value ? (<div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{value[0].toUpperCase()}</div><span>{value}</span></div>) : "-- Select Project --"}
         <span style={{ position: "absolute", right: 12, top: "50%", transform: `translateY(-50%) rotate(${open ? 180 : 0}deg)`, fontSize: 10, color: "var(--app-muted)", transition: "0.2s" }}>▼</span>
       </div>
       {open && (
         <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "var(--app-card)", border: "1.5px solid var(--app-border)", borderRadius: 12, boxShadow: "var(--app-shadow)", zIndex: 999, overflow: "hidden" }}>
           <div style={{ padding: "10px 10px 6px" }}><div style={{ position: "relative" }}><span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12 }}>Search</span><input autoFocus placeholder="Search project..." value={search} onChange={e => setSearch(e.target.value)} onClick={e => e.stopPropagation()} style={{ width: "100%", padding: "7px 10px 7px 30px", border: "1.5px solid var(--app-border)", borderRadius: 8, fontSize: 12, background: "var(--app-bg)", color: "var(--app-text)", outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} /></div></div>
-          {onAddProject && <div onClick={() => { setOpen(false); setSearch(""); onAddProject(); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: "var(--app-surface)", borderBottom: "2px solid var(--app-border)" }}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 17, fontWeight: 700, flexShrink: 0 }}>+</div><div><div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>Add New Project</div></div></div>}
+          {onAddProject && <div onClick={() => { setOpen(false); setSearch(""); onAddProject(); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: "var(--app-surface)", borderBottom: "2px solid var(--app-border)" }}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 17, fontWeight: 700, flexShrink: 0 }}>+</div><div><div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>Add New Project</div></div></div>}
           <div style={{ maxHeight: 180, overflowY: "auto" }}>
             {filtered.length === 0 ? <div style={{ padding: 14, textAlign: "center", color: "var(--app-muted)", fontSize: 13 }}>No projects found</div>
-              : filtered.map((p, i) => { const name = p.name || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "var(--app-surface)" : "transparent", borderBottom: "1px solid var(--app-border)" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-surface)"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "var(--app-surface)" : "transparent"}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0, overflow: "hidden" }}>{name[0]?.toUpperCase() || "?"}</div><div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</div></div>{isSel && <span style={{ fontSize: 14, color: "var(--app-accent)" }}>Yes</span>}</div>); })}
+              : filtered.map((p, i) => { const name = p.name || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "var(--app-surface)" : "transparent", borderBottom: "1px solid var(--app-border)" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-surface)"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "var(--app-surface)" : "transparent"}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 11, fontWeight: 700, flexShrink: 0, overflow: "hidden" }}>{name[0]?.toUpperCase() || "?"}</div><div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</div></div>{isSel && <span style={{ fontSize: 14, color: "var(--app-accent)" }}>Yes</span>}</div>); })}
           </div>
         </div>
       )}
@@ -903,8 +903,8 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
   };
 
   const inp = (err) => ({
-    width: "100%", border: `1.5px solid ${err ? "#ef4444" : "var(--app-border)"}`, borderRadius: 10,
-    padding: "10px 12px", fontSize: 14, color: "var(--app-text)", background: err ? "#fff5f5" : "var(--app-surface)",
+    width: "100%", border: `1.5px solid ${err ? "#64748B" : "var(--app-border)"}`, borderRadius: 10,
+    padding: "10px 12px", fontSize: 14, color: "var(--app-text)", background: err ? "#F8FAFC" : "var(--app-surface)",
     boxSizing: "border-box", outline: "none", fontFamily: "inherit", transition: "all 0.2s",
   });
   const lbl = { display: "block", fontSize: 12, color: "var(--app-muted)", fontWeight: 700, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.5px" };
@@ -920,10 +920,10 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
     const initials = (name) => (name || "Q").trim().split(/\s+/).slice(0, 2).map(w => w[0]).join("").toUpperCase();
     const badgeCfg = (status) => {
       const ok = status === "approved" || status === "converted";
-      return ok ? { bg: "#dcfce7", fg: "#16a34a" } : { bg: "#fef2f2", fg: "#dc2626" };
+      return ok ? { bg: "#E2E8F0", fg: "#16A34A" } : { bg: "#F8FAFC", fg: "#64748B" };
     };
     return (
-      <div style={{ padding: "16px 14px", background: "#F5F8FA", minHeight: "100%", boxSizing: "border-box", maxWidth: "100%", overflowX: "hidden" }}>
+      <div style={{ padding: "16px 14px", background: "#F8FAFC", minHeight: "100%", boxSizing: "border-box", maxWidth: "100%", overflowX: "hidden" }}>
         <div
           onClick={() => onBackOverride && onBackOverride()}
           style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 4px 16px", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #2563EB)" }}
@@ -931,18 +931,18 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
           <i className="ti ti-arrow-left" style={{ fontSize: 16 }}></i> Back to Dashboard
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #2563EB), #0891b2)", borderRadius: 16, padding: "16px 18px", marginBottom: 14, boxShadow: "0 6px 18px rgba(37, 99, 235,0.25)" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #2563EB), #2563EB)", borderRadius: 16, padding: "16px 18px", marginBottom: 14, boxShadow: "0 6px 18px rgba(37, 99, 235, 0.25)" }}>
           <div>
             <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.8)", letterSpacing: 0.5, textTransform: "uppercase" }}>Total Quotations</div>
-            <div style={{ fontSize: 26, fontWeight: 800, color: "#fff" }}>{enrichedMinimal.length}</div>
+            <div style={{ fontSize: 26, fontWeight: 800, color: "#FFFFFF" }}>{enrichedMinimal.length}</div>
           </div>
           <div style={{ width: 46, height: 46, borderRadius: 13, background: "rgba(255,255,255,0.18)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <i className="ti ti-receipt" style={{ fontSize: 22, color: "#fff" }} />
+            <i className="ti ti-receipt" style={{ fontSize: 22, color: "#FFFFFF" }} />
           </div>
         </div>
 
         {enrichedMinimal.length === 0 ? (
-          <div style={{ padding: "40px 16px", textAlign: "center", color: "#64748B", fontSize: 13, fontWeight: 600, background: "#fff", borderRadius: 16, boxShadow: "0 2px 10px rgba(15,28,46,0.05)" }}>
+          <div style={{ padding: "40px 16px", textAlign: "center", color: "#64748B", fontSize: 13, fontWeight: 600, background: "#FFFFFF", borderRadius: 16, boxShadow: "0 2px 10px rgba(15, 23, 42, 0.05)" }}>
             No quotations found.
           </div>
         ) : (
@@ -956,10 +956,10 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
                   key={entry.id || entry.quoteNo || i}
                   onClick={() => { loadEntry(entry); setStep("preview"); }}
                   style={{
-                    background: "#fff",
+                    background: "#FFFFFF",
                     borderRadius: 16,
                     padding: "16px",
-                    boxShadow: "0 3px 14px rgba(15,28,46,0.07)",
+                    boxShadow: "0 3px 14px rgba(15, 23, 42, 0.07)",
                     cursor: "pointer",
                     boxSizing: "border-box",
                     borderLeft: `4px solid ${bc.fg}`
@@ -969,14 +969,14 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
                     <div style={{ display: "flex", alignItems: "flex-start", gap: 10, minWidth: 0, flex: 1 }}>
                       <div style={{
                         width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
-                        background: "linear-gradient(135deg, var(--app-accent, #2563EB), #0891b2)", color: "#fff",
+                        background: "linear-gradient(135deg, var(--app-accent, #2563EB), #2563EB)", color: "#FFFFFF",
                         display: "flex", alignItems: "center", justifyContent: "center",
                         fontSize: 14, fontWeight: 800
                       }}>
                         {initials(client)}
                       </div>
                       <div style={{ minWidth: 0, flex: 1 }}>
-                        <div style={{ fontWeight: 800, color: "#0f172a", fontSize: 14.5, wordBreak: "break-word" }}>{client}</div>
+                        <div style={{ fontWeight: 800, color: "#0F172A", fontSize: 14.5, wordBreak: "break-word" }}>{client}</div>
                         {quoteNo && (
                           <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 3, fontSize: 11.5, color: "#64748B", fontWeight: 600 }}>
                             <i className="ti ti-hash" style={{ fontSize: 12, flexShrink: 0 }} />
@@ -1063,7 +1063,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
     return (
       <div style={{ fontFamily: "var(--font, 'Nunito', sans-serif)", minHeight: "100%", width: "100%", maxWidth: "100%", overflowX: "hidden", boxSizing: "border-box", background: "var(--bg, #F8FAFC)" }}>
         {toastMsg && (
-          <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 99999, background: '#1E293B', color: '#fff', borderRadius: 12, padding: '12px 20px', fontSize: 13, fontWeight: 700, boxShadow: '0 8px 24px rgba(0,0,0,0.18)', display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 99999, background: '#1E293B', color: '#FFFFFF', borderRadius: 12, padding: '12px 20px', fontSize: 13, fontWeight: 700, boxShadow: '0 8px 24px rgba(0,0,0,0.18)', display: 'flex', alignItems: 'center', gap: 8 }}>
             <i className="ti ti-check" style={{ fontSize: 15, color: '#16A34A' }}></i> {toastMsg}
           </div>
         )}
@@ -1092,7 +1092,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
           </div>
 
           <div className="stats-row" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14 }}>
-            <div className="stat-card" style={{ display: "flex", alignItems: "center", gap: 12, position: "relative", border: "1.5px solid var(--border,#E2E8F0)", borderRadius: 16, background: "#fff", padding: "18px 20px" }}>
+            <div className="stat-card" style={{ display: "flex", alignItems: "center", gap: 12, position: "relative", border: "1.5px solid var(--border,#E2E8F0)", borderRadius: 16, background: "#FFFFFF", padding: "18px 20px" }}>
               <div className="stat-icon" style={{ width: 44, height: 44, borderRadius: 12, background: "var(--teal-light)", color: "var(--teal)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}><i className="ti ti-file-text"></i></div>
               <div>
                 <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1E293B)", lineHeight: 1 }}>{totalQuotes}</div>
@@ -1101,8 +1101,8 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
               </div>
             </div>
 
-            <div className="stat-card" style={{ display: "flex", alignItems: "center", gap: 12, position: "relative", border: "1.5px solid var(--border,#E2E8F0)", borderRadius: 16, background: "#fff", padding: "18px 20px" }}>
-              <div className="stat-icon" style={{ width: 44, height: 44, borderRadius: 12, background: "var(--green-bg)", color: "var(--green)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}><i className="ti ti-circle-check"></i></div>
+            <div className="stat-card" style={{ display: "flex", alignItems: "center", gap: 12, position: "relative", border: "1.5px solid var(--border,#E2E8F0)", borderRadius: 16, background: "#FFFFFF", padding: "18px 20px" }}>
+              <div className="stat-icon" style={{ width: 44, height: 44, borderRadius: 12, background: "var(--app-accent-light)", color: "var(--green)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}><i className="ti ti-circle-check"></i></div>
               <div>
                 <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1E293B)", lineHeight: 1 }}>{wonCount}</div>
                 <div style={{ fontSize: 11, color: "var(--text3,#64748B)", fontWeight: 600, marginTop: 3 }}>Accepted</div>
@@ -1110,21 +1110,21 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
               </div>
             </div>
 
-            <div className="stat-card" style={{ display: "flex", alignItems: "center", gap: 12, position: "relative", border: "1.5px solid var(--border,#E2E8F0)", borderRadius: 16, background: "#fff", padding: "18px 20px" }}>
-              <div className="stat-icon" style={{ width: 44, height: 44, borderRadius: 12, background: "var(--amber-bg)", color: "var(--amber)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}><i className="ti ti-clock"></i></div>
+            <div className="stat-card" style={{ display: "flex", alignItems: "center", gap: 12, position: "relative", border: "1.5px solid var(--border,#E2E8F0)", borderRadius: 16, background: "#FFFFFF", padding: "18px 20px" }}>
+              <div className="stat-icon" style={{ width: 44, height: 44, borderRadius: 12, background: "var(--app-accent-light)", color: "var(--app-muted)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}><i className="ti ti-clock"></i></div>
               <div>
                 <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1E293B)", lineHeight: 1 }}>{pendingCount}</div>
                 <div style={{ fontSize: 11, color: "var(--text3,#64748B)", fontWeight: 600, marginTop: 3 }}>Pending</div>
-                <div style={{ fontSize: 10, fontWeight: 700, marginTop: 4, color: "var(--amber)" }}>₹{pendingValue.toLocaleString("en-IN")} pending</div>
+                <div style={{ fontSize: 10, fontWeight: 700, marginTop: 4, color: "var(--app-muted)" }}>₹{pendingValue.toLocaleString("en-IN")} pending</div>
               </div>
             </div>
 
-            <div className="stat-card" style={{ display: "flex", alignItems: "center", gap: 12, position: "relative", border: "1.5px solid var(--border,#E2E8F0)", borderRadius: 16, background: "#fff", padding: "18px 20px" }}>
-              <div className="stat-icon" style={{ width: 44, height: 44, borderRadius: 12, background: "var(--purple-bg)", color: "var(--purple)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}><i className="ti ti-percentage"></i></div>
+            <div className="stat-card" style={{ display: "flex", alignItems: "center", gap: 12, position: "relative", border: "1.5px solid var(--border,#E2E8F0)", borderRadius: 16, background: "#FFFFFF", padding: "18px 20px" }}>
+              <div className="stat-icon" style={{ width: 44, height: 44, borderRadius: 12, background: "var(--app-accent-light)", color: "var(--app-accent)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}><i className="ti ti-percentage"></i></div>
               <div>
                 <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1E293B)", lineHeight: 1 }}>{winRate}%</div>
                 <div style={{ fontSize: 11, color: "var(--text3,#64748B)", fontWeight: 600, marginTop: 3 }}>Win Rate</div>
-                <div style={{ fontSize: 10, fontWeight: 700, marginTop: 4, color: "var(--purple)" }}>{wonCount} of {sentCount} sent</div>
+                <div style={{ fontSize: 10, fontWeight: 700, marginTop: 4, color: "var(--app-accent)" }}>{wonCount} of {sentCount} sent</div>
               </div>
             </div>
           </div>
@@ -1151,7 +1151,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
                     <select
                       value={entry.status}
                       onChange={(e) => { e.stopPropagation(); handleStatusChange(entry, e.target.value); }}
-                      style={{ border: "1px solid #e2e8f0", borderRadius: 6, padding: "2px 6px", fontSize: 10, fontWeight: 700, color: "#374151", background: "#fff", cursor: "pointer", outline: "none", marginLeft: "auto" }}
+                      style={{ border: "1px solid #E2E8F0", borderRadius: 6, padding: "2px 6px", fontSize: 10, fontWeight: 700, color: "#1E293B", background: "#FFFFFF", cursor: "pointer", outline: "none", marginLeft: "auto" }}
                       onClick={e => e.stopPropagation()}
                     >
                       {["draft", "sent", "pending", "approved", "rejected", "converted"].map(s => (
@@ -1196,7 +1196,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
                     )}
                     <button
                       className="qa-btn"
-                      style={{ color: "#ef4444", borderColor: "#fca5a5" }}
+                      style={{ color: "#64748B", borderColor: "#E2E8F0" }}
                       onClick={() => {
                         if (window.confirm(`Delete quotation ${entry.quoteNo}?`)) {
                           axios.delete(`${BASE_URL}/api/quotations/${entry.id}`)
@@ -1252,7 +1252,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
                 <div className="funnel-step">
                   <span className="fs-label">Rejected</span>
                   <div className="fs-bar-wrap">
-                    <div className="fs-bar" style={{ width: `${totalQuotes > 0 ? (rejectedCount / totalQuotes) * 100 : 0}%`, background: "var(--red)" }}></div>
+                    <div className="fs-bar" style={{ width: `${totalQuotes > 0 ? (rejectedCount / totalQuotes) * 100 : 0}%`, background: "var(--app-text)" }}></div>
                   </div>
                   <span className="fs-count">{rejectedCount}</span>
                   <span className="fs-pct">{totalQuotes > 0 ? Math.round((rejectedCount / totalQuotes) * 100) : 0}%</span>
@@ -1266,7 +1266,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
                 {enriched.slice(0, 5).map((e, idx, arr) => (
                   <div className="act-item" key={e.id || idx}>
                     <div className="act-dot-col">
-                      <div className="act-dot" style={{ background: e.status === "approved" || e.status === "converted" ? "var(--green)" : e.status === "sent" ? "var(--blue)" : e.status === "rejected" ? "var(--red)" : "var(--purple)" }}></div>
+                      <div className="act-dot" style={{ background: e.status === "approved" || e.status === "converted" ? "var(--green)" : e.status === "sent" ? "var(--blue)" : e.status === "rejected" ? "var(--app-text)" : "var(--app-accent)" }}></div>
                       {idx !== arr.length - 1 && <div className="act-line"></div>}
                     </div>
                     <div>
@@ -1284,21 +1284,21 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
         {/* Send to Client Portal Popup */}
         {showSendPopup && (
           <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.5)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowSendPopup(false)}>
-            <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: 16, padding: 24, width: 420, maxWidth: '92vw' }}>
+            <div onClick={e => e.stopPropagation()} style={{ background: '#FFFFFF', borderRadius: 16, padding: 24, width: 420, maxWidth: '92vw' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
                 <div style={{ fontSize: 16, fontWeight: 900, color: '#0F172A' }}>Send to Client Portal</div>
                 <i className="ti ti-x" style={{ cursor: 'pointer', fontSize: 18 }} onClick={() => setShowSendPopup(false)}></i>
               </div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: '#374151', marginBottom: 8 }}>Select Client</div>
-              <select value={targetPortalClient} onChange={e => setTargetPortalClient(e.target.value)} style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #E5E7EB', borderRadius: 8, fontSize: 13, marginBottom: 20 }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#1E293B', marginBottom: 8 }}>Select Client</div>
+              <select value={targetPortalClient} onChange={e => setTargetPortalClient(e.target.value)} style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #E2E8F0', borderRadius: 8, fontSize: 13, marginBottom: 20 }}>
                 <option value="">-- Select Client --</option>
                 {(clients || []).map(c => (
                   <option key={c._id || c.clientName || c.name} value={c.clientName || c.name}>{c.clientName || c.name}</option>
                 ))}
               </select>
               <div style={{ display: 'flex', gap: 10 }}>
-                <button onClick={() => setShowSendPopup(false)} style={{ flex: 1, padding: '10px', background: '#F3F4F6', color: '#374151', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: 'pointer' }}>Cancel</button>
-                <button onClick={() => handleSendQuotationToPortal(targetPortalClient)} disabled={!targetPortalClient} style={{ flex: 1, padding: '10px', background: '#22C55E', color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: !targetPortalClient ? 'not-allowed' : 'pointer', opacity: !targetPortalClient ? 0.5 : 1 }}>Send Now</button>
+                <button onClick={() => setShowSendPopup(false)} style={{ flex: 1, padding: '10px', background: '#F8FAFC', color: '#1E293B', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: 'pointer' }}>Cancel</button>
+                <button onClick={() => handleSendQuotationToPortal(targetPortalClient)} disabled={!targetPortalClient} style={{ flex: 1, padding: '10px', background: '#16A34A', color: '#FFFFFF', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: !targetPortalClient ? 'not-allowed' : 'pointer', opacity: !targetPortalClient ? 0.5 : 1 }}>Send Now</button>
               </div>
             </div>
           </div>
@@ -1324,8 +1324,8 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
 
     const isMobileView = typeof window !== "undefined" && window.innerWidth < 769;
     return isMobileView ? (
-      <div style={{ position: "fixed", inset: 0, zIndex: 999999, background: "rgba(15,28,46,0.55)", padding: "20px 12px", display: "flex", alignItems: "center", justifyContent: "center" }} onClick={() => { if (onBackOverride) onBackOverride(); else setStep("list"); }}>
-      <div className="print-wrapper quotation-mobile-popup-scope" onClick={(e) => e.stopPropagation()} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "#fff", borderRadius: 16, overflow: "hidden", maxWidth: 830, width: "100%", maxHeight: "calc(100vh - 32px)", boxShadow: "0 32px 80px rgba(0,0,0,0.3)", display: "flex", flexDirection: "column" }}>
+      <div style={{ position: "fixed", inset: 0, zIndex: 999999, background: "rgba(15, 23, 42, 0.55)", padding: "20px 12px", display: "flex", alignItems: "center", justifyContent: "center" }} onClick={() => { if (onBackOverride) onBackOverride(); else setStep("list"); }}>
+      <div className="print-wrapper quotation-mobile-popup-scope" onClick={(e) => e.stopPropagation()} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "#FFFFFF", borderRadius: 16, overflow: "hidden", maxWidth: 830, width: "100%", maxHeight: "calc(100vh - 32px)", boxShadow: "0 32px 80px rgba(0,0,0,0.3)", display: "flex", flexDirection: "column" }}>
      <style>{`
         @media screen {
           .quotation-mobile-popup-scope, .quotation-mobile-popup-scope * { box-sizing: border-box !important; max-width: 100% !important; }
@@ -1389,14 +1389,14 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
         }
         `}</style>
         {toastMsg && (
-          <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 99999, background: '#1E293B', color: '#fff', borderRadius: 12, padding: '12px 20px', fontSize: 13, fontWeight: 700, boxShadow: '0 8px 24px rgba(0,0,0,0.18)', display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 99999, background: '#1E293B', color: '#FFFFFF', borderRadius: 12, padding: '12px 20px', fontSize: 13, fontWeight: 700, boxShadow: '0 8px 24px rgba(0,0,0,0.18)', display: 'flex', alignItems: 'center', gap: 8 }}>
             <i className="ti ti-check" style={{ fontSize: 15, color: '#16A34A' }}></i> {toastMsg}
           </div>
         )}
         <style>{`
           @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
           * { box-sizing: border-box; }
-          .qt-paper { position: relative; max-width: 794px; margin: 0 auto; background: #fff; border-radius: 18px; box-shadow: 0 24px 80px rgba(5,150,105,0.15); display: flex; flex-direction: column; min-height: 1122px; }
+          .qt-paper { position: relative; max-width: 794px; margin: 0 auto; background: #FFFFFF; border-radius: 18px; box-shadow: 0 24px 80px rgba(22, 163, 74, 0.15); display: flex; flex-direction: column; min-height: 1122px; }
           @media print {
             @page { size: A4 portrait; margin: 10mm; }
             html, body { margin: 0 !important; padding: 0 !important; height: auto !important; min-height: 0 !important; overflow: visible !important; background: white !important; }
@@ -1425,7 +1425,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
 
         <div className="no-print" style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap", padding: "20px 20px 12px", flexShrink: 0 }}>
 
-          <button onClick={() => { if (onBackOverride) { onBackOverride(); } else { setViewEntry(null); setStep("list"); } }} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>Document List</button>
+          <button onClick={() => { if (onBackOverride) { onBackOverride(); } else { setViewEntry(null); setStep("list"); } }} style={{ padding: "10px 18px", background: "#FFFFFF", border: "1.5px solid #E2E8F0", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#1E293B", fontFamily: "inherit" }}>Document List</button>
           <button onClick={() => {
             const isMobile = typeof window !== "undefined" && window.innerWidth < 769;
             if (isMobile) {
@@ -1436,11 +1436,11 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
             } else {
               setStep("form");
             }
-          }} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>Edit</button>
+          }} style={{ padding: "10px 18px", background: "#FFFFFF", border: "1.5px solid #E2E8F0", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#1E293B", fontFamily: "inherit" }}>Edit</button>
           <button onClick={async () => {
             const node = document.querySelector('.qt-paper');
             if (!node) return;
-            const canvas = await html2canvas(node, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+            const canvas = await html2canvas(node, { scale: 2, useCORS: true, backgroundColor: '#FFFFFF' });
             const imgData = canvas.toDataURL('image/png');
             const doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
             const pageWidth = 210;
@@ -1470,39 +1470,39 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
             }
             doc.save(fileName);
             showToast('Sharing not supported on this device — PDF downloaded instead.');
-          }} style={{ padding: "10px 18px", background: "#eff6ff", border: "1.5px solid #bfdbfe", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#2563eb", fontFamily: "inherit" }}>Share</button>  <button onClick={() => window.print()} style={{ padding: "10px 22px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>Print / PDF</button>
+          }} style={{ padding: "10px 18px", background: "#EFF6FF", border: "1.5px solid #E2E8F0", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#2563EB", fontFamily: "inherit" }}>Share</button>  <button onClick={() => window.print()} style={{ padding: "10px 22px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#FFFFFF", fontFamily: "inherit" }}>Print / PDF</button>
         </div>
 
         <div className="qt-paper print-container" style={{ overflowY: "auto", flex: 1, padding: "0 20px 20px", margin: 0, maxWidth: "100%" }}>
           {/* Header */}
-          <div className="avoid-break" style={{ background: "#f8fafc", padding: "28px 32px", position: "relative", overflow: "visible", flexShrink: 0, borderBottom: "1px solid #e2e8f0" }}>
-            <div style={{ position: "absolute", width: 240, height: 240, borderRadius: "50%", background: "radial-gradient(circle,rgba(5,150,105,0.05),transparent)", top: -80, right: -40, pointerEvents: "none" }} />
+          <div className="avoid-break" style={{ background: "#F8FAFC", padding: "28px 32px", position: "relative", overflow: "visible", flexShrink: 0, borderBottom: "1px solid #E2E8F0" }}>
+            <div style={{ position: "absolute", width: 240, height: 240, borderRadius: "50%", background: "radial-gradient(circle,rgba(22, 163, 74, 0.05),transparent)", top: -80, right: -40, pointerEvents: "none" }} />
             <div className="qt-hgrid" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", position: "relative", gap: 20 }}>
               <div>
                 {effectiveLogo ? (
                   <img src={effectiveLogo} alt="logo" style={{ height: 85, borderRadius: 10, marginBottom: 12, objectFit: "contain" }} />
                 ) : (
-                  <div style={{ height: 60, width: 60, background: "var(--app-accent)", borderRadius: 10, marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, fontWeight: 900, color: "#fff" }}>
+                  <div style={{ height: 60, width: 60, background: "var(--app-accent)", borderRadius: 10, marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, fontWeight: 900, color: "#FFFFFF" }}>
                     {effectiveCompanyName[0] || "?"}
                   </div>
                 )}
-                <div style={{ fontSize: 24, fontWeight: 900, color: "#064e3b", textTransform: "uppercase", letterSpacing: 1 }}>{qt.companyName || effectiveCompanyName}</div>
-                {qt.companyEmail && <div style={{ fontSize: 11, color: "#065f46", marginTop: 3 }}>{qt.companyEmail}</div>}
-                {qt.companyPhone && <div style={{ fontSize: 11, color: "#065f46", marginTop: 2 }}>{qt.companyPhone}</div>}
-                {qt.companyAddress && <div style={{ fontSize: 11, color: "#065f46", marginTop: 2 }}>{qt.companyAddress}</div>}
+                <div style={{ fontSize: 24, fontWeight: 900, color: "#1E293B", textTransform: "uppercase", letterSpacing: 1 }}>{qt.companyName || effectiveCompanyName}</div>
+                {qt.companyEmail && <div style={{ fontSize: 11, color: "#1E293B", marginTop: 3 }}>{qt.companyEmail}</div>}
+                {qt.companyPhone && <div style={{ fontSize: 11, color: "#1E293B", marginTop: 2 }}>{qt.companyPhone}</div>}
+                {qt.companyAddress && <div style={{ fontSize: 11, color: "#1E293B", marginTop: 2 }}>{qt.companyAddress}</div>}
               </div>
               <div style={{ textAlign: "right" }}>
-                <div style={{ fontSize: 32, fontWeight: 900, color: "rgba(5,150,105,0.1)", letterSpacing: -2, lineHeight: 1, marginBottom: 4 }}>QUOTATION</div>
+                <div style={{ fontSize: 32, fontWeight: 900, color: "rgba(22, 163, 74, 0.1)", letterSpacing: -2, lineHeight: 1, marginBottom: 4 }}>QUOTATION</div>
                 <div style={{ fontSize: 16, fontWeight: 800, color: "var(--app-accent)" }}>{qt.quoteNo}</div>
-                {qt.refNo && <div style={{ fontSize: 11, color: "#065f46", marginTop: 3 }}>Ref # {qt.refNo}</div>}
+                {qt.refNo && <div style={{ fontSize: 11, color: "#1E293B", marginTop: 3 }}>Ref # {qt.refNo}</div>}
                 <div style={{ marginTop: 14, display: "flex", gap: 20, justifyContent: "flex-end" }}>
                   <div style={{ textAlign: "right" }}>
                     <div style={{ fontSize: 9, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>DATE</div>
-                    <div style={{ fontSize: 12, color: "#064e3b", fontWeight: 700 }}>{formatDate(qt.date)}</div>
+                    <div style={{ fontSize: 12, color: "#1E293B", fontWeight: 700 }}>{formatDate(qt.date)}</div>
                   </div>
                   <div style={{ textAlign: "right" }}>
                     <div style={{ fontSize: 9, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>VALID UNTIL</div>
-                    <div style={{ fontSize: 12, color: "#ea580c", fontWeight: 700 }}>{formatDate(qt.expiryDate)}</div>
+                    <div style={{ fontSize: 12, color: "#64748B", fontWeight: 700 }}>{formatDate(qt.expiryDate)}</div>
                   </div>
                 </div>
               </div>
@@ -1510,19 +1510,19 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
           </div>
 
           {/* Prepared for */}
-          <div className="qt-btgrid avoid-break" style={{ display: "grid", gridTemplateColumns: qt.project ? "1fr 1fr" : "1fr", borderBottom: "2px solid #f0fdf4", flexShrink: 0 }}>
-            <div style={{ padding: "20px 32px", borderRight: qt.project ? "1px solid #f0fdf4" : "none" }}>
+          <div className="qt-btgrid avoid-break" style={{ display: "grid", gridTemplateColumns: qt.project ? "1fr 1fr" : "1fr", borderBottom: "2px solid #F8FAFC", flexShrink: 0 }}>
+            <div style={{ padding: "20px 32px", borderRight: qt.project ? "1px solid #F8FAFC" : "none" }}>
               <div style={{ fontSize: 9, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 2, marginBottom: 10 }}>PREPARED FOR</div>
-              <div style={{ fontSize: 17, fontWeight: 800, color: "#111827" }}>{qt.client || "—"}</div>
+              <div style={{ fontSize: 17, fontWeight: 800, color: "#0F172A" }}>{qt.client || "—"}</div>
               {selectedClient?.companyName && <div style={{ fontSize: 13, color: "var(--app-accent)", fontWeight: 600, marginTop: 2 }}>{selectedClient.companyName}</div>}
-              {selectedClient?.email && <div style={{ fontSize: 12, color: "#6b7280", marginTop: 5 }}> {selectedClient.email}</div>}
-              {selectedClient?.phone && <div style={{ fontSize: 12, color: "#6b7280", marginTop: 2 }}> {selectedClient.phone}</div>}
+              {selectedClient?.email && <div style={{ fontSize: 12, color: "#64748B", marginTop: 5 }}> {selectedClient.email}</div>}
+              {selectedClient?.phone && <div style={{ fontSize: 12, color: "#64748B", marginTop: 2 }}> {selectedClient.phone}</div>}
               {selectedClient?.gstNumber && <div style={{ fontSize: 12, color: "var(--app-accent)", marginTop: 4, fontWeight: 600 }}> GST: {selectedClient.gstNumber}</div>}
             </div>
             {qt.project && (
               <div style={{ padding: "20px 32px" }}>
                 <div style={{ fontSize: 9, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 2, marginBottom: 10 }}>PROJECT</div>
-                <div style={{ fontSize: 15, fontWeight: 700, color: "#111827" }}>{qt.project}</div>
+                <div style={{ fontSize: 15, fontWeight: 700, color: "#0F172A" }}>{qt.project}</div>
               </div>
             )}
           </div>
@@ -1531,20 +1531,20 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
           <div className="qt-table-wrap" style={{ padding: "22px 32px", overflowX: "auto", flexShrink: 0 }}>
             <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 360 }}>
               <thead>
-                <tr className="avoid-break" style={{ background: "linear-gradient(90deg,#f0fdf4,#f7fffe)" }}>
+                <tr className="avoid-break" style={{ background: "linear-gradient(90deg,#F8FAFC,#F8FAFC)" }}>
                   {["#", "Description", "Qty", "Unit Rate", "Amount"].map((h, i) => (
-                    <th key={i} style={{ padding: "9px 11px", fontSize: 9, fontWeight: 700, color: "var(--app-accent)", letterSpacing: 1.5, borderBottom: "2px solid #d1fae5", textAlign: ["Amount", "Unit Rate", "Qty"].includes(h) ? "right" : "left" }}>{h.toUpperCase()}</th>
+                    <th key={i} style={{ padding: "9px 11px", fontSize: 9, fontWeight: 700, color: "var(--app-accent)", letterSpacing: 1.5, borderBottom: "2px solid #E2E8F0", textAlign: ["Amount", "Unit Rate", "Qty"].includes(h) ? "right" : "left" }}>{h.toUpperCase()}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {items.map((item, idx) => (
-                  <tr key={item.id} className="avoid-break" style={{ borderBottom: "1px solid #f0fdf4" }}>
-                    <td style={{ padding: "12px 11px", color: "#6ee7b7", fontWeight: 700, fontSize: 12 }}>{String(idx + 1).padStart(2, "0")}</td>
-                    <td style={{ padding: "12px 11px", fontSize: 13, fontWeight: 600, color: "#111827" }}>{item.description || "—"}</td>
-                    <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{item.quantity}</td>
-                    <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{formatCurrency(item.rate, qt.currency)}</td>
-                    <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 14, fontWeight: 700, color: "#111827" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), qt.currency)}</td>
+                  <tr key={item.id} className="avoid-break" style={{ borderBottom: "1px solid #F8FAFC" }}>
+                    <td style={{ padding: "12px 11px", color: "#64748B", fontWeight: 700, fontSize: 12 }}>{String(idx + 1).padStart(2, "0")}</td>
+                    <td style={{ padding: "12px 11px", fontSize: 13, fontWeight: 600, color: "#0F172A" }}>{item.description || "—"}</td>
+                    <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#1E293B" }}>{item.quantity}</td>
+                    <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#1E293B" }}>{formatCurrency(item.rate, qt.currency)}</td>
+                    <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 14, fontWeight: 700, color: "#0F172A" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), qt.currency)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -1557,14 +1557,14 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
                   ["Total Amount", formatCurrency(total, qt.currency)],
                   ["Amount Paid", formatCurrency(amountPaid, qt.currency)]
                 ].map(([l, v]) => (
-                  <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid #f0fdf4" }}>
-                    <span style={{ fontSize: 12, color: "#6b7280" }}>{l}</span>
-                    <span style={{ fontSize: 12, fontWeight: 600, color: "#111827" }}>{v}</span>
+                  <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid #F8FAFC" }}>
+                    <span style={{ fontSize: 12, color: "#64748B" }}>{l}</span>
+                    <span style={{ fontSize: 12, fontWeight: 600, color: "#0F172A" }}>{v}</span>
                   </div>
                 ))}
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 16px", background: "#f8fafc", borderRadius: 12, marginTop: 8, border: "1.5px solid #e2e8f0" }}>
-                  <span style={{ fontSize: 13, fontWeight: 800, color: "#64748b" }}>BALANCE DUE</span>
-                  <span style={{ fontSize: 19, fontWeight: 900, color: "#064e3b" }}>{formatCurrency(balanceDue, qt.currency)}</span>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 16px", background: "#F8FAFC", borderRadius: 12, marginTop: 8, border: "1.5px solid #E2E8F0" }}>
+                  <span style={{ fontSize: 13, fontWeight: 800, color: "#64748B" }}>BALANCE DUE</span>
+                  <span style={{ fontSize: 19, fontWeight: 900, color: "#1E293B" }}>{formatCurrency(balanceDue, qt.currency)}</span>
                 </div>
               </div>
             </div>
@@ -1574,44 +1574,44 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
           <div className="avoid-break" style={{ padding: "0 32px 24px", display: "grid", gridTemplateColumns: "1fr auto", gap: 16, alignItems: "flex-start", flexShrink: 0 }}>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {qt.notes && (
-                <div style={{ background: "#f0fdf4", borderRadius: 11, padding: "14px 16px", border: "1px solid #d1fae5" }}>
+                <div style={{ background: "#F8FAFC", borderRadius: 11, padding: "14px 16px", border: "1px solid #E2E8F0" }}>
                   <div style={{ fontSize: 9, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>NOTES</div>
-                  <div style={{ fontSize: 12, color: "#374151", lineHeight: 1.7 }}>{qt.notes}</div>
+                  <div style={{ fontSize: 12, color: "#1E293B", lineHeight: 1.7 }}>{qt.notes}</div>
                 </div>
               )}
               {qt.terms && (
-                <div style={{ background: "#f0fdf4", borderRadius: 11, padding: "14px 16px", border: "1px solid #d1fae5" }}>
+                <div style={{ background: "#F8FAFC", borderRadius: 11, padding: "14px 16px", border: "1px solid #E2E8F0" }}>
                   <div style={{ fontSize: 9, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>TERMS & CONDITIONS</div>
-                  <div style={{ fontSize: 12, color: "#374151", lineHeight: 1.7 }}>{qt.terms}</div>
+                  <div style={{ fontSize: 12, color: "#1E293B", lineHeight: 1.7 }}>{qt.terms}</div>
                 </div>
               )}
               {(qt.upiId || qt.bankName) && (
-                <div style={{ background: "#f8fafc", borderRadius: 11, padding: "14px 16px", border: "1px solid #e2e8f0" }}>
+                <div style={{ background: "#F8FAFC", borderRadius: 11, padding: "14px 16px", border: "1px solid #E2E8F0" }}>
                   <div style={{ fontSize: 9, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}> PAYMENT INSTRUCTIONS</div>
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 20px" }}>
                     {qt.upiId && (
                       <div>
-                        <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700 }}>UPI ID</div>
-                        <div style={{ fontSize: 12, fontWeight: 700, color: "#111827" }}>{qt.upiId}</div>
+                        <div style={{ fontSize: 9, color: "#64748B", fontWeight: 700 }}>UPI ID</div>
+                        <div style={{ fontSize: 12, fontWeight: 700, color: "#0F172A" }}>{qt.upiId}</div>
                       </div>
                     )}
                     {qt.bankName && (
                       <>
                         <div>
-                          <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700 }}>BANK NAME</div>
-                          <div style={{ fontSize: 12, fontWeight: 700, color: "#111827" }}>{qt.bankName}</div>
+                          <div style={{ fontSize: 9, color: "#64748B", fontWeight: 700 }}>BANK NAME</div>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: "#0F172A" }}>{qt.bankName}</div>
                         </div>
                         <div>
-                          <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700 }}>ACCOUNT NAME</div>
-                          <div style={{ fontSize: 12, fontWeight: 700, color: "#111827" }}>{qt.accountName}</div>
+                          <div style={{ fontSize: 9, color: "#64748B", fontWeight: 700 }}>ACCOUNT NAME</div>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: "#0F172A" }}>{qt.accountName}</div>
                         </div>
                         <div>
-                          <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700 }}>ACCOUNT NUMBER</div>
-                          <div style={{ fontSize: 12, fontWeight: 700, color: "#111827", fontFamily: "monospace" }}>{qt.accountNumber}</div>
+                          <div style={{ fontSize: 9, color: "#64748B", fontWeight: 700 }}>ACCOUNT NUMBER</div>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: "#0F172A", fontFamily: "monospace" }}>{qt.accountNumber}</div>
                         </div>
                         <div>
-                          <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700 }}>IFSC CODE</div>
-                          <div style={{ fontSize: 12, fontWeight: 700, color: "#111827", fontFamily: "monospace" }}>{qt.ifscCode}</div>
+                          <div style={{ fontSize: 9, color: "#64748B", fontWeight: 700 }}>IFSC CODE</div>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: "#0F172A", fontFamily: "monospace" }}>{qt.ifscCode}</div>
                         </div>
                       </>
                     )}
@@ -1619,37 +1619,37 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
                 </div>
               )}
             </div>
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", background: "#f0fdf4", borderRadius: 12, padding: "14px 16px", border: "1px solid #d1fae5", minWidth: 110 }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", background: "#F8FAFC", borderRadius: 12, padding: "14px 16px", border: "1px solid #E2E8F0", minWidth: 110 }}>
               <div style={{ fontSize: 8, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 1.5, marginBottom: 8, textAlign: "center" }}>SCAN QUOTE</div>
-              <div style={{ background: "#fff", padding: 6, borderRadius: 8, border: "1px solid #d1fae5" }}>
-                <QRCodeSVG value={qrData} size={88} bgColor="#ffffff" fgColor="#064e3b" />
+              <div style={{ background: "#FFFFFF", padding: 6, borderRadius: 8, border: "1px solid #E2E8F0" }}>
+                <QRCodeSVG value={qrData} size={88} bgColor="#FFFFFF" fgColor="#1E293B" />
               </div>
-              <div style={{ fontSize: 8, color: "#9ca3af", marginTop: 7, textAlign: "center", fontWeight: 600 }}>{qt.quoteNo}</div>
+              <div style={{ fontSize: 8, color: "#64748B", marginTop: 7, textAlign: "center", fontWeight: 600 }}>{qt.quoteNo}</div>
             </div>
           </div>
 
           <div className="flex-spacer" style={{ flex: 1 }} />
 
           {/* Footer */}
-          <div style={{ background: "#ffffff", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0, borderTop: "2px solid #f1f5f9", pageBreakBefore: "auto", breakBefore: "auto" }}>
-            <div style={{ fontSize: 11, color: "#6b7280", fontWeight: 600 }}>{effectiveCompanyName}</div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: "#2563eb" }}>{qt.footerMessage}</div>
-            <div style={{ fontSize: 11, color: "#6b7280", fontWeight: 600 }}>{qt.quoteNo}</div>
+          <div style={{ background: "#FFFFFF", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0, borderTop: "2px solid #EFF6FF", pageBreakBefore: "auto", breakBefore: "auto" }}>
+            <div style={{ fontSize: 11, color: "#64748B", fontWeight: 600 }}>{effectiveCompanyName}</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "#2563EB" }}>{qt.footerMessage}</div>
+            <div style={{ fontSize: 11, color: "#64748B", fontWeight: 600 }}>{qt.quoteNo}</div>
           </div>
         </div>
      </div>
       </div>
     ) : (
-      <div className="print-wrapper" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "#ecfdf5", minHeight: "100vh", padding: "20px 12px" }}>
+      <div className="print-wrapper" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "#EFF6FF", minHeight: "100vh", padding: "20px 12px" }}>
         {toastMsg && (
-          <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 99999, background: '#1E293B', color: '#fff', borderRadius: 12, padding: '12px 20px', fontSize: 13, fontWeight: 700, boxShadow: '0 8px 24px rgba(0,0,0,0.18)', display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 99999, background: '#1E293B', color: '#FFFFFF', borderRadius: 12, padding: '12px 20px', fontSize: 13, fontWeight: 700, boxShadow: '0 8px 24px rgba(0,0,0,0.18)', display: 'flex', alignItems: 'center', gap: 8 }}>
             <i className="ti ti-check" style={{ fontSize: 15, color: '#16A34A' }}></i> {toastMsg}
           </div>
         )}
         <style>{`
           @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
           * { box-sizing: border-box; }
-          .qt-paper { position: relative; max-width: 794px; margin: 0 auto; background: #fff; border-radius: 18px; box-shadow: 0 24px 80px rgba(5,150,105,0.15); display: flex; flex-direction: column; min-height: 1122px; }
+          .qt-paper { position: relative; max-width: 794px; margin: 0 auto; background: #FFFFFF; border-radius: 18px; box-shadow: 0 24px 80px rgba(22, 163, 74, 0.15); display: flex; flex-direction: column; min-height: 1122px; }
           @media print {
             @page { size: A4 portrait; margin: 0; }
             html, body { margin: 0 !important; padding: 0 !important; height: auto !important; min-height: 0 !important; overflow: visible !important; background: white !important; }
@@ -1676,7 +1676,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
 
         <div className="no-print" style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 20, flexWrap: "wrap" }}>
 
-        <button onClick={() => { if (onBackOverride) { onBackOverride(); } else { setViewEntry(null); setStep("list"); } }} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>Document List</button>
+        <button onClick={() => { if (onBackOverride) { onBackOverride(); } else { setViewEntry(null); setStep("list"); } }} style={{ padding: "10px 18px", background: "#FFFFFF", border: "1.5px solid #E2E8F0", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#1E293B", fontFamily: "inherit" }}>Document List</button>
        <button onClick={() => {
             const isMobile = typeof window !== "undefined" && window.innerWidth < 769;
             if (isMobile) {
@@ -1687,11 +1687,11 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
             } else {
               setStep("form");
             }
-          }} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>Edit</button>
+          }} style={{ padding: "10px 18px", background: "#FFFFFF", border: "1.5px solid #E2E8F0", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#1E293B", fontFamily: "inherit" }}>Edit</button>
           <button onClick={async () => {
             const node = document.querySelector('.qt-paper');
             if (!node) return;
-            const canvas = await html2canvas(node, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+            const canvas = await html2canvas(node, { scale: 2, useCORS: true, backgroundColor: '#FFFFFF' });
             const imgData = canvas.toDataURL('image/png');
             const doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
             const pageWidth = 210;
@@ -1721,57 +1721,57 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
             }
             doc.save(fileName);
             showToast('Sharing not supported on this device — PDF downloaded instead.');
-          }} style={{ padding: "10px 18px", background: "#eff6ff", border: "1.5px solid #bfdbfe", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#2563eb", fontFamily: "inherit" }}>Share</button>  <button onClick={() => window.print()} style={{ padding: "10px 22px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>Print / PDF</button>
+          }} style={{ padding: "10px 18px", background: "#EFF6FF", border: "1.5px solid #E2E8F0", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#2563EB", fontFamily: "inherit" }}>Share</button>  <button onClick={() => window.print()} style={{ padding: "10px 22px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#FFFFFF", fontFamily: "inherit" }}>Print / PDF</button>
         </div>
 
         <div className="qt-paper print-container">
-          <div className="avoid-break" style={{ background: "#f8fafc", padding: "28px 32px", position: "relative", overflow: "visible", flexShrink: 0, borderBottom: "1px solid #e2e8f0" }}>
-            <div style={{ position: "absolute", width: 240, height: 240, borderRadius: "50%", background: "radial-gradient(circle,rgba(5,150,105,0.05),transparent)", top: -80, right: -40, pointerEvents: "none" }} />
+          <div className="avoid-break" style={{ background: "#F8FAFC", padding: "28px 32px", position: "relative", overflow: "visible", flexShrink: 0, borderBottom: "1px solid #E2E8F0" }}>
+            <div style={{ position: "absolute", width: 240, height: 240, borderRadius: "50%", background: "radial-gradient(circle,rgba(22, 163, 74, 0.05),transparent)", top: -80, right: -40, pointerEvents: "none" }} />
             <div className="qt-hgrid" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", position: "relative", gap: 20 }}>
               <div>
                 {effectiveLogo ? (
                   <img src={effectiveLogo} alt="logo" style={{ height: 85, borderRadius: 10, marginBottom: 12, objectFit: "contain" }} />
                 ) : (
-                  <div style={{ height: 60, width: 60, background: "var(--app-accent)", borderRadius: 10, marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, fontWeight: 900, color: "#fff" }}>
+                  <div style={{ height: 60, width: 60, background: "var(--app-accent)", borderRadius: 10, marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, fontWeight: 900, color: "#FFFFFF" }}>
                     {effectiveCompanyName[0] || "?"}
                   </div>
                 )}
-                <div style={{ fontSize: 24, fontWeight: 900, color: "#064e3b", textTransform: "uppercase", letterSpacing: 1 }}>{qt.companyName || effectiveCompanyName}</div>
-                {qt.companyEmail && <div style={{ fontSize: 11, color: "#065f46", marginTop: 3 }}>{qt.companyEmail}</div>}
-                {qt.companyPhone && <div style={{ fontSize: 11, color: "#065f46", marginTop: 2 }}>{qt.companyPhone}</div>}
-                {qt.companyAddress && <div style={{ fontSize: 11, color: "#065f46", marginTop: 2 }}>{qt.companyAddress}</div>}
+                <div style={{ fontSize: 24, fontWeight: 900, color: "#1E293B", textTransform: "uppercase", letterSpacing: 1 }}>{qt.companyName || effectiveCompanyName}</div>
+                {qt.companyEmail && <div style={{ fontSize: 11, color: "#1E293B", marginTop: 3 }}>{qt.companyEmail}</div>}
+                {qt.companyPhone && <div style={{ fontSize: 11, color: "#1E293B", marginTop: 2 }}>{qt.companyPhone}</div>}
+                {qt.companyAddress && <div style={{ fontSize: 11, color: "#1E293B", marginTop: 2 }}>{qt.companyAddress}</div>}
               </div>
               <div style={{ textAlign: "right" }}>
-                <div style={{ fontSize: 32, fontWeight: 900, color: "rgba(5,150,105,0.1)", letterSpacing: -2, lineHeight: 1, marginBottom: 4 }}>QUOTATION</div>
+                <div style={{ fontSize: 32, fontWeight: 900, color: "rgba(22, 163, 74, 0.1)", letterSpacing: -2, lineHeight: 1, marginBottom: 4 }}>QUOTATION</div>
                 <div style={{ fontSize: 16, fontWeight: 800, color: "var(--app-accent)" }}>{qt.quoteNo}</div>
-                {qt.refNo && <div style={{ fontSize: 11, color: "#065f46", marginTop: 3 }}>Ref # {qt.refNo}</div>}
+                {qt.refNo && <div style={{ fontSize: 11, color: "#1E293B", marginTop: 3 }}>Ref # {qt.refNo}</div>}
                 <div style={{ marginTop: 14, display: "flex", gap: 20, justifyContent: "flex-end" }}>
                   <div style={{ textAlign: "right" }}>
                     <div style={{ fontSize: 9, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>DATE</div>
-                    <div style={{ fontSize: 12, color: "#064e3b", fontWeight: 700 }}>{formatDate(qt.date)}</div>
+                    <div style={{ fontSize: 12, color: "#1E293B", fontWeight: 700 }}>{formatDate(qt.date)}</div>
                   </div>
                   <div style={{ textAlign: "right" }}>
                     <div style={{ fontSize: 9, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>VALID UNTIL</div>
-                    <div style={{ fontSize: 12, color: "#ea580c", fontWeight: 700 }}>{formatDate(qt.expiryDate)}</div>
+                    <div style={{ fontSize: 12, color: "#64748B", fontWeight: 700 }}>{formatDate(qt.expiryDate)}</div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="qt-btgrid avoid-break" style={{ display: "grid", gridTemplateColumns: qt.project ? "1fr 1fr" : "1fr", borderBottom: "2px solid #f0fdf4", flexShrink: 0 }}>
-            <div style={{ padding: "20px 32px", borderRight: qt.project ? "1px solid #f0fdf4" : "none" }}>
+          <div className="qt-btgrid avoid-break" style={{ display: "grid", gridTemplateColumns: qt.project ? "1fr 1fr" : "1fr", borderBottom: "2px solid #F8FAFC", flexShrink: 0 }}>
+            <div style={{ padding: "20px 32px", borderRight: qt.project ? "1px solid #F8FAFC" : "none" }}>
               <div style={{ fontSize: 9, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 2, marginBottom: 10 }}>PREPARED FOR</div>
-              <div style={{ fontSize: 17, fontWeight: 800, color: "#111827" }}>{qt.client || "—"}</div>
+              <div style={{ fontSize: 17, fontWeight: 800, color: "#0F172A" }}>{qt.client || "—"}</div>
               {selectedClient?.companyName && <div style={{ fontSize: 13, color: "var(--app-accent)", fontWeight: 600, marginTop: 2 }}>{selectedClient.companyName}</div>}
-              {selectedClient?.email && <div style={{ fontSize: 12, color: "#6b7280", marginTop: 5 }}> {selectedClient.email}</div>}
-              {selectedClient?.phone && <div style={{ fontSize: 12, color: "#6b7280", marginTop: 2 }}> {selectedClient.phone}</div>}
+              {selectedClient?.email && <div style={{ fontSize: 12, color: "#64748B", marginTop: 5 }}> {selectedClient.email}</div>}
+              {selectedClient?.phone && <div style={{ fontSize: 12, color: "#64748B", marginTop: 2 }}> {selectedClient.phone}</div>}
               {selectedClient?.gstNumber && <div style={{ fontSize: 12, color: "var(--app-accent)", marginTop: 4, fontWeight: 600 }}> GST: {selectedClient.gstNumber}</div>}
             </div>
             {qt.project && (
               <div style={{ padding: "20px 32px" }}>
                 <div style={{ fontSize: 9, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 2, marginBottom: 10 }}>PROJECT</div>
-                <div style={{ fontSize: 15, fontWeight: 700, color: "#111827" }}>{qt.project}</div>
+                <div style={{ fontSize: 15, fontWeight: 700, color: "#0F172A" }}>{qt.project}</div>
               </div>
             )}
           </div>
@@ -1779,20 +1779,20 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
           <div className="qt-table-wrap" style={{ padding: "22px 32px", overflowX: "auto", flexShrink: 0 }}>
             <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 360 }}>
               <thead>
-                <tr className="avoid-break" style={{ background: "linear-gradient(90deg,#f0fdf4,#f7fffe)" }}>
+                <tr className="avoid-break" style={{ background: "linear-gradient(90deg,#F8FAFC,#F8FAFC)" }}>
                   {["#", "Description", "Qty", "Unit Rate", "Amount"].map((h, i) => (
-                    <th key={i} style={{ padding: "9px 11px", fontSize: 9, fontWeight: 700, color: "var(--app-accent)", letterSpacing: 1.5, borderBottom: "2px solid #d1fae5", textAlign: ["Amount", "Unit Rate", "Qty"].includes(h) ? "right" : "left" }}>{h.toUpperCase()}</th>
+                    <th key={i} style={{ padding: "9px 11px", fontSize: 9, fontWeight: 700, color: "var(--app-accent)", letterSpacing: 1.5, borderBottom: "2px solid #E2E8F0", textAlign: ["Amount", "Unit Rate", "Qty"].includes(h) ? "right" : "left" }}>{h.toUpperCase()}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {items.map((item, idx) => (
-                  <tr key={item.id} className="avoid-break" style={{ borderBottom: "1px solid #f0fdf4" }}>
-                    <td style={{ padding: "12px 11px", color: "#6ee7b7", fontWeight: 700, fontSize: 12 }}>{String(idx + 1).padStart(2, "0")}</td>
-                    <td style={{ padding: "12px 11px", fontSize: 13, fontWeight: 600, color: "#111827" }}>{item.description || "—"}</td>
-                    <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{item.quantity}</td>
-                    <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{formatCurrency(item.rate, qt.currency)}</td>
-                    <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 14, fontWeight: 700, color: "#111827" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), qt.currency)}</td>
+                  <tr key={item.id} className="avoid-break" style={{ borderBottom: "1px solid #F8FAFC" }}>
+                    <td style={{ padding: "12px 11px", color: "#64748B", fontWeight: 700, fontSize: 12 }}>{String(idx + 1).padStart(2, "0")}</td>
+                    <td style={{ padding: "12px 11px", fontSize: 13, fontWeight: 600, color: "#0F172A" }}>{item.description || "—"}</td>
+                    <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#1E293B" }}>{item.quantity}</td>
+                    <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#1E293B" }}>{formatCurrency(item.rate, qt.currency)}</td>
+                    <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 14, fontWeight: 700, color: "#0F172A" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), qt.currency)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -1805,14 +1805,14 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
                   ["Total Amount", formatCurrency(total, qt.currency)],
                   ["Amount Paid", formatCurrency(amountPaid, qt.currency)]
                 ].map(([l, v]) => (
-                  <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid #f0fdf4" }}>
-                    <span style={{ fontSize: 12, color: "#6b7280" }}>{l}</span>
-                    <span style={{ fontSize: 12, fontWeight: 600, color: "#111827" }}>{v}</span>
+                  <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid #F8FAFC" }}>
+                    <span style={{ fontSize: 12, color: "#64748B" }}>{l}</span>
+                    <span style={{ fontSize: 12, fontWeight: 600, color: "#0F172A" }}>{v}</span>
                   </div>
                 ))}
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 16px", background: "#f8fafc", borderRadius: 12, marginTop: 8, border: "1.5px solid #e2e8f0" }}>
-                  <span style={{ fontSize: 13, fontWeight: 800, color: "#64748b" }}>BALANCE DUE</span>
-                  <span style={{ fontSize: 19, fontWeight: 900, color: "#064e3b" }}>{formatCurrency(balanceDue, qt.currency)}</span>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 16px", background: "#F8FAFC", borderRadius: 12, marginTop: 8, border: "1.5px solid #E2E8F0" }}>
+                  <span style={{ fontSize: 13, fontWeight: 800, color: "#64748B" }}>BALANCE DUE</span>
+                  <span style={{ fontSize: 19, fontWeight: 900, color: "#1E293B" }}>{formatCurrency(balanceDue, qt.currency)}</span>
                 </div>
               </div>
             </div>
@@ -1821,44 +1821,44 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
           <div className="avoid-break" style={{ padding: "0 32px 24px", display: "grid", gridTemplateColumns: "1fr auto", gap: 16, alignItems: "flex-start", flexShrink: 0 }}>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {qt.notes && (
-                <div style={{ background: "#f0fdf4", borderRadius: 11, padding: "14px 16px", border: "1px solid #d1fae5" }}>
+                <div style={{ background: "#F8FAFC", borderRadius: 11, padding: "14px 16px", border: "1px solid #E2E8F0" }}>
                   <div style={{ fontSize: 9, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>NOTES</div>
-                  <div style={{ fontSize: 12, color: "#374151", lineHeight: 1.7 }}>{qt.notes}</div>
+                  <div style={{ fontSize: 12, color: "#1E293B", lineHeight: 1.7 }}>{qt.notes}</div>
                 </div>
               )}
               {qt.terms && (
-                <div style={{ background: "#f0fdf4", borderRadius: 11, padding: "14px 16px", border: "1px solid #d1fae5" }}>
+                <div style={{ background: "#F8FAFC", borderRadius: 11, padding: "14px 16px", border: "1px solid #E2E8F0" }}>
                   <div style={{ fontSize: 9, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>TERMS & CONDITIONS</div>
-                  <div style={{ fontSize: 12, color: "#374151", lineHeight: 1.7 }}>{qt.terms}</div>
+                  <div style={{ fontSize: 12, color: "#1E293B", lineHeight: 1.7 }}>{qt.terms}</div>
                 </div>
               )}
               {(qt.upiId || qt.bankName) && (
-                <div style={{ background: "#f8fafc", borderRadius: 11, padding: "14px 16px", border: "1px solid #e2e8f0" }}>
+                <div style={{ background: "#F8FAFC", borderRadius: 11, padding: "14px 16px", border: "1px solid #E2E8F0" }}>
                   <div style={{ fontSize: 9, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}> PAYMENT INSTRUCTIONS</div>
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 20px" }}>
                     {qt.upiId && (
                       <div>
-                        <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700 }}>UPI ID</div>
-                        <div style={{ fontSize: 12, fontWeight: 700, color: "#111827" }}>{qt.upiId}</div>
+                        <div style={{ fontSize: 9, color: "#64748B", fontWeight: 700 }}>UPI ID</div>
+                        <div style={{ fontSize: 12, fontWeight: 700, color: "#0F172A" }}>{qt.upiId}</div>
                       </div>
                     )}
                     {qt.bankName && (
                       <>
                         <div>
-                          <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700 }}>BANK NAME</div>
-                          <div style={{ fontSize: 12, fontWeight: 700, color: "#111827" }}>{qt.bankName}</div>
+                          <div style={{ fontSize: 9, color: "#64748B", fontWeight: 700 }}>BANK NAME</div>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: "#0F172A" }}>{qt.bankName}</div>
                         </div>
                         <div>
-                          <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700 }}>ACCOUNT NAME</div>
-                          <div style={{ fontSize: 12, fontWeight: 700, color: "#111827" }}>{qt.accountName}</div>
+                          <div style={{ fontSize: 9, color: "#64748B", fontWeight: 700 }}>ACCOUNT NAME</div>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: "#0F172A" }}>{qt.accountName}</div>
                         </div>
                         <div>
-                          <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700 }}>ACCOUNT NUMBER</div>
-                          <div style={{ fontSize: 12, fontWeight: 700, color: "#111827", fontFamily: "monospace" }}>{qt.accountNumber}</div>
+                          <div style={{ fontSize: 9, color: "#64748B", fontWeight: 700 }}>ACCOUNT NUMBER</div>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: "#0F172A", fontFamily: "monospace" }}>{qt.accountNumber}</div>
                         </div>
                         <div>
-                          <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700 }}>IFSC CODE</div>
-                          <div style={{ fontSize: 12, fontWeight: 700, color: "#111827", fontFamily: "monospace" }}>{qt.ifscCode}</div>
+                          <div style={{ fontSize: 9, color: "#64748B", fontWeight: 700 }}>IFSC CODE</div>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: "#0F172A", fontFamily: "monospace" }}>{qt.ifscCode}</div>
                         </div>
                       </>
                     )}
@@ -1866,21 +1866,21 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
                 </div>
               )}
             </div>
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", background: "#f0fdf4", borderRadius: 12, padding: "14px 16px", border: "1px solid #d1fae5", minWidth: 110 }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", background: "#F8FAFC", borderRadius: 12, padding: "14px 16px", border: "1px solid #E2E8F0", minWidth: 110 }}>
               <div style={{ fontSize: 8, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 1.5, marginBottom: 8, textAlign: "center" }}>SCAN QUOTE</div>
-              <div style={{ background: "#fff", padding: 6, borderRadius: 8, border: "1px solid #d1fae5" }}>
-                <QRCodeSVG value={qrData} size={88} bgColor="#ffffff" fgColor="#064e3b" />
+              <div style={{ background: "#FFFFFF", padding: 6, borderRadius: 8, border: "1px solid #E2E8F0" }}>
+                <QRCodeSVG value={qrData} size={88} bgColor="#FFFFFF" fgColor="#1E293B" />
               </div>
-              <div style={{ fontSize: 8, color: "#9ca3af", marginTop: 7, textAlign: "center", fontWeight: 600 }}>{qt.quoteNo}</div>
+              <div style={{ fontSize: 8, color: "#64748B", marginTop: 7, textAlign: "center", fontWeight: 600 }}>{qt.quoteNo}</div>
             </div>
           </div>
 
           <div className="flex-spacer" style={{ flex: 1 }} />
 
-          <div style={{ background: "#ffffff", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0, borderTop: "2px solid #f1f5f9", pageBreakBefore: "auto", breakBefore: "auto" }}>
-            <div style={{ fontSize: 11, color: "#6b7280", fontWeight: 600 }}>{effectiveCompanyName}</div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: "#2563eb" }}>{qt.footerMessage}</div>
-            <div style={{ fontSize: 11, color: "#6b7280", fontWeight: 600 }}>{qt.quoteNo}</div>
+          <div style={{ background: "#FFFFFF", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0, borderTop: "2px solid #EFF6FF", pageBreakBefore: "auto", breakBefore: "auto" }}>
+            <div style={{ fontSize: 11, color: "#64748B", fontWeight: 600 }}>{effectiveCompanyName}</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "#2563EB" }}>{qt.footerMessage}</div>
+            <div style={{ fontSize: 11, color: "#64748B", fontWeight: 600 }}>{qt.quoteNo}</div>
           </div>
         </div>
       </div>
@@ -1908,7 +1908,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
         * { box-sizing: border-box; }
-        input:focus,select:focus,textarea:focus { border-color: var(--app-accent) !important; box-shadow: 0 0 0 3px rgba(5,150,105,0.1); }
+        input:focus,select:focus,textarea:focus { border-color: var(--app-accent) !important; box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1); }
         @keyframes shake { 0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)} }
         .shake { animation: shake 0.35s ease; }
         @media (max-width:600px) { .f2col { grid-template-columns:1fr!important; } .f3col { grid-template-columns:1fr 1fr!important; } }
@@ -1921,13 +1921,13 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
         <button onClick={() => setStep("list")} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 13, color: "var(--app-accent)", fontWeight: 700, padding: 0, fontFamily: "inherit" }}> Back</button>
         <div style={{ display: "flex", gap: 8 }}>
-          <button onClick={clearForm} style={{ padding: "8px 14px", background: "#fff", border: "1.5px solid #f3f4f6", borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: "pointer", color: "#6b7280", fontFamily: "inherit" }}>Clear</button>
+          <button onClick={clearForm} style={{ padding: "8px 14px", background: "#FFFFFF", border: "1.5px solid #F8FAFC", borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: "pointer", color: "#64748B", fontFamily: "inherit" }}>Clear</button>
           <button onClick={handleSaveDraft} disabled={!!saving}
-            style={{ padding: "8px 18px", background: draftSaved ? "#22c55e" : "#fff", border: `1.5px solid ${draftSaved ? "#22c55e" : "#e5e7eb"}`, borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: saving ? "not-allowed" : "pointer", color: draftSaved ? "#fff" : "#374151", fontFamily: "inherit", transition: "all 0.3s" }}>
+            style={{ padding: "8px 18px", background: draftSaved ? "#16A34A" : "#FFFFFF", border: `1.5px solid ${draftSaved ? "#16A34A" : "#E2E8F0"}`, borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: saving ? "not-allowed" : "pointer", color: draftSaved ? "#FFFFFF" : "#1E293B", fontFamily: "inherit", transition: "all 0.3s" }}>
             {saving === "draft" ? "Saving…" : draftSaved ? "Success Saved!" : " Save Draft"}
           </button>
           <button onClick={handleSavePreview} disabled={!!saving}
-            style={{ padding: "8px 22px", background: saving === "preview" ? "#9ca3af" : "linear-gradient(135deg,var(--app-accent),var(--app-muted))", border: "none", borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: saving ? "not-allowed" : "pointer", color: "#fff", fontFamily: "inherit" }}>
+            style={{ padding: "8px 22px", background: saving === "preview" ? "#64748B" : "linear-gradient(135deg,var(--app-accent),var(--app-muted))", border: "none", borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: saving ? "not-allowed" : "pointer", color: "#FFFFFF", fontFamily: "inherit" }}>
             {saving === "preview" ? "Saving…" : "Preview "}
           </button>
         </div>
@@ -1936,14 +1936,14 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
 
 
       {/* Quote Details */}
-      <div style={{ background: "#fff", borderRadius: 12, padding: "20px 24px", border: "1px solid #f3f4f6", marginBottom: 12 }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: "#374151", marginBottom: 16 }}>Quotation Details</div>
+      <div style={{ background: "#FFFFFF", borderRadius: 12, padding: "20px 24px", border: "1px solid #F8FAFC", marginBottom: 12 }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: "#1E293B", marginBottom: 16 }}>Quotation Details</div>
         <div className="f2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           <div>
             <label style={lbl}>Quote Number</label>
             <div style={{ display: "flex", gap: 6 }}>
               <input value={qt.quoteNo} onChange={(e) => upd("quoteNo", e.target.value)} style={{ ...inp(), flex: 1 }} />
-              <button onClick={() => upd("quoteNo", generateQuoteNo())} style={{ padding: "0 10px", background: "#f9fafb", border: "1.5px solid #e5e7eb", borderRadius: 8, cursor: "pointer", fontSize: 14, color: "#6b7280", display: "flex", alignItems: "center", justifyContent: "center" }}><i className="ti ti-refresh" style={{ fontSize: 15 }}></i></button>
+              <button onClick={() => upd("quoteNo", generateQuoteNo())} style={{ padding: "0 10px", background: "#F8FAFC", border: "1.5px solid #E2E8F0", borderRadius: 8, cursor: "pointer", fontSize: 14, color: "#64748B", display: "flex", alignItems: "center", justifyContent: "center" }}><i className="ti ti-refresh" style={{ fontSize: 15 }}></i></button>
             </div>
           </div>
           <div>
@@ -1956,18 +1956,18 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
 
 
       {/* Company Name */}
-      <div style={{ background: "#fff", borderRadius: 12, padding: "20px 24px", border: errors.client ? "1.5px solid #fca5a5" : "1px solid #f3f4f6", marginBottom: 12 }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: "#374151", marginBottom: 16 }}>Company & Project</div>
+      <div style={{ background: "#FFFFFF", borderRadius: 12, padding: "20px 24px", border: errors.client ? "1.5px solid #E2E8F0" : "1px solid #F8FAFC", marginBottom: 12 }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: "#1E293B", marginBottom: 16 }}>Company & Project</div>
         <div className="f2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           <div>
-            <label style={{ ...lbl, color: errors.client ? "#ef4444" : "#6b7280" }}>Company Name *</label>
+            <label style={{ ...lbl, color: errors.client ? "#64748B" : "#64748B" }}>Company Name *</label>
             <CompanyDropdown clients={clients} value={qt.client}
               onChange={(val) => { upd("client", val); upd("project", ""); setErrors((p) => { const n = { ...p }; delete n.client; return n; }); }}
               error={errors.client} onAddCompany={onAddClient} />
-            {errors.client && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4, fontWeight: 600 }}>Warning {errors.client}</div>}
+            {errors.client && <div style={{ fontSize: 11, color: "#64748B", marginTop: 4, fontWeight: 600 }}>Warning {errors.client}</div>}
           </div>
           <div>
-            <label style={lbl}>Project <span style={{ color: "#d1d5db" }}></span></label>
+            <label style={lbl}>Project <span style={{ color: "#E2E8F0" }}></span></label>
             <ProjectDropdown projects={filteredProjects} value={qt.project}
               onChange={(val) => upd("project", val)}
               onAddProject={onAddProject}
@@ -1975,22 +1975,22 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
           </div>
         </div>
         {selectedClient && (
-          <div style={{ marginTop: 10, padding: "8px 12px", background: "#f0fdf4", borderRadius: 8, display: "flex", gap: 16, flexWrap: "wrap" }}>
+          <div style={{ marginTop: 10, padding: "8px 12px", background: "#F8FAFC", borderRadius: 8, display: "flex", gap: 16, flexWrap: "wrap" }}>
             {[["", selectedClient.email], ["", selectedClient.phone], ["Location", selectedClient.address], ["", selectedClient.gstNumber]].filter(([, v]) => v).map(([icon, val], i) => (
-              <span key={i} style={{ fontSize: 12, color: "#6b7280" }}>{icon} {val}</span>
+              <span key={i} style={{ fontSize: 12, color: "#64748B" }}>{icon} {val}</span>
             ))}
           </div>
         )}
       </div>
 
       {/* Items */}
-      <div style={{ background: "#fff", borderRadius: 12, padding: "20px 24px", border: "1px solid #f3f4f6", marginBottom: 12 }}>
+      <div style={{ background: "#FFFFFF", borderRadius: 12, padding: "20px 24px", border: "1px solid #F8FAFC", marginBottom: 12 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: "#374151" }}>Items / Services</div>
-          <button onClick={addItem} style={{ padding: "6px 14px", background: "linear-gradient(135deg,var(--app-accent),#10b981)", border: "none", borderRadius: 8, fontWeight: 700, fontSize: 12, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>+ Add Item</button>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "#1E293B" }}>Items / Services</div>
+          <button onClick={addItem} style={{ padding: "6px 14px", background: "linear-gradient(135deg,var(--app-accent),#16A34A)", border: "none", borderRadius: 8, fontWeight: 700, fontSize: 12, cursor: "pointer", color: "#FFFFFF", fontFamily: "inherit" }}>+ Add Item</button>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 80px 110px 36px", gap: 8, paddingBottom: 8, borderBottom: "1px solid #f3f4f6", marginBottom: 8 }}>
-          {["Description", "Qty", `Rate (${qt.currency || "₹"})`, ""].map((h, i) => <div key={i} style={{ fontSize: 11, fontWeight: 700, color: "#9ca3af" }}>{h}</div>)}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 80px 110px 36px", gap: 8, paddingBottom: 8, borderBottom: "1px solid #F8FAFC", marginBottom: 8 }}>
+          {["Description", "Qty", `Rate (${qt.currency || "₹"})`, ""].map((h, i) => <div key={i} style={{ fontSize: 11, fontWeight: 700, color: "#64748B" }}>{h}</div>)}
         </div>
         {items.map((item, idx) => {
           const dErr = errors[`item_${item.id}_description`];
@@ -1999,39 +1999,39 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
             <div key={item.id} style={{ display: "grid", gridTemplateColumns: "1fr 80px 110px 36px", gap: 8, marginBottom: 8, alignItems: "flex-start" }}>
               <div>
                 <input value={item.description} onChange={(e) => updItem(item.id, "description", e.target.value)} placeholder={`Item ${idx + 1} description`} style={{ ...inp(dErr), fontSize: 13 }} />
-                {dErr && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 2 }}>Warning Required</div>}
+                {dErr && <div style={{ fontSize: 11, color: "#64748B", marginTop: 2 }}>Warning Required</div>}
               </div>
               <input type="number" min="1" value={item.quantity} onChange={(e) => updItem(item.id, "quantity", e.target.value)} onWheel={(e) => e.target.blur()} style={{ ...inp(), textAlign: "center", fontSize: 13 }} />
               <div>
                 <input type="number" min="0" value={item.rate} onChange={(e) => updItem(item.id, "rate", e.target.value)} onWheel={(e) => e.target.blur()} placeholder="0.00" style={{ ...inp(rErr), textAlign: "right", fontSize: 13 }} />
-                {rErr && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 2 }}>Warning Required</div>}
+                {rErr && <div style={{ fontSize: 11, color: "#64748B", marginTop: 2 }}>Warning Required</div>}
               </div>
               <button onClick={() => removeItem(item.id)} disabled={items.length === 1}
-                style={{ width: 32, height: 42, borderRadius: 8, background: items.length === 1 ? "#f9fafb" : "#fee2e2", border: "none", cursor: items.length === 1 ? "not-allowed" : "pointer", fontSize: 13, color: items.length === 1 ? "#d1d5db" : "#ef4444", display: "flex", alignItems: "center", justifyContent: "center" }}><i className="ti ti-trash" style={{ fontSize: 15 }}></i></button>
+                style={{ width: 32, height: 42, borderRadius: 8, background: items.length === 1 ? "#F8FAFC" : "#E2E8F0", border: "none", cursor: items.length === 1 ? "not-allowed" : "pointer", fontSize: 13, color: items.length === 1 ? "#E2E8F0" : "#64748B", display: "flex", alignItems: "center", justifyContent: "center" }}><i className="ti ti-trash" style={{ fontSize: 15 }}></i></button>
             </div>
           );
         })}
         <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 16 }}>
           <div style={{ minWidth: 220 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: "1px solid #f3f4f6" }}>
-              <span style={{ fontSize: 13, color: "#6b7280" }}>Subtotal</span>
+            <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: "1px solid #F8FAFC" }}>
+              <span style={{ fontSize: 13, color: "#64748B" }}>Subtotal</span>
               <span style={{ fontSize: 13, fontWeight: 600 }}>{formatCurrency(subtotal, qt.currency)}</span>
             </div>
-            <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: "1px solid #f3f4f6" }}>
-              <span style={{ fontSize: 13, color: "#6b7280" }}>GST ({qt.gstRate}%){qt.isGstIncluded ? " (Incl.)" : ""}</span>
+            <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: "1px solid #F8FAFC" }}>
+              <span style={{ fontSize: 13, color: "#64748B" }}>GST ({qt.gstRate}%){qt.isGstIncluded ? " (Incl.)" : ""}</span>
               <span style={{ fontSize: 13, fontWeight: 600 }}>{formatCurrency(gstAmt, qt.currency)}</span>
             </div>
-            <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 14px", background: "linear-gradient(135deg,#064e3b,var(--app-accent))", borderRadius: 10, marginTop: 8 }}>
-              <span style={{ fontSize: 14, fontWeight: 800, color: "#d1fae5" }}>Total</span>
-              <span style={{ fontSize: 18, fontWeight: 900, color: "#fff" }}>{formatCurrency(total, qt.currency)}</span>
+            <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 14px", background: "linear-gradient(135deg,#1E293B,var(--app-accent))", borderRadius: 10, marginTop: 8 }}>
+              <span style={{ fontSize: 14, fontWeight: 800, color: "#E2E8F0" }}>Total</span>
+              <span style={{ fontSize: 18, fontWeight: 900, color: "#FFFFFF" }}>{formatCurrency(total, qt.currency)}</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* Notes & Terms */}
-      <div style={{ background: "#fff", borderRadius: 12, padding: "20px 24px", border: "1px solid #f3f4f6", marginBottom: 12 }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: "#374151", marginBottom: 16 }}>Notes & Terms <span style={{ color: "#d1d5db", fontWeight: 500 }}></span></div>
+      <div style={{ background: "#FFFFFF", borderRadius: 12, padding: "20px 24px", border: "1px solid #F8FAFC", marginBottom: 12 }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: "#1E293B", marginBottom: 16 }}>Notes & Terms <span style={{ color: "#E2E8F0", fontWeight: 500 }}></span></div>
         <div className="f2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           <div>
             <label style={lbl}>Notes</label>
@@ -2049,11 +2049,11 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
       {/* Bottom buttons */}
       <div style={{ display: "flex", gap: 10, marginBottom: 32 }}>
         <button onClick={handleSaveDraft} disabled={!!saving}
-          style={{ padding: "13px", background: draftSaved ? "#22c55e" : "#fff", border: `1.5px solid ${draftSaved ? "#22c55e" : "#e5e7eb"}`, borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: saving ? "not-allowed" : "pointer", color: draftSaved ? "#fff" : "#374151", fontFamily: "inherit", transition: "all 0.3s" }}>
+          style={{ padding: "13px", background: draftSaved ? "#16A34A" : "#FFFFFF", border: `1.5px solid ${draftSaved ? "#16A34A" : "#E2E8F0"}`, borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: saving ? "not-allowed" : "pointer", color: draftSaved ? "#FFFFFF" : "#1E293B", fontFamily: "inherit", transition: "all 0.3s" }}>
           {saving === "draft" ? "Saving…" : draftSaved ? "Success Saved as Draft!" : " Save Draft"}
         </button>
         <button onClick={handleSavePreview} disabled={!!saving}
-          style={{ padding: "13px", background: saving === "preview" ? "#9ca3af" : "linear-gradient(135deg,#064e3b,var(--app-accent))", border: "none", borderRadius: 12, fontWeight: 800, fontSize: 15, cursor: saving ? "not-allowed" : "pointer", color: "#fff", fontFamily: "inherit" }}>
+          style={{ padding: "13px", background: saving === "preview" ? "#64748B" : "linear-gradient(135deg,#1E293B,var(--app-accent))", border: "none", borderRadius: 12, fontWeight: 800, fontSize: 15, cursor: saving ? "not-allowed" : "pointer", color: "#FFFFFF", fontFamily: "inherit" }}>
           {saving === "preview" ? "Saving…" : "Preview & Print "}
         </button>
       </div>
@@ -2062,8 +2062,8 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
 
   if (isMobileFormView) {
     return (
-      <div style={{ position: "fixed", inset: 0, zIndex: 999999, background: "rgba(15,28,46,0.55)", padding: "20px 12px", display: "flex", alignItems: "center", justifyContent: "center" }} onClick={() => { if (onBackOverride) onBackOverride(); else setStep("list"); }}>
-        <div onClick={(e) => e.stopPropagation()} style={{ background: "#fff", borderRadius: 16, overflow: "hidden", maxWidth: 830, width: "100%", maxHeight: "calc(100vh - 32px)", boxShadow: "0 32px 80px rgba(0,0,0,0.3)", display: "flex", flexDirection: "column" }}>
+      <div style={{ position: "fixed", inset: 0, zIndex: 999999, background: "rgba(15, 23, 42, 0.55)", padding: "20px 12px", display: "flex", alignItems: "center", justifyContent: "center" }} onClick={() => { if (onBackOverride) onBackOverride(); else setStep("list"); }}>
+        <div onClick={(e) => e.stopPropagation()} style={{ background: "#FFFFFF", borderRadius: 16, overflow: "hidden", maxWidth: 830, width: "100%", maxHeight: "calc(100vh - 32px)", boxShadow: "0 32px 80px rgba(0,0,0,0.3)", display: "flex", flexDirection: "column" }}>
           <div style={{ overflowY: "auto", padding: "16px" }}>
             {formInner}
           </div>

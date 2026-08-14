@@ -80,23 +80,23 @@ const formatCurrency = (amount, currency = 'INR') => {
 
 const getStatusColor = (status) => {
 const colors = {
-      completed: '#22C55E',
-      pending: '#F59E0B',
-      failed: '#EF4444',
-      refunded: '#3B82F6',
-      cancelled: '#6B7280'
+      completed: '#16A34A',
+      pending: '#64748B',
+      failed: '#64748B',
+      refunded: '#2563EB',
+      cancelled: '#64748B'
     };
-    return colors[status] || '#6B7280';
+    return colors[status] || '#64748B';
   };
 
 const getTypeColor = (type) => {
 const colors = {
-      subscription: '#8B5CF6',
-      invoice: '#10B981',
-      quotation: '#F59E0B',
-      other: '#6B7280'
+      subscription: '#2563EB',
+      invoice: '#16A34A',
+      quotation: '#64748B',
+      other: '#64748B'
     };
-    return colors[type] || '#6B7280';
+    return colors[type] || '#64748B';
   };
 
   if (loading) {
@@ -104,7 +104,7 @@ const colors = {
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: 60 }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: 32, marginBottom: 12 }}>        </div>
-          <div style={{ color: '#666', fontSize: 14 }}>Loading payment data...</div>
+          <div style={{ color: '#64748B', fontSize: 14 }}>Loading payment data...</div>
         </div>
       </div>
     );
@@ -113,7 +113,7 @@ const colors = {
   return (
     <div style={{ padding: 20 }}>
       <div style={{ marginBottom: 30 }}>
-        <h2 style={{ margin: '0 0 20px 0', color: '#1e293b', fontSize: 28 }}>
+        <h2 style={{ margin: '0 0 20px 0', color: '#1E293B', fontSize: 28 }}>
           Payment Management
         </h2>
         
@@ -126,7 +126,7 @@ const colors = {
             marginBottom: 30
           }}>
             <div style={{
-              background: 'linear-gradient(135deg, #22C55E, #16a34a)',
+              background: 'linear-gradient(135deg, #16A34A, #16A34A)',
               color: 'white',
               padding: 20,
               borderRadius: 12,
@@ -139,7 +139,7 @@ const colors = {
             </div>
             
             <div style={{
-              background: 'linear-gradient(135deg, #3B82F6, #2563eb)',
+              background: 'linear-gradient(135deg, #2563EB, #2563EB)',
               color: 'white',
               padding: 20,
               borderRadius: 12,
@@ -152,7 +152,7 @@ const colors = {
             </div>
             
             <div style={{
-              background: 'linear-gradient(135deg, #8B5CF6, var(--app-accent))',
+              background: 'linear-gradient(135deg, #2563EB, var(--app-accent))',
               color: 'white',
               padding: 20,
               borderRadius: 12,
@@ -165,7 +165,7 @@ const colors = {
             </div>
             
             <div style={{
-              background: 'linear-gradient(135deg, #F59E0B, #d97706)',
+              background: 'linear-gradient(135deg, #64748B, #64748B)',
               color: 'white',
               padding: 20,
               borderRadius: 12,
@@ -185,16 +185,16 @@ const colors = {
           gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
           gap: 16,
           padding: 20,
-          background: '#f8fafc',
+          background: '#F8FAFC',
           borderRadius: 12,
-          border: '1px solid #e2e8f0'
+          border: '1px solid #E2E8F0'
         }}>
           <select
             value={filter.status}
             onChange={(e) => setFilter({ ...filter, status: e.target.value })}
             style={{
               padding: '10px 12px',
-              border: '1px solid #d1d5db',
+              border: '1px solid #E2E8F0',
               borderRadius: 8,
               fontSize: 14
             }}
@@ -212,7 +212,7 @@ const colors = {
             onChange={(e) => setFilter({ ...filter, type: e.target.value })}
             style={{
               padding: '10px 12px',
-              border: '1px solid #d1d5db',
+              border: '1px solid #E2E8F0',
               borderRadius: 8,
               fontSize: 14
             }}
@@ -231,7 +231,7 @@ const colors = {
             onChange={(e) => setFilter({ ...filter, userId: e.target.value })}
             style={{
               padding: '10px 12px',
-              border: '1px solid #d1d5db',
+              border: '1px solid #E2E8F0',
               borderRadius: 8,
               fontSize: 14
             }}
@@ -241,7 +241,7 @@ const colors = {
             onClick={() => setFilter({ status: '', type: '', userId: '', page: 1 })}
             style={{
               padding: '10px 16px',
-              background: '#6b7280',
+              background: '#64748B',
               color: 'white',
               border: 'none',
               borderRadius: 8,
@@ -256,12 +256,12 @@ const colors = {
 
       {error && (
         <div style={{
-          background: '#fef2f2',
-          color: '#dc2626',
+          background: '#F8FAFC',
+          color: '#64748B',
           padding: 16,
           borderRadius: 8,
           marginBottom: 20,
-          border: '1px solid #fecaca'
+          border: '1px solid #E2E8F0'
         }}>
           {error}
         </div>
@@ -271,15 +271,15 @@ const colors = {
       <div style={{
         background: 'white',
         borderRadius: 12,
-        border: '1px solid #e2e8f0',
+        border: '1px solid #E2E8F0',
         overflow: 'hidden'
       }}>
         <div style={{
           padding: 20,
-          borderBottom: '1px solid #e2e8f0',
-          background: '#f8fafc'
+          borderBottom: '1px solid #E2E8F0',
+          background: '#F8FAFC'
         }}>
-          <h3 style={{ margin: 0, color: '#1e293b', fontSize: 18 }}>
+          <h3 style={{ margin: 0, color: '#1E293B', fontSize: 18 }}>
             All Payments ({payments.length})
           </h3>
         </div>
@@ -288,7 +288,7 @@ const colors = {
           <div style={{
             textAlign: 'center',
             padding: 60,
-            color: '#6b7280'
+            color: '#64748B'
           }}>
             <div style={{ fontSize: 48, marginBottom: 16 }}>        </div>
             <p>No payments found</p>
@@ -297,89 +297,89 @@ const colors = {
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
-                <tr style={{ background: '#f8fafc' }}>
+                <tr style={{ background: '#F8FAFC' }}>
                   <th style={{
                     padding: '12px 16px',
                     textAlign: 'left',
                     fontWeight: 600,
-                    color: '#374151',
+                    color: '#1E293B',
                     fontSize: 12,
                     textTransform: 'uppercase',
-                    borderBottom: '1px solid #e5e7eb'
+                    borderBottom: '1px solid #E2E8F0'
                   }}>Payment ID</th>
                   <th style={{
                     padding: '12px 16px',
                     textAlign: 'left',
                     fontWeight: 600,
-                    color: '#374151',
+                    color: '#1E293B',
                     fontSize: 12,
                     textTransform: 'uppercase',
-                    borderBottom: '1px solid #e5e7eb'
+                    borderBottom: '1px solid #E2E8F0'
                   }}>User</th>
                   <th style={{
                     padding: '12px 16px',
                     textAlign: 'left',
                     fontWeight: 600,
-                    color: '#374151',
+                    color: '#1E293B',
                     fontSize: 12,
                     textTransform: 'uppercase',
-                    borderBottom: '1px solid #e5e7eb'
+                    borderBottom: '1px solid #E2E8F0'
                   }}>Amount</th>
                   <th style={{
                     padding: '12px 16px',
                     textAlign: 'left',
                     fontWeight: 600,
-                    color: '#374151',
+                    color: '#1E293B',
                     fontSize: 12,
                     textTransform: 'uppercase',
-                    borderBottom: '1px solid #e5e7eb'
+                    borderBottom: '1px solid #E2E8F0'
                   }}>Type</th>
                   <th style={{
                     padding: '12px 16px',
                     textAlign: 'left',
                     fontWeight: 600,
-                    color: '#374151',
+                    color: '#1E293B',
                     fontSize: 12,
                     textTransform: 'uppercase',
-                    borderBottom: '1px solid #e5e7eb'
+                    borderBottom: '1px solid #E2E8F0'
                   }}>Method</th>
                   <th style={{
                     padding: '12px 16px',
                     textAlign: 'left',
                     fontWeight: 600,
-                    color: '#374151',
+                    color: '#1E293B',
                     fontSize: 12,
                     textTransform: 'uppercase',
-                    borderBottom: '1px solid #e5e7eb'
+                    borderBottom: '1px solid #E2E8F0'
                   }}>Status</th>
                   <th style={{
                     padding: '12px 16px',
                     textAlign: 'left',
                     fontWeight: 600,
-                    color: '#374151',
+                    color: '#1E293B',
                     fontSize: 12,
                     textTransform: 'uppercase',
-                    borderBottom: '1px solid #e5e7eb'
+                    borderBottom: '1px solid #E2E8F0'
                   }}>Date</th>
                   <th style={{
                     padding: '12px 16px',
                     textAlign: 'left',
                     fontWeight: 600,
-                    color: '#374151',
+                    color: '#1E293B',
                     fontSize: 12,
                     textTransform: 'uppercase',
-                    borderBottom: '1px solid #e5e7eb'
+                    borderBottom: '1px solid #E2E8F0'
                   }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {payments.map((payment) => (
-                  <tr key={payment._id} style={{ borderBottom: '1px solid #f3f4f6' }}>
+                  <tr key={payment._id} style={{ borderBottom: '1px solid #F8FAFC' }}>
                     <td style={{
                       padding: '12px 16px',
                       fontSize: 13,
                       fontFamily: 'monospace',
-                      color: '#6b7280'
+                      color: '#64748B'
                     }}>
                       {payment.paymentId}
                     </td>
@@ -388,10 +388,10 @@ const colors = {
                       fontSize: 13
                     }}>
                       <div>
-                        <div style={{ fontWeight: 600, color: '#1f2937' }}>
+                        <div style={{ fontWeight: 600, color: '#1E293B' }}>
                           {payment.userEmail}
                         </div>
-                        <div style={{ fontSize: 11, color: '#6b7280' }}>
+                        <div style={{ fontSize: 11, color: '#64748B' }}>
                           ID: {payment.userId?.slice(0, 8)}...
                         </div>
                       </div>
@@ -400,7 +400,7 @@ const colors = {
                       padding: '12px 16px',
                       fontSize: 13,
                       fontWeight: 600,
-                      color: '#059669'
+                      color: '#16A34A'
                     }}>
                       {formatCurrency(payment.amount, payment.currency)}
                     </td>
@@ -423,7 +423,7 @@ const colors = {
                     <td style={{
                       padding: '12px 16px',
                       fontSize: 13,
-                      color: '#6b7280',
+                      color: '#64748B',
                       textTransform: 'capitalize'
                     }}>
                       {payment.paymentMethod}
@@ -447,7 +447,7 @@ const colors = {
                     <td style={{
                       padding: '12px 16px',
                       fontSize: 13,
-                      color: '#6b7280'
+                      color: '#64748B'
                     }}>
                       {formatDate(payment.paymentDate)}
                     </td>
@@ -462,7 +462,7 @@ const colors = {
                         }}
                         style={{
                           padding: '6px 12px',
-                          background: '#3b82f6',
+                          background: '#2563EB',
                           color: 'white',
                           border: 'none',
                           borderRadius: 6,
@@ -501,18 +501,18 @@ const colors = {
             maxWidth: 500,
             padding: 24
           }}>
-            <h3 style={{ margin: '0 0 20px 0', color: '#1e293b' }}>
+            <h3 style={{ margin: '0 0 20px 0', color: '#1E293B' }}>
               Update Payment Status
             </h3>
             
             <div style={{ marginBottom: 20 }}>
-              <p style={{ fontSize: 14, color: '#6b7280', marginBottom: 8 }}>
+              <p style={{ fontSize: 14, color: '#64748B', marginBottom: 8 }}>
                 Payment ID: <strong>{selectedPayment.paymentId}</strong>
               </p>
-              <p style={{ fontSize: 14, color: '#6b7280', marginBottom: 8 }}>
+              <p style={{ fontSize: 14, color: '#64748B', marginBottom: 8 }}>
                 Amount: <strong>{formatCurrency(selectedPayment.amount, selectedPayment.currency)}</strong>
               </p>
-              <p style={{ fontSize: 14, color: '#6b7280', marginBottom: 8 }}>
+              <p style={{ fontSize: 14, color: '#64748B', marginBottom: 8 }}>
                 Current Status: <strong>{selectedPayment.status}</strong>
               </p>
             </div>
@@ -527,7 +527,7 @@ const colors = {
                 style={{
                   width: '100%',
                   padding: '10px 12px',
-                  border: '1px solid #d1d5db',
+                  border: '1px solid #E2E8F0',
                   borderRadius: 8,
                   fontSize: 14
                 }}
@@ -552,7 +552,7 @@ const colors = {
                 }}
                 style={{
                   padding: '10px 20px',
-                  background: '#6b7280',
+                  background: '#64748B',
                   color: 'white',
                   border: 'none',
                   borderRadius: 8,
@@ -569,7 +569,7 @@ const colors = {
                 }}
                 style={{
                   padding: '10px 20px',
-                  background: '#3b82f6',
+                  background: '#2563EB',
                   color: 'white',
                   border: 'none',
                   borderRadius: 8,

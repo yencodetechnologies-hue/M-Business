@@ -31,7 +31,7 @@ async function downloadReceiptPdf(invoice, clientName, agencyName) {
     margin: 10,
     filename: `Receipt-${invoice.invoiceNo || "invoice"}.pdf`,
     image: { type: "jpeg", quality: 0.98 },
-    html2canvas: { scale: 2, backgroundColor: "#ffffff" },
+    html2canvas: { scale: 2, backgroundColor: "#FFFFFF" },
     jsPDF: { unit: "mm", format: "a5", orientation: "portrait" },
   };
   try {
@@ -43,30 +43,30 @@ async function downloadReceiptPdf(invoice, clientName, agencyName) {
 }
 // ── Teal Theme Colors --------------------      ----------------------
 const C = {
-  bg: "#F3F8F9",
+  bg: "#F8FAFC",
   surface: "#FFFFFF",
-  surface2: "#F8FAFB",
-  border: "#DFF0F2",
+  surface2: "#F8FAFC",
+  border: "#E2E8F0",
   border2: "#E2E8F0",
-  text: "#0D2027",
-  text2: "#4E6B75",
-  text3: "#96B0B8",
+  text: "#0F172A",
+  text2: "#64748B",
+  text3: "#64748B",
   teal: " var(--app-accent, var(--app-accent, #2563EB))",
   teal2: "var(--app-accent2, #2563EB)",
-  teal3: "#006E7F",
+  teal3: "#16A34A",
   tealLight: "var(--teal-light, var(--teal-light, #EFF6FF))",
   tealLighter: "var(--teal-lighter, #EFF6FF)",
-  tealMid: "rgba(37, 99, 235,.12)",
-  green: "#1DB87A",
-  greenBg: "#E3FAF0",
-  amber: "#F59E0B",
-  amberBg: "#FEF3C7",
-  red: "#EF4444",
-  redBg: "#FEF2F2",
+  tealMid: "rgba(37, 99, 235, .12)",
+  green: "#16A34A",
+  greenBg: "#E2E8F0",
+  amber: "#64748B",
+  amberBg: "#E2E8F0",
+  red: "#64748B",
+  redBg: "#F8FAFC",
   purple: "#2563EB",
   purpleBg: "#EFF6FF",
   blue: "#2563EB",
-  blueBg: "#EFF4FF",
+  blueBg: "#EFF6FF",
 };
 
 // Load Nunito Font + Tabler Icons
@@ -121,7 +121,7 @@ function ProposalViewerModal({ proposal, clientName, BASE_URL, onClose, onSigned
     cv.width = rect.width || 500;
     cv.height = 150;
     const ctx = cv.getContext("2d");
-    ctx.strokeStyle = "#1e293b";
+    ctx.strokeStyle = "#1E293B";
     ctx.lineWidth = 2.5;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
@@ -201,36 +201,36 @@ function ProposalViewerModal({ proposal, clientName, BASE_URL, onClose, onSigned
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.6)", display: "flex", flexDirection: "column" }}>
       {/* Top bar */}
-      <div style={{ background: "#fff", borderBottom: "1px solid #e2e8f0", padding: "12px 24px", display: "flex", alignItems: "center", gap: 16, flexShrink: 0 }}>
-        <button onClick={onClose} style={{ background: "#eff6ff", border: "1.5px solid #e2e8f0", borderRadius: 8, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", color: " var(--app-accent, var(--app-accent, #2563EB))", display: "flex", alignItems: "center", gap: 6 }}>
+      <div style={{ background: "#FFFFFF", borderBottom: "1px solid #E2E8F0", padding: "12px 24px", display: "flex", alignItems: "center", gap: 16, flexShrink: 0 }}>
+        <button onClick={onClose} style={{ background: "#EFF6FF", border: "1.5px solid #E2E8F0", borderRadius: 8, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", color: " var(--app-accent, var(--app-accent, #2563EB))", display: "flex", alignItems: "center", gap: 6 }}>
           <i className="ti ti-arrow-left"></i> Back
         </button>
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 15, fontWeight: 800, color: "#0D2027" }}>{prop.title || "Proposal"}</div>
-          <div style={{ fontSize: 11, color: "#96B0B8" }}>
+          <div style={{ fontSize: 15, fontWeight: 800, color: "#0F172A" }}>{prop.title || "Proposal"}</div>
+          <div style={{ fontSize: 11, color: "#64748B" }}>
             {prop.client || prop.clientName} · {prop.sentAt ? new Date(prop.sentAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : ""}
           </div>
         </div>
         {(st === "approved" || st === "rejected") && (
-          <span style={{ background: st === "approved" ? "#DCFCE7" : "#FEE2E2", color: st === "approved" ? "#15803D" : "#DC2626", borderRadius: 20, padding: "4px 14px", fontSize: 11, fontWeight: 800 }}>
+          <span style={{ background: st === "approved" ? "#E2E8F0" : "#E2E8F0", color: st === "approved" ? "#16A34A" : "#64748B", borderRadius: 20, padding: "4px 14px", fontSize: 11, fontWeight: 800 }}>
             {st.charAt(0).toUpperCase() + st.slice(1)}
           </span>
         )}
-        <button onClick={() => printProposal(proposal)} style={{ background: "#eff6ff", border: "1.5px solid #e2e8f0", borderRadius: 8, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", color: " var(--app-accent, var(--app-accent, #2563EB))", display: "flex", alignItems: "center", gap: 6 }}>
+        <button onClick={() => printProposal(proposal)} style={{ background: "#EFF6FF", border: "1.5px solid #E2E8F0", borderRadius: 8, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", color: " var(--app-accent, var(--app-accent, #2563EB))", display: "flex", alignItems: "center", gap: 6 }}>
           <i className="ti ti-printer"></i> Print / PDF
         </button>
-        <button onClick={() => shareProposalAsPDF(proposal, agencyName, null)} style={{ background: " var(--app-accent, var(--app-accent, #2563EB))", border: "none", borderRadius: 8, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", color: "#fff", display: "flex", alignItems: "center", gap: 6 }}>
+        <button onClick={() => shareProposalAsPDF(proposal, agencyName, null)} style={{ background: " var(--app-accent, var(--app-accent, #2563EB))", border: "none", borderRadius: 8, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", color: "#FFFFFF", display: "flex", alignItems: "center", gap: 6 }}>
           <i className="ti ti-share"></i> Share PDF
         </button>
       </div>
 
       {/* Body */}
-      <div style={{ flex: 1, overflowY: "auto", background: "#f8fafc", padding: "24px" }}>
+      <div style={{ flex: 1, overflowY: "auto", background: "#F8FAFC", padding: "24px" }}>
         <div style={{ maxWidth: 900, margin: "0 auto", display: "flex", flexDirection: "column", gap: 20 }}>
 
           {/* Canvas-based proposal — show read-only canvas, same as admin side */}
           {prop.format === "canvas" && prop.canvasElements && prop.canvasElements.length > 0 ? (
-            <div style={{ background: '#fff', borderRadius: 14, border: '1.5px solid #e2e8f0', overflow: 'hidden' }}>
+            <div style={{ background: '#FFFFFF', borderRadius: 14, border: '1.5px solid #E2E8F0', overflow: 'hidden' }}>
               <CanvasProposalEditor
                 isPreviewMode={true}
                 proposalData={prop}
@@ -239,7 +239,7 @@ function ProposalViewerModal({ proposal, clientName, BASE_URL, onClose, onSigned
           ) : prop.html ? (
             <>
               <style>{PROPOSAL_PREVIEW_CSS}</style>
-              <div className="prop-doc" style={{ background: "#fff", borderRadius: 14, border: "1.5px solid #e2e8f0", boxShadow: "0 2px 12px rgba(0,0,0,0.06)", maxHeight: "none", overflow: "visible" }}
+              <div className="prop-doc" style={{ background: "#FFFFFF", borderRadius: 14, border: "1.5px solid #E2E8F0", boxShadow: "0 2px 12px rgba(0,0,0,0.06)", maxHeight: "none", overflow: "visible" }}
                 dangerouslySetInnerHTML={{
                   __html: (() => {
                     const div = document.createElement("div");
@@ -252,43 +252,43 @@ function ProposalViewerModal({ proposal, clientName, BASE_URL, onClose, onSigned
                   })()
                 }} />
             </>) : prop.slides && prop.slides.length > 0 ? (
-              <div style={{ background: "#fff", borderRadius: 14, border: "1.5px solid #e2e8f0", padding: "32px 40px", boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}>
+              <div style={{ background: "#FFFFFF", borderRadius: 14, border: "1.5px solid #E2E8F0", padding: "32px 40px", boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}>
                 {/* Slide-based proposal summary */}
                 <div style={{ textAlign: "center", marginBottom: 28 }}>
-                  <div style={{ fontSize: 28, fontWeight: 900, color: "#0D2027", marginBottom: 6 }}>{prop.title}</div>
+                  <div style={{ fontSize: 28, fontWeight: 900, color: "#0F172A", marginBottom: 6 }}>{prop.title}</div>
                   <div style={{ fontSize: 14, color: "#64748B" }}>Prepared for {prop.client || prop.clientName}</div>
-                  <div style={{ fontSize: 13, color: "#96B0B8", marginTop: 4 }}>
+                  <div style={{ fontSize: 13, color: "#64748B", marginTop: 4 }}>
                     {prop.sentAt ? new Date(prop.sentAt).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" }) : ""}
                   </div>
                 </div>
                 <div style={{ borderTop: "2px solid  var(--app-accent, var(--app-accent, #2563EB))", marginBottom: 24 }}></div>
                 {prop.slides.map((slide, si) => (
-                  <div key={si} style={{ marginBottom: 20, padding: "16px 20px", background: "#f8fafc", borderRadius: 10, border: "1px solid #e2e8f0" }}>
+                  <div key={si} style={{ marginBottom: 20, padding: "16px 20px", background: "#F8FAFC", borderRadius: 10, border: "1px solid #E2E8F0" }}>
                     <div style={{ fontSize: 13, fontWeight: 800, color: " var(--app-accent, var(--app-accent, #2563EB))", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>{slide.type}</div>
-                    {slide.heading && <div style={{ fontSize: 16, fontWeight: 700, color: "#0D2027", marginBottom: 4 }}>{slide.heading}</div>}
-                    {slide.title && <div style={{ fontSize: 16, fontWeight: 700, color: "#0D2027", marginBottom: 4 }}>{slide.title}</div>}
-                    {slide.body && <div style={{ fontSize: 13, color: "#4E6B75", lineHeight: 1.7 }}>{slide.body}</div>}
-                    {slide.subtitle && <div style={{ fontSize: 13, color: "#4E6B75" }}>{slide.subtitle}</div>}
+                    {slide.heading && <div style={{ fontSize: 16, fontWeight: 700, color: "#0F172A", marginBottom: 4 }}>{slide.heading}</div>}
+                    {slide.title && <div style={{ fontSize: 16, fontWeight: 700, color: "#0F172A", marginBottom: 4 }}>{slide.title}</div>}
+                    {slide.body && <div style={{ fontSize: 13, color: "#64748B", lineHeight: 1.7 }}>{slide.body}</div>}
+                    {slide.subtitle && <div style={{ fontSize: 13, color: "#64748B" }}>{slide.subtitle}</div>}
                     {slide.items && slide.items.map((item, ii) => (
-                      <div key={ii} style={{ fontSize: 13, color: "#4E6B75", padding: "4px 0", borderBottom: "1px solid #e2e8f0" }}>Yes {item}</div>
+                      <div key={ii} style={{ fontSize: 13, color: "#64748B", padding: "4px 0", borderBottom: "1px solid #E2E8F0" }}>Yes {item}</div>
                     ))}
                     {slide.rows && slide.rows.map((row, ri) => (
-                      <div key={ri} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, padding: "4px 0", borderBottom: "1px solid #e2e8f0" }}>
+                      <div key={ri} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, padding: "4px 0", borderBottom: "1px solid #E2E8F0" }}>
                         <span>{row.item}</span><span style={{ fontWeight: 700 }}>{row.cost}</span>
                       </div>
                     ))}
                     {slide.total && <div style={{ fontSize: 14, fontWeight: 800, color: " var(--app-accent, var(--app-accent, #2563EB))", marginTop: 8 }}>Total: {slide.total}</div>}
                     {slide.phases && slide.phases.map((ph, pi) => (
-                      <div key={pi} style={{ fontSize: 13, color: "#4E6B75", padding: "3px 0" }}>Phase {pi + 1}: {ph.label} — {ph.dur}</div>
+                      <div key={pi} style={{ fontSize: 13, color: "#64748B", padding: "3px 0" }}>Phase {pi + 1}: {ph.label} — {ph.dur}</div>
                     ))}
                     {slide.members && slide.members.map((m, mi) => (
-                      <div key={mi} style={{ fontSize: 13, color: "#4E6B75", padding: "3px 0" }}>{m.name} — {m.role}</div>
+                      <div key={mi} style={{ fontSize: 13, color: "#64748B", padding: "3px 0" }}>{m.name} — {m.role}</div>
                     ))}
                   </div>
                 ))}
               </div>
             ) : (
-            <div style={{ background: "#fff", borderRadius: 14, border: "1.5px solid #e2e8f0", padding: 40, textAlign: "center", color: "#96B0B8" }}>
+            <div style={{ background: "#FFFFFF", borderRadius: 14, border: "1.5px solid #E2E8F0", padding: 40, textAlign: "center", color: "#64748B" }}>
               No proposal content available.
             </div>
           )}
@@ -297,19 +297,19 @@ function ProposalViewerModal({ proposal, clientName, BASE_URL, onClose, onSigned
 
           {/* Signature box — show only if not yet signed */}
           {!prop.clientSignature && !saved && (
-            <div style={{ background: "#fff", borderRadius: 14, border: "2px solid  var(--app-accent, var(--app-accent, #2563EB))", padding: "24px 28px", boxShadow: "0 4px 20px rgba(37, 99, 235,0.1)" }}>
-              <div style={{ fontSize: 15, fontWeight: 800, color: "#0D2027", marginBottom: 4 }}>
+            <div style={{ background: "#FFFFFF", borderRadius: 14, border: "2px solid  var(--app-accent, var(--app-accent, #2563EB))", padding: "24px 28px", boxShadow: "0 4px 20px rgba(37, 99, 235, 0.1)" }}>
+              <div style={{ fontSize: 15, fontWeight: 800, color: "#0F172A", marginBottom: 4 }}>
                 <i className="ti ti-writing" style={{ color: " var(--app-accent, var(--app-accent, #2563EB))", marginRight: 8 }}></i>
                 Awaiting Client Signature
               </div>
-              <div style={{ fontSize: 12, color: "#96B0B8", marginBottom: 18 }}>
+              <div style={{ fontSize: 12, color: "#64748B", marginBottom: 18 }}>
                 Please sign below to accept this proposal. Your signature confirms agreement to the terms outlined.
               </div>
 
               {/* Tabs */}
-              <div style={{ display: "flex", gap: 4, background: "#f8fafc", borderRadius: 10, padding: 4, marginBottom: 16, width: "fit-content" }}>
+              <div style={{ display: "flex", gap: 4, background: "#F8FAFC", borderRadius: 10, padding: 4, marginBottom: 16, width: "fit-content" }}>
                 {["draw", "type"].map(mode => (
-                  <button key={mode} onClick={() => setSigMode(mode)} style={{ padding: "6px 16px", borderRadius: 8, border: "none", fontWeight: 700, fontSize: 12, cursor: "pointer", background: sigMode === mode ? " var(--app-accent, var(--app-accent, #2563EB))" : "transparent", color: sigMode === mode ? "#fff" : "#64748B" }}>
+                  <button key={mode} onClick={() => setSigMode(mode)} style={{ padding: "6px 16px", borderRadius: 8, border: "none", fontWeight: 700, fontSize: 12, cursor: "pointer", background: sigMode === mode ? " var(--app-accent, var(--app-accent, #2563EB))" : "transparent", color: sigMode === mode ? "#FFFFFF" : "#64748B" }}>
                     {mode === "draw" ? "Draw" : "Type"}
                   </button>
                 ))}
@@ -317,10 +317,10 @@ function ProposalViewerModal({ proposal, clientName, BASE_URL, onClose, onSigned
 
               {sigMode === "draw" ? (
                 <div>
-                  <div style={{ background: "#f8fafc", border: "1.5px dashed #e2e8f0", borderRadius: 10, overflow: "hidden", marginBottom: 12 }}>
+                  <div style={{ background: "#F8FAFC", border: "1.5px dashed #E2E8F0", borderRadius: 10, overflow: "hidden", marginBottom: 12 }}>
                     <canvas ref={canvasRef} style={{ width: "100%", height: 150, cursor: "crosshair", display: "block", touchAction: "none" }} />
                   </div>
-                  <button onClick={clearCanvas} style={{ background: "none", border: "1px solid #e2e8f0", borderRadius: 7, padding: "5px 12px", fontSize: 11, fontWeight: 700, cursor: "pointer", color: "#64748B", marginBottom: 12 }}>
+                  <button onClick={clearCanvas} style={{ background: "none", border: "1px solid #E2E8F0", borderRadius: 7, padding: "5px 12px", fontSize: 11, fontWeight: 700, cursor: "pointer", color: "#64748B", marginBottom: 12 }}>
                     Clear
                   </button>
                 </div>
@@ -330,11 +330,11 @@ function ProposalViewerModal({ proposal, clientName, BASE_URL, onClose, onSigned
                     value={sigText}
                     onChange={e => setSigText(e.target.value)}
                     placeholder="Type your full name to sign..."
-                    style={{ width: "100%", padding: "12px 16px", border: "1.5px solid #e2e8f0", borderRadius: 10, fontSize: 22, fontFamily: "'Dancing Script', cursive", color: "#0D2027", outline: "none", boxSizing: "border-box" }}
+                    style={{ width: "100%", padding: "12px 16px", border: "1.5px solid #E2E8F0", borderRadius: 10, fontSize: 22, fontFamily: "'Dancing Script', cursive", color: "#0F172A", outline: "none", boxSizing: "border-box" }}
                   />
                   {sigText && (
-                    <div style={{ marginTop: 8, fontSize: 11, color: "#96B0B8" }}>
-                      Preview: <span style={{ fontFamily: "'Dancing Script', cursive", fontSize: 22, color: "#0D2027" }}>{sigText}</span>
+                    <div style={{ marginTop: 8, fontSize: 11, color: "#64748B" }}>
+                      Preview: <span style={{ fontFamily: "'Dancing Script', cursive", fontSize: 22, color: "#0F172A" }}>{sigText}</span>
                     </div>
                   )}
                 </div>
@@ -344,12 +344,12 @@ function ProposalViewerModal({ proposal, clientName, BASE_URL, onClose, onSigned
               <button
                 onClick={saveSignature}
                 disabled={saving}
-                style={{ width: "100%", padding: "13px", background: saving ? "#96B0B8" : " var(--app-accent, var(--app-accent, #2563EB))", color: "#fff", border: "none", borderRadius: 10, fontSize: 14, fontWeight: 800, cursor: saving ? "not-allowed" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, boxShadow: "0 4px 14px rgba(37, 99, 235,0.3)" }}>
+                style={{ width: "100%", padding: "13px", background: saving ? "#64748B" : " var(--app-accent, var(--app-accent, #2563EB))", color: "#FFFFFF", border: "none", borderRadius: 10, fontSize: 14, fontWeight: 800, cursor: saving ? "not-allowed" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, boxShadow: "0 4px 14px rgba(37, 99, 235, 0.3)" }}>
                 <i className="ti ti-writing" style={{ fontSize: 16 }}></i>
                 {saving ? "Saving Signature..." : "Sign & Accept Proposal"}
               </button>
 
-              <div style={{ textAlign: "center", fontSize: 11, color: "#96B0B8", marginTop: 10 }}>
+              <div style={{ textAlign: "center", fontSize: 11, color: "#64748B", marginTop: 10 }}>
                 By signing, you agree to the terms and conditions outlined in this proposal.
               </div>
             </div>
@@ -357,9 +357,9 @@ function ProposalViewerModal({ proposal, clientName, BASE_URL, onClose, onSigned
 
           {/* Success state after signing */}
           {!prop.clientSignature && saved && (
-            <div style={{ background: "#f0fdf4", border: "1.5px solid #86efac", borderRadius: 14, padding: "20px 28px", textAlign: "center" }}>
-              <i className="ti ti-circle-check" style={{ fontSize: 36, color: "#15803D" }}></i>
-              <div style={{ fontSize: 16, fontWeight: 800, color: "#15803D", marginTop: 8 }}>Proposal Signed Successfully!</div>
+            <div style={{ background: "#F8FAFC", border: "1.5px solid #E2E8F0", borderRadius: 14, padding: "20px 28px", textAlign: "center" }}>
+              <i className="ti ti-circle-check" style={{ fontSize: 36, color: "#16A34A" }}></i>
+              <div style={{ fontSize: 16, fontWeight: 800, color: "#16A34A", marginTop: 8 }}>Proposal Signed Successfully!</div>
               <div style={{ fontSize: 12, color: "#64748B", marginTop: 4 }}>Your signature has been saved and the subadmin has been notified.</div>
             </div>
           )}
@@ -390,7 +390,7 @@ function QuotationViewerModal({ quotation, clientName, BASE_URL, onClose, onSign
     cv.width = rect.width || 500;
     cv.height = 150;
     const ctx = cv.getContext("2d");
-    ctx.strokeStyle = "#1e293b";
+    ctx.strokeStyle = "#1E293B";
     ctx.lineWidth = 2.5;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
@@ -502,20 +502,20 @@ function QuotationViewerModal({ quotation, clientName, BASE_URL, onClose, onSign
 
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.6)", display: "flex", flexDirection: "column" }}>
-      <div style={{ background: "#fff", borderBottom: "1px solid #e2e8f0", padding: "12px 24px", display: "flex", alignItems: "center", gap: 16, flexShrink: 0 }}>
-        <button onClick={onClose} style={{ background: "#eff6ff", border: "1.5px solid #e2e8f0", borderRadius: 8, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", color: "#2563EB", display: "flex", alignItems: "center", gap: 6 }}>
+      <div style={{ background: "#FFFFFF", borderBottom: "1px solid #E2E8F0", padding: "12px 24px", display: "flex", alignItems: "center", gap: 16, flexShrink: 0 }}>
+        <button onClick={onClose} style={{ background: "#EFF6FF", border: "1.5px solid #E2E8F0", borderRadius: 8, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", color: "#2563EB", display: "flex", alignItems: "center", gap: 6 }}>
           <i className="ti ti-arrow-left"></i> Back
         </button>
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 15, fontWeight: 800, color: "#0D2027" }}>#{qt.quoteNo || q.quoteNo}</div>
-          <div style={{ fontSize: 11, color: "#96B0B8" }}>{qt.client || clientName}</div>
+          <div style={{ fontSize: 15, fontWeight: 800, color: "#0F172A" }}>#{qt.quoteNo || q.quoteNo}</div>
+          <div style={{ fontSize: 11, color: "#64748B" }}>{qt.client || clientName}</div>
         </div>
         {(st === "approved" || st === "rejected") && (
-          <span style={{ background: st === "approved" ? "#DCFCE7" : "#FEE2E2", color: st === "approved" ? "#15803D" : "#DC2626", borderRadius: 20, padding: "4px 14px", fontSize: 11, fontWeight: 800 }}>
+          <span style={{ background: st === "approved" ? "#E2E8F0" : "#E2E8F0", color: st === "approved" ? "#16A34A" : "#64748B", borderRadius: 20, padding: "4px 14px", fontSize: 11, fontWeight: 800 }}>
             {st.charAt(0).toUpperCase() + st.slice(1)}
           </span>
         )}
-        <button onClick={() => window.print()} className="no-print" style={{ padding: "8px 16px", background: "#2563EB", border: "none", borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: "pointer", color: "#fff", marginLeft: 12 }}>
+        <button onClick={() => window.print()} className="no-print" style={{ padding: "8px 16px", background: "#2563EB", border: "none", borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: "pointer", color: "#FFFFFF", marginLeft: 12 }}>
           Print / PDF
         </button>
       </div>
@@ -524,57 +524,57 @@ function QuotationViewerModal({ quotation, clientName, BASE_URL, onClose, onSign
           @page { size: A4 portrait; margin: 0; }
           html, body { margin: 0 !important; padding: 0 !important; background: white !important; }
           .no-print, .no-print * { display: none !important; }
-          #qt-portal-scroll { padding: 0 !important; background: #fff !important; overflow: visible !important; }
+          #qt-portal-scroll { padding: 0 !important; background: #FFFFFF !important; overflow: visible !important; }
           #qt-portal-paper { box-shadow: none !important; border: none !important; border-radius: 0 !important; max-width: 100% !important; margin: 0 !important; }
         }
       `}</style>
 
-      <div id="qt-portal-scroll" style={{ flex: 1, overflowY: "auto", background: "#f8fafc", padding: "24px" }}>
+      <div id="qt-portal-scroll" style={{ flex: 1, overflowY: "auto", background: "#F8FAFC", padding: "24px" }}>
         <div style={{ maxWidth: 900, margin: "0 auto", display: "flex", flexDirection: "column", gap: 20 }}>
 
-          <div id="qt-portal-paper" style={{ position: "relative", maxWidth: 794, margin: "0 auto", background: "#fff", borderRadius: 18, boxShadow: "0 24px 80px rgba(5,150,105,0.15)", display: "flex", flexDirection: "column" }}>
-            <div style={{ background: "#f8fafc", padding: "28px 32px", position: "relative", overflow: "hidden", borderBottom: "1px solid #e2e8f0" }}>
+          <div id="qt-portal-paper" style={{ position: "relative", maxWidth: 794, margin: "0 auto", background: "#FFFFFF", borderRadius: 18, boxShadow: "0 24px 80px rgba(22, 163, 74, 0.15)", display: "flex", flexDirection: "column" }}>
+            <div style={{ background: "#F8FAFC", padding: "28px 32px", position: "relative", overflow: "hidden", borderBottom: "1px solid #E2E8F0" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 20 }}>
                 <div>
                   {qt.companyLogo ? (
                     <img src={qt.companyLogo} alt="logo" style={{ height: 85, borderRadius: 10, marginBottom: 12, objectFit: "contain" }} />
                   ) : (
-                    <div style={{ height: 60, width: 60, background: "#2563EB", borderRadius: 10, marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, fontWeight: 900, color: "#fff" }}>
+                    <div style={{ height: 60, width: 60, background: "#2563EB", borderRadius: 10, marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, fontWeight: 900, color: "#FFFFFF" }}>
                       {(qt.companyName || "?")[0]}
                     </div>
                   )}
-                  <div style={{ fontSize: 24, fontWeight: 900, color: "#064e3b", textTransform: "uppercase", letterSpacing: 1 }}>{qt.companyName || qt.fromCompany || ""}</div>
-                  {qt.companyEmail && <div style={{ fontSize: 11, color: "#065f46", marginTop: 3 }}>{qt.companyEmail}</div>}
-                  {qt.companyPhone && <div style={{ fontSize: 11, color: "#065f46", marginTop: 2 }}>{qt.companyPhone}</div>}
-                  {qt.companyAddress && <div style={{ fontSize: 11, color: "#065f46", marginTop: 2 }}>{qt.companyAddress}</div>}
+                  <div style={{ fontSize: 24, fontWeight: 900, color: "#1E293B", textTransform: "uppercase", letterSpacing: 1 }}>{qt.companyName || qt.fromCompany || ""}</div>
+                  {qt.companyEmail && <div style={{ fontSize: 11, color: "#1E293B", marginTop: 3 }}>{qt.companyEmail}</div>}
+                  {qt.companyPhone && <div style={{ fontSize: 11, color: "#1E293B", marginTop: 2 }}>{qt.companyPhone}</div>}
+                  {qt.companyAddress && <div style={{ fontSize: 11, color: "#1E293B", marginTop: 2 }}>{qt.companyAddress}</div>}
                 </div>
                 <div style={{ textAlign: "right" }}>
-                  <div style={{ fontSize: 32, fontWeight: 900, color: "rgba(5,150,105,0.1)", letterSpacing: -2, lineHeight: 1, marginBottom: 4 }}>QUOTATION</div>
+                  <div style={{ fontSize: 32, fontWeight: 900, color: "rgba(22, 163, 74, 0.1)", letterSpacing: -2, lineHeight: 1, marginBottom: 4 }}>QUOTATION</div>
                   <div style={{ fontSize: 16, fontWeight: 800, color: "#2563EB" }}>{qt.quoteNo || q.quoteNo}</div>
-                  {qt.refNo && <div style={{ fontSize: 11, color: "#065f46", marginTop: 3 }}>Ref # {qt.refNo}</div>}
+                  {qt.refNo && <div style={{ fontSize: 11, color: "#1E293B", marginTop: 3 }}>Ref # {qt.refNo}</div>}
                   <div style={{ marginTop: 14, display: "flex", gap: 20, justifyContent: "flex-end" }}>
                     <div style={{ textAlign: "right" }}>
                       <div style={{ fontSize: 9, color: "#2563EB", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>DATE</div>
-                      <div style={{ fontSize: 12, color: "#064e3b", fontWeight: 700 }}>{formatQtDate(qt.date)}</div>
+                      <div style={{ fontSize: 12, color: "#1E293B", fontWeight: 700 }}>{formatQtDate(qt.date)}</div>
                     </div>
                     <div style={{ textAlign: "right" }}>
                       <div style={{ fontSize: 9, color: "#2563EB", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>VALID UNTIL</div>
-                      <div style={{ fontSize: 12, color: "#ea580c", fontWeight: 700 }}>{formatQtDate(qt.expiryDate)}</div>
+                      <div style={{ fontSize: 12, color: "#64748B", fontWeight: 700 }}>{formatQtDate(qt.expiryDate)}</div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: qt.project ? "1fr 1fr" : "1fr", borderBottom: "2px solid #f0fdf4" }}>
-              <div style={{ padding: "20px 32px", borderRight: qt.project ? "1px solid #f0fdf4" : "none" }}>
+            <div style={{ display: "grid", gridTemplateColumns: qt.project ? "1fr 1fr" : "1fr", borderBottom: "2px solid #F8FAFC" }}>
+              <div style={{ padding: "20px 32px", borderRight: qt.project ? "1px solid #F8FAFC" : "none" }}>
                 <div style={{ fontSize: 9, color: "#2563EB", fontWeight: 700, letterSpacing: 2, marginBottom: 10 }}>PREPARED FOR</div>
-                <div style={{ fontSize: 17, fontWeight: 800, color: "#111827" }}>{qt.client || qt.toName || clientName || "—"}</div>
+                <div style={{ fontSize: 17, fontWeight: 800, color: "#0F172A" }}>{qt.client || qt.toName || clientName || "—"}</div>
               </div>
               {qt.project && (
                 <div style={{ padding: "20px 32px" }}>
                   <div style={{ fontSize: 9, color: "#2563EB", fontWeight: 700, letterSpacing: 2, marginBottom: 10 }}>PROJECT</div>
-                  <div style={{ fontSize: 15, fontWeight: 700, color: "#111827" }}>{qt.project}</div>
+                  <div style={{ fontSize: 15, fontWeight: 700, color: "#0F172A" }}>{qt.project}</div>
                 </div>
               )}
             </div>
@@ -582,20 +582,20 @@ function QuotationViewerModal({ quotation, clientName, BASE_URL, onClose, onSign
             <div style={{ padding: "22px 32px", overflowX: "auto" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 360 }}>
                 <thead>
-                  <tr style={{ background: "linear-gradient(90deg,#f0fdf4,#f7fffe)" }}>
+                  <tr style={{ background: "linear-gradient(90deg,#F8FAFC,#F8FAFC)" }}>
                     {["#", "Description", "Qty", "Unit Rate", "Amount"].map((h, i) => (
-                      <th key={i} style={{ padding: "9px 11px", fontSize: 9, fontWeight: 700, color: "#2563EB", letterSpacing: 1.5, borderBottom: "2px solid #d1fae5", textAlign: ["Amount", "Unit Rate", "Qty"].includes(h) ? "right" : "left" }}>{h.toUpperCase()}</th>
+                      <th key={i} style={{ padding: "9px 11px", fontSize: 9, fontWeight: 700, color: "#2563EB", letterSpacing: 1.5, borderBottom: "2px solid #E2E8F0", textAlign: ["Amount", "Unit Rate", "Qty"].includes(h) ? "right" : "left" }}>{h.toUpperCase()}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {items.map((item, idx) => (
-                    <tr key={idx} style={{ borderBottom: "1px solid #f0fdf4" }}>
-                      <td style={{ padding: "12px 11px", color: "#6ee7b7", fontWeight: 700, fontSize: 12 }}>{String(idx + 1).padStart(2, "0")}</td>
-                      <td style={{ padding: "12px 11px", fontSize: 13, fontWeight: 600, color: "#111827" }}>{item.description || item.desc || "—"}</td>
-                      <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{item.quantity || item.qty}</td>
-                      <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{formatCurrency(item.rate, qt.currency)}</td>
-                      <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 14, fontWeight: 700, color: "#111827" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity || item.qty) || 0), qt.currency)}</td>
+                    <tr key={idx} style={{ borderBottom: "1px solid #F8FAFC" }}>
+                      <td style={{ padding: "12px 11px", color: "#64748B", fontWeight: 700, fontSize: 12 }}>{String(idx + 1).padStart(2, "0")}</td>
+                      <td style={{ padding: "12px 11px", fontSize: 13, fontWeight: 600, color: "#0F172A" }}>{item.description || item.desc || "—"}</td>
+                      <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#1E293B" }}>{item.quantity || item.qty}</td>
+                      <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#1E293B" }}>{formatCurrency(item.rate, qt.currency)}</td>
+                      <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 14, fontWeight: 700, color: "#0F172A" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity || item.qty) || 0), qt.currency)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -608,14 +608,14 @@ function QuotationViewerModal({ quotation, clientName, BASE_URL, onClose, onSign
                     ["Total Amount", formatCurrency(total, qt.currency)],
                     ["Amount Paid", formatCurrency(amountPaid, qt.currency)]
                   ].map(([l, v]) => (
-                    <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid #f0fdf4" }}>
-                      <span style={{ fontSize: 12, color: "#6b7280" }}>{l}</span>
-                      <span style={{ fontSize: 12, fontWeight: 600, color: "#111827" }}>{v}</span>
+                    <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid #F8FAFC" }}>
+                      <span style={{ fontSize: 12, color: "#64748B" }}>{l}</span>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: "#0F172A" }}>{v}</span>
                     </div>
                   ))}
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 16px", background: "#f8fafc", borderRadius: 12, marginTop: 8, border: "1.5px solid #e2e8f0" }}>
-                    <span style={{ fontSize: 13, fontWeight: 800, color: "#64748b" }}>BALANCE DUE</span>
-                    <span style={{ fontSize: 19, fontWeight: 900, color: "#064e3b" }}>{formatCurrency(balanceDue, qt.currency)}</span>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 16px", background: "#F8FAFC", borderRadius: 12, marginTop: 8, border: "1.5px solid #E2E8F0" }}>
+                    <span style={{ fontSize: 13, fontWeight: 800, color: "#64748B" }}>BALANCE DUE</span>
+                    <span style={{ fontSize: 19, fontWeight: 900, color: "#1E293B" }}>{formatCurrency(balanceDue, qt.currency)}</span>
                   </div>
                 </div>
               </div>
@@ -624,44 +624,44 @@ function QuotationViewerModal({ quotation, clientName, BASE_URL, onClose, onSign
             <div style={{ padding: "0 32px 24px", display: "grid", gridTemplateColumns: "1fr auto", gap: 16, alignItems: "flex-start" }}>
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 {qt.notes && (
-                  <div style={{ background: "#f0fdf4", borderRadius: 11, padding: "14px 16px", border: "1px solid #d1fae5" }}>
+                  <div style={{ background: "#F8FAFC", borderRadius: 11, padding: "14px 16px", border: "1px solid #E2E8F0" }}>
                     <div style={{ fontSize: 9, color: "#2563EB", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>NOTES</div>
-                    <div style={{ fontSize: 12, color: "#374151", lineHeight: 1.7 }}>{qt.notes}</div>
+                    <div style={{ fontSize: 12, color: "#1E293B", lineHeight: 1.7 }}>{qt.notes}</div>
                   </div>
                 )}
                 {qt.terms && (
-                  <div style={{ background: "#f0fdf4", borderRadius: 11, padding: "14px 16px", border: "1px solid #d1fae5" }}>
+                  <div style={{ background: "#F8FAFC", borderRadius: 11, padding: "14px 16px", border: "1px solid #E2E8F0" }}>
                     <div style={{ fontSize: 9, color: "#2563EB", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>TERMS & CONDITIONS</div>
-                    <div style={{ fontSize: 12, color: "#374151", lineHeight: 1.7 }}>{qt.terms}</div>
+                    <div style={{ fontSize: 12, color: "#1E293B", lineHeight: 1.7 }}>{qt.terms}</div>
                   </div>
                 )}
                 {(qt.upiId || qt.bankName) && (
-                  <div style={{ background: "#f8fafc", borderRadius: 11, padding: "14px 16px", border: "1px solid #e2e8f0" }}>
+                  <div style={{ background: "#F8FAFC", borderRadius: 11, padding: "14px 16px", border: "1px solid #E2E8F0" }}>
                     <div style={{ fontSize: 9, color: "#2563EB", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>PAYMENT INSTRUCTIONS</div>
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 20px" }}>
                       {qt.upiId && (
                         <div>
-                          <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700 }}>UPI ID</div>
-                          <div style={{ fontSize: 12, fontWeight: 700, color: "#111827" }}>{qt.upiId}</div>
+                          <div style={{ fontSize: 9, color: "#64748B", fontWeight: 700 }}>UPI ID</div>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: "#0F172A" }}>{qt.upiId}</div>
                         </div>
                       )}
                       {qt.bankName && (
                         <>
                           <div>
-                            <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700 }}>BANK NAME</div>
-                            <div style={{ fontSize: 12, fontWeight: 700, color: "#111827" }}>{qt.bankName}</div>
+                            <div style={{ fontSize: 9, color: "#64748B", fontWeight: 700 }}>BANK NAME</div>
+                            <div style={{ fontSize: 12, fontWeight: 700, color: "#0F172A" }}>{qt.bankName}</div>
                           </div>
                           <div>
-                            <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700 }}>ACCOUNT NAME</div>
-                            <div style={{ fontSize: 12, fontWeight: 700, color: "#111827" }}>{qt.accountName}</div>
+                            <div style={{ fontSize: 9, color: "#64748B", fontWeight: 700 }}>ACCOUNT NAME</div>
+                            <div style={{ fontSize: 12, fontWeight: 700, color: "#0F172A" }}>{qt.accountName}</div>
                           </div>
                           <div>
-                            <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700 }}>ACCOUNT NUMBER</div>
-                            <div style={{ fontSize: 12, fontWeight: 700, color: "#111827", fontFamily: "monospace" }}>{qt.accountNumber}</div>
+                            <div style={{ fontSize: 9, color: "#64748B", fontWeight: 700 }}>ACCOUNT NUMBER</div>
+                            <div style={{ fontSize: 12, fontWeight: 700, color: "#0F172A", fontFamily: "monospace" }}>{qt.accountNumber}</div>
                           </div>
                           <div>
-                            <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700 }}>IFSC CODE</div>
-                            <div style={{ fontSize: 12, fontWeight: 700, color: "#111827", fontFamily: "monospace" }}>{qt.ifscCode}</div>
+                            <div style={{ fontSize: 9, color: "#64748B", fontWeight: 700 }}>IFSC CODE</div>
+                            <div style={{ fontSize: 12, fontWeight: 700, color: "#0F172A", fontFamily: "monospace" }}>{qt.ifscCode}</div>
                           </div>
                         </>
                       )}
@@ -669,19 +669,19 @@ function QuotationViewerModal({ quotation, clientName, BASE_URL, onClose, onSign
                   </div>
                 )}
               </div>
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", background: "#f0fdf4", borderRadius: 12, padding: "14px 16px", border: "1px solid #d1fae5", minWidth: 110 }}>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", background: "#F8FAFC", borderRadius: 12, padding: "14px 16px", border: "1px solid #E2E8F0", minWidth: 110 }}>
                 <div style={{ fontSize: 8, color: "#2563EB", fontWeight: 700, letterSpacing: 1.5, marginBottom: 8, textAlign: "center" }}>SCAN QUOTE</div>
-                <div style={{ background: "#fff", padding: 6, borderRadius: 8, border: "1px solid #d1fae5" }}>
-                  <QRCodeSVG value={`${FRONTEND_URL}/quotation-view?no=${qt.quoteNo || q.quoteNo || ""}`} size={88} bgColor="#ffffff" fgColor="#064e3b" />
+                <div style={{ background: "#FFFFFF", padding: 6, borderRadius: 8, border: "1px solid #E2E8F0" }}>
+                  <QRCodeSVG value={`${FRONTEND_URL}/quotation-view?no=${qt.quoteNo || q.quoteNo || ""}`} size={88} bgColor="#FFFFFF" fgColor="#1E293B" />
                 </div>
-                <div style={{ fontSize: 8, color: "#9ca3af", marginTop: 7, textAlign: "center", fontWeight: 600 }}>{qt.quoteNo || q.quoteNo}</div>
+                <div style={{ fontSize: 8, color: "#64748B", marginTop: 7, textAlign: "center", fontWeight: 600 }}>{qt.quoteNo || q.quoteNo}</div>
               </div>
             </div>
 
-            <div style={{ background: "#ffffff", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "2px solid #f1f5f9" }}>
-              <div style={{ fontSize: 11, color: "#6b7280", fontWeight: 600 }}>{qt.companyName || qt.fromCompany || ""}</div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: "#2563eb" }}>{qt.footerMessage}</div>
-              <div style={{ fontSize: 11, color: "#6b7280", fontWeight: 600 }}>{qt.quoteNo || q.quoteNo}</div>
+            <div style={{ background: "#FFFFFF", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "2px solid #EFF6FF" }}>
+              <div style={{ fontSize: 11, color: "#64748B", fontWeight: 600 }}>{qt.companyName || qt.fromCompany || ""}</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "#2563EB" }}>{qt.footerMessage}</div>
+              <div style={{ fontSize: 11, color: "#64748B", fontWeight: 600 }}>{qt.quoteNo || q.quoteNo}</div>
             </div>
           </div>
 
@@ -710,7 +710,7 @@ function QuickApprovePopup({ target, clientName, BASE_URL, onClose, onApproved }
     cv.width = rect.width || 400;
     cv.height = 140;
     const ctx = cv.getContext("2d");
-    ctx.strokeStyle = "#1e293b";
+    ctx.strokeStyle = "#1E293B";
     ctx.lineWidth = 2.5;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
@@ -794,31 +794,31 @@ function QuickApprovePopup({ target, clientName, BASE_URL, onClose, onApproved }
 
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 99999, background: "rgba(0,0,0,.5)", display: "flex", alignItems: "center", justifyContent: "center" }} onClick={onClose}>
-      <div onClick={e => e.stopPropagation()} style={{ background: "#fff", borderRadius: 16, padding: 24, width: 440, maxWidth: "92vw" }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: "#FFFFFF", borderRadius: 16, padding: 24, width: 440, maxWidth: "92vw" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
           <div style={{ fontSize: 16, fontWeight: 900, color: "#0F172A" }}>Sign to Approve</div>
           <i className="ti ti-x" style={{ cursor: "pointer", fontSize: 18 }} onClick={onClose}></i>
         </div>
-        <div style={{ display: "flex", gap: 4, background: "#f8fafc", borderRadius: 10, padding: 4, marginBottom: 14, width: "fit-content" }}>
+        <div style={{ display: "flex", gap: 4, background: "#F8FAFC", borderRadius: 10, padding: 4, marginBottom: 14, width: "fit-content" }}>
           {["draw", "type"].map(mode => (
-            <button key={mode} onClick={() => setSigMode(mode)} style={{ padding: "6px 16px", borderRadius: 8, border: "none", fontWeight: 700, fontSize: 12, cursor: "pointer", background: sigMode === mode ? "#2563EB" : "transparent", color: sigMode === mode ? "#fff" : "#64748B" }}>
+            <button key={mode} onClick={() => setSigMode(mode)} style={{ padding: "6px 16px", borderRadius: 8, border: "none", fontWeight: 700, fontSize: 12, cursor: "pointer", background: sigMode === mode ? "#2563EB" : "transparent", color: sigMode === mode ? "#FFFFFF" : "#64748B" }}>
               {mode === "draw" ? "Draw" : "Type"}
             </button>
           ))}
         </div>
         {sigMode === "draw" ? (
           <div>
-            <div style={{ background: "#f8fafc", border: "1.5px dashed #e2e8f0", borderRadius: 10, overflow: "hidden", marginBottom: 10 }}>
+            <div style={{ background: "#F8FAFC", border: "1.5px dashed #E2E8F0", borderRadius: 10, overflow: "hidden", marginBottom: 10 }}>
               <canvas ref={canvasRef} style={{ width: "100%", height: 140, cursor: "crosshair", display: "block", touchAction: "none" }} />
             </div>
-            <button onClick={clearCanvas} style={{ background: "none", border: "1px solid #e2e8f0", borderRadius: 7, padding: "5px 12px", fontSize: 11, fontWeight: 700, cursor: "pointer", color: "#64748B", marginBottom: 14 }}>Clear</button>
+            <button onClick={clearCanvas} style={{ background: "none", border: "1px solid #E2E8F0", borderRadius: 7, padding: "5px 12px", fontSize: 11, fontWeight: 700, cursor: "pointer", color: "#64748B", marginBottom: 14 }}>Clear</button>
           </div>
         ) : (
-          <input value={sigText} onChange={e => setSigText(e.target.value)} placeholder="Type your full name to sign..." style={{ width: "100%", padding: "12px 16px", border: "1.5px solid #e2e8f0", borderRadius: 10, fontSize: 20, fontFamily: "'Dancing Script', cursive", color: "#0D2027", outline: "none", boxSizing: "border-box", marginBottom: 14 }} />
+          <input value={sigText} onChange={e => setSigText(e.target.value)} placeholder="Type your full name to sign..." style={{ width: "100%", padding: "12px 16px", border: "1.5px solid #E2E8F0", borderRadius: 10, fontSize: 20, fontFamily: "'Dancing Script', cursive", color: "#0F172A", outline: "none", boxSizing: "border-box", marginBottom: 14 }} />
         )}
         <div style={{ display: "flex", gap: 10 }}>
-          <button onClick={onClose} style={{ flex: 1, padding: "10px", background: "#F3F4F6", color: "#374151", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Cancel</button>
-          <button onClick={confirmApprove} disabled={saving} style={{ flex: 1, padding: "10px", background: saving ? "#96B0B8" : "#22C55E", color: "#fff", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: saving ? "not-allowed" : "pointer" }}>{saving ? "Saving..." : "Save / Confirm"}</button>
+          <button onClick={onClose} style={{ flex: 1, padding: "10px", background: "#F8FAFC", color: "#1E293B", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Cancel</button>
+          <button onClick={confirmApprove} disabled={saving} style={{ flex: 1, padding: "10px", background: saving ? "#64748B" : "#16A34A", color: "#FFFFFF", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: saving ? "not-allowed" : "pointer" }}>{saving ? "Saving..." : "Save / Confirm"}</button>
         </div>
       </div>
     </div>
@@ -861,15 +861,15 @@ function QuickReviewPopup({ target, BASE_URL, onClose, onReviewed }) {
 
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 99999, background: "rgba(0,0,0,.5)", display: "flex", alignItems: "center", justifyContent: "center" }} onClick={onClose}>
-      <div onClick={e => e.stopPropagation()} style={{ background: "#fff", borderRadius: 16, padding: 24, width: 420, maxWidth: "92vw" }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: "#FFFFFF", borderRadius: 16, padding: 24, width: 420, maxWidth: "92vw" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
           <div style={{ fontSize: 16, fontWeight: 900, color: "#0F172A" }}>Write a Review</div>
           <i className="ti ti-x" style={{ cursor: "pointer", fontSize: 18 }} onClick={onClose}></i>
         </div>
-        <textarea value={text} onChange={e => setText(e.target.value)} rows={4} placeholder="Type your review or comments here..." style={{ width: "100%", padding: "12px 14px", border: "1.5px solid #e2e8f0", borderRadius: 10, fontSize: 13, fontFamily: "inherit", resize: "vertical", outline: "none", boxSizing: "border-box", marginBottom: 14 }} />
+        <textarea value={text} onChange={e => setText(e.target.value)} rows={4} placeholder="Type your review or comments here..." style={{ width: "100%", padding: "12px 14px", border: "1.5px solid #E2E8F0", borderRadius: 10, fontSize: 13, fontFamily: "inherit", resize: "vertical", outline: "none", boxSizing: "border-box", marginBottom: 14 }} />
         <div style={{ display: "flex", gap: 10 }}>
-          <button onClick={onClose} style={{ flex: 1, padding: "10px", background: "#F3F4F6", color: "#374151", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Cancel</button>
-          <button onClick={submit} disabled={saving} style={{ flex: 1, padding: "10px", background: saving ? "#96B0B8" : "#2563EB", color: "#fff", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: saving ? "not-allowed" : "pointer" }}>{saving ? "Submitting..." : "Submit Review"}</button>
+          <button onClick={onClose} style={{ flex: 1, padding: "10px", background: "#F8FAFC", color: "#1E293B", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Cancel</button>
+          <button onClick={submit} disabled={saving} style={{ flex: 1, padding: "10px", background: saving ? "#64748B" : "#2563EB", color: "#FFFFFF", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: saving ? "not-allowed" : "pointer" }}>{saving ? "Submitting..." : "Submit Review"}</button>
         </div>
       </div>
     </div>
@@ -1499,11 +1499,11 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
   // with an empty/undefined user — show a clear, dead-end screen instead.
   if (portalMode && !portalUser) {
     return (
-      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#F3F8F9", fontFamily: "inherit", padding: 24, textAlign: "center" }}>
-        <div style={{ background: "#fff", border: "1.5px solid #E2E8F0", borderRadius: 16, padding: "40px 32px", maxWidth: 420 }}>
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#F8FAFC", fontFamily: "inherit", padding: 24, textAlign: "center" }}>
+        <div style={{ background: "#FFFFFF", border: "1.5px solid #E2E8F0", borderRadius: 16, padding: "40px 32px", maxWidth: 420 }}>
           <div style={{ fontSize: 40, marginBottom: 16 }}>🔒</div>
-          <div style={{ fontSize: 18, fontWeight: 800, color: "#0D2027", marginBottom: 8 }}>You've been signed out</div>
-          <div style={{ fontSize: 13, color: "#6B8790", lineHeight: 1.6 }}>
+          <div style={{ fontSize: 18, fontWeight: 800, color: "#0F172A", marginBottom: 8 }}>You've been signed out</div>
+          <div style={{ fontSize: 13, color: "#64748B", lineHeight: 1.6 }}>
             This portal session has ended. Please ask your agency to share a fresh portal link to access this page again.
           </div>
         </div>
@@ -1685,15 +1685,15 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
       if (mime.includes('pdf') || fname.endsWith('.pdf')) {
         icon = 'ti-file-type-pdf'; bg = C.redBg; col = C.red; fileType = 'Documents';
       } else if (mime.includes('image') || /\.(jpg|jpeg|png|gif|webp|svg)$/.test(fname)) {
-        icon = 'ti-photo'; bg = C.purpleBg || '#eff6ff'; col = C.purple || '#2563eb'; fileType = 'Designs';
+        icon = 'ti-photo'; bg = C.purpleBg || '#EFF6FF'; col = C.purple || '#2563EB'; fileType = 'Designs';
       } else if (mime.includes('spreadsheet') || mime.includes('excel') || /\.(xlsx|xls|csv)$/.test(fname)) {
         icon = 'ti-file-spreadsheet'; bg = C.greenBg; col = C.green; fileType = 'Reports';
       } else if (mime.includes('word') || /\.(doc|docx)$/.test(fname)) {
         icon = 'ti-file-text'; bg = C.blueBg; col = C.blue; fileType = 'Documents';
       } else if (mime.includes('zip') || mime.includes('rar') || /\.(zip|rar|tar|gz)$/.test(fname)) {
-        icon = 'ti-file-zip'; bg = C.amberBg || '#fef3c7'; col = C.amber || '#d97706'; fileType = 'Documents';
+        icon = 'ti-file-zip'; bg = C.amberBg || '#E2E8F0'; col = C.amber || '#64748B'; fileType = 'Documents';
       } else if (mime.includes('video') || /\.(mp4|mov|avi|mkv)$/.test(fname)) {
-        icon = 'ti-video'; bg = C.purpleBg || '#eff6ff'; col = C.purple || '#2563eb'; fileType = 'Designs';
+        icon = 'ti-video'; bg = C.purpleBg || '#EFF6FF'; col = C.purple || '#2563EB'; fileType = 'Designs';
       }
       if (/invoice/i.test(fname)) {
         fileType = 'Invoices';
@@ -1764,11 +1764,11 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
   // than falling through to a normal dashboard render.
   if (portalMode && targetProject && targetProject.portalSettings && targetProject.portalSettings.enablePortal === false) {
     return (
-      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#F3F8F9", fontFamily: "inherit", padding: 24, textAlign: "center" }}>
-        <div style={{ background: "#fff", border: "1.5px solid #E2E8F0", borderRadius: 16, padding: "40px 32px", maxWidth: 420 }}>
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#F8FAFC", fontFamily: "inherit", padding: 24, textAlign: "center" }}>
+        <div style={{ background: "#FFFFFF", border: "1.5px solid #E2E8F0", borderRadius: 16, padding: "40px 32px", maxWidth: 420 }}>
           <div style={{ fontSize: 40, marginBottom: 16 }}>🔒</div>
-          <div style={{ fontSize: 18, fontWeight: 800, color: "#0D2027", marginBottom: 8 }}>Portal Unavailable</div>
-          <div style={{ fontSize: 13, color: "#6B8790", lineHeight: 1.6 }}>
+          <div style={{ fontSize: 18, fontWeight: 800, color: "#0F172A", marginBottom: 8 }}>Portal Unavailable</div>
+          <div style={{ fontSize: 13, color: "#64748B", lineHeight: 1.6 }}>
             The client portal has been disabled for this project. Please contact your agency for more information.
           </div>
         </div>
@@ -1781,27 +1781,27 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
   .cp-root {
 --teal: ${themeColor};
       --teal2: ${themeColor};
-      --teal3: #006E7F;
+      --teal3: #16A34A;
       --teal-light: var(--teal-light, var(--teal-light, #EFF6FF));
       --teal-lighter: var(--teal-lighter, #EFF6FF);
-      --bg: #F3F8F9;
+      --bg: #F8FAFC;
       --surface: #FFFFFF;
-      --surface2: #F8FAFB;
-      --border: #DFF0F2;
+      --surface2: #F8FAFC;
+      --border: #E2E8F0;
       --border2: #E2E8F0;
-      --text: #0D2027;
-      --text2: #4E6B75;
-      --text3: #96B0B8;
-      --green: #1DB87A;
-      --green-bg: #E3FAF0;
-      --amber: #F59E0B;
-      --amber-bg: #FEF3C7;
-      --red: #EF4444;
-      --red-bg: #FEF2F2;
+      --text: #0F172A;
+      --text2: #64748B;
+      --text3: #64748B;
+      --green: #16A34A;
+      --green-bg: #E2E8F0;
+      --amber: #64748B;
+      --amber-bg: #E2E8F0;
+      --red: #64748B;
+      --red-bg: #F8FAFC;
       --purple: #2563EB;
       --purple-bg: #EFF6FF;
       --blue: #2563EB;
-      --blue-bg: #EFF4FF;
+      --blue-bg: #EFF6FF;
       --radius: 16px;
       --font: 'Nunito', sans-serif;
       --font2: 'Nunito Sans', sans-serif;
@@ -1821,22 +1821,22 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     .cp-root .topnav { background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 12px rgba(0,0,0,.05); backdrop-filter: blur(8px); }
     .cp-root .topnav-inner { max-width: 1240px; margin: 0 auto; padding: 0 24px; height: 66px; display: flex; align-items: center; gap: 16px; }
     .cp-root .tn-brand { display: flex; align-items: center; gap: 11px; }
-    .cp-root .tn-logo { width: 40px; height: 40px; border-radius: 11px; background: linear-gradient(135deg, var(--teal3), var(--teal)); display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 900; color: #fff; letter-spacing: -.5px; box-shadow: 0 6px 16px rgba(37, 99, 235,0.3); }
+    .cp-root .tn-logo { width: 40px; height: 40px; border-radius: 11px; background: linear-gradient(135deg, var(--app-accent), var(--teal)); display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 900; color: #FFFFFF; letter-spacing: -.5px; box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3); }
     .cp-root .tn-company { font-size: 15px; font-weight: 800; color: var(--text); letter-spacing: -0.2px; }
     .cp-root .tn-powered { font-size: 10px; color: var(--text3); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 1px; }
     .cp-root .tn-nav { display: flex; gap: 3px; margin-left: 20px; background: var(--bg); padding: 4px; border-radius: 12px; border: 1px solid var(--border); }
     .cp-root .tn-item { display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 9px; font-size: 12.5px; font-weight: 700; color: var(--text2); cursor: pointer; transition: all .15s; border: none; background: none; white-space: nowrap; }
     .cp-root .tn-item i { font-size: 14px; opacity: 0.8; }
     .cp-root .tn-item:hover { background: rgba(255,255,255,0.6); color: var(--text); }
-    .cp-root .tn-item.active { background: #fff; color: var(--teal); box-shadow: 0 2px 8px rgba(37, 99, 235,0.18); }
+    .cp-root .tn-item.active { background: #FFFFFF; color: var(--teal); box-shadow: 0 2px 8px rgba(37, 99, 235, 0.18); }
     .cp-root .tn-item.active i { opacity: 1; }
     .cp-root .tn-right { margin-left: auto; display: flex; align-items: center; gap: 10px; position: relative; }
     .cp-root .tn-notif { width: 38px; height: 38px; border-radius: 10px; background: var(--bg); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 17px; color: var(--text2); position: relative; transition: all 0.2s; }
     .cp-root .tn-notif:hover { border-color: var(--teal); color: var(--teal); background: var(--teal-lighter); transform: translateY(-1px); }
-    .cp-root .tn-notif-dot { position: absolute; top: 8px; right: 9px; width: 7px; height: 7px; border-radius: 50%; background: var(--red); border: 1.5px solid #fff; box-shadow: 0 0 0 2px rgba(239,68,68,0.2); }
+    .cp-root .tn-notif-dot { position: absolute; top: 8px; right: 9px; width: 7px; height: 7px; border-radius: 50%; background: var(--app-text); border: 1.5px solid #FFFFFF; box-shadow: 0 0 0 2px rgba(100, 116, 139, 0.2); }
     .cp-root .tn-client-chip { display: flex; align-items: center; gap: 8px; padding: 6px 12px 6px 6px; background: var(--bg); border: 1px solid var(--border); border-radius: 9px; cursor: pointer; position: relative; }
     .cp-root .tn-client-chip:hover { border-color: var(--teal); }
-    .cp-root .tn-avatar { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, var(--amber), #D97706); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: #fff; }
+    .cp-root .tn-avatar { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, var(--app-muted), #64748B); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: #FFFFFF; }
     .cp-root .tn-client-name { font-size: 12px; font-weight: 700; color: var(--text); }
     .cp-root .mobile-menu-btn { display: none; width: 36px; height: 36px; border-radius: 9px; background: var(--bg); border: 1px solid var(--border); align-items: center; justify-content: center; cursor: pointer; font-size: 18px; color: var(--text2); }
 
@@ -1844,27 +1844,27 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     .cp-root .profile-dropdown { position: absolute; top: 48px; right: 0; background: var(--surface); border: 1.5px solid var(--border); border-radius: 12px; box-shadow: 0 4px 18px rgba(0,0,0,0.08); width: 150px; z-index: 150; padding: 6px 0; }
     .cp-root .profile-drop-item { width: 100%; padding: 8px 14px; text-align: left; background: none; border: none; font-size: 13px; color: var(--text2); cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.15s; }
     .cp-root .profile-drop-item:hover { background: var(--teal-lighter); color: var(--teal); }
-    .cp-root .profile-drop-item.signout:hover { background: var(--red-bg); color: var(--red); }
+    .cp-root .profile-drop-item.signout:hover { background: var(--app-accent-light); color: var(--app-text); }
 
     /* ── HERO BANNER ── */
-    .cp-root .hero { background: linear-gradient(135deg, #004D5E 0%, var(--teal3) 40%, var(--teal) 100%); position: relative; overflow: hidden; border-radius: 0 0 20px 20px; }
+    .cp-root .hero { background: linear-gradient(135deg, #1E293B 0%, var(--app-accent) 40%, var(--teal) 100%); position: relative; overflow: hidden; border-radius: 0 0 20px 20px; }
     .cp-root .hero::after { content: ''; position: absolute; right: -80px; top: -80px; width: 320px; height: 320px; border-radius: 50%; background: rgba(255,255,255,.05); pointer-events: none; }
     .cp-root .hero::before { content: ''; position: absolute; right: 120px; bottom: -100px; width: 200px; height: 200px; border-radius: 50%; background: rgba(255,255,255,.04); pointer-events: none; }
     .cp-root .hero-inner { max-width: 1200px; margin: 0 auto; padding: 36px 24px; display: grid; grid-template-columns: 1fr auto; gap: 32px; align-items: center; position: relative; z-index: 1; }
     .cp-root .hero-label { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,.15); color: rgba(255,255,255,.9); font-size: 10px; font-weight: 800; padding: 4px 12px; border-radius: 20px; margin-bottom: 10px; letter-spacing: .6px; text-transform: uppercase; }
-    .cp-root .hero-title { font-size: 24px; font-weight: 900; color: #fff; letter-spacing: -.5px; margin-bottom: 6px; }
+    .cp-root .hero-title { font-size: 24px; font-weight: 900; color: #FFFFFF; letter-spacing: -.5px; margin-bottom: 6px; }
     .cp-root .hero-sub { font-size: 13px; color: rgba(255,255,255,.7); line-height: 1.6; max-width: 480px; font-family: var(--font2); }
     .cp-root .hero-stats { display: flex; gap: 28px; margin-top: 22px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,.15); }
     .cp-root .hs-item { text-align: left; }
-    .cp-root .hs-val { font-size: 22px; font-weight: 800; color: #fff; }
+    .cp-root .hs-val { font-size: 22px; font-weight: 800; color: #FFFFFF; }
     .cp-root .hs-label { font-size: 10px; color: rgba(255,255,255,.6); font-weight: 600; text-transform: uppercase; letter-spacing: .5px; margin-top: 2px; }
     .cp-root .hero-right { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
     .cp-root .hero-pct-ring { position: relative; width: 110px; height: 110px; }
     .cp-root .hero-pct-ring svg { width: 100%; height: 100%; }
     .cp-root .hero-pct-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); text-align: center; }
-    .cp-root .hero-pct-val { font-size: 22px; font-weight: 900; color: #fff; }
+    .cp-root .hero-pct-val { font-size: 22px; font-weight: 900; color: #FFFFFF; }
     .cp-root .hero-pct-label { font-size: 9px; color: rgba(255,255,255,.6); font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
-    .cp-root .hero-status-badge { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,.15); color: #fff; font-size: 11px; font-weight: 700; padding: 5px 12px; border-radius: 20px; }
+    .cp-root .hero-status-badge { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,.15); color: #FFFFFF; font-size: 11px; font-weight: 700; padding: 5px 12px; border-radius: 20px; }
     .cp-root .hero-status-badge::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
 
     /* ── PAGE BODY ── */
@@ -1898,11 +1898,11 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     .cp-root .tl-grid-cell { height: 28px; border-left: 1px dashed var(--border); position: relative; }
     .cp-root .tl-grid-cell:last-child { border-right: 1px dashed var(--border); }
     .cp-root .tl-bar-wrap { position: relative; height: 22px; margin: 3px 0; }
-.cp-root .tl-bar { height: 100%; border-radius: 6px; display: flex; align-items: center; padding-left: 8px; font-size: 10px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; position: absolute; }
+.cp-root .tl-bar { height: 100%; border-radius: 6px; display: flex; align-items: center; padding-left: 8px; font-size: 10px; font-weight: 700; color: #FFFFFF; white-space: nowrap; overflow: hidden; position: absolute; }
 .cp-root .tl-bar-fill { position: absolute; top: 0; left: 0; bottom: 0; background: rgba(255,255,255,0.35); border-radius: 6px 0 0 6px; z-index: 1; }
 .cp-root .tl-bar-label { position: relative; z-index: 2; }
-    .cp-root .today-line { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--red); z-index: 5; pointer-events: none; }
-    .cp-root .today-label { position: absolute; top: -18px; transform: translateX(-50%); font-size: 9px; font-weight: 800; color: var(--red); background: var(--red-bg); padding: 1px 6px; border-radius: 20px; white-space: nowrap; }
+    .cp-root .today-line { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--app-text); z-index: 5; pointer-events: none; }
+    .cp-root .today-label { position: absolute; top: -18px; transform: translateX(-50%); font-size: 9px; font-weight: 800; color: var(--app-text); background: var(--app-accent-light); padding: 1px 6px; border-radius: 20px; white-space: nowrap; }
 
     /* ── PROGRESS STEPS ── */
     .cp-root .steps-grid { display: flex; justify-content: center; align-items: flex-start; gap: 0; position: relative; width: 100%; }
@@ -1910,7 +1910,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     .cp-root .step-item { flex: 0 1 160px; }
     .cp-root .step-item { display: flex; flex-direction: column; align-items: center; gap: 6px; position: relative; z-index: 1; }
     .cp-root .step-circle { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; border: 2px solid transparent; transition: all .2s; cursor: pointer; }
-    .cp-root .step-circle.done { background: var(--teal); color: #fff; border-color: var(--teal); box-shadow: 0 3px 10px rgba(37, 99, 235,.3); }
+    .cp-root .step-circle.done { background: var(--teal); color: #FFFFFF; border-color: var(--teal); box-shadow: 0 3px 10px rgba(37, 99, 235, .3); }
     .cp-root .step-circle.active { background: var(--surface); color: var(--teal); border-color: var(--teal); box-shadow: 0 0 0 4px var(--teal-light); }
     .cp-root .step-circle.pending { background: var(--surface2); color: var(--text3); border-color: var(--border); }
     .cp-root .step-name { font-size: 10px; font-weight: 700; color: var(--text2); text-align: center; max-width: 80px; }
@@ -1924,7 +1924,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     .cp-root .files-panel { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); overflow: hidden; }
     .cp-root .files-toolbar { display: flex; align-items: center; gap: 8px; padding: 12px 18px; border-bottom: 1px solid var(--border); background: var(--surface2); }
     .cp-root .ft-filter { padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; cursor: pointer; border: 1.5px solid var(--border); background: var(--surface); color: var(--text2); transition: all .15s; }
-    .cp-root .ft-filter.active { background: var(--teal); color: #fff; border-color: var(--teal); }
+    .cp-root .ft-filter.active { background: var(--teal); color: #FFFFFF; border-color: var(--teal); }
     .cp-root .ft-filter:hover:not(.active) { border-color: var(--teal); color: var(--teal); }
     .cp-root .mpd-milestones-card { padding: 32px 36px !important; box-sizing: border-box !important; }
 .cp-root .mpd-proj-header { padding: 32px 36px !important; box-sizing: border-box !important; }
@@ -1935,14 +1935,14 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
 .cp-root .mpd-member-row { padding: 14px 8px !important; }
 .cp-root .mpd-topbar { margin-bottom: 28px !important; padding-top: 4px !important; }
     .cp-root .file-card { background: var(--surface2); border: 1.5px solid var(--border); border-radius: 12px; padding: 14px; cursor: pointer; transition: all .2s; position: relative; overflow: hidden; }
-    .cp-root .file-card:hover { border-color: var(--teal); box-shadow: 0 4px 14px rgba(37, 99, 235,.1); transform: translateY(-1px); }
+    .cp-root .file-card:hover { border-color: var(--teal); box-shadow: 0 4px 14px rgba(37, 99, 235, .1); transform: translateY(-1px); }
     .cp-root .fc-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 10px; }
     .cp-root .fc-name { font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .cp-root .fc-meta { font-size: 10px; color: var(--text3); font-weight: 600; }
     .cp-root .fc-date { font-size: 10px; color: var(--text3); margin-top: 6px; }
     .cp-root .fc-download { position: absolute; top: 10px; right: 10px; width: 26px; height: 26px; border-radius: 7px; background: var(--teal-light); display: flex; align-items: center; justify-content: center; font-size: 13px; color: var(--teal); opacity: 0; transition: opacity .15s; }
     .cp-root .file-card:hover .fc-download { opacity: 1; }
-    .cp-root .fc-new-badge { position: absolute; top: 10px; left: 10px; background: var(--red); color: #fff; font-size: 9px; font-weight: 800; padding: 1px 6px; border-radius: 20px; }
+    .cp-root .fc-new-badge { position: absolute; top: 10px; left: 10px; background: var(--app-text); color: #FFFFFF; font-size: 9px; font-weight: 800; padding: 1px 6px; border-radius: 20px; }
 
     /* ── INVOICES ── */
     .cp-root .invoice-item { display: flex; align-items: center; gap: 14px; padding: 14px 18px; border-bottom: 1px solid var(--border); cursor: pointer; transition: all .15s; }
@@ -1954,35 +1954,35 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     .cp-root .inv-date { font-size: 11px; color: var(--text2); font-weight: 600; }
     .cp-root .inv-amount { font-size: 14px; font-weight: 800; text-align: right; }
     .cp-root .inv-dl { width: 30px; height: 30px; border-radius: 8px; background: var(--teal-light); border: 1px solid var(--teal-light); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 15px; color: var(--teal); flex-shrink: 0; transition: all .15s; }
-    .cp-root .inv-dl:hover { background: var(--teal); color: #fff; }
+    .cp-root .inv-dl:hover { background: var(--teal); color: #FFFFFF; }
     .cp-root .badge { display: inline-flex; align-items: center; gap: 3px; padding: 3px 9px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: capitalize; }
     .cp-root .badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; }
-    .cp-root .badge.paid { background: var(--green-bg); color: var(--green); }
+    .cp-root .badge.paid { background: var(--app-accent-light); color: var(--green); }
     .cp-root .badge.paid::before { background: var(--green); }
-    .cp-root .badge.pending, .cp-root .badge.unpaid, .cp-root .badge.sent, .cp-root .badge.part_paid { background: var(--amber-bg); color: var(--amber); }
-    .cp-root .badge.pending::before, .cp-root .badge.unpaid::before, .cp-root .badge.sent::before, .cp-root .badge.part_paid::before { background: var(--amber); }
-    .cp-root .badge.overdue { background: var(--red-bg); color: var(--red); }
-    .cp-root .badge.overdue::before { background: var(--red); }
+    .cp-root .badge.pending, .cp-root .badge.unpaid, .cp-root .badge.sent, .cp-root .badge.part_paid { background: var(--app-accent-light); color: var(--app-muted); }
+    .cp-root .badge.pending::before, .cp-root .badge.unpaid::before, .cp-root .badge.sent::before, .cp-root .badge.part_paid::before { background: var(--app-muted); }
+    .cp-root .badge.overdue { background: var(--app-accent-light); color: var(--app-text); }
+    .cp-root .badge.overdue::before { background: var(--app-text); }
 
     /* ── MESSAGES / CHAT ── */
     .cp-root .messages-panel { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; height: 100%; }
     .cp-root .msg-list { flex: 1; padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; }
     .cp-root .msg-row { display: flex; gap: 8px; align-items: flex-end; }
     .cp-root .msg-row.mine { flex-direction: row-reverse; }
-    .cp-root .msg-av { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; color: #fff; flex-shrink: 0; }
+    .cp-root .msg-av { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; color: #FFFFFF; flex-shrink: 0; }
     .cp-root .msg-body { display: flex; flex-direction: column; gap: 2px; max-width: 70%; }
     .cp-root .msg-row.mine .msg-body { align-items: flex-end; }
     .cp-root .msg-name { font-size: 10px; font-weight: 700; color: var(--text3); margin-bottom: 1px; }
     .cp-root .msg-bubble { padding: 9px 13px; border-radius: 12px; font-size: 12px; line-height: 1.5; color: var(--text); }
     .cp-root .msg-bubble.them { background: var(--surface2); border: 1px solid var(--border); border-radius: 4px 12px 12px 12px; }
-    .cp-root .msg-bubble.mine { background: var(--teal); color: #fff; border-radius: 12px 4px 12px 12px; }
+    .cp-root .msg-bubble.mine { background: var(--teal); color: #FFFFFF; border-radius: 12px 4px 12px 12px; }
     .cp-root .msg-time { font-size: 10px; color: var(--text3); font-weight: 600; margin-top: 1px; }
     .cp-root .msg-row.mine .msg-time { color: var(--text3); }
     .cp-root .msg-input-row { display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-top: 1px solid var(--border); background: var(--surface); }
     .cp-root .msg-inp { flex: 1; padding: 9px 13px; background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; font-size: 12px; color: var(--text); outline: none; transition: all .15s; }
-    .cp-root .msg-inp:focus { border-color: var(--teal); background: #fff; }
+    .cp-root .msg-inp:focus { border-color: var(--teal); background: #FFFFFF; }
     .cp-root .msg-inp::placeholder { color: var(--text3); }
-    .cp-root .msg-send { width: 36px; height: 36px; border-radius: 9px; background: var(--teal); border: none; display: flex; align-items: center; justify-content: center; font-size: 17px; color: #fff; cursor: pointer; flex-shrink: 0; transition: all .15s; }
+    .cp-root .msg-send { width: 36px; height: 36px; border-radius: 9px; background: var(--teal); border: none; display: flex; align-items: center; justify-content: center; font-size: 17px; color: #FFFFFF; cursor: pointer; flex-shrink: 0; transition: all .15s; }
     .cp-root .msg-send:hover { background: var(--teal2); }
     .cp-root .msg-attach { width: 36px; height: 36px; border-radius: 9px; background: var(--bg); border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 16px; color: var(--text2); cursor: pointer; flex-shrink: 0; transition: all .15s; }
     .cp-root .msg-attach:hover { border-color: var(--teal); color: var(--teal); }
@@ -2000,9 +2000,9 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     .cp-root .cal-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
     .cp-root .cal-day { height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: var(--text2); cursor: pointer; transition: all .15s; position: relative; }
     .cp-root .cal-day:hover { background: var(--teal-light); color: var(--teal); }
-    .cp-root .cal-day.today { background: var(--teal); color: #fff; font-weight: 800; box-shadow: 0 2px 8px rgba(37, 99, 235,.3); }
-    .cp-root .cal-day.has-event::after { content: ''; position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%); width: 5px; height: 5px; border-radius: 50%; background: var(--amber); }
-    .cp-root .cal-day.has-event.today::after { background: #fff; }
+    .cp-root .cal-day.today { background: var(--teal); color: #FFFFFF; font-weight: 800; box-shadow: 0 2px 8px rgba(37, 99, 235, .3); }
+    .cp-root .cal-day.has-event::after { content: ''; position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%); width: 5px; height: 5px; border-radius: 50%; background: var(--app-muted); }
+    .cp-root .cal-day.has-event.today::after { background: #FFFFFF; }
     .cp-root .cal-day.other-month { color: var(--text3); opacity: .4; }
     .cp-root .cal-day.selected { background: var(--teal-light); color: var(--teal); font-weight: 700; border: 1px solid var(--teal); }
     .cp-root .meetings-list { padding: 0 14px 14px; display: flex; flex-direction: column; gap: 8px; }
@@ -2014,7 +2014,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     .cp-root .mi-divider { width: 2px; height: 32px; background: var(--teal-light); border-radius: 1px; align-self: center; }
     .cp-root .mi-title { font-size: 12px; font-weight: 700; color: var(--text); }
     .cp-root .mi-meta { font-size: 10px; color: var(--text3); margin-top: 2px; }
-    .cp-root .mi-join { margin-left: auto; display: flex; align-items: center; gap: 4px; padding: 5px 10px; background: var(--teal); color: #fff; border-radius: 7px; font-size: 10px; font-weight: 700; flex-shrink: 0; transition: all 0.15s; }
+    .cp-root .mi-join { margin-left: auto; display: flex; align-items: center; gap: 4px; padding: 5px 10px; background: var(--teal); color: #FFFFFF; border-radius: 7px; font-size: 10px; font-weight: 700; flex-shrink: 0; transition: all 0.15s; }
     .cp-root .mi-join:hover { background: var(--teal2); }
 
     /* ── APPROVALS ── */
@@ -2026,10 +2026,10 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     .cp-root .ai-desc { font-size: 11px; color: var(--text3); margin-top: 1px; }
     .cp-root .ai-actions { margin-left: auto; display: flex; gap: 6px; }
     .cp-root .ai-btn { padding: 6px 12px; border-radius: 7px; font-size: 11px; font-weight: 700; cursor: pointer; border: 1.5px solid var(--border); background: none; color: var(--text2); transition: all .15s; }
-    .cp-root .ai-btn.approve { background: var(--green); color: #fff; border-color: var(--green); }
-    .cp-root .ai-btn.reject { background: none; color: var(--red); border-color: rgba(239,68,68,.3); }
+    .cp-root .ai-btn.approve { background: var(--green); color: #FFFFFF; border-color: var(--green); }
+    .cp-root .ai-btn.reject { background: none; color: var(--app-text); border-color: rgba(100, 116, 139, .3); }
     .cp-root .ai-btn.approve:hover { opacity: .85; }
-    .cp-root .ai-btn.reject:hover { background: var(--red-bg); }
+    .cp-root .ai-btn.reject:hover { background: var(--app-accent-light); }
 
     /* ── ACTIVITY FEED ── */
     .cp-root .activity-feed { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 18px; display: flex; flex-direction: column; gap: 0; }
@@ -2046,16 +2046,16 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     .cp-root .feedback-panel { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 20px; }
     .cp-root .rating-row { display: flex; gap: 8px; margin: 10px 0 14px; }
     .cp-root .star { font-size: 24px; cursor: pointer; color: var(--border2); transition: color .15s; }
-    .cp-root .star.active { color: var(--amber); }
-    .cp-root .star:hover { color: var(--amber); }
+    .cp-root .star.active { color: var(--app-muted); }
+    .cp-root .star:hover { color: var(--app-muted); }
     .cp-root .feedback-input { width: 100%; padding: 10px 13px; background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; font-size: 12px; color: var(--text); outline: none; resize: none; min-height: 72px; transition: all .15s; }
-    .cp-root .feedback-input:focus { border-color: var(--teal); background: #fff; }
+    .cp-root .feedback-input:focus { border-color: var(--teal); background: #FFFFFF; }
     .cp-root .feedback-input::placeholder { color: var(--text3); }
-    .cp-root .feedback-submit { width: 100%; margin-top: 10px; padding: 11px; background: var(--teal); color: #fff; border: none; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; transition: background .15s; box-shadow: 0 3px 10px rgba(37, 99, 235,.25); }
-    .cp-root .feedback-submit:hover { background: var(--app-accent-dark, #2563EB); color: #fff; }
+    .cp-root .feedback-submit { width: 100%; margin-top: 10px; padding: 11px; background: var(--teal); color: #FFFFFF; border: none; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; transition: background .15s; box-shadow: 0 3px 10px rgba(37, 99, 235, .25); }
+    .cp-root .feedback-submit:hover { background: var(--app-accent-dark, #2563EB); color: #FFFFFF; }
 
     /* ── CONTACT CARD ── */
-    .cp-root .contact-card { background: linear-gradient(135deg, #004D5E, var(--teal)); border-radius: var(--radius); padding: 22px; color: #fff; }
+    .cp-root .contact-card { background: linear-gradient(135deg, #1E293B, var(--teal)); border-radius: var(--radius); padding: 22px; color: #FFFFFF; }
     .cp-root .cc-label { font-size: 10px; font-weight: 700; opacity: .65; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 8px; }
     .cp-root .cc-name { font-size: 16px; font-weight: 800; margin-bottom: 4px; }
     .cp-root .cc-role { font-size: 12px; opacity: .7; margin-bottom: 16px; }
@@ -2063,7 +2063,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     .cp-root .cc-contact-row { display: flex; align-items: center; gap: 8px; font-size: 12px; opacity: .85; }
     .cp-root .cc-contact-row i { font-size: 15px; opacity: .7; }
     .cp-root .cc-actions { display: flex; gap: 8px; margin-top: 16px; }
-    .cp-root .cc-btn { flex: 1; padding: 9px; background: rgba(255,255,255,.15); border: 1.5px solid rgba(255,255,255,.25); border-radius: 9px; font-size: 11px; font-weight: 700; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; transition: all .15s; }
+    .cp-root .cc-btn { flex: 1; padding: 9px; background: rgba(255,255,255,.15); border: 1.5px solid rgba(255,255,255,.25); border-radius: 9px; font-size: 11px; font-weight: 700; color: #FFFFFF; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; transition: all .15s; }
     .cp-root .cc-btn:hover { background: rgba(255,255,255,.25); }
 
     /* ── MOBILE BOTTOM NAV ── */
@@ -2077,7 +2077,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     .cp-root .mbn-item.active .mbn-label { color: var(--teal); }
 
     /* ── POPUP MODAL OVERLAY ── */
-    .cp-root .modal-overlay { position: fixed; inset: 0; background: rgba(13, 32, 39, 0.4); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+    .cp-root .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
     .cp-root .modal-card { background: var(--surface); border-radius: var(--radius); border: 1.5px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.15); width: 100%; max-width: 420px; overflow: hidden; animation: popUp 0.3s ease; }
     .cp-root .modal-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
     .cp-root .modal-title { font-size: 15px; font-weight: 800; color: var(--text); }
@@ -2125,18 +2125,18 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
         <style>{CSS}</style>
         {renderTopNav()}
         <div style={{ maxWidth: 600, margin: "40px auto", padding: "0 24px" }}>
-          <div style={{ background: "#fff", borderRadius: 16, border: "1.5px solid #E2E8F0", padding: "32px" }}>
-            <div style={{ fontSize: 18, fontWeight: 800, color: "#0D2027", marginBottom: 20 }}>Account Settings</div>
+          <div style={{ background: "#FFFFFF", borderRadius: 16, border: "1.5px solid #E2E8F0", padding: "32px" }}>
+            <div style={{ fontSize: 18, fontWeight: 800, color: "#0F172A", marginBottom: 20 }}>Account Settings</div>
             <div style={{ marginBottom: 16 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: "#96B0B8", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 6 }}>Company Name</div>
-              <div style={{ fontSize: 14, fontWeight: 600, color: "#0D2027", padding: "10px 14px", background: "#F3F8F9", borderRadius: 9, border: "1px solid #DFF0F2" }}>{user?.companyName || user?.company || "—"}</div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: "#64748B", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 6 }}>Company Name</div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: "#0F172A", padding: "10px 14px", background: "#F8FAFC", borderRadius: 9, border: "1px solid #E2E8F0" }}>{user?.companyName || user?.company || "—"}</div>
             </div>
             <div style={{ marginBottom: 16 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: "#96B0B8", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 6 }}>Email</div>
-              <div style={{ fontSize: 14, fontWeight: 600, color: "#0D2027", padding: "10px 14px", background: "#F3F8F9", borderRadius: 9, border: "1px solid #DFF0F2" }}>{user?.email || "—"}</div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: "#64748B", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 6 }}>Email</div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: "#0F172A", padding: "10px 14px", background: "#F8FAFC", borderRadius: 9, border: "1px solid #E2E8F0" }}>{user?.email || "—"}</div>
             </div>
 
-            <button onClick={handleLogout} style={{ marginTop: 8, padding: "10px 20px", background: "#FEF2F2", border: "1.5px solid #FECACA", borderRadius: 9, color: "#EF4444", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+            <button onClick={handleLogout} style={{ marginTop: 8, padding: "10px 20px", background: "#F8FAFC", border: "1.5px solid #E2E8F0", borderRadius: 9, color: "#64748B", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
               <i className="ti ti-logout" style={{ marginRight: 6 }}></i>Sign Out
             </button>
           </div>
@@ -2191,7 +2191,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                 {totalUnreadNotifs > 0 && <span className="tn-notif-dot"></span>}
               </div>
               {notifDropdownOpen && (
-                <div data-notif-panel="true" style={{ position: "absolute", top: 46, right: 0, width: 320, background: "#fff", border: "1.5px solid " + C.border, borderRadius: 14, boxShadow: "0 8px 32px rgba(0,0,0,0.12)", zIndex: 1000, overflow: "hidden" }}>
+                <div data-notif-panel="true" style={{ position: "absolute", top: 46, right: 0, width: 320, background: "#FFFFFF", border: "1.5px solid " + C.border, borderRadius: 14, boxShadow: "0 8px 32px rgba(0,0,0,0.12)", zIndex: 1000, overflow: "hidden" }}>
                   <div style={{ padding: "13px 16px", borderBottom: "1px solid " + C.border, background: C.surface2, fontSize: 13, fontWeight: 800, color: C.text, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                     <span>Notifications</span>
                     <button onClick={() => setNotifDropdownOpen(false)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 16, color: C.text3, padding: 0, lineHeight: 1 }}>✕</button>
@@ -2201,7 +2201,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                       <div style={{ padding: "30px 16px", textAlign: "center", color: C.text3, fontSize: 12 }}>No notifications yet.</div>
                     ) : (
                       notifs.map((n, i) => (
-                        <div key={n._id || i} style={{ padding: "12px 16px", borderBottom: i < notifs.length - 1 ? "1px solid " + C.border : "none", background: !n.isRead ? C.tealLighter : "#fff" }}>
+                        <div key={n._id || i} style={{ padding: "12px 16px", borderBottom: i < notifs.length - 1 ? "1px solid " + C.border : "none", background: !n.isRead ? C.tealLighter : "#FFFFFF" }}>
                           <div style={{ fontSize: 12, fontWeight: 700, color: C.text }}>{n.text || "Notification"}</div>
                           <div style={{ fontSize: 10, color: C.text3, marginTop: 4 }}>{n.createdAt ? new Date(n.createdAt).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : ""}</div>
                         </div>
@@ -2274,7 +2274,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
               <div className="hero-pct-ring">
                 <svg viewBox="0 0 110 110">
                   <circle cx="55" cy="55" r="46" fill="none" stroke="rgba(255,255,255,.15)" strokeWidth="10" />
-                  <circle cx="55" cy="55" r="46" fill="none" stroke="#fff" strokeWidth="10"
+                  <circle cx="55" cy="55" r="46" fill="none" stroke="#FFFFFF" strokeWidth="10"
                     strokeDasharray="289" strokeDashoffset={dashoffset} strokeLinecap="round" style={{ transition: "stroke-dashoffset 1s ease" }} />
                 </svg>
                 <div className="hero-pct-center">
@@ -2370,8 +2370,8 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
       const startColIdx = monthIndex(barStart);
       const endColIdx = monthIndex(barEnd);
       const isTodayInRange = startColIdx !== -1 && endColIdx !== -1 && todayColIdx >= startColIdx && todayColIdx <= endColIdx;
-      const barColor = m.done ? C.teal : (isTodayInRange ? C.amber : '#CBD5E1');
-      const textColor = m.done ? '#fff' : C.text2;
+      const barColor = m.done ? C.teal : (isTodayInRange ? C.amber : '#E2E8F0');
+      const textColor = m.done ? '#FFFFFF' : C.text2;
       const labelText = m.done ? `${m.name} ✓` : (isTodayInRange ? 'In Review' : 'Planned');
 
       // Progress: explicit m.progress wins; else done=100, in-progress=time-elapsed within range, pending=0
@@ -2465,7 +2465,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             <div className="tc-legend">
               <div className="tc-legend-item"><div className="tc-legend-dot" style={{ background: C.teal }}></div>Completed</div>
               <div className="tc-legend-item"><div className="tc-legend-dot" style={{ background: C.amber }}></div>Active</div>
-              <div className="tc-legend-item"><div className="tc-legend-dot" style={{ background: '#CBD5E1' }}></div>Pending</div>
+              <div className="tc-legend-item"><div className="tc-legend-dot" style={{ background: '#E2E8F0' }}></div>Pending</div>
               <div className="tc-legend-item"><div className="tc-legend-dot" style={{ background: C.red }}></div>Today</div>
             </div>
           </div>
@@ -2502,7 +2502,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {assigned.map((name, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <div style={{ width: 34, height: 34, borderRadius: "50%", background: C.teal, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 13, flexShrink: 0 }}>
+                <div style={{ width: 34, height: 34, borderRadius: "50%", background: C.teal, color: "#FFFFFF", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 13, flexShrink: 0 }}>
                   {(name || "?").trim().slice(0, 1).toUpperCase()}
                 </div>
                 <div style={{ fontSize: 13, fontWeight: 700, color: C.text1 }}>{name}</div>
@@ -2527,7 +2527,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             <div style={{ fontSize: 15, fontWeight: 800, color: C.text }}>{selectedDoc.docType ? selectedDoc.docType.toUpperCase() : "Document"} Preview</div>
           </div>
           <style>{`
-            .lh-wrap { max-width: 760px; margin: 0 auto; background: #fff; box-shadow: 0 8px 30px rgba(0,0,0,0.12); border-radius: 4px; display: flex; flex-direction: column; border: 1px solid #eaeaea; font-family: 'Nunito', sans-serif; overflow: hidden; }
+            .lh-wrap { max-width: 760px; margin: 0 auto; background: #FFFFFF; box-shadow: 0 8px 30px rgba(0,0,0,0.12); border-radius: 4px; display: flex; flex-direction: column; border: 1px solid #E2E8F0; font-family: 'Nunito', sans-serif; overflow: hidden; }
             .doc-body { padding: 28px 40px; font-size: 12.5px; line-height: 1.8; color: #1E293B; flex: 1; }
             .lb-date{color:#64748B;margin-bottom:14px;font-size:11.5px}
             .lb-recip{margin-bottom:14px;display:block}
@@ -2546,7 +2546,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             .lb-sig-role{color:#64748B;font-size:11px;margin-top:2px}
             .lb-sig-dept{color:#64748B;font-size:10px;margin-top:1px}
           `}</style>
-          <div style={{ flex: 1, background: "#fff", borderRadius: 12, padding: "20px", overflowY: "auto", border: "1px solid " + C.border, minHeight: 350, maxHeight: "70vh", color: "#333", fontSize: 13, lineHeight: 1.6 }} dangerouslySetInnerHTML={{ __html: selectedDoc.htmlContent || `<p>No preview available.</p>` }} />
+          <div style={{ flex: 1, background: "#FFFFFF", borderRadius: 12, padding: "20px", overflowY: "auto", border: "1px solid " + C.border, minHeight: 350, maxHeight: "70vh", color: "#1E293B", fontSize: 13, lineHeight: 1.6 }} dangerouslySetInnerHTML={{ __html: selectedDoc.htmlContent || `<p>No preview available.</p>` }} />
         </div>
       );
     }
@@ -2605,7 +2605,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             <div style={{ fontSize: 15, fontWeight: 800, color: C.text }}>{selectedDoc.docType ? selectedDoc.docType.toUpperCase() : "Document"} Preview</div>
           </div>
           <style>{`
-            .lh-wrap { max-width: 760px; margin: 0 auto; background: #fff; box-shadow: 0 8px 30px rgba(0,0,0,0.12); border-radius: 4px; display: flex; flex-direction: column; border: 1px solid #eaeaea; font-family: 'Nunito', sans-serif; overflow: hidden; }
+            .lh-wrap { max-width: 760px; margin: 0 auto; background: #FFFFFF; box-shadow: 0 8px 30px rgba(0,0,0,0.12); border-radius: 4px; display: flex; flex-direction: column; border: 1px solid #E2E8F0; font-family: 'Nunito', sans-serif; overflow: hidden; }
             .doc-body { padding: 28px 40px; font-size: 12.5px; line-height: 1.8; color: #1E293B; flex: 1; }
             .lb-date{color:#64748B;margin-bottom:14px;font-size:11.5px}
             .lb-recip{margin-bottom:14px;display:block}
@@ -2624,7 +2624,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             .lb-sig-role{color:#64748B;font-size:11px;margin-top:2px}
             .lb-sig-dept{color:#64748B;font-size:10px;margin-top:1px}
           `}</style>
-          <div style={{ background: "#fff", borderRadius: 12, padding: "20px", overflowY: "auto", border: "1px solid " + C.border, minHeight: 350, maxHeight: 500, color: "#333", fontSize: 13, lineHeight: 1.6 }} dangerouslySetInnerHTML={{ __html: selectedDoc.htmlContent || `<p>No preview available.</p>` }} />
+          <div style={{ background: "#FFFFFF", borderRadius: 12, padding: "20px", overflowY: "auto", border: "1px solid " + C.border, minHeight: 350, maxHeight: 500, color: "#1E293B", fontSize: 13, lineHeight: 1.6 }} dangerouslySetInnerHTML={{ __html: selectedDoc.htmlContent || `<p>No preview available.</p>` }} />
         </div>
       );
     }
@@ -2707,7 +2707,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
               {inv.status !== "paid" ? (
                 <button
                   onClick={(e) => { e.stopPropagation(); startPayment(inv); }}
-                  style={{ marginLeft: "8px", padding: "6px 12px", background: C.teal, color: "#fff", border: "none", borderRadius: "8px", fontSize: "11px", fontWeight: "700", cursor: "pointer", display: "flex", alignItems: "center", gap: "5px", whiteSpace: "nowrap", flexShrink: 0 }}
+                  style={{ marginLeft: "8px", padding: "6px 12px", background: C.teal, color: "#FFFFFF", border: "none", borderRadius: "8px", fontSize: "11px", fontWeight: "700", cursor: "pointer", display: "flex", alignItems: "center", gap: "5px", whiteSpace: "nowrap", flexShrink: 0 }}
                 >
                   <i className="ti ti-credit-card" style={{ fontSize: "12px" }}></i> Pay
                 </button>
@@ -2740,7 +2740,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             <div style={{ fontSize: 15, fontWeight: 800, color: C.text }}>{selectedDoc.docType ? selectedDoc.docType.toUpperCase() : "Document"} Preview</div>
           </div>
           <style>{`
-            .lh-wrap { max-width: 760px; margin: 0 auto; background: #fff; box-shadow: 0 8px 30px rgba(0,0,0,0.12); border-radius: 4px; display: flex; flex-direction: column; border: 1px solid #eaeaea; font-family: 'Nunito', sans-serif; overflow: hidden; }
+            .lh-wrap { max-width: 760px; margin: 0 auto; background: #FFFFFF; box-shadow: 0 8px 30px rgba(0,0,0,0.12); border-radius: 4px; display: flex; flex-direction: column; border: 1px solid #E2E8F0; font-family: 'Nunito', sans-serif; overflow: hidden; }
             .doc-body { padding: 28px 40px; font-size: 12.5px; line-height: 1.8; color: #1E293B; flex: 1; }
             .lb-date{color:#64748B;margin-bottom:14px;font-size:11.5px}
             .lb-recip{margin-bottom:14px;display:block}
@@ -2759,7 +2759,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             .lb-sig-role{color:#64748B;font-size:11px;margin-top:2px}
             .lb-sig-dept{color:#64748B;font-size:10px;margin-top:1px}
           `}</style>
-          <div style={{ flex: 1, background: "#fff", borderRadius: 12, padding: "20px", overflowY: "auto", border: "1px solid " + C.border, minHeight: 350, color: "#333", fontSize: 13, lineHeight: 1.6 }} dangerouslySetInnerHTML={{ __html: selectedDoc.htmlContent || `<p>No HTML preview available. Standard attachment file: <b>${selectedDoc.fileName || "document.pdf"}</b></p>` }} />
+          <div style={{ flex: 1, background: "#FFFFFF", borderRadius: 12, padding: "20px", overflowY: "auto", border: "1px solid " + C.border, minHeight: 350, color: "#1E293B", fontSize: 13, lineHeight: 1.6 }} dangerouslySetInnerHTML={{ __html: selectedDoc.htmlContent || `<p>No HTML preview available. Standard attachment file: <b>${selectedDoc.fileName || "document.pdf"}</b></p>` }} />
         </div>
       );
     }
@@ -2774,7 +2774,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
           ) : (
             chatMessages.map((msg, idx) => (
               <div key={msg.id || idx} className={`msg-row ${msg.mine ? "mine" : ""}`}>
-                <div className="msg-av" style={{ background: msg.mine ? "linear-gradient(135deg, " + C.amber + ", #D97706)" : "linear-gradient(135deg, " + C.teal + ", " + C.teal3 + ")" }}>
+                <div className="msg-av" style={{ background: msg.mine ? "linear-gradient(135deg, " + C.amber + ", #64748B)" : "linear-gradient(135deg, " + C.teal + ", " + C.teal3 + ")" }}>
                   {msg.mine ? initials : "P"}
                 </div>
                 <div className="msg-body">
@@ -2977,11 +2977,11 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                                 src={file.url}
                                 alt={file.name || "Attached file"}
                                 onClick={() => setLightboxImages({ list: files.filter(f => /\.(jpg|jpeg|png|gif|webp)$/.test((f.name || f.url || "").toLowerCase()) || (f.type || "").startsWith("image/")), index: idx })}
-                                style={{ width: "100%", height: 100, objectFit: "cover", display: "block", background: "#f5f5f5", cursor: "pointer" }}
+                                style={{ width: "100%", height: 100, objectFit: "cover", display: "block", background: "#F8FAFC", cursor: "pointer" }}
                               />
                             ) : isPdf ? (
                               <a href="#" onClick={(e) => { e.preventDefault(); if (file.url) openPdf(file.url); }} style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "16px 8px", gap: 6, background: C.surface2, textDecoration: "none", cursor: "pointer" }}>
-                                <i className="ti ti-file-type-pdf" style={{ fontSize: 36, color: "#EF4444" }}></i>
+                                <i className="ti ti-file-type-pdf" style={{ fontSize: 36, color: "#64748B" }}></i>
                                 <div style={{ fontSize: 13, fontWeight: 700, color: C.text }}>{file.name || "Attached PDF"}</div>
                                 <div style={{ fontSize: 11, color: C.teal, fontWeight: 700 }}>Open <i className="ti ti-external-link" style={{ marginLeft: 2 }}></i></div>
                               </a>
@@ -3050,16 +3050,16 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
         {
           lightboxImages && (
             <div style={{ position: "fixed", inset: 0, zIndex: 100000, background: "rgba(0,0,0,0.9)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }} onClick={() => setLightboxImages(null)}>
-              <button onClick={() => setLightboxImages(null)} style={{ position: "absolute", top: 20, right: 24, background: "rgba(255,255,255,0.15)", border: "none", color: "#fff", width: 40, height: 40, borderRadius: 10, fontSize: 20, cursor: "pointer" }}>✕</button>
+              <button onClick={() => setLightboxImages(null)} style={{ position: "absolute", top: 20, right: 24, background: "rgba(255,255,255,0.15)", border: "none", color: "#FFFFFF", width: 40, height: 40, borderRadius: 10, fontSize: 20, cursor: "pointer" }}>✕</button>
               {lightboxImages.list.length > 1 && (
-                <button onClick={(e) => { e.stopPropagation(); setLightboxImages(prev => ({ ...prev, index: (prev.index - 1 + prev.list.length) % prev.list.length })); }} style={{ position: "absolute", left: 24, top: "50%", transform: "translateY(-50%)", background: "rgba(255,255,255,0.15)", border: "none", color: "#fff", width: 44, height: 44, borderRadius: "50%", fontSize: 20, cursor: "pointer" }}>‹</button>
+                <button onClick={(e) => { e.stopPropagation(); setLightboxImages(prev => ({ ...prev, index: (prev.index - 1 + prev.list.length) % prev.list.length })); }} style={{ position: "absolute", left: 24, top: "50%", transform: "translateY(-50%)", background: "rgba(255,255,255,0.15)", border: "none", color: "#FFFFFF", width: 44, height: 44, borderRadius: "50%", fontSize: 20, cursor: "pointer" }}>‹</button>
               )}
               <img src={lightboxImages.list[lightboxImages.index]?.url} alt="" style={{ maxWidth: "90%", maxHeight: "85vh", objectFit: "contain", borderRadius: 8 }} onClick={(e) => e.stopPropagation()} />
               {lightboxImages.list.length > 1 && (
-                <button onClick={(e) => { e.stopPropagation(); setLightboxImages(prev => ({ ...prev, index: (prev.index + 1) % prev.list.length })); }} style={{ position: "absolute", right: 24, top: "50%", transform: "translateY(-50%)", background: "rgba(255,255,255,0.15)", border: "none", color: "#fff", width: 44, height: 44, borderRadius: "50%", fontSize: 20, cursor: "pointer" }}>›</button>
+                <button onClick={(e) => { e.stopPropagation(); setLightboxImages(prev => ({ ...prev, index: (prev.index + 1) % prev.list.length })); }} style={{ position: "absolute", right: 24, top: "50%", transform: "translateY(-50%)", background: "rgba(255,255,255,0.15)", border: "none", color: "#FFFFFF", width: 44, height: 44, borderRadius: "50%", fontSize: 20, cursor: "pointer" }}>›</button>
               )}
               {lightboxImages.list.length > 1 && (
-                <div style={{ position: "absolute", bottom: 24, left: "50%", transform: "translateX(-50%)", color: "#fff", fontSize: 13, fontWeight: 700 }}>{lightboxImages.index + 1} / {lightboxImages.list.length}</div>
+                <div style={{ position: "absolute", bottom: 24, left: "50%", transform: "translateX(-50%)", color: "#FFFFFF", fontSize: 13, fontWeight: 700 }}>{lightboxImages.index + 1} / {lightboxImages.list.length}</div>
               )}
             </div>
           )
@@ -3082,7 +3082,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                     placeholder="Please explain what needs to change..."
                     style={{ width: "100%", padding: "10px 12px", borderRadius: 9, border: "1.5px solid " + C.border, fontSize: 13, outline: "none", resize: "none", boxSizing: "border-box" }}
                   />
-                  <button onClick={submitRejection} style={{ width: "100%", padding: "11px", background: C.red, color: "#fff", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+                  <button onClick={submitRejection} style={{ width: "100%", padding: "11px", background: C.red, color: "#FFFFFF", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
                     Submit Rejection
                   </button>
                 </div>
@@ -3211,7 +3211,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
               cursor: 'pointer',
               transition: 'all .2s',
             }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = C.teal; e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(37, 99, 235,.12)'; }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = C.teal; e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(37, 99, 235, .12)'; }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.04)'; }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
@@ -3345,7 +3345,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
       <div className="contact-card" style={{ height: "100%", display: "flex", flexDirection: "column" }}>
         <div className="cc-label">Point of Contact</div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 14 }}>
-          <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'rgba(255,255,255,.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 800, color: '#fff', flexShrink: 0, border: '2px solid rgba(255,255,255,.3)' }}>{initial}</div>
+          <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'rgba(255,255,255,.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 800, color: '#FFFFFF', flexShrink: 0, border: '2px solid rgba(255,255,255,.3)' }}>{initial}</div>
           <div>
             <div className="cc-name">{managerName}</div>
             <div className="cc-role">{proj?.managerRole || `Project Lead, ${agencyName}`}</div>
@@ -3643,10 +3643,10 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                 {proposals.map((prop, idx) => {
                   const st = (prop.status || "sent").toLowerCase();
                   const statusMap = {
-                    sent: { bg: "#EFF4FF", color: "#2563EB", label: "Sent" },
-                    pending: { bg: "#FEF3C7", color: "#B45309", label: "Under Review" },
-                    approved: { bg: "#DCFCE7", color: "#15803D", label: "Approved" },
-                    rejected: { bg: "#FEE2E2", color: "#DC2626", label: "Rejected" },
+                    sent: { bg: "#EFF6FF", color: "#2563EB", label: "Sent" },
+                    pending: { bg: "#E2E8F0", color: "#64748B", label: "Under Review" },
+                    approved: { bg: "#E2E8F0", color: "#16A34A", label: "Approved" },
+                    rejected: { bg: "#E2E8F0", color: "#64748B", label: "Rejected" },
                   };
                   const badge = statusMap[st] || statusMap.sent;
                   const sentDate = prop.sentAt || prop.submittedAt || prop.updatedAt;
@@ -3669,7 +3669,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                             </span>
                           )}
                           {prop.rejectNote && st === "rejected" && (
-                            <span style={{ fontSize: 11, color: "#DC2626", fontWeight: 600 }}>Note: {prop.rejectNote}</span>
+                            <span style={{ fontSize: 11, color: "#64748B", fontWeight: 600 }}>Note: {prop.rejectNote}</span>
                           )}
                           {prop.clientSignature && (prop.status || "").toLowerCase() === "approved" && (
                             <span style={{ fontSize: 11, color: C.green, fontWeight: 700 }}>
@@ -3694,7 +3694,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                           {prop.status !== "approved" && (
                             <button
                               onClick={() => setApproveTarget({ type: "proposal", doc: prop })}
-                              style={{ background: "#22C55E", color: "#fff", borderRadius: 8, padding: "6px 14px", fontSize: 12, fontWeight: 700, border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
+                              style={{ background: "#16A34A", color: "#FFFFFF", borderRadius: 8, padding: "6px 14px", fontSize: 12, fontWeight: 700, border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
                               <i className="ti ti-writing" style={{ fontSize: 13 }}></i> Approve
                             </button>
                           )}
@@ -3781,9 +3781,9 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                       <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
                         {(() => {
                           const qst = (q.status || "sent").toLowerCase();
-                          const qBadge = qst === "approved" ? { bg: "#DCFCE7", color: "#15803D", label: "Approved" }
-                            : qst === "rejected" ? { bg: "#FEE2E2", color: "#DC2626", label: "Rejected" }
-                              : qst === "pending" ? { bg: "#FEF3C7", color: "#B45309", label: "Under Review" }
+                          const qBadge = qst === "approved" ? { bg: "#E2E8F0", color: "#16A34A", label: "Approved" }
+                            : qst === "rejected" ? { bg: "#E2E8F0", color: "#64748B", label: "Rejected" }
+                              : qst === "pending" ? { bg: "#E2E8F0", color: "#64748B", label: "Under Review" }
                                 : null;
                           return qBadge ? <span style={{ background: qBadge.bg, color: qBadge.color, borderRadius: 20, padding: "4px 12px", fontSize: 11, fontWeight: 800 }}>{qBadge.label}</span> : null;
                         })()}
@@ -3796,7 +3796,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                           {q.status !== "approved" && (
                             <button
                               onClick={() => setApproveTarget({ type: "quotation", doc: q })}
-                              style={{ background: "#22C55E", color: "#fff", borderRadius: 8, padding: "6px 14px", fontSize: 12, fontWeight: 700, border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
+                              style={{ background: "#16A34A", color: "#FFFFFF", borderRadius: 8, padding: "6px 14px", fontSize: 12, fontWeight: 700, border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
                               <i className="ti ti-writing" style={{ fontSize: 13 }}></i> Approve
                             </button>
                           )}
@@ -3875,9 +3875,9 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                   return (
                     <div key={proj._id || idx}
                       onClick={() => { setSelectedClientProject(proj); setActive('projects'); }}
-                      style={{ background: C.surface, border: '1.5px solid ' + C.border, borderRadius: 16, padding: '20px 22px', cursor: 'pointer', transition: 'all .2s', boxShadow: '0 2px 12px rgba(37, 99, 235,.06)' }}
-                      onMouseEnter={e => { e.currentTarget.style.borderColor = C.teal; e.currentTarget.style.boxShadow = '0 6px 24px rgba(37, 99, 235,.15)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
-                      onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.boxShadow = '0 2px 12px rgba(37, 99, 235,.06)'; e.currentTarget.style.transform = 'none'; }}
+                      style={{ background: C.surface, border: '1.5px solid ' + C.border, borderRadius: 16, padding: '20px 22px', cursor: 'pointer', transition: 'all .2s', boxShadow: '0 2px 12px rgba(37, 99, 235, .06)' }}
+                      onMouseEnter={e => { e.currentTarget.style.borderColor = C.teal; e.currentTarget.style.boxShadow = '0 6px 24px rgba(37, 99, 235, .15)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                      onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.boxShadow = '0 2px 12px rgba(37, 99, 235, .06)'; e.currentTarget.style.transform = 'none'; }}
                     >
                       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 10 }}>
                         <div style={{ flex: 1, minWidth: 0 }}>
@@ -4088,14 +4088,14 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                     <i className="ti ti-brand-google-play" style={{ fontSize: 20, color: C.teal }}></i>
                     <div style={{ flex: 1, fontSize: 13, fontWeight: 700, color: C.text }}>Google Pay / UPI</div>
                     <div style={{ width: 14, height: 14, borderRadius: "50%", background: C.teal, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#fff" }}></div>
+                      <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#FFFFFF" }}></div>
                     </div>
                   </div>
 
 
                 </div>
 
-                <button onClick={executePayment} disabled={paymentProcessing} style={{ width: "100%", padding: "12px", background: C.teal, color: "#fff", border: "none", borderRadius: "10px", fontSize: "13px", fontWeight: "700", cursor: "pointer", marginTop: 8, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+                <button onClick={executePayment} disabled={paymentProcessing} style={{ width: "100%", padding: "12px", background: C.teal, color: "#FFFFFF", border: "none", borderRadius: "10px", fontSize: "13px", fontWeight: "700", cursor: "pointer", marginTop: 8, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
                   {paymentProcessing ? (
                     <>Processing...</>
                   ) : (
@@ -4118,7 +4118,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                 <button className="modal-close" onClick={() => setReceiptInvoice(null)}>&times;</button>
               </div>
               <div className="modal-body">
-                <div id="receipt-print-area" style={{ background: "#fff", border: "1px solid " + C.border, borderRadius: 12, padding: 24 }}>
+                <div id="receipt-print-area" style={{ background: "#FFFFFF", border: "1px solid " + C.border, borderRadius: 12, padding: 24 }}>
                   <div style={{ textAlign: "center", marginBottom: 16 }}>
                     <div style={{ width: 44, height: 44, borderRadius: "50%", background: C.greenBg, color: C.green, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 8px" }}>
                       <i className="ti ti-circle-check" style={{ fontSize: 22 }}></i>
@@ -4168,7 +4168,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                     }
                   }
                 `}</style>
-                  <button onClick={() => downloadReceiptPdf(receiptInvoice, clientName, agencyName)} style={{ flex: 1, padding: "11px", background: C.teal, color: "#fff", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+                  <button onClick={() => downloadReceiptPdf(receiptInvoice, clientName, agencyName)} style={{ flex: 1, padding: "11px", background: C.teal, color: "#FFFFFF", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
                     <i className="ti ti-download"></i> Download PDF
                   </button>
                 </div>
@@ -4181,12 +4181,12 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
       {
         previewFile && (
           <div style={{ position: "fixed", inset: 0, zIndex: 99999, background: "rgba(0,0,0,0.75)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }} onClick={() => setPreviewFile(null)}>
-            <div style={{ background: "#fff", width: "100%", maxWidth: 900, height: "85vh", borderRadius: 14, overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 20px 60px rgba(0,0,0,0.4)" }} onClick={(e) => e.stopPropagation()}>
+            <div style={{ background: "#FFFFFF", width: "100%", maxWidth: 900, height: "85vh", borderRadius: 14, overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 20px 60px rgba(0,0,0,0.4)" }} onClick={(e) => e.stopPropagation()}>
               <div style={{ padding: "14px 20px", borderBottom: "1px solid " + C.border, display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
                 <div style={{ fontSize: 14, fontWeight: 800, color: C.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", paddingRight: 12 }}>{previewFile.name}</div>
                 <button onClick={() => setPreviewFile(null)} style={{ background: C.bg, border: "1px solid " + C.border, color: C.text2, width: 30, height: 30, borderRadius: 8, cursor: "pointer", fontSize: 15, flexShrink: 0 }}>✕</button>
               </div>
-              <div style={{ flex: 1, background: "#f4f4f4", display: "flex", alignItems: "center", justifyContent: "center", overflow: "auto" }}>
+              <div style={{ flex: 1, background: "#F8FAFC", display: "flex", alignItems: "center", justifyContent: "center", overflow: "auto" }}>
                 {isPreviewableFile(previewFile) === "image" ? (
                   <img src={previewFile.url} alt={previewFile.name} style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />
                 ) : isPreviewableFile(previewFile) === "office" ? (

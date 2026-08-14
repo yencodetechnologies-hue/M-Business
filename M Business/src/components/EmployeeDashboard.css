@@ -3,21 +3,21 @@
   --teal-dim: rgba(37, 99, 235, 0.08);
   --teal-mid: rgba(37, 99, 235, 0.15);
   --teal-glow: rgba(37, 99, 235, 0.25);
-  --bg: #f0f4f8;
-  --card: #ffffff;
-  --border: #e5eaf0;
-  --border2: #d0dae4;
-  --text: #0f172a;
-  --text-mid: #4a5568;
-  --text-soft: #94a3b8;
-  --green: #16a34a;
-  --green-bg: #dcfce7;
-  --amber: #d97706;
-  --amber-bg: #fef3c7;
-  --red: #dc2626;
-  --red-bg: #fee2e2;
-  --blue: #2563eb;
-  --blue-bg: #dbeafe;
+  --bg: #EFF6FF;
+  --card: #FFFFFF;
+  --border: #E2E8F0;
+  --border2: #E2E8F0;
+  --text: #0F172A;
+  --text-mid: #64748B;
+  --text-soft: #64748B;
+  --green: #16A34A;
+  --green-bg: #E2E8F0;
+  --amber: #64748B;
+  --amber-bg: #E2E8F0;
+  --red: #64748B;
+  --red-bg: #E2E8F0;
+  --blue: #2563EB;
+  --blue-bg: #E2E8F0;
 }
 
 /* ── MAIN ── */
@@ -36,7 +36,7 @@
 
 /* ── GREETING HERO ── */
 .greet-hero {
-  background: linear-gradient(135deg, var(--app-accent, var(--app-accent, #2563EB)) 0%, #0097a7 60%, #006978 100%);
+  background: linear-gradient(135deg, var(--app-accent, var(--app-accent, #2563EB)) 0%, #2563EB 60%, #16A34A 100%);
   border-radius: 16px;
   padding: 28px 32px;
   display: flex;
@@ -81,7 +81,7 @@
   font-size: 24px;
   font-weight: 900;
   color: var(--teal);
-  background: #fff;
+  background: #FFFFFF;
   border: 3px solid rgba(255, 255, 255, 0.4);
   flex-shrink: 0;
   position: relative;
@@ -104,7 +104,7 @@
 .greet-name {
   font-size: 22px;
   font-weight: 900;
-  color: #fff;
+  color: #FFFFFF;
   margin-bottom: 3px;
 }
 
@@ -127,7 +127,7 @@
 .greet-date strong {
   display: block;
   font-size: 14px;
-  color: #fff;
+  color: #FFFFFF;
   margin-bottom: 2px;
 }
 
@@ -141,7 +141,7 @@
   padding: 4px 12px;
   font-size: 11px;
   font-weight: 800;
-  color: #fff;
+  color: #FFFFFF;
   margin-top: 8px;
 }
 
@@ -149,7 +149,7 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #fff;
+  background: #FFFFFF;
 }
 
 /* ── QUICK STATS ── */
@@ -161,7 +161,7 @@
 }
 
 .qs-card {
-  background: #fff;
+  background: #FFFFFF;
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 16px 18px;
@@ -205,13 +205,13 @@
 }
 
 .qi-green {
-  background: var(--green-bg);
+  background: var(--app-accent-light);
   color: var(--green);
 }
 
 .qi-amber {
-  background: var(--amber-bg);
-  color: var(--amber);
+  background: var(--app-accent-light);
+  color: var(--app-muted);
 }
 
 .qi-blue {
@@ -250,7 +250,7 @@
 
 /* ── SECTION CARD ── */
 .sc {
-  background: #fff;
+  background: #FFFFFF;
   border: 1px solid var(--border);
   border-radius: 14px;
   overflow: hidden;
@@ -276,7 +276,7 @@
   justify-content: space-between;
   padding: 13px 18px;
   border-bottom: 1px solid var(--border);
-  background: #fafbfc;
+  background: #F8FAFC;
 }
 
 .sc-title {
@@ -354,11 +354,11 @@
 }
 
 .av-r {
-  color: var(--red);
+  color: var(--app-text);
 }
 
 .av-a {
-  color: var(--amber);
+  color: var(--app-muted);
 }
 
 .av-b {
@@ -391,7 +391,7 @@
 
 .prog-bar {
   height: 7px;
-  background: #e9eef4;
+  background: #E2E8F0;
   border-radius: 10px;
   overflow: hidden;
 }
@@ -440,18 +440,18 @@
 }
 
 .ls.approved {
-  background: var(--green-bg);
+  background: var(--app-accent-light);
   color: var(--green);
 }
 
 .ls.pending {
-  background: var(--amber-bg);
-  color: var(--amber);
+  background: var(--app-accent-light);
+  color: var(--app-muted);
 }
 
 .ls.rejected {
-  background: var(--red-bg);
-  color: var(--red);
+  background: var(--app-accent-light);
+  color: var(--app-text);
 }
 
 /* ── PROJECTS ── */
@@ -507,7 +507,7 @@
 
 .proj-bar {
   height: 4px;
-  background: #e9eef4;
+  background: #E2E8F0;
   border-radius: 10px;
   overflow: hidden;
   margin-top: 4px;
@@ -551,7 +551,7 @@
 .task-chk.done {
   background: var(--teal);
   border-color: var(--teal);
-  color: #fff;
+  color: #FFFFFF;
 }
 
 .task-chk:not(.done):hover {
@@ -576,12 +576,12 @@
 }
 
 .task-due.overdue {
-  color: var(--red);
+  color: var(--app-text);
   font-weight: 700;
 }
 
 .task-due.today {
-  color: var(--amber);
+  color: var(--app-muted);
   font-weight: 700;
 }
 
@@ -596,17 +596,17 @@
 }
 
 .tp-high {
-  background: var(--red-bg);
-  color: var(--red);
+  background: var(--app-accent-light);
+  color: var(--app-text);
 }
 
 .tp-mid {
-  background: var(--amber-bg);
-  color: var(--amber);
+  background: var(--app-accent-light);
+  color: var(--app-muted);
 }
 
 .tp-low {
-  background: var(--green-bg);
+  background: var(--app-accent-light);
   color: var(--green);
 }
 
@@ -655,7 +655,7 @@
 
 .doc-item:hover {
   border-color: var(--teal);
-  background: #f0fbfd;
+  background: #EFF6FF;
 }
 
 .doc-ico {

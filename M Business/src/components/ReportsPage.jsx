@@ -83,8 +83,8 @@ function ReportCard({ THEME, r, idx, RPT_COLORS }) {
         {[
           { k: "Total", v: r.total, c: THEME.accent },
           { k: "Revenue", v: r.revenue, c: color },
-          { k: "Done", v: r.done, c: "#22C55E" },
-          { k: "Pending", v: r.pending, c: "#f59e0b" },
+          { k: "Done", v: r.done, c: "#16A34A" },
+          { k: "Pending", v: r.pending, c: "#64748B" },
         ].map(({ k, v, c }) => (
           <div key={k} style={{
             background: THEME.surface, borderRadius: 14,
@@ -112,7 +112,7 @@ export default function ReportsPage({ THEME, clients = [], projects = [], employ
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(false);
   const [lastSync, setLastSync] = useState(null);
-  const RPT_COLORS = [THEME.accent, THEME.accent, THEME.muted, "#f59e0b"];
+  const RPT_COLORS = [THEME.accent, THEME.accent, THEME.muted, "#64748B"];
 
   useEffect(() => {
     // Show data instantly from what we already have in memory — no network
@@ -205,10 +205,10 @@ export default function ReportsPage({ THEME, clients = [], projects = [], employ
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap');`}</style>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 20, marginBottom: 32 }}>
-        <StatCard THEME={THEME} icon="ti-currency-rupee" label="Total Revenue" value={(() => { const n = income.reduce((s, x) => s + (Number(x.amount) || 0), 0); return n >= 100000 ? `₹${(n / 100000).toFixed(2)}L` : `₹${n.toLocaleString("en-IN")}`; })()} color="#10b981" />
+        <StatCard THEME={THEME} icon="ti-currency-rupee" label="Total Revenue" value={(() => { const n = income.reduce((s, x) => s + (Number(x.amount) || 0), 0); return n >= 100000 ? `₹${(n / 100000).toFixed(2)}L` : `₹${n.toLocaleString("en-IN")}`; })()} color="#16A34A" />
         <StatCard THEME={THEME} icon="ti-folder" label="Active Projects" value={projects.filter(p => (p.status || "").toLowerCase() !== "completed").length} color={THEME.accent} />
-        <StatCard THEME={THEME} icon="ti-users" label="Total Clients" value={clients.length} color="#f59e0b" />
-        <StatCard THEME={THEME} icon="ti-users-group" label="Team Size" value={employees.length + managers.length} color="#6366f1" />
+        <StatCard THEME={THEME} icon="ti-users" label="Total Clients" value={clients.length} color="#64748B" />
+        <StatCard THEME={THEME} icon="ti-users-group" label="Team Size" value={employees.length + managers.length} color="#2563EB" />
       </div>
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
@@ -216,7 +216,7 @@ export default function ReportsPage({ THEME, clients = [], projects = [], employ
           <h2 style={{ margin: 0, fontSize: 24, fontWeight: 900, letterSpacing: "-0.5px" }}>Available Reports</h2>
           <p style={{ margin: "4px 0 0", color: THEME.muted, fontSize: 14, fontWeight: 600 }}>Real-time business insights and analytics</p>
         </div>
-        <button onClick={fetchReports} style={{ background: THEME.accent, color: "#fff", border: "none", borderRadius: 12, padding: "12px 24px", fontWeight: 800, fontSize: 14, cursor: "pointer", boxShadow: "0 4px 12px rgba(37, 99, 235,0.2)", display: "flex", alignItems: "center", gap: 8 }}><i className="ti ti-refresh"></i> Refresh Reports</button>
+        <button onClick={fetchReports} style={{ background: THEME.accent, color: "#FFFFFF", border: "none", borderRadius: 12, padding: "12px 24px", fontWeight: 800, fontSize: 14, cursor: "pointer", boxShadow: "0 4px 12px rgba(37, 99, 235, 0.2)", display: "flex", alignItems: "center", gap: 8 }}><i className="ti ti-refresh"></i> Refresh Reports</button>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(340px,1fr))", gap: 24, alignItems: "stretch" }}>
@@ -255,7 +255,7 @@ export default function ReportsPage({ THEME, clients = [], projects = [], employ
                 borderRadius: 12, padding: "8px 16px", color: "var(--app-text)",
                 fontWeight: 700, cursor: "pointer", fontSize: 13, transition: "0.2s"
               }}
-              onMouseEnter={e => e.currentTarget.style.background = "#f1f5f9"}
+              onMouseEnter={e => e.currentTarget.style.background = "#EFF6FF"}
               onMouseLeave={e => e.currentTarget.style.background = "var(--app-bg)"}
             ><i className="ti ti-x" style={{ marginRight: 6 }}></i>Close</button>
           </div>
@@ -263,14 +263,14 @@ export default function ReportsPage({ THEME, clients = [], projects = [], employ
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(400px, 1fr))", gap: 30 }}>
             {/* Income Table */}
             <div style={{ background: THEME.surface, borderRadius: 16, padding: 20, border: `1.5px solid ${THEME.border}` }}>
-              <h4 style={{ fontSize: 15, fontWeight: 800, color: "#16a34a", marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ width: 32, height: 32, borderRadius: 10, background: "#dcfce7", display: "flex", alignItems: "center", justifyContent: "center", color: "#16a34a" }}><i className="ti ti-trending-up"></i></span>
+              <h4 style={{ fontSize: 15, fontWeight: 800, color: "#16A34A", marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ width: 32, height: 32, borderRadius: 10, background: "#E2E8F0", display: "flex", alignItems: "center", justifyContent: "center", color: "#16A34A" }}><i className="ti ti-trending-up"></i></span>
                 Recent Income
               </h4>
               <div style={{ overflowX: "auto" }}>
                 <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
                   <thead>
-                    <tr style={{ textAlign: "left", color: "var(--app-muted)", borderBottom: "2.5px solid #f1f5f9" }}>
+                    <tr style={{ textAlign: "left", color: "var(--app-muted)", borderBottom: "2.5px solid #EFF6FF" }}>
                       <th style={{ padding: "12px 8px", fontWeight: 700, fontSize: 11, letterSpacing: 0.5 }}>DATE</th>
                       <th style={{ padding: "12px 8px", fontWeight: 700, fontSize: 11, letterSpacing: 0.5 }}>SOURCE</th>
                       <th style={{ padding: "12px 8px", fontWeight: 700, fontSize: 11, letterSpacing: 0.5, textAlign: "right" }}>AMOUNT</th>
@@ -278,10 +278,10 @@ export default function ReportsPage({ THEME, clients = [], projects = [], employ
                   </thead>
                   <tbody>
                     {income.length > 0 ? income.slice(0, 15).map((item, i) => (
-                      <tr key={i} style={{ borderBottom: "1.5px solid #f8fafc" }}>
+                      <tr key={i} style={{ borderBottom: "1.5px solid #F8FAFC" }}>
                         <td style={{ padding: "14px 8px", color: "var(--app-muted)" }}>{item.date ? new Date(item.date).toLocaleDateString("en-IN", { day: '2-digit', month: 'short' }) : "N/A"}</td>
                         <td style={{ padding: "14px 8px", fontWeight: 700, color: "var(--app-text)" }}>{item.source || item.title || "Payment Received"}</td>
-                        <td style={{ padding: "14px 8px", textAlign: "right", color: "#16a34a", fontWeight: 800 }}>₹{Number(item.amount).toLocaleString()}</td>
+                        <td style={{ padding: "14px 8px", textAlign: "right", color: "#16A34A", fontWeight: 800 }}>₹{Number(item.amount).toLocaleString()}</td>
                       </tr>
                     )) : <tr><td colSpan="3" style={{ padding: 40, textAlign: "center", color: "var(--app-muted)" }}>No income records found</td></tr>}
                   </tbody>
@@ -291,14 +291,14 @@ export default function ReportsPage({ THEME, clients = [], projects = [], employ
 
             {/* Expense Table */}
             <div style={{ background: THEME.surface, borderRadius: 16, padding: 20, border: `1.5px solid ${THEME.border}` }}>
-              <h4 style={{ fontSize: 15, fontWeight: 800, color: "#dc2626", marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ width: 32, height: 32, borderRadius: 10, background: "#fee2e2", display: "flex", alignItems: "center", justifyContent: "center", color: "#dc2626" }}><i className="ti ti-trending-down"></i></span>
+              <h4 style={{ fontSize: 15, fontWeight: 800, color: "#64748B", marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ width: 32, height: 32, borderRadius: 10, background: "#E2E8F0", display: "flex", alignItems: "center", justifyContent: "center", color: "#64748B" }}><i className="ti ti-trending-down"></i></span>
                 Recent Expenses
               </h4>
               <div style={{ overflowX: "auto" }}>
                 <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
                   <thead>
-                    <tr style={{ textAlign: "left", color: "var(--app-muted)", borderBottom: "2.5px solid #f1f5f9" }}>
+                    <tr style={{ textAlign: "left", color: "var(--app-muted)", borderBottom: "2.5px solid #EFF6FF" }}>
                       <th style={{ padding: "12px 8px", fontWeight: 700, fontSize: 11, letterSpacing: 0.5 }}>DATE</th>
                       <th style={{ padding: "12px 8px", fontWeight: 700, fontSize: 11, letterSpacing: 0.5 }}>CATEGORY</th>
                       <th style={{ padding: "12px 8px", fontWeight: 700, fontSize: 11, letterSpacing: 0.5, textAlign: "right" }}>AMOUNT</th>
@@ -306,10 +306,10 @@ export default function ReportsPage({ THEME, clients = [], projects = [], employ
                   </thead>
                   <tbody>
                     {expenses.length > 0 ? expenses.slice(0, 15).map((item, i) => (
-                      <tr key={i} style={{ borderBottom: "1.5px solid #f8fafc" }}>
+                      <tr key={i} style={{ borderBottom: "1.5px solid #F8FAFC" }}>
                         <td style={{ padding: "14px 8px", color: "var(--app-muted)" }}>{item.date ? new Date(item.date).toLocaleDateString("en-IN", { day: '2-digit', month: 'short' }) : "N/A"}</td>
                         <td style={{ padding: "14px 8px", fontWeight: 700, color: "var(--app-text)" }}>{item.category || item.title || "General Expense"}</td>
-                        <td style={{ padding: "14px 8px", textAlign: "right", color: "#dc2626", fontWeight: 800 }}>₹{Number(item.amount).toLocaleString()}</td>
+                        <td style={{ padding: "14px 8px", textAlign: "right", color: "#64748B", fontWeight: 800 }}>₹{Number(item.amount).toLocaleString()}</td>
                       </tr>
                     )) : <tr><td colSpan="3" style={{ padding: 40, textAlign: "center", color: "var(--app-muted)" }}>No expense records found</td></tr>}
                   </tbody>
@@ -367,10 +367,10 @@ export default function ReportsPage({ THEME, clients = [], projects = [], employ
                         {r.revenue}
                       </td>
                       <td style={{ padding: "12px 14px" }}>
-                        <span style={{ color: "#22C55E", fontWeight: 700 }}>{r.done}</span>
+                        <span style={{ color: "#16A34A", fontWeight: 700 }}>{r.done}</span>
                       </td>
                       <td style={{ padding: "12px 14px" }}>
-                        <span style={{ color: "#f59e0b", fontWeight: 700 }}>{r.pending}</span>
+                        <span style={{ color: "#64748B", fontWeight: 700 }}>{r.pending}</span>
                       </td>
                     </tr>
                   );

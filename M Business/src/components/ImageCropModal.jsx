@@ -79,7 +79,7 @@ const ImageCropModal = ({ image, onCropComplete, onCancel, aspect: initialAspect
         width: '100%',
         maxWidth: '500px',
         height: 'min(400px, 45vh)',
-        backgroundColor: '#1e1e1e',
+        backgroundColor: '#0F172A',
         borderRadius: '16px 16px 0 0',
         overflow: 'hidden',
         flexShrink: 0
@@ -103,7 +103,7 @@ const ImageCropModal = ({ image, onCropComplete, onCancel, aspect: initialAspect
         width: '100%',
         maxWidth: '500px',
         padding: 'clamp(14px, 4vw, 24px)',
-        backgroundColor: '#fff',
+        backgroundColor: '#FFFFFF',
         borderRadius: '0 0 16px 16px',
         display: 'flex',
         flexDirection: 'column',
@@ -115,7 +115,7 @@ const ImageCropModal = ({ image, onCropComplete, onCancel, aspect: initialAspect
       }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: 'clamp(10px, 3vw, 12px)', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Zoom</span>
+            <span style={{ fontSize: 'clamp(10px, 3vw, 12px)', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Zoom</span>
             <span style={{ fontSize: 'clamp(10px, 3vw, 12px)', fontWeight: 700, color: 'var(--app-accent)' }}>
               {Math.round(zoom * 100)}%
               {croppedAreaPixels ? ` · ${Math.round(croppedAreaPixels.width)}×${Math.round(croppedAreaPixels.height)}px` : ''}
@@ -138,7 +138,7 @@ const ImageCropModal = ({ image, onCropComplete, onCancel, aspect: initialAspect
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          <span style={{ fontSize: 'clamp(10px, 3vw, 12px)', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Aspect Ratio</span>
+          <span style={{ fontSize: 'clamp(10px, 3vw, 12px)', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Aspect Ratio</span>
           <div style={{ display: 'flex', gap: '8px' }}>
             {[
               { label: '1:1', value: 1 },
@@ -153,9 +153,9 @@ const ImageCropModal = ({ image, onCropComplete, onCancel, aspect: initialAspect
                   flex: 1,
                   padding: 'clamp(6px, 2vw, 8px)',
                   borderRadius: '8px',
-                  border: aspect === opt.value ? '2px solid var(--app-accent)' : '1px solid #e2e8f0',
-                  background: aspect === opt.value ? 'var(--app-bg)' : '#fff',
-                  color: aspect === opt.value ? 'var(--app-accent)' : '#64748b',
+                  border: aspect === opt.value ? '2px solid var(--app-accent)' : '1px solid #E2E8F0',
+                  background: aspect === opt.value ? 'var(--app-bg)' : '#FFFFFF',
+                  color: aspect === opt.value ? 'var(--app-accent)' : '#64748B',
                   fontSize: 'clamp(10px, 3vw, 12px)',
                   fontWeight: 700,
                   cursor: 'pointer',
@@ -174,10 +174,10 @@ const ImageCropModal = ({ image, onCropComplete, onCancel, aspect: initialAspect
             style={{
               flex: 1,
               padding: 'clamp(10px, 3vw, 12px)',
-              backgroundColor: '#f8fafc',
-              border: '1px solid #e2e8f0',
+              backgroundColor: '#F8FAFC',
+              border: '1px solid #E2E8F0',
               borderRadius: '12px',
-              color: '#64748b',
+              color: '#64748B',
               fontWeight: '700',
               fontSize: 'clamp(12px, 3.5vw, 14px)',
               cursor: 'pointer',
@@ -194,7 +194,7 @@ const ImageCropModal = ({ image, onCropComplete, onCancel, aspect: initialAspect
               backgroundColor: 'var(--app-accent)',
               border: 'none',
               borderRadius: '12px',
-              color: '#fff',
+              color: '#FFFFFF',
               fontWeight: '700',
               fontSize: 'clamp(12px, 3.5vw, 14px)',
               cursor: 'pointer',

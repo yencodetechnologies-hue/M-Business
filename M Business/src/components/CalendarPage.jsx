@@ -9,7 +9,7 @@ const FULL_MONTHS = ["January", "February", "March", "April", "May", "June", "Ju
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const FIXED_TYPES = ["Meeting", "Call", "Review", "Planning", "Handover"];
 const TYPES = [...FIXED_TYPES, "Custom"];
-const TC = { Meeting: "var(--app-accent)", Call: "var(--app-accent)", Review: "#22C55E", Planning: "#f59e0b", Handover: "var(--app-accent)", Custom: "var(--app-muted)" };
+const TC = { Meeting: "var(--app-accent)", Call: "var(--app-accent)", Review: "#16A34A", Planning: "#64748B", Handover: "var(--app-accent)", Custom: "var(--app-muted)" };
 const EMPTY = { name: "", project: "", client: "", date: "", start: "", end: "", notes: "", type: "Meeting", category: "Event" };
 
 export default function CalendarPage({ projects = [], tasks = [], clients = [], companyId, onUpdateProject, onUpdateTask, config, user, THEME, onAddProject, onAddClient, newlyAddedClientName, newlyAddedProjectName }) {
@@ -390,7 +390,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
 
   const Btn = {
     background: finalTheme.gradient || finalTheme.accent,
-    color: "#fff",
+    color: "#FFFFFF",
     border: "none",
     borderRadius: 12,
     padding: "10px 22px",
@@ -404,7 +404,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
 
   const inp = (hasErr) => ({
     width: "100%",
-    border: `1.5px solid ${hasErr ? "#ef4444" : finalTheme.border}`,
+    border: `1.5px solid ${hasErr ? "#64748B" : finalTheme.border}`,
     borderRadius: 12,
     padding: "12px 16px",
     fontSize: 14,
@@ -437,8 +437,8 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
       {toast && (
         <div style={{
           position: "fixed", bottom: 24, right: 24, zIndex: 9999,
-          background: finalTheme.card, border: `1.5px solid #22c55e`, borderRadius: 12,
-          padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e",
+          background: finalTheme.card, border: `1.5px solid #16A34A`, borderRadius: 12,
+          padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#16A34A",
           boxShadow: finalTheme.shadow || "var(--app-shadow)"
         }}>{toast}</div>
       )}
@@ -453,7 +453,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
           width: 44, height: 44, borderRadius: 12, background: finalTheme.gradient || finalTheme.accent,
           display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0
         }}>
-          <i className="ti ti-calendar" style={{ fontSize: 20, color: "#fff" }} />
+          <i className="ti ti-calendar" style={{ fontSize: 20, color: "#FFFFFF" }} />
         </div>
         <div style={{ flex: 1, minWidth: 160 }}>
           <div style={{ fontSize: 18, fontWeight: 900, color: finalTheme.text || "var(--app-text)" }}>Calendar</div>
@@ -500,7 +500,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
               width: 40, height: 40, borderRadius: 10, background: finalTheme.gradient || finalTheme.accent,
               display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0
             }}>
-              <i className="ti ti-calendar-event" style={{ fontSize: 18, color: "#fff" }} />
+              <i className="ti ti-calendar-event" style={{ fontSize: 18, color: "#FFFFFF" }} />
             </div>
             <div>
               <div style={{ fontSize: 15, fontWeight: 800, color: finalTheme.text || "var(--app-text)" }}>
@@ -828,9 +828,9 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
                                   Edit
                                 </button>
                                 <button onClick={() => del(ev._id || ev.id)} style={{
-                                  background: "#fee2e2", border: "1px solid #fecaca",
+                                  background: "#E2E8F0", border: "1px solid #E2E8F0",
                                   borderRadius: 7, padding: "5px 12px", fontSize: 11,
-                                  color: "#ef4444", cursor: "pointer", fontWeight: 700
+                                  color: "#64748B", cursor: "pointer", fontWeight: 700
                                 }}>
                                   Delete
                                 </button>
@@ -894,7 +894,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
                     type="date"
                     value={form.date}
                     onChange={e => setForm({ ...form, date: e.target.value })}
-                    style={{ border: "none", background: "#fff", padding: 0, fontSize: 13, fontWeight: 700, color: finalTheme.text || "var(--app-text)", marginTop: 1, width: "100%", outline: "none", fontFamily: "inherit", colorScheme: "light" }}
+                    style={{ border: "none", background: "#FFFFFF", padding: 0, fontSize: 13, fontWeight: 700, color: finalTheme.text || "var(--app-text)", marginTop: 1, width: "100%", outline: "none", fontFamily: "inherit", colorScheme: "light" }}
                     disabled={form._readOnly}
                   />
                 </div>
@@ -921,7 +921,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
               {!form._readOnly && (
                 <button
                   onClick={() => updateProjectTask("project", form._original._id, { status: form._original.status, deadline: form.date })}
-                  style={{ background: finalTheme.gradient || finalTheme.accent, color: "#fff", border: "none", borderRadius: 10, padding: "10px 20px", cursor: "pointer", fontWeight: 700 }}
+                  style={{ background: finalTheme.gradient || finalTheme.accent, color: "#FFFFFF", border: "none", borderRadius: 10, padding: "10px 20px", cursor: "pointer", fontWeight: 700 }}
                 >
                   Save Changes
                 </button>
@@ -962,7 +962,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
               {!form._readOnly && (
                 <button
                   onClick={() => updateProjectTask("task", form._original._id, { status: form._original.status, date: form.date })}
-                  style={{ background: finalTheme.gradient || finalTheme.accent, color: "#fff", border: "none", borderRadius: 10, padding: "10px 20px", cursor: "pointer", fontWeight: 700 }}
+                  style={{ background: finalTheme.gradient || finalTheme.accent, color: "#FFFFFF", border: "none", borderRadius: 10, padding: "10px 20px", cursor: "pointer", fontWeight: 700 }}
                 >
                   Save Changes
                 </button>
@@ -998,7 +998,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
                 onClick={() => { setModal(null); setForm(EMPTY); setErr({}); }}
                 style={{
                   background: "none", border: "none", cursor: "pointer",
-                  fontSize: 20, lineHeight: 1, color: finalTheme.muted || "#64748b",
+                  fontSize: 20, lineHeight: 1, color: finalTheme.muted || "#64748B",
                   padding: 4, display: "flex", alignItems: "center", justifyContent: "center"
                 }}
                 aria-label="Close"
@@ -1024,7 +1024,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
                     onChange={e => { setForm({ ...form, name: e.target.value }); setErr(p => ({ ...p, name: "" })); }}
                     placeholder={`e.g. ${form.category === "Project" ? "New Website Development" : form.category === "Task" ? "Design Homepage" : "Client Review Meeting"}`}
                     style={{ ...inp(err.name), background: finalTheme.bg }} />
-                  {err.name && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4 }}>Warning {err.name}</div>}
+                  {err.name && <div style={{ fontSize: 11, color: "#64748B", marginTop: 4 }}>Warning {err.name}</div>}
                 </div>
 
                 {/* Type */}
@@ -1049,7 +1049,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
                           title="Switch back to dropdown"
                           style={{
                             position: "absolute", right: 6, top: "50%", transform: "translateY(-50%)",
-                            background: "none", border: "none", cursor: "pointer", color: finalTheme.muted || "#94a3b8", fontSize: 14, lineHeight: 1, padding: 2
+                            background: "none", border: "none", cursor: "pointer", color: finalTheme.muted || "#64748B", fontSize: 14, lineHeight: 1, padding: 2
                           }}
                         >
                           <i className="ti ti-selector"></i>
@@ -1073,7 +1073,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
                   <input type="date" value={form.date} disabled={modal === "view"}
                     onChange={e => { setForm({ ...form, date: e.target.value }); setErr(p => ({ ...p, date: "" })); }}
                     style={{ ...inp(err.date), background: finalTheme.bg }} />
-                  {err.date && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4 }}>Warning {err.date}</div>}
+                  {err.date && <div style={{ fontSize: 11, color: "#64748B", marginTop: 4 }}>Warning {err.date}</div>}
                 </div>
 
                 {/* Time */}

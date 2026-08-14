@@ -71,12 +71,12 @@ function Modal({ title, onClose, children, THEME }) {
         }}>
           <div style={{ position: "absolute", right: -15, top: -15, fontSize: 70, opacity: 0.12, transform: "rotate(-15deg)", pointerEvents: "none" }}>{isIncome ? "Cost" : isExpense ? "Payment" : "Edit"}</div>
           <div style={{ position: "relative", zIndex: 1 }}>
-            <h2 style={{ margin: 0, fontSize: 22, fontWeight: 900, color: "#fff", letterSpacing: "-0.5px" }}>{title}</h2>
+            <h2 style={{ margin: 0, fontSize: 22, fontWeight: 900, color: "#FFFFFF", letterSpacing: "-0.5px" }}>{title}</h2>
             <div style={{ fontSize: 11, color: "rgba(255,255,255,0.7)", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, marginTop: 4 }}>Financial Entry</div>
           </div>
           <button onClick={onClose} style={{
             background: "rgba(255,255,255,0.15)", border: "none",
-            fontSize: 14, cursor: "pointer", color: "#fff", width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 10, fontWeight: 900, transition: "0.2s"
+            fontSize: 14, cursor: "pointer", color: "#FFFFFF", width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 10, fontWeight: 900, transition: "0.2s"
           }} onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.25)"} onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,0.15)"}>Close</button>
         </div>
         <div style={{ overflowY: "auto", padding: "28px 32px", flex: 1, background: "var(--app-card)" }}>{children}</div>
@@ -90,8 +90,8 @@ function Toast({ msg, THEME }) {
   return (
     <div style={{
       position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: THEME.card,
-      border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px",
-      fontSize: 13, fontWeight: 700, color: "#22c55e",
+      border: "1.5px solid #16A34A", borderRadius: 12, padding: "12px 20px",
+      fontSize: 13, fontWeight: 700, color: "#16A34A",
       boxShadow: THEME.shadow
     }}>{msg}</div>
   );
@@ -99,7 +99,7 @@ function Toast({ msg, THEME }) {
 
 function Fld({ label, value, onChange, options, type = "text", error, placeholder, prefix, THEME }) {
   const s = {
-    width: "100%", border: `1.5px solid ${error ? "#EF4444" : THEME.border}`,
+    width: "100%", border: `1.5px solid ${error ? "#64748B" : THEME.border}`,
     borderRadius: 14, padding: prefix ? "14px 14px 14px 38px" : "14px 16px",
     fontSize: 15, color: THEME.text, background: THEME.surface,
     boxSizing: "border-box", outline: "none", fontFamily: "inherit", fontWeight: 700,
@@ -126,7 +126,7 @@ function Fld({ label, value, onChange, options, type = "text", error, placeholde
           </select>
           : <input type={type} value={value} onChange={e => onChange(e.target.value)} style={s} placeholder={placeholder || ""} />}
       </div>
-      {error && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {error}</div>}
+      {error && <div style={{ fontSize: 11, color: "#64748B", marginTop: 4 }}>Warning {error}</div>}
     </div>
   );
 }
@@ -150,10 +150,10 @@ function ClientDropdown({ clients, value, onChange, error, onAddClient, THEME })
   const selected = clients.find(c => (c.clientName || c.name) === value);
   return (
     <div style={{ position: "relative", zIndex: open ? 1000 : 1 }}>
-      <div onClick={() => setOpen(!open)} style={{ width: "100%", border: `1.5px solid ${error ? "#EF4444" : open ? THEME.accent : "var(--app-border)"}`, borderRadius: 12, padding: "12px 36px 12px 14px", fontSize: 14, color: value ? "var(--app-text)" : "var(--app-muted)", background: "var(--app-bg)", cursor: "pointer", userSelect: "none", boxSizing: "border-box", position: "relative", minHeight: 46, fontWeight: 600 }}>
+      <div onClick={() => setOpen(!open)} style={{ width: "100%", border: `1.5px solid ${error ? "#64748B" : open ? THEME.accent : "var(--app-border)"}`, borderRadius: 12, padding: "12px 36px 12px 14px", fontSize: 14, color: value ? "var(--app-text)" : "var(--app-muted)", background: "var(--app-bg)", cursor: "pointer", userSelect: "none", boxSizing: "border-box", position: "relative", minHeight: 46, fontWeight: 600 }}>
         {value ? (
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <div style={{ width: 24, height: 24, borderRadius: "50%", background: THEME.accent, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 800, flexShrink: 0 }}>{value[0].toUpperCase()}</div>
+            <div style={{ width: 24, height: 24, borderRadius: "50%", background: THEME.accent, display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 11, fontWeight: 800, flexShrink: 0 }}>{value[0].toUpperCase()}</div>
             <span>{value}</span>
             {selected?.companyName && <span style={{ fontSize: 12, color: THEME.muted }}>({selected.companyName})</span>}
           </div>
@@ -175,7 +175,7 @@ function ClientDropdown({ clients, value, onChange, error, onAddClient, THEME })
                 const isSel = value === name;
                 return (
                   <div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? THEME.surface : "transparent" }} onMouseEnter={e => e.currentTarget.style.background = THEME.surface} onMouseLeave={e => e.currentTarget.style.background = isSel ? THEME.surface : "transparent"}>
-                    <div style={{ width: 28, height: 28, borderRadius: "50%", background: THEME.accent, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{name[0]?.toUpperCase() || "?"}</div>
+                    <div style={{ width: 28, height: 28, borderRadius: "50%", background: THEME.accent, display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{name[0]?.toUpperCase() || "?"}</div>
                     <div style={{ flex: 1 }}>
                       <div style={{ fontSize: 13, fontWeight: 600, color: THEME.text }}>{name}</div>
                       {c.companyName && <div style={{ fontSize: 11, color: THEME.muted }}>{c.companyName}</div>}
@@ -197,9 +197,9 @@ function FinancialOverview({ THEME, income = [], expenses = [] }) {
   const netBalance = totalIncome - totalExpenses;
 
   const stats = [
-    { t: "Total Income", v: formatCurrency(totalIncome), f: formatCurrency(totalIncome, "₹", false, true), c: "#22c55e", i: "Cost", desc: "Revenue generated" },
-    { t: "Total Expenses", v: formatCurrency(totalExpenses), f: formatCurrency(totalExpenses, "₹", false, true), c: "#ef4444", i: "Payment", desc: "Operational costs" },
-    { t: "Net Balance", v: formatCurrency(netBalance), f: formatCurrency(netBalance, "₹", false, true), c: netBalance >= 0 ? THEME.accent : "#f43f5e", i: "Bank", desc: "Current liquidity" },
+    { t: "Total Income", v: formatCurrency(totalIncome), f: formatCurrency(totalIncome, "₹", false, true), c: "#16A34A", i: "Cost", desc: "Revenue generated" },
+    { t: "Total Expenses", v: formatCurrency(totalExpenses), f: formatCurrency(totalExpenses, "₹", false, true), c: "#64748B", i: "Payment", desc: "Operational costs" },
+    { t: "Net Balance", v: formatCurrency(netBalance), f: formatCurrency(netBalance, "₹", false, true), c: netBalance >= 0 ? THEME.accent : "#64748B", i: "Bank", desc: "Current liquidity" },
   ];
 
   return (
@@ -245,19 +245,19 @@ function FinancialOverview({ THEME, income = [], expenses = [] }) {
             <div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12, fontSize: 14, fontWeight: 800 }}>
                 <span style={{ color: THEME.text }}>Total Income</span>
-                <span style={{ color: "#22c55e", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginLeft: 10 }} title={formatCurrency(totalIncome, "₹", false, true)}>{formatCurrency(totalIncome)}</span>
+                <span style={{ color: "#16A34A", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginLeft: 10 }} title={formatCurrency(totalIncome, "₹", false, true)}>{formatCurrency(totalIncome)}</span>
               </div>
-              <div style={{ height: 14, background: "#f1f5f9", borderRadius: 7, overflow: "hidden", border: "1px solid #e2e8f0" }}>
-                <div style={{ height: "100%", background: "linear-gradient(90deg, #22c55e, #4ade80)", width: `${Math.min(100, (totalIncome / (totalIncome + totalExpenses || 1)) * 100)}%`, borderRadius: 7 }}></div>
+              <div style={{ height: 14, background: "#EFF6FF", borderRadius: 7, overflow: "hidden", border: "1px solid #E2E8F0" }}>
+                <div style={{ height: "100%", background: "linear-gradient(90deg, #16A34A, #16A34A)", width: `${Math.min(100, (totalIncome / (totalIncome + totalExpenses || 1)) * 100)}%`, borderRadius: 7 }}></div>
               </div>
             </div>
             <div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12, fontSize: 14, fontWeight: 800 }}>
                 <span style={{ color: THEME.text }}>Total Expenses</span>
-                <span style={{ color: "#ef4444", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginLeft: 10 }} title={formatCurrency(totalExpenses, "₹", false, true)}>{formatCurrency(totalExpenses)}</span>
+                <span style={{ color: "#64748B", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginLeft: 10 }} title={formatCurrency(totalExpenses, "₹", false, true)}>{formatCurrency(totalExpenses)}</span>
               </div>
-              <div style={{ height: 14, background: "#f1f5f9", borderRadius: 7, overflow: "hidden", border: "1px solid #e2e8f0" }}>
-                <div style={{ height: "100%", background: "linear-gradient(90deg, #ef4444, #f87171)", width: `${Math.min(100, (totalExpenses / (totalIncome + totalExpenses || 1)) * 100)}%`, borderRadius: 7 }}></div>
+              <div style={{ height: 14, background: "#EFF6FF", borderRadius: 7, overflow: "hidden", border: "1px solid #E2E8F0" }}>
+                <div style={{ height: "100%", background: "linear-gradient(90deg, #64748B, #64748B)", width: `${Math.min(100, (totalExpenses / (totalIncome + totalExpenses || 1)) * 100)}%`, borderRadius: 7 }}></div>
               </div>
             </div>
           </div>
@@ -274,14 +274,14 @@ function FinancialOverview({ THEME, income = [], expenses = [] }) {
               .slice(0, 5)
               .map((item, idx) => (
                 <div key={idx} style={{ display: "flex", alignItems: "center", gap: 16, padding: "12px", borderRadius: 16, background: idx === 0 ? `${THEME.accent}08` : "transparent", transition: "background 0.2s" }}>
-                  <div style={{ width: 44, height: 44, borderRadius: 14, background: item.type === "income" ? "#dcfce7" : "#fee2e2", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: item.type === "income" ? "0 4px 12px #dcfce7" : "0 4px 12px #fee2e2" }}>
+                  <div style={{ width: 44, height: 44, borderRadius: 14, background: item.type === "income" ? "#E2E8F0" : "#E2E8F0", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: item.type === "income" ? "0 4px 12px #E2E8F0" : "0 4px 12px #E2E8F0" }}>
                     {item.type === "income" ? "Cost" : "Payment"}
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: 14, fontWeight: 800, color: THEME.text }}>{item.title}</div>
                     <div style={{ fontSize: 12, color: THEME.muted, fontWeight: 600 }}>{new Date(item.createdAt || item.date).toLocaleDateString()} • {item.category}</div>
                   </div>
-                  <div style={{ fontSize: 16, fontWeight: 900, color: item.type === "income" ? "#16a34a" : "#dc2626", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginLeft: 10 }} title={formatCurrency(item.amount, "₹", false, true)}>
+                  <div style={{ fontSize: 16, fontWeight: 900, color: item.type === "income" ? "#16A34A" : "#64748B", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginLeft: 10 }} title={formatCurrency(item.amount, "₹", false, true)}>
                     {item.type === "income" ? "+" : "-"}{formatCurrency(item.amount)}
                   </div>
                 </div>
@@ -358,9 +358,9 @@ export default function AccountsPage({
     padding: "8px 16px", borderRadius: 10, fontSize: 12, fontWeight: 800,
     cursor: "pointer", border: "none",
     background: on ? THEME.accent : "transparent",
-    color: on ? "#fff" : THEME.muted,
+    color: on ? "#FFFFFF" : THEME.muted,
     transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
-    boxShadow: on ? "0 4px 12px rgba(37, 99, 235,0.25)" : "none"
+    boxShadow: on ? "0 4px 12px rgba(37, 99, 235, 0.25)" : "none"
   });
   if (loading) return <div style={{ textAlign: "center", padding: 100, color: THEME.muted, fontWeight: 800 }}>Action Generating Financial Dashboard...</div>;
 
@@ -401,7 +401,7 @@ export default function AccountsPage({
         <button onClick={() => setActiveTab("reports")} style={tabStyle(activeTab === "reports")}>
           <i className="ti ti-file-analytics" style={{ marginRight: 6 }} />Reports
         </button>
-        <button onClick={() => setActiveTab("auditor")} style={{ ...tabStyle(activeTab === "auditor"), background: activeTab === "auditor" ? "#8B5CF6" : "transparent", color: activeTab === "auditor" ? "#fff" : "#718096" }}>
+        <button onClick={() => setActiveTab("auditor")} style={{ ...tabStyle(activeTab === "auditor"), background: activeTab === "auditor" ? "#2563EB" : "transparent", color: activeTab === "auditor" ? "#FFFFFF" : "#64748B" }}>
           <i className="ti ti-shield-check" style={{ marginRight: 6 }} />Auditor Portal
         </button>
       </div>
@@ -422,9 +422,9 @@ export default function AccountsPage({
 
 // ── Expenses Page Component -------------------------------------
 const CATEGORIES = ["Food", "Travel", "Office", "Utilities", "Marketing", "Salary", "Miscellaneous"];
-const CATEGORY_COLOR = { Food: "#f59e0b", Travel: "#3b82f6", Office: "#2563eb", Utilities: "#06b6d4", Marketing: "#ec4899", Salary: "#22c55e", Miscellaneous: "#64748b" };
+const CATEGORY_COLOR = { Food: "#64748B", Travel: "#2563EB", Office: "#2563EB", Utilities: "#2563EB", Marketing: "#64748B", Salary: "#16A34A", Miscellaneous: "#64748B" };
 const CATEGORY_ICON = { Food: "Food", Travel: "Travel", Office: "Company", Utilities: "Tip", Marketing: "Marketing", Salary: "Cost", Miscellaneous: "Package" };
-const STATUS_COLOR = { Pending: "#f59e0b", Approved: "#22c55e", Rejected: "#ef4444" };
+const STATUS_COLOR = { Pending: "#64748B", Approved: "#16A34A", Rejected: "#64748B" };
 
 export function ExpensesPage({ THEME, expenses = [], setExpenses, fetchExpenses }) {
   const [modal, setModal] = useState(null);
@@ -505,7 +505,7 @@ export function ExpensesPage({ THEME, expenses = [], setExpenses, fetchExpenses 
       <div className="stats-row">
         <div className="stat-card">
           <div className="stat-card-inner">
-            <div className="stat-icon" style={{ background: "var(--red-bg)", color: "var(--red)" }}><i className="ti ti-credit-card-pay"></i></div>
+            <div className="stat-icon" style={{ background: "var(--app-accent-light)", color: "var(--app-text)" }}><i className="ti ti-credit-card-pay"></i></div>
             <div>
               <div className="stat-num">{formatCurrency(expenses.reduce((s, e) => s + Number(e.amount || 0), 0), "₹", true)}</div>
               <div className="stat-label">Total Expenses</div>
@@ -515,7 +515,7 @@ export function ExpensesPage({ THEME, expenses = [], setExpenses, fetchExpenses 
         </div>
         <div className="stat-card">
           <div className="stat-card-inner">
-            <div className="stat-icon" style={{ background: "var(--amber-bg)", color: "var(--amber)" }}><i className="ti ti-clock"></i></div>
+            <div className="stat-icon" style={{ background: "var(--app-accent-light)", color: "var(--app-muted)" }}><i className="ti ti-clock"></i></div>
             <div>
               <div className="stat-num">{formatCurrency(expenses.filter(e => e.status === "Pending").reduce((s, e) => s + Number(e.amount || 0), 0), "₹", true)}</div>
               <div className="stat-label">Pending Approval</div>
@@ -525,7 +525,7 @@ export function ExpensesPage({ THEME, expenses = [], setExpenses, fetchExpenses 
         </div>
         <div className="stat-card">
           <div className="stat-card-inner">
-            <div className="stat-icon" style={{ background: "var(--green-bg)", color: "var(--green)" }}><i className="ti ti-building-store"></i></div>
+            <div className="stat-icon" style={{ background: "var(--app-accent-light)", color: "var(--green)" }}><i className="ti ti-building-store"></i></div>
             <div>
               <div className="stat-num">{formatCurrency(expenses.filter(e => e.expenseType === "Vendor").reduce((s, e) => s + Number(e.amount || 0), 0), "₹", true)}</div>
               <div className="stat-label">Vendor Payments</div>
@@ -559,11 +559,11 @@ export function ExpensesPage({ THEME, expenses = [], setExpenses, fetchExpenses 
               <div className="cat-bar"><div className="cat-fill" style={{ width: expenses.length > 0 ? (expenses.filter(e => e.category === "Office").length / expenses.length * 100) + "%" : "0%", background: "var(--teal)" }}></div></div>
             </div>
             <div className="cat-card">
-              <div className="cat-icon" style={{ background: "var(--purple-bg)", color: "var(--purple)" }}><i className="ti ti-server"></i></div>
+              <div className="cat-icon" style={{ background: "var(--app-accent-light)", color: "var(--app-accent)" }}><i className="ti ti-server"></i></div>
               <div className="cat-name">Tech & Software</div>
               <div className="cat-amount">{formatCurrency(expenses.filter(e => e.category === "Utilities").reduce((s, e) => s + Number(e.amount || 0), 0), "₹", true)}</div>
               <div className="cat-count">{expenses.filter(e => e.category === "Utilities").length} entries</div>
-              <div className="cat-bar"><div className="cat-fill" style={{ width: expenses.length > 0 ? (expenses.filter(e => e.category === "Utilities").length / expenses.length * 100) + "%" : "0%", background: "var(--purple)" }}></div></div>
+              <div className="cat-bar"><div className="cat-fill" style={{ width: expenses.length > 0 ? (expenses.filter(e => e.category === "Utilities").length / expenses.length * 100) + "%" : "0%", background: "var(--app-accent)" }}></div></div>
             </div>
             <div className="cat-card">
               <div className="cat-icon" style={{ background: "var(--pink-bg)", color: "var(--pink)" }}><i className="ti ti-speakerphone"></i></div>
@@ -573,11 +573,11 @@ export function ExpensesPage({ THEME, expenses = [], setExpenses, fetchExpenses 
               <div className="cat-bar"><div className="cat-fill" style={{ width: expenses.length > 0 ? (expenses.filter(e => e.category === "Marketing").length / expenses.length * 100) + "%" : "0%", background: "var(--pink)" }}></div></div>
             </div>
             <div className="cat-card">
-              <div className="cat-icon" style={{ background: "var(--amber-bg)", color: "var(--amber)" }}><i className="ti ti-plane-departure"></i></div>
+              <div className="cat-icon" style={{ background: "var(--app-accent-light)", color: "var(--app-muted)" }}><i className="ti ti-plane-departure"></i></div>
               <div className="cat-name">Travel & Food</div>
               <div className="cat-amount">{formatCurrency(expenses.filter(e => e.category === "Travel" || e.category === "Food").reduce((s, e) => s + Number(e.amount || 0), 0), "₹", true)}</div>
               <div className="cat-count">{expenses.filter(e => e.category === "Travel" || e.category === "Food").length} entries</div>
-              <div className="cat-bar"><div className="cat-fill" style={{ width: expenses.length > 0 ? (expenses.filter(e => e.category === "Travel" || e.category === "Food").length / expenses.length * 100) + "%" : "0%", background: "var(--amber)" }}></div></div>
+              <div className="cat-bar"><div className="cat-fill" style={{ width: expenses.length > 0 ? (expenses.filter(e => e.category === "Travel" || e.category === "Food").length / expenses.length * 100) + "%" : "0%", background: "var(--app-muted)" }}></div></div>
             </div>
           </div>
 
@@ -619,7 +619,7 @@ export function ExpensesPage({ THEME, expenses = [], setExpenses, fetchExpenses 
                     <tr key={idx}>
                       <td>
                         <div className="exp-cell">
-                          <div className="exp-icon" style={{ background: e.status === "Pending" ? "var(--amber-bg)" : e.status === "Rejected" ? "var(--red-bg)" : "var(--surface2)", color: e.status === "Pending" ? "var(--amber)" : e.status === "Rejected" ? "var(--red)" : "var(--text)" }}>
+                          <div className="exp-icon" style={{ background: e.status === "Pending" ? "var(--app-accent-light)" : e.status === "Rejected" ? "var(--app-accent-light)" : "var(--surface2)", color: e.status === "Pending" ? "var(--app-muted)" : e.status === "Rejected" ? "var(--app-text)" : "var(--text)" }}>
                             <i className={CATEGORY_ICON[e.category] ? "ti ti-receipt" : "ti ti-file-invoice"}></i>
                           </div>
                           <div>
@@ -658,9 +658,9 @@ export function ExpensesPage({ THEME, expenses = [], setExpenses, fetchExpenses 
             <div className="bp-title">Monthly Budget Overview</div>
             <div className="bp-hero">
               <div className="bp-label">TOTAL SPENT THIS MONTH</div>
-              <div className="bp-val" style={{ color: "var(--red)" }}>{formatCurrency(expenses.reduce((s, e) => s + Number(e.amount || 0), 0))}</div>
+              <div className="bp-val" style={{ color: "var(--app-text)" }}>{formatCurrency(expenses.reduce((s, e) => s + Number(e.amount || 0), 0))}</div>
               <div className="bp-sub">of {formatCurrency(150000)} budget limit</div>
-              <div className="cat-bar" style={{ marginTop: 14, height: 6 }}><div className="cat-fill" style={{ width: (expenses.reduce((s, e) => s + Number(e.amount || 0), 0) / 150000) * 100 + "%", background: "var(--red)" }}></div></div>
+              <div className="cat-bar" style={{ marginTop: 14, height: 6 }}><div className="cat-fill" style={{ width: (expenses.reduce((s, e) => s + Number(e.amount || 0), 0) / 150000) * 100 + "%", background: "var(--app-text)" }}></div></div>
             </div>
 
             <div className="budget-item">
@@ -677,7 +677,7 @@ export function ExpensesPage({ THEME, expenses = [], setExpenses, fetchExpenses 
             </div>
             <div className="budget-item">
               <div className="bi-left">
-                <div className="bi-icon" style={{ background: "var(--purple-bg)", color: "var(--purple)" }}><i className="ti ti-server"></i></div>
+                <div className="bi-icon" style={{ background: "var(--app-accent-light)", color: "var(--app-accent)" }}><i className="ti ti-server"></i></div>
                 <div>
                   <div className="bi-name">Tech Stack</div>
                   <div className="bi-used">Cloud & Subscriptions</div>
@@ -725,7 +725,7 @@ export function ExpensesPage({ THEME, expenses = [], setExpenses, fetchExpenses 
           <Fld THEME={THEME} label="Payment Mode" value={form.paymentMode} onChange={v => setForm({ ...form, paymentMode: v })} options={["Cash", "Bank Transfer", "UPI", "Card", "Cheque"]} />
           <Fld THEME={THEME} label="Status" value={form.status} onChange={v => setForm({ ...form, status: v })} options={["Pending", "Approved", "Rejected"]} />
           <Fld THEME={THEME} label="Amount" type="number" value={form.amount} onChange={v => setForm({ ...form, amount: v })} prefix="₹" />
-          <button onClick={save} disabled={saving} style={{ width: "100%", padding: 18, borderRadius: 16, background: THEME.accent, color: "#fff", border: "none", fontWeight: 900, marginTop: 12, cursor: "pointer", fontSize: 16, boxShadow: `0 10px 20px ${THEME.accent}40` }}>
+          <button onClick={save} disabled={saving} style={{ width: "100%", padding: 18, borderRadius: 16, background: THEME.accent, color: "#FFFFFF", border: "none", fontWeight: 900, marginTop: 12, cursor: "pointer", fontSize: 16, boxShadow: `0 10px 20px ${THEME.accent}40` }}>
             {saving ? "Processing..." : "Save Expense Entry"}
           </button>
         </Modal>
@@ -748,7 +748,7 @@ export function ExpensesPage({ THEME, expenses = [], setExpenses, fetchExpenses 
               <span style={{ fontWeight: 600, color: "var(--app-sidebar)" }}>{val || "—"}</span>
             </div>
           ))}
-          <button onClick={() => { setViewItem(null); openEdit(viewItem); }} style={{ width: "100%", padding: 14, borderRadius: 12, background: THEME.accent, color: "#fff", border: "none", fontWeight: 800, marginTop: 16, cursor: "pointer", fontSize: 14 }}>Edit This Expense</button>
+          <button onClick={() => { setViewItem(null); openEdit(viewItem); }} style={{ width: "100%", padding: 14, borderRadius: 12, background: THEME.accent, color: "#FFFFFF", border: "none", fontWeight: 800, marginTop: 16, cursor: "pointer", fontSize: 14 }}>Edit This Expense</button>
         </Modal>
       )}
 
@@ -761,7 +761,7 @@ export function ExpensesPage({ THEME, expenses = [], setExpenses, fetchExpenses 
           <Fld THEME={THEME} label="Payment Mode" value={editForm.paymentMode} onChange={v => setEditForm({ ...editForm, paymentMode: v })} options={["Cash", "Bank Transfer", "UPI", "Card", "Cheque"]} />
           <Fld THEME={THEME} label="Status" value={editForm.status} onChange={v => setEditForm({ ...editForm, status: v })} options={["Pending", "Approved", "Rejected"]} />
           <Fld THEME={THEME} label="Amount" type="number" value={editForm.amount} onChange={v => setEditForm({ ...editForm, amount: v })} prefix="₹" />
-          <button onClick={saveEdit} disabled={saving} style={{ width: "100%", padding: 18, borderRadius: 16, background: THEME.accent, color: "#fff", border: "none", fontWeight: 900, marginTop: 12, cursor: "pointer", fontSize: 16, boxShadow: `0 10px 20px ${THEME.accent}40` }}>
+          <button onClick={saveEdit} disabled={saving} style={{ width: "100%", padding: 18, borderRadius: 16, background: THEME.accent, color: "#FFFFFF", border: "none", fontWeight: 900, marginTop: 12, cursor: "pointer", fontSize: 16, boxShadow: `0 10px 20px ${THEME.accent}40` }}>
             {saving ? "Updating..." : "Update Expense"}
           </button>
         </Modal>
@@ -862,7 +862,7 @@ export function IncomePage({ THEME, income = [], setIncome, fetchIncome }) {
         </div>
         <div className="stat-card">
           <div className="stat-card-inner">
-            <div className="stat-icon" style={{ background: "var(--amber-bg)", color: "var(--amber)" }}><i className="ti ti-clock"></i></div>
+            <div className="stat-icon" style={{ background: "var(--app-accent-light)", color: "var(--app-muted)" }}><i className="ti ti-clock"></i></div>
             <div>
               <div className="stat-num">{formatCurrency(income.filter(i => i.status === "Pending").reduce((s, i) => s + Number(i.amount || 0), 0), "₹", true)}</div>
               <div className="stat-label">Awaiting</div>
@@ -872,7 +872,7 @@ export function IncomePage({ THEME, income = [], setIncome, fetchIncome }) {
         </div>
         <div className="stat-card">
           <div className="stat-card-inner">
-            <div className="stat-icon" style={{ background: "var(--red-bg)", color: "var(--red)" }}><i className="ti ti-circle-x"></i></div>
+            <div className="stat-icon" style={{ background: "var(--app-accent-light)", color: "var(--app-text)" }}><i className="ti ti-circle-x"></i></div>
             <div>
               <div className="stat-num">₹0</div>
               <div className="stat-label">Failed / Refunded</div>
@@ -882,7 +882,7 @@ export function IncomePage({ THEME, income = [], setIncome, fetchIncome }) {
         </div>
         <div className="stat-card">
           <div className="stat-card-inner">
-            <div className="stat-icon" style={{ background: "var(--green-bg)", color: "var(--green)" }}><i className="ti ti-check"></i></div>
+            <div className="stat-icon" style={{ background: "var(--app-accent-light)", color: "var(--green)" }}><i className="ti ti-check"></i></div>
             <div>
               <div className="stat-num">{income.filter(i => i.status !== "Pending").length}</div>
               <div className="stat-label">Successful</div>
@@ -905,8 +905,8 @@ export function IncomePage({ THEME, income = [], setIncome, fetchIncome }) {
                   <stop offset="100%" stopColor="var(--teal)" stopOpacity="0" />
                 </linearGradient>
                 <linearGradient id="gPending" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#F5A623" stopOpacity=".15" />
-                  <stop offset="100%" stopColor="#F5A623" stopOpacity="0" />
+                  <stop offset="0%" stopColor="#64748B" stopOpacity=".15" />
+                  <stop offset="100%" stopColor="#64748B" stopOpacity="0" />
                 </linearGradient>
               </defs>
               <line x1="0" y1="30" x2="560" y2="30" stroke="#E2E8F0" strokeWidth="1" />
@@ -917,11 +917,11 @@ export function IncomePage({ THEME, income = [], setIncome, fetchIncome }) {
               <path d="M0,90 C60,75 100,45 160,40 C220,35 260,55 320,30 C380,10 420,50 480,25 C510,15 535,30 560,20" stroke="var(--teal)" strokeWidth="2.5" fill="none" strokeLinecap="round" />
               {/* Pending */}
               <path d="M0,100 C60,95 100,85 160,80 C220,75 260,85 320,70 C380,60 420,75 480,65 C510,60 535,70 560,60 L560,120 L0,120Z" fill="url(#gPending)" />
-              <path d="M0,100 C60,95 100,85 160,80 C220,75 260,85 320,70 C380,60 420,75 480,65 C510,60 535,70 560,60" stroke="#F5A623" strokeWidth="2" fill="none" strokeLinecap="round" strokeDasharray="6,3" />
+              <path d="M0,100 C60,95 100,85 160,80 C220,75 260,85 320,70 C380,60 420,75 480,65 C510,60 535,70 560,60" stroke="#64748B" strokeWidth="2" fill="none" strokeLinecap="round" strokeDasharray="6,3" />
               {/* Dots */}
-              <circle cx="160" cy="40" r="4" fill="#fff" stroke="var(--teal)" strokeWidth="2" />
-              <circle cx="320" cy="30" r="4" fill="var(--teal)" stroke="#fff" strokeWidth="2" />
-              <circle cx="480" cy="25" r="4" fill="#fff" stroke="var(--teal)" strokeWidth="2" />
+              <circle cx="160" cy="40" r="4" fill="#FFFFFF" stroke="var(--teal)" strokeWidth="2" />
+              <circle cx="320" cy="30" r="4" fill="var(--teal)" stroke="#FFFFFF" strokeWidth="2" />
+              <circle cx="480" cy="25" r="4" fill="#FFFFFF" stroke="var(--teal)" strokeWidth="2" />
               {/* Labels */}
               <text x="56" y="118" fill="#64748B" fontSize="9" fontFamily="Nunito" textAnchor="middle">Week 1</text>
               <text x="168" y="118" fill="#64748B" fontSize="9" fontFamily="Nunito" textAnchor="middle">Week 2</text>
@@ -938,9 +938,9 @@ export function IncomePage({ THEME, income = [], setIncome, fetchIncome }) {
             <div className="cl-val" style={{ color: "var(--teal)" }}>{formatCurrency(income.filter(i => i.status !== "Pending").reduce((s, i) => s + Number(i.amount || 0), 0), "₹", true)}</div>
           </div>
           <div className="chart-legend-item">
-            <div className="cl-dot" style={{ background: "var(--amber)" }}></div>
+            <div className="cl-dot" style={{ background: "var(--app-muted)" }}></div>
             <div className="cl-label">Awaiting</div>
-            <div className="cl-val" style={{ color: "var(--amber)" }}>{formatCurrency(income.filter(i => i.status === "Pending").reduce((s, i) => s + Number(i.amount || 0), 0), "₹", true)}</div>
+            <div className="cl-val" style={{ color: "var(--app-muted)" }}>{formatCurrency(income.filter(i => i.status === "Pending").reduce((s, i) => s + Number(i.amount || 0), 0), "₹", true)}</div>
           </div>
           <div className="chart-legend-item">
             <div className="cl-dot" style={{ background: "var(--green)" }}></div>
@@ -994,7 +994,7 @@ export function IncomePage({ THEME, income = [], setIncome, fetchIncome }) {
                   <tr key={idx}>
                     <td>
                       <div className="pay-cell">
-                        <div className="pay-icon" style={{ background: inc.status === "Pending" ? "var(--amber-bg)" : "var(--green-bg)", color: inc.status === "Pending" ? "var(--amber)" : "var(--green)" }}>
+                        <div className="pay-icon" style={{ background: inc.status === "Pending" ? "var(--app-accent-light)" : "var(--app-accent-light)", color: inc.status === "Pending" ? "var(--app-muted)" : "var(--green)" }}>
                           <i className={inc.status === "Pending" ? "ti ti-clock" : "ti ti-arrow-down-left"}></i>
                         </div>
                         <div>
@@ -1005,7 +1005,7 @@ export function IncomePage({ THEME, income = [], setIncome, fetchIncome }) {
                     </td>
                     <td>
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <div style={{ width: 24, height: 24, borderRadius: "50%", background: "var(--teal)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, fontWeight: 800, color: "#fff" }}>
+                        <div style={{ width: 24, height: 24, borderRadius: "50%", background: "var(--teal)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, fontWeight: 800, color: "#FFFFFF" }}>
                           {(inc.client || "?")[0].toUpperCase()}
                         </div>
                         <span style={{ fontSize: 12, fontWeight: 600, color: "var(--text)" }}>{inc.client}</span>
@@ -1049,12 +1049,12 @@ export function IncomePage({ THEME, income = [], setIncome, fetchIncome }) {
             <div className="up-list">
               {income.filter(i => i.status === "Pending").slice(0, 3).map((inc, i) => (
                 <div className="up-item" key={i}>
-                  <div className="up-icon" style={{ background: "var(--amber-bg)", color: "var(--amber)" }}><i className="ti ti-clock"></i></div>
+                  <div className="up-icon" style={{ background: "var(--app-accent-light)", color: "var(--app-muted)" }}><i className="ti ti-clock"></i></div>
                   <div>
                     <div className="up-name">{inc.client} – {inc.title}</div>
                     <div className="up-date">Expected soon</div>
                   </div>
-                  <div className="up-amount" style={{ color: "var(--amber)" }}>{formatCurrency(inc.amount)}</div>
+                  <div className="up-amount" style={{ color: "var(--app-muted)" }}>{formatCurrency(inc.amount)}</div>
                 </div>
               ))}
               {income.filter(i => i.status === "Pending").length === 0 && (
@@ -1075,7 +1075,7 @@ export function IncomePage({ THEME, income = [], setIncome, fetchIncome }) {
               <div className="method-check"><i className="ti ti-check"></i></div>
             </div>
             <div className="method-row">
-              <div className="method-icon" style={{ background: "var(--purple-bg)", color: "var(--purple)" }}><i className="ti ti-device-mobile"></i></div>
+              <div className="method-icon" style={{ background: "var(--app-accent-light)", color: "var(--app-accent)" }}><i className="ti ti-device-mobile"></i></div>
               <div>
                 <div className="method-name">UPI</div>
                 <div className="method-detail">business@upi</div>
@@ -1083,7 +1083,7 @@ export function IncomePage({ THEME, income = [], setIncome, fetchIncome }) {
               <div className="method-check"><i className="ti ti-check"></i></div>
             </div>
             <div className="method-row">
-              <div className="method-icon" style={{ background: "var(--amber-bg)", color: "var(--amber)" }}><i className="ti ti-credit-card"></i></div>
+              <div className="method-icon" style={{ background: "var(--app-accent-light)", color: "var(--app-muted)" }}><i className="ti ti-credit-card"></i></div>
               <div>
                 <div className="method-name">Debit Card</div>
                 <div className="method-detail">HDFC ••9034</div>
@@ -1106,7 +1106,7 @@ export function IncomePage({ THEME, income = [], setIncome, fetchIncome }) {
           <Fld THEME={THEME} label="Payment Mode" value={form.paymentMode || "Bank Transfer"} onChange={v => setForm({ ...form, paymentMode: v })} options={["Bank Transfer", "UPI", "Cash", "Card", "Cheque"]} />
           <Fld THEME={THEME} label="Status" value={form.status} onChange={v => setForm({ ...form, status: v })} options={["Received", "Pending"]} />
           <Fld THEME={THEME} label="Amount" type="number" value={form.amount} onChange={v => setForm({ ...form, amount: v })} prefix="₹" />
-          <button onClick={save} disabled={saving} style={{ width: "100%", padding: 18, borderRadius: 16, background: THEME.accent, color: "#fff", border: "none", fontWeight: 900, marginTop: 12, cursor: "pointer", fontSize: 16, boxShadow: `0 10px 20px ${THEME.accent}40` }}>{saving ? "Saving..." : "Record Payment"}</button>
+          <button onClick={save} disabled={saving} style={{ width: "100%", padding: 18, borderRadius: 16, background: THEME.accent, color: "#FFFFFF", border: "none", fontWeight: 900, marginTop: 12, cursor: "pointer", fontSize: 16, boxShadow: `0 10px 20px ${THEME.accent}40` }}>{saving ? "Saving..." : "Record Payment"}</button>
         </Modal>
       )}
 
@@ -1128,7 +1128,7 @@ export function IncomePage({ THEME, income = [], setIncome, fetchIncome }) {
               <span style={{ fontWeight: 600, color: "var(--app-sidebar)" }}>{val || "—"}</span>
             </div>
           ))}
-          <button onClick={() => { setViewItem(null); openEdit(viewItem); }} style={{ width: "100%", padding: 14, borderRadius: 12, background: THEME.accent, color: "#fff", border: "none", fontWeight: 800, marginTop: 16, cursor: "pointer", fontSize: 14 }}>Edit This Payment</button>
+          <button onClick={() => { setViewItem(null); openEdit(viewItem); }} style={{ width: "100%", padding: 14, borderRadius: 12, background: THEME.accent, color: "#FFFFFF", border: "none", fontWeight: 800, marginTop: 16, cursor: "pointer", fontSize: 14 }}>Edit This Payment</button>
         </Modal>
       )}
 
@@ -1144,7 +1144,7 @@ export function IncomePage({ THEME, income = [], setIncome, fetchIncome }) {
           <Fld THEME={THEME} label="Payment Mode" value={editForm.paymentMode} onChange={v => setEditForm({ ...editForm, paymentMode: v })} options={["Bank Transfer", "UPI", "Cash", "Card", "Cheque"]} />
           <Fld THEME={THEME} label="Status" value={editForm.status} onChange={v => setEditForm({ ...editForm, status: v })} options={["Received", "Pending"]} />
           <Fld THEME={THEME} label="Amount" type="number" value={editForm.amount} onChange={v => setEditForm({ ...editForm, amount: v })} prefix="₹" />
-          <button onClick={saveEdit} disabled={saving} style={{ width: "100%", padding: 18, borderRadius: 16, background: THEME.accent, color: "#fff", border: "none", fontWeight: 900, marginTop: 12, cursor: "pointer", fontSize: 16, boxShadow: `0 10px 20px ${THEME.accent}40` }}>
+          <button onClick={saveEdit} disabled={saving} style={{ width: "100%", padding: 18, borderRadius: 16, background: THEME.accent, color: "#FFFFFF", border: "none", fontWeight: 900, marginTop: 12, cursor: "pointer", fontSize: 16, boxShadow: `0 10px 20px ${THEME.accent}40` }}>
             {saving ? "Updating..." : "Update Payment"}
           </button>
         </Modal>

@@ -13,7 +13,7 @@
 
     --bg: var(--app-bg, var(--theme-bg, #F8FAFC));
     --surface: var(--app-surface, var(--theme-surface, #FFFFFF));
-    --surface2: var(--app-surface, #F8FAFB);
+    --surface2: var(--app-surface, #F8FAFC);
     --border: var(--app-border, var(--theme-border, #E2E8F0));
     --border2: var(--app-border, #E2E8F0);
 
@@ -22,19 +22,19 @@
     --text3: var(--app-muted, #64748B);
 
     --green: #16A34A;
-    --green-bg: #E8FAF3;
+    --green-bg: #EFF6FF;
 
-    --amber: #F5A623;
-    --amber-bg: #FEF5E6;
+    --amber: #64748B;
+    --amber-bg: #F8FAFC;
 
-    --red: #F05C5C;
-    --red-bg: #FEF2F2;
+    --red: #64748B;
+    --red-bg: #F8FAFC;
 
-    --purple: #7C5CFC;
-    --purple-bg: #EEE9FF;
+    --purple: #2563EB;
+    --purple-bg: #EFF6FF;
 
     --blue: #2563EB;
-    --blue-bg: #EFF4FF;
+    --blue-bg: #EFF6FF;
 
     --font: 'Nunito', sans-serif;
     --radius: 16px;
@@ -82,7 +82,7 @@
 
 .modern-app .m-logo-badge {
     background: var(--theme-primary, var(--teal));
-    color: #fff;
+    color: #FFFFFF;
     font-size: 10px;
     font-weight: 800;
     padding: 2px 7px;
@@ -102,13 +102,13 @@
     width: 34px;
     height: 34px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--theme-primary, var(--teal)), var(--theme-primary2, #006E7F));
+    background: linear-gradient(135deg, var(--theme-primary, var(--teal)), var(--theme-primary2, #16A34A));
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 13px;
     font-weight: 800;
-    color: #fff;
+    color: #FFFFFF;
     flex-shrink: 0;
 }
 
@@ -184,7 +184,7 @@
 .modern-app .m-nav-badge {
     margin-left: auto;
     background: var(--theme-primary, var(--teal));
-    color: #fff;
+    color: #FFFFFF;
     font-size: 9px;
     font-weight: 800;
     padding: 1px 7px;
@@ -200,7 +200,7 @@
     width: 100%;
     padding: 11px;
     background: var(--theme-primary, var(--teal));
-    color: #fff;
+    color: #FFFFFF;
     border: none;
     border-radius: 12px;
     font-size: 13px;
@@ -307,8 +307,8 @@
     width: 7px;
     height: 7px;
     border-radius: 50%;
-    background: var(--red);
-    border: 1.5px solid #fff;
+    background: var(--app-text);
+    border: 1.5px solid #FFFFFF;
 }
 
 .modern-app .m-theme-menu {
@@ -358,7 +358,7 @@
     gap: 7px;
     padding: 11px 20px;
     background: var(--theme-primary, var(--teal));
-    color: #fff;
+    color: #FFFFFF;
     border: none;
     border-radius: 12px;
     font-size: 13px;
@@ -518,7 +518,7 @@
 }
 
 .modern-app .m-stat-trend.down {
-    color: var(--red);
+    color: var(--app-text);
 }
 
 .modern-app .m-stat-trend.neutral {
@@ -551,13 +551,13 @@
 
 .modern-app .m-tab.active {
     background: var(--app-accent, var(--teal)) !important;
-    color: #ffffff !important;
+    color: #FFFFFF !important;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
     border: 1px solid transparent !important;
 }
 
 .modern-app .m-tab:not(.active):hover {
-    background: rgba(128, 128, 128, 0.1) !important;
+    background: rgba(100, 116, 139, 0.1) !important;
     color: var(--app-accent, var(--teal)) !important;
 }
 
@@ -575,7 +575,7 @@
 }
 
 .m-project-card {
-    background: #fff;
+    background: #FFFFFF;
     border-radius: 16px;
     box-shadow: 0 2px 12px rgba(37, 99, 235, 0.08);
     overflow: hidden;
@@ -592,7 +592,7 @@
     min-height: 260px !important;
     border: 2.5px dashed var(--app-accent, var(--app-accent, #2563EB)) !important;
     border-radius: 16px !important;
-    background: linear-gradient(135deg, var(--teal-light, var(--teal-light, #EFF6FF)) 0%, #F0FDFF 100%) !important;
+    background: linear-gradient(135deg, var(--teal-light, var(--teal-light, #EFF6FF)) 0%, #EFF6FF 100%) !important;
     cursor: pointer !important;
     gap: 12px !important;
     transition: all 0.2s !important;
@@ -653,9 +653,9 @@
     justify-content: center;
     font-size: 18px;
     font-weight: 800;
-    color: #fff;
+    color: #FFFFFF;
     flex-shrink: 0;
-    background: linear-gradient(135deg, var(--theme-primary, var(--teal)), var(--theme-primary2, #006E7F));
+    background: linear-gradient(135deg, var(--theme-primary, var(--teal)), var(--theme-primary2, #16A34A));
 }
 
 .modern-app .m-pc-more {
@@ -723,27 +723,27 @@
 }
 
 .modern-app .m-pc-fill.teal {
-    background: linear-gradient(90deg, var(--teal), #26D0CE);
+    background: linear-gradient(90deg, var(--teal), #2563EB);
 }
 
 .modern-app .m-pc-fill.amber {
-    background: linear-gradient(90deg, var(--amber), #FDD87B);
+    background: linear-gradient(90deg, var(--app-muted), #E2E8F0);
 }
 
 .modern-app .m-pc-fill.green {
-    background: linear-gradient(90deg, var(--green), #7EECC4);
+    background: linear-gradient(90deg, var(--green), #E2E8F0);
 }
 
 .modern-app .m-pc-fill.purple {
-    background: linear-gradient(90deg, var(--purple), #B39DFF);
+    background: linear-gradient(90deg, var(--app-accent), #E2E8F0);
 }
 
 .modern-app .m-pc-fill.blue {
-    background: linear-gradient(90deg, var(--blue), #7EC8FD);
+    background: linear-gradient(90deg, var(--blue), #E2E8F0);
 }
 
 .modern-app .m-pc-fill.red {
-    background: linear-gradient(90deg, var(--red), #FF9A9A);
+    background: linear-gradient(90deg, var(--app-text), #E2E8F0);
 }
 
 .modern-app .m-pc-footer {
@@ -760,13 +760,13 @@
     width: 24px;
     height: 24px;
     border-radius: 50%;
-    border: 2px solid #fff;
+    border: 2px solid #FFFFFF;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 8px;
     font-weight: 800;
-    color: #fff;
+    color: #FFFFFF;
     margin-left: -6px;
     background: var(--theme-primary, var(--teal));
 }
@@ -776,7 +776,7 @@
 }
 
 .modern-app .m-pc-av:nth-child(3) {
-    background: #F5A623;
+    background: #64748B;
 }
 
 .modern-app .m-pc-av:first-child {
@@ -810,16 +810,16 @@
 }
 
 .modern-app .m-status-badge.inprogress {
-    background: var(--amber-bg);
-    color: var(--amber);
+    background: var(--app-accent-light);
+    color: var(--app-muted);
 }
 
 .modern-app .m-status-badge.inprogress::before {
-    background: var(--amber);
+    background: var(--app-muted);
 }
 
 .modern-app .m-status-badge.active {
-    background: var(--green-bg);
+    background: var(--app-accent-light);
     color: var(--green);
 }
 
@@ -846,12 +846,12 @@
 }
 
 .modern-app .m-status-badge.onhold {
-    background: var(--red-bg);
-    color: var(--red);
+    background: var(--app-accent-light);
+    color: var(--app-text);
 }
 
 .modern-app .m-status-badge.onhold::before {
-    background: var(--red);
+    background: var(--app-text);
 }
 
 /* ACCENT LINE */
@@ -872,27 +872,27 @@
 }
 
 .modern-app .m-project-card.c-teal::before {
-    background: linear-gradient(90deg, var(--teal), #26D0CE);
+    background: linear-gradient(90deg, var(--teal), #2563EB);
 }
 
 .modern-app .m-project-card.c-amber::before {
-    background: linear-gradient(90deg, var(--amber), #FDD87B);
+    background: linear-gradient(90deg, var(--app-muted), #E2E8F0);
 }
 
 .modern-app .m-project-card.c-green::before {
-    background: linear-gradient(90deg, var(--green), #7EECC4);
+    background: linear-gradient(90deg, var(--green), #E2E8F0);
 }
 
 .modern-app .m-project-card.c-purple::before {
-    background: linear-gradient(90deg, var(--purple), #B39DFF);
+    background: linear-gradient(90deg, var(--app-accent), #E2E8F0);
 }
 
 .modern-app .m-project-card.c-blue::before {
-    background: linear-gradient(90deg, var(--blue), #7EC8FD);
+    background: linear-gradient(90deg, var(--blue), #E2E8F0);
 }
 
 .modern-app .m-project-card.c-red::before {
-    background: linear-gradient(90deg, var(--red), #FF9A9A);
+    background: linear-gradient(90deg, var(--app-text), #E2E8F0);
 }
 
 /* ADD PROJECT CARD */
@@ -925,7 +925,7 @@
     align-items: center;
     justify-content: center;
     font-size: 22px;
-    color: #fff;
+    color: #FFFFFF;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 

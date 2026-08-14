@@ -13,7 +13,7 @@ function hexToRgb(hex) {
 
 const CSS = `
 .settings-layout{display:grid;grid-template-columns:220px 1fr;gap:22px;align-items:start}
-.settings-nav{background:var(--app-card,#fff);border:1.5px solid var(--app-border,#E2E8F0);border-radius:16px;padding:8px;position:sticky;top:22px}
+.settings-nav{background:var(--app-card,#FFFFFF);border:1.5px solid var(--app-border,#E2E8F0);border-radius:16px;padding:8px;position:sticky;top:22px}
 .sn-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;color:var(--app-muted,#64748B);font-size:13px;font-weight:600;transition:all .15s;margin-bottom:2px}
 .sn-item:hover{background:var(--app-bg,#F8FAFC);color:var(--app-text,#1E293B)}
 .sn-item.sn-active{background:rgba(var(--app-accent-rgb,0,188,212),.12);color:var(--app-accent, var(--app-accent, var(--app-accent, #2563EB)))}
@@ -21,7 +21,7 @@ const CSS = `
 .sn-item.sn-active i,.sn-item:hover i{color:var(--app-accent, var(--app-accent, var(--app-accent, #2563EB)))}
 .sn-divider{border:none;border-top:1px solid var(--app-border,#E2E8F0);margin:6px 0}
 .settings-panels{display:flex;flex-direction:column;gap:20px}
-.settings-section{background:var(--app-card,#fff);border:1.5px solid var(--app-border,#E2E8F0);border-radius:16px;overflow:hidden}
+.settings-section{background:var(--app-card,#FFFFFF);border:1.5px solid var(--app-border,#E2E8F0);border-radius:16px;overflow:hidden}
 .ss-header{padding:18px 22px;border-bottom:1px solid var(--app-border,#E2E8F0);display:flex;align-items:center;gap:12px}
 .ss-header-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
 .ss-title{font-size:13px;font-weight:800;color:var(--app-text,#1E293B)}
@@ -32,19 +32,19 @@ const CSS = `
 .form-group:last-child{margin-bottom:0}
 .form-label{font-size:11px;font-weight:700;color:var(--app-muted,#64748B);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;display:block}
 .form-input{width:100%;padding:10px 13px;background:var(--app-bg,#F8FAFC);border:1.5px solid var(--app-border,#E2E8F0);border-radius:10px;font-size:13px;color:var(--app-text,#1E293B);font-family:inherit;outline:none;transition:all .15s;box-sizing:border-box}
-.form-input:focus{border-color:var(--app-accent, var(--app-accent, var(--app-accent, #2563EB)));background:#fff;box-shadow:0 0 0 3px rgba(var(--app-accent-rgb,0,188,212),.08)}
+.form-input:focus{border-color:var(--app-accent, var(--app-accent, var(--app-accent, #2563EB)));background:#FFFFFF;box-shadow:0 0 0 3px rgba(var(--app-accent-rgb,0,188,212),.08)}
 .form-select{width:100%;padding:10px 13px;background:var(--app-bg,#F8FAFC);border:1.5px solid var(--app-border,#E2E8F0);border-radius:10px;font-size:13px;color:var(--app-text,#1E293B);font-family:inherit;outline:none;cursor:pointer;transition:all .15s;box-sizing:border-box}
 .form-select:focus{border-color:var(--app-accent, var(--app-accent, var(--app-accent, #2563EB)))}
 .form-textarea{width:100%;padding:10px 13px;background:var(--app-bg,#F8FAFC);border:1.5px solid var(--app-border,#E2E8F0);border-radius:10px;font-size:13px;color:var(--app-text,#1E293B);font-family:inherit;outline:none;transition:all .15s;resize:vertical;min-height:80px;box-sizing:border-box}
-.form-textarea:focus{border-color:var(--app-accent, var(--app-accent, var(--app-accent, #2563EB)));background:#fff;box-shadow:0 0 0 3px rgba(var(--app-accent-rgb,0,188,212),.08)}
+.form-textarea:focus{border-color:var(--app-accent, var(--app-accent, var(--app-accent, #2563EB)));background:#FFFFFF;box-shadow:0 0 0 3px rgba(var(--app-accent-rgb,0,188,212),.08)}
 .form-hint{font-size:10px;color:var(--app-muted,#64748B);margin-top:5px;font-weight:600}
 .avatar-upload{display:flex;align-items:center;gap:18px;margin-bottom:22px}
-.avatar-big{width:72px;height:72px;border-radius:16px;background:linear-gradient(135deg,var(--app-accent, #2563EB),#006E7F);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;color:#fff;flex-shrink:0;border:3px solid rgba(var(--app-accent-rgb,0,188,212),.2);position:relative;overflow:hidden}
-.avatar-edit{position:absolute;bottom:0;right:0;width:22px;height:22px;border-radius:50%;background:var(--app-accent, var(--app-accent, var(--app-accent, #2563EB)));border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;cursor:pointer}
+.avatar-big{width:72px;height:72px;border-radius:16px;background:linear-gradient(135deg,var(--app-accent, #2563EB),#16A34A);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;color:#FFFFFF;flex-shrink:0;border:3px solid rgba(var(--app-accent-rgb,0,188,212),.2);position:relative;overflow:hidden}
+.avatar-edit{position:absolute;bottom:0;right:0;width:22px;height:22px;border-radius:50%;background:var(--app-accent, var(--app-accent, var(--app-accent, #2563EB)));border:2px solid #FFFFFF;display:flex;align-items:center;justify-content:center;font-size:11px;color:#FFFFFF;cursor:pointer}
 .avatar-upload-btn{display:flex;align-items:center;gap:6px;padding:8px 16px;background:rgba(var(--app-accent-rgb,0,188,212),.1);border:1.5px solid var(--app-accent, var(--app-accent, var(--app-accent, #2563EB)));border-radius:9px;font-size:12px;font-weight:700;color:var(--app-accent, var(--app-accent, var(--app-accent, #2563EB)));cursor:pointer;font-family:inherit;transition:all .15s}
-.avatar-upload-btn:hover{background:var(--app-accent, var(--app-accent, var(--app-accent, #2563EB)));color:#fff}
+.avatar-upload-btn:hover{background:var(--app-accent, var(--app-accent, var(--app-accent, #2563EB)));color:#FFFFFF}
 .avatar-remove{font-size:11px;color:var(--app-muted,#64748B);cursor:pointer;font-weight:600}
-.avatar-remove:hover{color:#EF4444}
+.avatar-remove:hover{color:#64748B}
 .logo-upload-area{border:2px dashed var(--app-border,#E2E8F0);border-radius:12px;padding:20px;text-align:center;cursor:pointer;transition:all .15s;margin-bottom:16px}
 .logo-upload-area:hover{border-color:var(--app-accent, var(--app-accent, var(--app-accent, #2563EB)));background:rgba(var(--app-accent-rgb,0,188,212),.04)}
 .toggle-row{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--app-border,#E2E8F0)}
@@ -54,16 +54,16 @@ const CSS = `
 .toggle{width:42px;height:24px;border-radius:12px;position:relative;cursor:pointer;flex-shrink:0;transition:background .2s}
 .toggle.t-on{background:var(--app-accent, var(--app-accent, var(--app-accent, #2563EB)))}
 .toggle.t-off{background:var(--app-border,#E2E8F0)}
-.toggle::after{content:'';position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;top:3px;transition:all .2s;box-shadow:0 1px 4px rgba(0,0,0,.15)}
+.toggle::after{content:'';position:absolute;width:18px;height:18px;border-radius:50%;background:#FFFFFF;top:3px;transition:all .2s;box-shadow:0 1px 4px rgba(0,0,0,.15)}
 .toggle.t-on::after{right:3px}
 .toggle.t-off::after{left:3px}
 .color-picker-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
 .color-swatch{width:32px;height:32px;border-radius:8px;cursor:pointer;transition:all .15s;border:2px solid transparent;position:relative;flex-shrink:0}
-.color-swatch.sw-selected{border-color:#fff;box-shadow:0 0 0 2px #333;transform:scale(1.15)}
-.color-swatch.sw-selected::after{content:'✓';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#fff;font-size:14px;font-weight:800}
+.color-swatch.sw-selected{border-color:#FFFFFF;box-shadow:0 0 0 2px #1E293B;transform:scale(1.15)}
+.color-swatch.sw-selected::after{content:'✓';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#FFFFFF;font-size:14px;font-weight:800}
 .color-swatch:hover{transform:scale(1.1)}
 .section-save{display:flex;justify-content:flex-end;margin-top:18px;padding-top:16px;border-top:1px solid var(--app-border,#E2E8F0)}
-.sec-save-btn{display:flex;align-items:center;gap:6px;padding:10px 22px;background:var(--app-accent, var(--app-accent, var(--app-accent, #2563EB)));color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s;box-shadow:0 3px 10px rgba(var(--app-accent-rgb,0,188,212),.25)}
+.sec-save-btn{display:flex;align-items:center;gap:6px;padding:10px 22px;background:var(--app-accent, var(--app-accent, var(--app-accent, #2563EB)));color:#FFFFFF;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s;box-shadow:0 3px 10px rgba(var(--app-accent-rgb,0,188,212),.25)}
 .sec-save-btn:hover{opacity:.9}
 .sec-save-btn:disabled{opacity:.6;cursor:not-allowed}
 .sec-cancel-btn{display:flex;align-items:center;gap:6px;padding:10px 18px;background:none;color:var(--app-muted,#64748B);border:1.5px solid var(--app-border,#E2E8F0);border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-right:8px;transition:all .15s}
@@ -73,19 +73,19 @@ const CSS = `
 .sec-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
 .sec-action{margin-left:auto;display:flex;align-items:center;gap:8px}
 .sec-status{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px}
-.sec-status-on{background:#dcfce7;color:#16a34a}
+.sec-status-on{background:#E2E8F0;color:#16A34A}
 .sec-status-off{background:var(--app-bg);color:var(--app-muted);border:1px solid var(--app-border)}
 .sec-btn{padding:7px 14px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;border:1.5px solid var(--app-border);background:none;color:var(--app-muted);transition:all .15s}
 .sec-btn:hover{border-color:var(--app-accent);color:var(--app-accent)}
 .notif-grid{display:grid;grid-template-columns:1fr 80px 80px;align-items:center;padding:13px 0;border-bottom:1px solid var(--app-border)}
 .notif-grid:last-child{border-bottom:none}
-.danger-zone{background:#fef2f2;border:1.5px solid rgba(240,92,92,.2);border-radius:16px;padding:20px}
-.dz-title{font-size:13px;font-weight:800;color:#EF4444;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.danger-zone{background:#F8FAFC;border:1.5px solid rgba(100, 116, 139, .2);border-radius:16px;padding:20px}
+.dz-title{font-size:13px;font-weight:800;color:#64748B;margin-bottom:4px;display:flex;align-items:center;gap:6px}
 .dz-sub{font-size:12px;color:var(--app-muted);margin-bottom:16px;line-height:1.5}
 .dz-actions{display:flex;gap:10px;flex-wrap:wrap}
-.dz-btn{display:flex;align-items:center;gap:6px;padding:9px 16px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;border:1.5px solid rgba(240,92,92,.3);background:none;color:#EF4444;transition:all .15s}
-.dz-btn:hover{background:#EF4444;color:#fff;border-color:#EF4444}
-.settings-toast{position:fixed;bottom:24px;right:24px;z-index:9999;padding:14px 20px;border-radius:12px;font-size:13px;font-weight:700;color:#fff;box-shadow:0 8px 24px rgba(0,0,0,.2);animation:fadeInUp .3s ease}
+.dz-btn{display:flex;align-items:center;gap:6px;padding:9px 16px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;border:1.5px solid rgba(100, 116, 139, .3);background:none;color:#64748B;transition:all .15s}
+.dz-btn:hover{background:#64748B;color:#FFFFFF;border-color:#64748B}
+.settings-toast{position:fixed;bottom:24px;right:24px;z-index:9999;padding:14px 20px;border-radius:12px;font-size:13px;font-weight:700;color:#FFFFFF;box-shadow:0 8px 24px rgba(0,0,0,.2);animation:fadeInUp .3s ease}
 @keyframes fadeInUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 @media(max-width:768px){.settings-layout{grid-template-columns:1fr}.settings-nav{position:static}.form-row-2{grid-template-columns:1fr}}
 `;
@@ -260,7 +260,7 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
 
       {/* Toast */}
       {toast && (
-        <div className="settings-toast" style={{ background: toast.type === 'error' ? '#EF4444' : accent }}>
+        <div className="settings-toast" style={{ background: toast.type === 'error' ? '#64748B' : accent }}>
           {toast.type === 'error' ? '⚠ ' : '✓ '}{toast.msg}
         </div>
       )}
@@ -285,10 +285,10 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
               <div
                 key={item.key}
                 className={`sn-item ${activeSection === item.key ? 'sn-active' : ''}`}
-                style={item.danger ? { color: '#EF4444' } : {}}
+                style={item.danger ? { color: '#64748B' } : {}}
                 onClick={() => setActiveSection(item.key)}
               >
-                <i className={`ti ${item.icon}`} style={item.danger ? { color: '#EF4444' } : {}} />
+                <i className={`ti ${item.icon}`} style={item.danger ? { color: '#64748B' } : {}} />
                 {item.label}
               </div>
             );
@@ -351,7 +351,7 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
           {activeSection === 'company' && (
             <div className="settings-section">
               <div className="ss-header">
-                <div className="ss-header-icon" style={{ background: '#eff4ff', color: '#2563EB' }}><i className="ti ti-building" /></div>
+                <div className="ss-header-icon" style={{ background: '#EFF6FF', color: '#2563EB' }}><i className="ti ti-building" /></div>
                 <div><div className="ss-title">Company Information</div><div className="ss-sub">Your company details used in invoices and documents</div></div>
               </div>
               <div className="ss-body">
@@ -389,7 +389,7 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
           {activeSection === 'notifications' && (
             <div className="settings-section">
               <div className="ss-header">
-                <div className="ss-header-icon" style={{ background: '#fef5e6', color: '#F5A623' }}><i className="ti ti-bell" /></div>
+                <div className="ss-header-icon" style={{ background: '#F8FAFC', color: '#64748B' }}><i className="ti ti-bell" /></div>
                 <div><div className="ss-title">Notification Preferences</div><div className="ss-sub">Choose how and when you want to be notified</div></div>
               </div>
               <div className="ss-body">
@@ -399,11 +399,11 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
                   <div style={{ textAlign: 'center', fontSize: 10, fontWeight: 700, color: 'var(--app-muted)', textTransform: 'uppercase', letterSpacing: '.5px' }}>In-App</div>
                 </div>
                 {[
-                  { label: 'Invoice Paid', desc: 'When a client pays an invoice', icon: 'ti-receipt-2', color: '#dcfce7', iconColor: '#16a34a', emailKey: 'invoicePaidEmail', appKey: 'invoicePaidApp' },
-                  { label: 'Invoice Overdue', desc: 'When a payment is past due date', icon: 'ti-alert-circle', color: '#fee2e2', iconColor: '#EF4444', emailKey: 'invoiceOverdueEmail', appKey: 'invoiceOverdueApp' },
-                  { label: 'Project Updates', desc: 'Status changes and milestones', icon: 'ti-briefcase', color: '#eff4ff', iconColor: '#2563EB', emailKey: 'projectEmail', appKey: 'projectApp' },
-                  { label: 'Proposal Activity', desc: 'Views, accepts and rejections', icon: 'ti-presentation', color: '#eee9ff', iconColor: '#7C5CFC', emailKey: 'proposalEmail', appKey: 'proposalApp' },
-                  { label: 'Subscription Alerts', desc: 'Renewals, limits and upgrades', icon: 'ti-rocket', color: '#fef5e6', iconColor: '#F5A623', emailKey: 'subscriptionEmail', appKey: 'subscriptionApp' },
+                  { label: 'Invoice Paid', desc: 'When a client pays an invoice', icon: 'ti-receipt-2', color: '#E2E8F0', iconColor: '#16A34A', emailKey: 'invoicePaidEmail', appKey: 'invoicePaidApp' },
+                  { label: 'Invoice Overdue', desc: 'When a payment is past due date', icon: 'ti-alert-circle', color: '#E2E8F0', iconColor: '#64748B', emailKey: 'invoiceOverdueEmail', appKey: 'invoiceOverdueApp' },
+                  { label: 'Project Updates', desc: 'Status changes and milestones', icon: 'ti-briefcase', color: '#EFF6FF', iconColor: '#2563EB', emailKey: 'projectEmail', appKey: 'projectApp' },
+                  { label: 'Proposal Activity', desc: 'Views, accepts and rejections', icon: 'ti-presentation', color: '#EFF6FF', iconColor: '#2563EB', emailKey: 'proposalEmail', appKey: 'proposalApp' },
+                  { label: 'Subscription Alerts', desc: 'Renewals, limits and upgrades', icon: 'ti-rocket', color: '#F8FAFC', iconColor: '#64748B', emailKey: 'subscriptionEmail', appKey: 'subscriptionApp' },
                 ].map(n => (
                   <div key={n.label} className="notif-grid">
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -422,7 +422,7 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
           {activeSection === 'security' && (
             <div className="settings-section">
               <div className="ss-header">
-                <div className="ss-header-icon" style={{ background: '#dcfce7', color: '#16a34a' }}><i className="ti ti-shield-lock" /></div>
+                <div className="ss-header-icon" style={{ background: '#E2E8F0', color: '#16A34A' }}><i className="ti ti-shield-lock" /></div>
                 <div><div className="ss-title">Security</div><div className="ss-sub">Manage your password</div></div>
               </div>
               <div className="ss-body">
@@ -447,7 +447,7 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
           {activeSection === 'appearance' && (
             <div className="settings-section">
               <div className="ss-header">
-                <div className="ss-header-icon" style={{ background: '#eee9ff', color: '#7C5CFC' }}><i className="ti ti-palette" /></div>
+                <div className="ss-header-icon" style={{ background: '#EFF6FF', color: '#2563EB' }}><i className="ti ti-palette" /></div>
                 <div><div className="ss-title">Appearance</div><div className="ss-sub">Customise the look and feel of your dashboard</div></div>
               </div>
               <div className="ss-body">
@@ -466,7 +466,7 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
                     <div style={{ position: 'relative' }}>
                       <div
                         className={`color-swatch ${appTheme === 'custom' ? 'sw-selected' : ''}`}
-                        style={{ background: customColor || '#888', border: '2px dashed #999' }}
+                        style={{ background: customColor || '#64748B', border: '2px dashed #64748B' }}
                         title="Custom color"
                         onClick={() => document.getElementById('customColorPicker')?.click()}
                       />

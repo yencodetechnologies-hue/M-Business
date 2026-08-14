@@ -186,27 +186,27 @@ export default function AuthPage({ setUser, initialTab = "login" }) {
   const inp = (err) => ({
     width: "100%", background: "transparent",
     border: "none",
-    borderBottom: `1.5px solid ${err ? "rgba(248,113,113,0.7)" : "rgba(255,255,255,0.2)"}`,
-    padding: "9px 36px 9px 0", color: "#fff", fontSize: 14,
+    borderBottom: `1.5px solid ${err ? "rgba(100, 116, 139, 0.7)" : "rgba(255,255,255,0.2)"}`,
+    padding: "9px 36px 9px 0", color: "#FFFFFF", fontSize: 14,
     outline: "none", fontFamily: "inherit", transition: "border-color .2s",
   });
 
   const selectSty = {
     width: "100%", background: "transparent",
     border: "none", borderBottom: "1.5px solid rgba(255,255,255,0.2)",
-    padding: "9px 0", color: "#fff", fontSize: 14,
+    padding: "9px 0", color: "#FFFFFF", fontSize: 14,
     outline: "none", fontFamily: "inherit", cursor: "pointer",
     appearance: "auto",
   };
 
   const errMsg = (msg) => msg
-    ? <div style={{ fontSize: 11, color: "#fca5a5", marginTop: 4 }}>Warning {msg}</div>
+    ? <div style={{ fontSize: 11, color: "#E2E8F0", marginTop: 4 }}>Warning {msg}</div>
     : null;
 
   return (
     <div style={{
       minHeight: "100vh", width: "100%",
-      background: "#08081a",
+      background: "#0F172A",
       display: "flex", alignItems: "center", justifyContent: "center",
       fontFamily: "'Plus Jakarta Sans', sans-serif",
       padding: 20,
@@ -217,10 +217,10 @@ export default function AuthPage({ setUser, initialTab = "login" }) {
         input::placeholder { color: rgba(255,255,255,0.25); }
         input:focus { border-bottom-color: rgba(255,255,255,0.2) !important; outline: none; box-shadow: none; }
         input:-webkit-autofill {
-          -webkit-box-shadow: 0 0 0 40px #100820 inset !important;
-          -webkit-text-fill-color: #fff !important;
+          -webkit-box-shadow: 0 0 0 40px #0F172A inset !important;
+          -webkit-text-fill-color: #FFFFFF !important;
         }
-        select option { background: #130a2e; color: #fff; }
+        select option { background: #0F172A; color: #FFFFFF; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
         .auth-card {
@@ -230,8 +230,8 @@ export default function AuthPage({ setUser, initialTab = "login" }) {
           border-radius: 22px;
 border: 2px solid #2563EB;
 -webkit-box-shadow:
-0 0 0 1px rgba(37, 99, 235,0.12),
-            0 0 60px rgba(37, 99, 235,0.28),
+0 0 0 1px rgba(37, 99, 235, 0.12),
+            0 0 60px rgba(37, 99, 235, 0.28),
             0 24px 80px rgba(0,0,0,0.5);
           display: flex;
           overflow: visible;
@@ -241,7 +241,7 @@ border: 2px solid #2563EB;
 
         .form-side {
           flex: 1;
-          background: #0d0d20;
+          background: #0F172A;
           display: flex;
           flex-direction: column;
           justify-content: center;
@@ -267,7 +267,7 @@ background: linear-gradient(155deg, #2563EB, #2563EB 60%, #2563EB 100%);
           flex-direction: column;
           justify-content: center;
           padding: 48px 40px;
-          color: #fff;
+          color: #FFFFFF;
           z-index: 10;
           border-radius: 18px;
           transform-style: preserve-3d;
@@ -295,7 +295,7 @@ background: linear-gradient(155deg, #2563EB, #2563EB 60%, #2563EB 100%);
           background: transparent;
           border: 2px solid rgba(255,255,255,0.7);
           border-radius: 50px;
-          color: #fff; font-size: 14px; font-weight: 700;
+          color: #FFFFFF; font-size: 14px; font-weight: 700;
           cursor: pointer; font-family: inherit;
           transition: background .2s;
         }
@@ -305,7 +305,7 @@ background: linear-gradient(155deg, #2563EB, #2563EB 60%, #2563EB 100%);
           width: 100%; padding: 13px 0;
 background: linear-gradient(90deg, #2563EB, #2563EB);
           border: none; border-radius: 50px;
-          color: #fff; font-size: 15px; font-weight: 700;
+          color: #FFFFFF; font-size: 15px; font-weight: 700;
           cursor: pointer; font-family: inherit;
           display: flex; align-items: center; justify-content: center; gap: 8px;
 box-shadow: 0 4px 22px #2563EB;
@@ -317,7 +317,7 @@ box-shadow: 0 4px 22px #2563EB;
         .spinner {
           width: 15px; height: 15px;
           border: 2px solid rgba(255,255,255,0.2);
-          border-top-color: #fff;
+          border-top-color: #FFFFFF;
           border-radius: 50%;
           animation: spin .8s linear infinite;
           display: inline-block;
@@ -379,7 +379,7 @@ color: #2563EB; font-weight: 700;
           {/* REGISTER */}
           {isRegister && (
             <div>
-              <h2 style={{ color: "#fff", fontSize: 26, fontWeight: 800, margin: "0 0 22px", textAlign: "left" }}>Sign Up</h2>
+              <h2 style={{ color: "#FFFFFF", fontSize: 26, fontWeight: 800, margin: "0 0 22px", textAlign: "left" }}>Sign Up</h2>
 
               {success && <Alert type="success" msg={success} />}
               {error && <Alert type="error" msg={error} />}
@@ -459,7 +459,7 @@ color: #2563EB; font-weight: 700;
           {/* LOGIN */}
           {isLogin && (
             <div>
-              <h2 style={{ color: "#fff", fontSize: 26, fontWeight: 800, margin: "0 0 28px", textAlign: "center" }}>Login</h2>
+              <h2 style={{ color: "#FFFFFF", fontSize: 26, fontWeight: 800, margin: "0 0 28px", textAlign: "center" }}>Login</h2>
 
               {success && <Alert type="success" msg={success} />}
               {error && <Alert type="error" msg={error} />}
@@ -504,7 +504,7 @@ color: #2563EB; font-weight: 700;
           {/* OTP */}
           {tab === "otp" && (
             <div style={{ maxWidth: 380, margin: "0 auto", width: "100%" }}>
-              <h2 style={{ color: "#fff", fontSize: 24, fontWeight: 800, margin: "0 0 12px", textAlign: "center" }}>Verify OTP</h2>
+              <h2 style={{ color: "#FFFFFF", fontSize: 24, fontWeight: 800, margin: "0 0 12px", textAlign: "center" }}>Verify OTP</h2>
               <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", marginBottom: 24, textAlign: "center" }}>
                 6-digit OTP sent to <strong style={{ color: "#2563EB" }}>{verifyEmail}</strong>
               </p>
@@ -529,7 +529,7 @@ color: #2563EB; font-weight: 700;
           {/* FORGOT */}
           {tab === "forgot" && (
             <div style={{ maxWidth: 380, margin: "0 auto", width: "100%" }}>
-              <h2 style={{ color: "#fff", fontSize: 24, fontWeight: 800, margin: "0 0 12px", textAlign: "center" }}>Forgot Password</h2>
+              <h2 style={{ color: "#FFFFFF", fontSize: 24, fontWeight: 800, margin: "0 0 12px", textAlign: "center" }}>Forgot Password</h2>
               <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", marginBottom: 24 }}>Enter your email to receive a password reset OTP.</p>
               {success && <Alert type="success" msg={success} />}
               {error && <Alert type="error" msg={error} />}
@@ -553,7 +553,7 @@ color: #2563EB; font-weight: 700;
           {/* RESET */}
           {tab === "reset" && (
             <div style={{ maxWidth: 380, margin: "0 auto", width: "100%" }}>
-              <h2 style={{ color: "#fff", fontSize: 24, fontWeight: 800, margin: "0 0 20px", textAlign: "center" }}>Reset Password</h2>
+              <h2 style={{ color: "#FFFFFF", fontSize: 24, fontWeight: 800, margin: "0 0 20px", textAlign: "center" }}>Reset Password</h2>
               {success && <Alert type="success" msg={success} />}
               {error && <Alert type="error" msg={error} />}
               <Field label="OTP Code">
@@ -591,7 +591,7 @@ color: #2563EB; font-weight: 700;
             }}
           >
 
-            <h2 style={{ fontSize: 36, fontWeight: 900, lineHeight: 1.1, margin: "0 0 16px", color: "#fff" }}>
+            <h2 style={{ fontSize: 36, fontWeight: 900, lineHeight: 1.1, margin: "0 0 16px", color: "#FFFFFF" }}>
               WELCOME<br />BACK!
             </h2>
             <p style={{ fontSize: 13.5, color: "rgba(255,255,255,0.62)", lineHeight: 1.8, marginBottom: 30, maxWidth: 250 }}>
@@ -640,10 +640,10 @@ function Alert({ type, msg }) {
   const isSuccess = type === "success";
   return (
     <div style={{
-      background: isSuccess ? "rgba(34,197,94,0.1)" : "rgba(239,68,68,0.1)",
-      border: `1px solid ${isSuccess ? "rgba(34,197,94,0.3)" : "rgba(239,68,68,0.3)"}`,
+      background: isSuccess ? "rgba(22, 163, 74, 0.1)" : "rgba(100, 116, 139, 0.1)",
+      border: `1px solid ${isSuccess ? "rgba(22, 163, 74, 0.3)" : "rgba(100, 116, 139, 0.3)"}`,
       borderRadius: 8, padding: "9px 13px", marginBottom: 14,
-      fontSize: 12.5, color: isSuccess ? "#86efac" : "#fca5a5",
+      fontSize: 12.5, color: isSuccess ? "#E2E8F0" : "#E2E8F0",
     }}>
       {isSuccess ? "Success" : "Warning"} {msg}
     </div>

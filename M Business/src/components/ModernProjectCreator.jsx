@@ -6,11 +6,11 @@ import AddClientView from './AddClientView';
 import { toast } from 'react-toastify';
 // ── Shared Colors ──
 const P = {
-  primary: ' var(--app-accent, var(--app-accent, #2563EB))', primaryDark: '#2563EB', primaryLight: 'var(--teal-light, var(--teal-light, #EFF6FF))', primaryMid: '#B2EBF2',
-  textDark: '#1A2332', textMid: '#4A5568', textLight: '#718096',
-  bg: '#F0F4F8', white: '#FFFFFF', border: '#E2E8F0',
-  green: '#16A34A', greenLight: '#D1FAE5', orange: '#F59E0B', orangeLight: '#FEF3C7',
-  red: '#FF6B6B', redLight: '#FEE2E2', purple: '#8B5CF6', purpleLight: '#EFF6FF',
+  primary: ' var(--app-accent, var(--app-accent, #2563EB))', primaryDark: '#2563EB', primaryLight: 'var(--teal-light, var(--teal-light, #EFF6FF))', primaryMid: '#E2E8F0',
+  textDark: '#1E293B', textMid: '#64748B', textLight: '#64748B',
+  bg: '#EFF6FF', white: '#FFFFFF', border: '#E2E8F0',
+  green: '#16A34A', greenLight: '#E2E8F0', orange: '#64748B', orangeLight: '#E2E8F0',
+  red: '#64748B', redLight: '#E2E8F0', purple: '#2563EB', purpleLight: '#EFF6FF',
 };
 
 const CSS = `
@@ -22,14 +22,14 @@ const CSS = `
 .mpc-step-bar { display:flex; align-items:center; gap:0; margin-bottom:26px; }
 .mpc-step { display:flex; align-items:center; gap:8px; font-size:13px; font-weight:700; color:${P.textLight}; transition:all .2s; }
 .mpc-step-num { width:28px; height:28px; border-radius:50%; border:2px solid ${P.border}; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800; flex-shrink:0; transition:all .2s; }
-.mpc-step.done .mpc-step-num { background:${P.green}; border-color:${P.green}; color:#fff; }
-.mpc-step.active .mpc-step-num { background:${P.primary}; border-color:${P.primary}; color:#fff; }
+.mpc-step.done .mpc-step-num { background:${P.green}; border-color:${P.green}; color:#FFFFFF; }
+.mpc-step.active .mpc-step-num { background:${P.primary}; border-color:${P.primary}; color:#FFFFFF; }
 .mpc-step.active { color:${P.textDark}; }
 .mpc-step-line { flex:1; height:2px; background:${P.border}; margin:0 8px; transition:all .2s; }
 .mpc-step-line.done { background:${P.green}; }
 
 /* CARDS */
-.mpc-section-card { background:#fff; border-radius:16px; box-shadow:0 2px 12px rgba(37, 99, 235,.08); padding:24px; margin-bottom:20px; border:1px solid #f1f5f9; }
+.mpc-section-card { background:#FFFFFF; border-radius:16px; box-shadow:0 2px 12px rgba(37, 99, 235, .08); padding:24px; margin-bottom:20px; border:1px solid #EFF6FF; }
 .mpc-section-heading { font-size:16px; font-weight:800; color:${P.textDark}; display:flex; align-items:center; gap:8px; margin-bottom:20px; padding-bottom:14px; border-bottom:1px solid ${P.border}; }
 .mpc-section-heading i { color:${P.primary}; font-size:20px; }
 
@@ -37,7 +37,7 @@ const CSS = `
 .mpc-form-group { margin-bottom:18px; }
 .mpc-form-group label { display:block; font-size:11px; font-weight:800; color:${P.textMid}; text-transform:uppercase; letter-spacing:.7px; margin-bottom:6px; }
 .mpc-form-group input, .mpc-form-group select, .mpc-form-group textarea { width:100%; padding:11px 14px; border:1.5px solid ${P.border}; border-radius:10px; font-family:'Nunito',sans-serif; font-size:14px; color:${P.textDark}; background:${P.bg}; outline:none; transition:border .15s; }
-.mpc-form-group input:focus, .mpc-form-group select:focus, .mpc-form-group textarea:focus { border-color:${P.primary}; background:#fff; }
+.mpc-form-group input:focus, .mpc-form-group select:focus, .mpc-form-group textarea:focus { border-color:${P.primary}; background:#FFFFFF; }
 .mpc-form-group textarea { resize:vertical; min-height:90px; line-height:1.6; }
 .mpc-form-2col { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
 
@@ -46,18 +46,18 @@ const CSS = `
 .mpc-team-row { display:flex; align-items:center; gap:12px; padding:10px 14px; border-radius:12px; border:1.5px solid ${P.border}; background:${P.bg}; cursor:pointer; transition:all .15s; user-select:none; }
 .mpc-team-row:hover { border-color:${P.primaryMid}; }
 .mpc-team-row.selected { border-color:${P.primary}; background:${P.primaryLight}; }
-.mpc-role-badge { font-size:10px; font-weight:800; background:#fff; border:1px solid ${P.border}; border-radius:20px; padding:3px 10px; color:${P.textMid}; margin-left:auto; }
-.mpc-team-row.selected .mpc-role-badge { background:${P.primary}; border-color:${P.primary}; color:#fff; }
-.mpc-av { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:800; color:#fff; flex-shrink:0; }
+.mpc-role-badge { font-size:10px; font-weight:800; background:#FFFFFF; border:1px solid ${P.border}; border-radius:20px; padding:3px 10px; color:${P.textMid}; margin-left:auto; }
+.mpc-team-row.selected .mpc-role-badge { background:${P.primary}; border-color:${P.primary}; color:#FFFFFF; }
+.mpc-av { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:800; color:#FFFFFF; flex-shrink:0; }
 
 /* MILESTONES */
 .mpc-milestone-list { display:flex; flex-direction:column; gap:10px; }
 .mpc-milestone-row { display:grid; grid-template-columns:1fr auto auto; gap:12px; align-items:center; background:${P.bg}; border-radius:12px; padding:12px 14px; border:1.5px solid ${P.border}; }
 .mpc-milestone-row input { border:none; background:transparent; font-family:'Nunito',sans-serif; font-size:14px; font-weight:700; color:${P.textDark}; outline:none; box-shadow:none; width:100%; padding:0; }
 .mpc-milestone-row input:focus { outline:none !important; box-shadow:none !important; }
-.mpc-milestone-row select { border-radius:10px; border:1.5px solid ${P.border}; background:#fff; }
-.mpc-milestone-row input[type="text"] { border-radius:10px; border:1.5px solid ${P.border}; background:#fff; }
-.mpc-milestone-row input[type="date"] { font-size:13px; color:${P.textMid}; font-weight:600; background:#fff; border:1.5px solid ${P.border}; border-radius:10px; padding:6px 10px; width:160px; cursor:pointer; }
+.mpc-milestone-row select { border-radius:10px; border:1.5px solid ${P.border}; background:#FFFFFF; }
+.mpc-milestone-row input[type="text"] { border-radius:10px; border:1.5px solid ${P.border}; background:#FFFFFF; }
+.mpc-milestone-row input[type="date"] { font-size:13px; color:${P.textMid}; font-weight:600; background:#FFFFFF; border:1.5px solid ${P.border}; border-radius:10px; padding:6px 10px; width:160px; cursor:pointer; }
 .mpc-milestone-row input[type="date"]:focus { border-color:${P.primary}; outline:none; }
 .mpc-remove-ms { color:${P.textLight}; cursor:pointer; font-size:18px; padding:4px; display:flex; align-items:center; transition:color .15s; }
 .mpc-remove-ms:hover { color:${P.red}; }
@@ -69,7 +69,7 @@ const CSS = `
 .mpc-bs-item input { width:100%; border:none; background:transparent; font-family:'Nunito',sans-serif; font-size:18px; font-weight:800; color:${P.primary}; text-align:center; outline:none; padding:0; }
 
 /* PREVIEW */
-.mpc-preview-card { background:#fff; border-radius:16px; box-shadow:0 8px 32px rgba(37, 99, 235,.08); padding:24px; position:sticky; top:80px; border:1px solid #f1f5f9; }
+.mpc-preview-card { background:#FFFFFF; border-radius:16px; box-shadow:0 8px 32px rgba(37, 99, 235, .08); padding:24px; position:sticky; top:80px; border:1px solid #EFF6FF; }
 .mpc-preview-card h3 { font-size:16px; font-weight:800; color:${P.textDark}; margin-bottom:20px; display:flex; align-items:center; gap:8px; }
 .mpc-preview-card h3 i { color:${P.primary}; font-size:20px; }
 .mpc-pv-row { display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px dashed ${P.border}; font-size:13px; }
@@ -84,9 +84,9 @@ const CSS = `
 .mpc-cl-item.pending i { color:${P.textLight}; }
 
 /* ACTION BAR */
-.mpc-action-bar { background:#fff; border-top:1px solid ${P.border}; padding:16px 26px; display:flex; align-items:center; justify-content:space-between; position:sticky; bottom:0; z-index:40; box-shadow:0 -4px 20px rgba(0,0,0,.03); margin: 0 -26px -26px -26px; border-radius:0 0 16px 16px; }
+.mpc-action-bar { background:#FFFFFF; border-top:1px solid ${P.border}; padding:16px 26px; display:flex; align-items:center; justify-content:space-between; position:sticky; bottom:0; z-index:40; box-shadow:0 -4px 20px rgba(0,0,0,.03); margin: 0 -26px -26px -26px; border-radius:0 0 16px 16px; }
 .mpc-btn { display:inline-flex; align-items:center; gap:8px; padding:10px 20px; border-radius:10px; font-family:'Nunito',sans-serif; font-size:14px; font-weight:800; cursor:pointer; border:none; transition:all .15s; }
-.mpc-btn-primary { background:${P.primary}; color:#fff; box-shadow:0 4px 12px rgba(37, 99, 235,.2); }
+.mpc-btn-primary { background:${P.primary}; color:#FFFFFF; box-shadow:0 4px 12px rgba(37, 99, 235, .2); }
 .mpc-btn-primary:hover { background:${P.primaryDark}; transform:translateY(-1px); }
 .mpc-btn-outline { background:transparent; border:1.5px solid ${P.border}; color:${P.textMid}; }
 .mpc-btn-outline:hover { border-color:${P.primary}; color:${P.primary}; background:${P.primaryLight}; }
@@ -104,7 +104,7 @@ function getInitials(name) {
 }
 
 function getAvatarColor(name) {
-  const colors = [' var(--app-accent, var(--app-accent, #2563EB))', '#8B5CF6', '#F59E0B', '#16A34A', '#EC4899', '#3B82F6'];
+  const colors = [' var(--app-accent, var(--app-accent, #2563EB))', '#2563EB', '#64748B', '#16A34A', '#64748B', '#2563EB'];
   if (!name) return colors[0];
   return colors[name.charCodeAt(0) % colors.length];
 }
@@ -684,7 +684,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                       borderRadius: 10,
                       fontSize: 14,
                       fontWeight: 700,
-                      color: '#0D2027',
+                      color: '#0F172A',
                       background: 'var(--teal-light, var(--teal-light, #EFF6FF))',
                       display: 'flex',
                       alignItems: 'center',
@@ -695,7 +695,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                         width: 28, height: 28, borderRadius: '50%',
                         background: 'linear-gradient(135deg, var(--app-accent, var(--app-accent, #2563EB)),#2563EB)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        color: '#fff', fontSize: 12, fontWeight: 800, flexShrink: 0
+                        color: '#FFFFFF', fontSize: 12, fontWeight: 800, flexShrink: 0
                       }}>
                         {client[0]?.toUpperCase() || '?'}
                       </div>
@@ -733,7 +733,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                           setClientId('');
                         }
                       }}
-                      style={{ flex: 1, border: fieldErrors.client ? '1.5px solid #EF4444' : undefined }}
+                      style={{ flex: 1, border: fieldErrors.client ? '1.5px solid #64748B' : undefined }}
                     >
                       <option value="">Select client...</option>
                       <option value="__add_client__" style={{ color: "var(--app-accent)", fontWeight: 400 }}>➕ Add New Client</option>
@@ -742,7 +742,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                   )}
                 </div>
                 {fieldErrors.client && (
-                  <div style={{ color: '#EF4444', fontSize: 12, fontWeight: 700, marginTop: 4 }}>Required</div>
+                  <div style={{ color: '#64748B', fontSize: 12, fontWeight: 700, marginTop: 4 }}>Required</div>
                 )}
 
                 {/* Inline Add Client Modal */}
@@ -797,10 +797,10 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                   onChange={e => { setName(e.target.value); if (fieldErrors.name) setFieldErrors(f => ({ ...f, name: false })); }}
                   placeholder="e.g. E-Commerce Platform Redesign"
                   autoFocus
-                  style={fieldErrors.name ? { border: '1.5px solid #EF4444' } : undefined}
+                  style={fieldErrors.name ? { border: '1.5px solid #64748B' } : undefined}
                 />
                 {fieldErrors.name && (
-                  <div style={{ color: '#EF4444', fontSize: 12, fontWeight: 700, marginTop: 4 }}>Required</div>
+                  <div style={{ color: '#64748B', fontSize: 12, fontWeight: 700, marginTop: 4 }}>Required</div>
                 )}
               </div>
             </div>
@@ -890,7 +890,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                           key={emp._id || emp.id}
                           style={{
                             display: 'flex', alignItems: 'center', gap: 6,
-                            background: '#F0F4F8', borderRadius: 20,
+                            background: '#EFF6FF', borderRadius: 20,
                             padding: '4px 8px 4px 4px'
                           }}
                         >
@@ -900,10 +900,10 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                             style={{
                               background: getAvatarColor(empName),
                               width: 26, height: 26, fontSize: 11,
-                              border: '2px solid #fff',
+                              border: '2px solid #FFFFFF',
                               borderRadius: '50%',
                               display: 'flex', alignItems: 'center', justifyContent: 'center',
-                              color: '#fff', fontWeight: 700, flexShrink: 0
+                              color: '#FFFFFF', fontWeight: 700, flexShrink: 0
                             }}
                           >
                             {getInitials(empName)}
@@ -915,7 +915,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                             title={`Remove ${empName}`}
                             style={{
                               background: 'none', border: 'none', cursor: 'pointer',
-                              color: '#94A3B8', fontSize: 15, fontWeight: 700,
+                              color: '#64748B', fontSize: 15, fontWeight: 700,
                               lineHeight: 1, padding: '0 2px'
                             }}
                           >
@@ -943,7 +943,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
               >
                 <div
                   style={{
-                    background: '#fff', borderRadius: 16,
+                    background: '#FFFFFF', borderRadius: 16,
                     padding: '32px 32px 26px', width: '100%', maxWidth: 560,
                     boxShadow: '0 20px 60px rgba(0,0,0,0.2)'
                   }}
@@ -1108,7 +1108,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                     <button
                       type="button"
                       className="mpc-btn mpc-btn-outline"
-                      style={{ marginLeft: 8, padding: '8px 12px', color: '#dc2626', borderColor: '#dc2626' }}
+                      style={{ marginLeft: 8, padding: '8px 12px', color: '#64748B', borderColor: '#64748B' }}
                       onClick={() => removeMilestone(idx)}
                       title="Delete milestone"
                     >
@@ -1118,7 +1118,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                 );
               })}
               {milestones.length === 0 && (
-                <div style={{ fontSize: 12, color: '#94a3b8', padding: '8px 0' }}>
+                <div style={{ fontSize: 12, color: '#64748B', padding: '8px 0' }}>
                   No milestones assigned yet.
                 </div>
               )}

@@ -18,28 +18,28 @@ function buildTheme(accent) {
     accent,
     accent2: accent,
     accentRgb: hexToRgbStr(accent),
-    text: "#1E1B2E",
-    muted: "#6B6478",
+    text: "#0F172A",
+    muted: "#64748B",
     border: "#E2E8F0",
-    bg: "#F0FDFA",
-    bgSoft: "#CCFBF1",
-    bgSoft2: "#99F6E4",
-    card: "#ffffff",
-    danger: "#DC2626",
-    dangerBg: "#FEF2F2",
+    bg: "#EFF6FF",
+    bgSoft: "#E2E8F0",
+    bgSoft2: "#E2E8F0",
+    card: "#FFFFFF",
+    danger: "#64748B",
+    dangerBg: "#F8FAFC",
     success: "#16A34A",
-    successBg: "#F0FDF4",
+    successBg: "#F8FAFC",
   };
 }
 
 function buildSections(accent) {
-  const s = { fg: accent, bg: "#CCFBF1", ring: `rgba(${hexToRgbStr(accent)},0.12)` };
+  const s = { fg: accent, bg: "#E2E8F0", ring: `rgba(${hexToRgbStr(accent)},0.12)` };
   return { personal: s, bank: s, docs: s };
 }
 
 const THEME_PRESETS = {
-  purple: "#2563eb", ocean: "#0284c7", forest: "#16a34a", sunset: "#ea580c",
-  rose: "#e11d48", slate: "#475569", mint: "#2563eb", candy: "#c026d3", teal: "#2563EB",
+  purple: "#2563EB", ocean: "#2563EB", forest: "#16A34A", sunset: "#64748B",
+  rose: "#64748B", slate: "#64748B", mint: "#2563EB", candy: "#64748B", teal: "#2563EB",
 };
 
 function hexToRgbStr(hex) {
@@ -205,7 +205,7 @@ export default function EmployeeOnboarding() {
     return (
       <div style={{ minHeight: "100vh", background: `radial-gradient(circle at 20% 10%, ${T.bgSoft} 0%, ${T.bg} 55%, ${T.bgSoft2} 100%)`, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
         <div style={{ maxWidth: 450, width: "100%", background: T.card, padding: 40, borderRadius: 24, boxShadow: `0 24px 60px -20px rgba(${T.accentRgb},0.25)`, textAlign: "center", border: `1px solid ${T.border}` }}>
-          <div style={{ width: 80, height: 80, background: T.successBg, color: T.success, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 34, margin: "0 auto 24px", border: `2px solid #DCFCE7` }}>
+          <div style={{ width: 80, height: 80, background: T.successBg, color: T.success, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 34, margin: "0 auto 24px", border: `2px solid #E2E8F0` }}>
             <i className="ti ti-check"></i>
           </div>
           <h2 style={{ fontSize: 24, fontWeight: 800, color: T.text, marginBottom: 12 }}>Registration Successful!</h2>
@@ -229,7 +229,7 @@ export default function EmployeeOnboarding() {
 
         <form onSubmit={handleSubmit} style={{ background: T.card, padding: 32, borderRadius: 24, boxShadow: `0 24px 60px -24px rgba(${T.accentRgb},0.2)`, border: `1px solid ${T.border}` }}>
           {err.submit && (
-            <div style={{ display: "flex", alignItems: "center", gap: 8, background: T.dangerBg, color: T.danger, padding: "12px 16px", borderRadius: 10, fontSize: 14, fontWeight: 600, marginBottom: 20, border: "1px solid #FECACA" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, background: T.dangerBg, color: T.danger, padding: "12px 16px", borderRadius: 10, fontSize: 14, fontWeight: 600, marginBottom: 20, border: "1px solid #E2E8F0" }}>
               <i className="ti ti-alert-circle"></i> {err.submit}
             </div>
           )}
@@ -243,8 +243,8 @@ export default function EmployeeOnboarding() {
                   <i className="ti ti-user" style={{ fontSize: 44, color: SECTIONS.personal.fg, opacity: 0.5 }}></i>
                 )}
               </div>
-              <label style={{ position: "absolute", bottom: 8, right: 8, background: `linear-gradient(135deg, ${T.accent}, ${T.accent2})`, width: 36, height: 36, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", border: "3px solid #fff", boxShadow: `0 4px 10px rgba(${T.accentRgb},0.4)` }}>
-                <i className="ti ti-camera" style={{ fontSize: 16, color: "#fff" }}></i>
+              <label style={{ position: "absolute", bottom: 8, right: 8, background: `linear-gradient(135deg, ${T.accent}, ${T.accent2})`, width: 36, height: 36, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", border: "3px solid #FFFFFF", boxShadow: `0 4px 10px rgba(${T.accentRgb},0.4)` }}>
+                <i className="ti ti-camera" style={{ fontSize: 16, color: "#FFFFFF" }}></i>
                 <input type="file" accept="image/*" style={{ display: "none" }} onChange={handlePhotoChange} />
               </label>
             </div>
@@ -319,7 +319,7 @@ export default function EmployeeOnboarding() {
               style={{
                 width: "60%",
                 background: `linear-gradient(135deg, ${T.accent}, ${T.accent2})`,
-                color: "#fff",
+                color: "#FFFFFF",
                 border: "none",
                 borderRadius: 14,
                 padding: "16px",
@@ -336,7 +336,7 @@ export default function EmployeeOnboarding() {
             >
               {loading ? (
                 <>
-                  <span style={{ width: 20, height: 20, border: "3px solid rgba(255,255,255,0.3)", borderTop: "3px solid #fff", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+                  <span style={{ width: 20, height: 20, border: "3px solid rgba(255,255,255,0.3)", borderTop: "3px solid #FFFFFF", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
                   <span>Submitting...</span>
                 </>
               ) : (
@@ -385,7 +385,7 @@ function Input({ label, value, onChange, error, type = "text", placeholder, sect
         value={value}
         onChange={e => onChange(e.target.value)}
         placeholder={placeholder}
-        onFocus={e => { e.target.style.borderColor = fg; e.target.style.boxShadow = `0 0 0 3px ${ring}`; e.target.style.background = "#fff"; }}
+        onFocus={e => { e.target.style.borderColor = fg; e.target.style.boxShadow = `0 0 0 3px ${ring}`; e.target.style.background = "#FFFFFF"; }}
         onBlur={e => { e.target.style.borderColor = error ? T.danger : T.border; e.target.style.boxShadow = "none"; e.target.style.background = error ? T.dangerBg : T.bg; }}
         style={{
           width: "100%",
@@ -450,7 +450,7 @@ function DocInput({ label, icon, file, onChange, section }) {
         <div style={{ fontSize: 13, fontWeight: 700, color: T.text }}>{label}</div>
         <div style={{ fontSize: 11, color: file ? fg : T.muted, fontWeight: 600 }}>{file ? file.name : "No file selected"}</div>
       </div>
-      <label style={{ background: file ? T.successBg : fg, color: file ? T.success : "#fff", padding: "6px 12px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer", border: file ? `1px solid #BBF7D0` : "none" }}>
+      <label style={{ background: file ? T.successBg : fg, color: file ? T.success : "#FFFFFF", padding: "6px 12px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer", border: file ? `1px solid #E2E8F0` : "none" }}>
         {file ? "Change" : "Upload"}
         <input type="file" style={{ display: "none" }} onChange={e => onChange(e.target.files[0])} />
       </label>

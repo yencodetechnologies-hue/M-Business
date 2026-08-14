@@ -249,7 +249,7 @@ const renderMembersAvatars = (inv) => {
 
   const clientInitials = inv.clientName ? inv.clientName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() : "MB";
 
-  const colors = ["#00BCC0", "#16A34A", "#7C5CFC", "#F5A623"];
+  const colors = ["#2563EB", "#16A34A", "#2563EB", "#64748B"];
 
   return (
 
@@ -267,7 +267,7 @@ const renderMembersAvatars = (inv) => {
 
             background: colors[index % colors.length],
 
-            border: "2px solid #fff",
+            border: "2px solid #FFFFFF",
 
             marginLeft: index > 0 ? "-5px" : "0"
 
@@ -459,7 +459,7 @@ function getNavForRole(role) {
 
 
 
-const sc = s => ({ Active: "#22C55E", Inactive: "#EF4444", "In Progress": "var(--app-accent)", Pending: "#F59E0B", Completed: "#22C55E", "On Hold": "var(--app-accent)", Sent: "var(--app-accent)", Approved: "#22C55E", Rejected: "#EF4444", Paid: "#22C55E", Overdue: "#EF4444", Company: "var(--app-accent)", Employee: "var(--app-accent)", Manager: "#f59e0b", pending: "#F59E0B", hired: "#22C55E", rejected: "#EF4444" }[s] || "var(--app-accent)");
+const sc = s => ({ Active: "#16A34A", Inactive: "#64748B", "In Progress": "var(--app-accent)", Pending: "#64748B", Completed: "#16A34A", "On Hold": "var(--app-accent)", Sent: "var(--app-accent)", Approved: "#16A34A", Rejected: "#64748B", Paid: "#16A34A", Overdue: "#64748B", Company: "var(--app-accent)", Employee: "var(--app-accent)", Manager: "#64748B", pending: "#64748B", hired: "#16A34A", rejected: "#64748B" }[s] || "var(--app-accent)");
 
 // Single source of truth for department names, shared by the "All Departments"
 // filter dropdown and the Add/Edit Employee "Role / Position" dropdown, so both
@@ -541,7 +541,7 @@ function Mdl({ title, onClose, children, maxWidth = 820, zIndex = 1000, fullScre
 
     >
 
-      <div className="client-details-popup-card" style={{ background: "#fff", borderRadius: fullScreenMobile ? 0 : 20, width: "100%", maxWidth, height: fullScreenMobile ? "100vh" : "auto", maxHeight: fullScreenMobile ? "100vh" : "calc(100vh - 32px)", overflow: "hidden", overflowX: "hidden", display: "flex", flexDirection: "column", boxShadow: fullScreenMobile ? "none" : "0 32px 80px rgba(var(--app-accent-rgb),0.25)", border: fullScreenMobile ? "none" : "1px solid var(--app-border)", margin: fullScreenMobile ? 0 : "16px auto" }} onClick={e => e.stopPropagation()}>
+      <div className="client-details-popup-card" style={{ background: "#FFFFFF", borderRadius: fullScreenMobile ? 0 : 20, width: "100%", maxWidth, height: fullScreenMobile ? "100vh" : "auto", maxHeight: fullScreenMobile ? "100vh" : "calc(100vh - 32px)", overflow: "hidden", overflowX: "hidden", display: "flex", flexDirection: "column", boxShadow: fullScreenMobile ? "none" : "0 32px 80px rgba(var(--app-accent-rgb),0.25)", border: fullScreenMobile ? "none" : "1px solid var(--app-border)", margin: fullScreenMobile ? 0 : "16px auto" }} onClick={e => e.stopPropagation()}>
 
         <div style={{ padding: fullScreenMobile ? "14px 16px" : "16px 22px", borderBottom: "1px solid var(--app-border)", display: "flex", justifyContent: "space-between", alignItems: "center", background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))", flexShrink: 0 }}>
 
@@ -583,9 +583,9 @@ function Fld({ label, value, onChange, options, type = "text", error, placeholde
     }
   }, [value, options, allowCustom]);
 
-  const s = { width: "100%", border: `1.5px solid ${error ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: disabled ? "#f3f0ff" : "var(--app-bg)", boxSizing: "border-box", outline: "none", fontFamily: "inherit", opacity: disabled ? 0.7 : 1 };
+  const s = { width: "100%", border: `1.5px solid ${error ? "#64748B" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: disabled ? "#EFF6FF" : "var(--app-bg)", boxSizing: "border-box", outline: "none", fontFamily: "inherit", opacity: disabled ? 0.7 : 1 };
 
-  const sCustom = { flex: 1.2, border: `1.5px solid ${error ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none", fontFamily: "inherit" };
+  const sCustom = { flex: 1.2, border: `1.5px solid ${error ? "#64748B" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none", fontFamily: "inherit" };
 
   return (
 
@@ -639,7 +639,7 @@ function Fld({ label, value, onChange, options, type = "text", error, placeholde
 
       }} style={s} placeholder={placeholder || ""} disabled={disabled} />}
 
-      {error && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {error}</div>}
+      {error && <div style={{ fontSize: 11, color: "#64748B", marginTop: 4 }}>Warning {error}</div>}
 
     </div>
 
@@ -703,7 +703,7 @@ function Pagination({ totalItems, itemsPerPage, currentPage, onPageChange, onIte
 
           [...Array(totalPages)].map((_, i) => (
 
-            <button key={i + 1} onClick={() => onPageChange(i + 1)} style={{ width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 10, border: "1.5px solid", borderColor: currentPage === (i + 1) ? "var(--app-accent)" : "var(--app-border)", background: currentPage === (i + 1) ? "var(--app-accent)" : "var(--app-card)", color: currentPage === (i + 1) ? "#fff" : "var(--app-text)", fontSize: 13, fontWeight: 700, cursor: "pointer", transition: "all 0.2s" }}>{i + 1}</button>
+            <button key={i + 1} onClick={() => onPageChange(i + 1)} style={{ width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 10, border: "1.5px solid", borderColor: currentPage === (i + 1) ? "var(--app-accent)" : "var(--app-border)", background: currentPage === (i + 1) ? "var(--app-accent)" : "var(--app-card)", color: currentPage === (i + 1) ? "#FFFFFF" : "var(--app-text)", fontSize: 13, fontWeight: 700, cursor: "pointer", transition: "all 0.2s" }}>{i + 1}</button>
 
           ))
 
@@ -711,19 +711,19 @@ function Pagination({ totalItems, itemsPerPage, currentPage, onPageChange, onIte
 
           <>
 
-            <button onClick={() => onPageChange(1)} style={{ width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 10, border: "1.5px solid", borderColor: currentPage === 1 ? "var(--app-accent)" : "var(--app-border)", background: currentPage === 1 ? "var(--app-accent)" : "var(--app-card)", color: currentPage === 1 ? "#fff" : "var(--app-text)", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>1</button>
+            <button onClick={() => onPageChange(1)} style={{ width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 10, border: "1.5px solid", borderColor: currentPage === 1 ? "var(--app-accent)" : "var(--app-border)", background: currentPage === 1 ? "var(--app-accent)" : "var(--app-card)", color: currentPage === 1 ? "#FFFFFF" : "var(--app-text)", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>1</button>
 
-            {currentPage > 3 && <span style={{ color: "#cbd5e1" }}>...</span>}
+            {currentPage > 3 && <span style={{ color: "#E2E8F0" }}>...</span>}
 
             {currentPage > 2 && currentPage < totalPages - 1 && (
 
-              <button onClick={() => onPageChange(currentPage)} style={{ width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 10, border: "1.5px solid var(--app-accent)", background: "var(--app-accent)", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>{currentPage}</button>
+              <button onClick={() => onPageChange(currentPage)} style={{ width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 10, border: "1.5px solid var(--app-accent)", background: "var(--app-accent)", color: "#FFFFFF", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>{currentPage}</button>
 
             )}
 
-            {currentPage < totalPages - 2 && <span style={{ color: "#cbd5e1" }}>...</span>}
+            {currentPage < totalPages - 2 && <span style={{ color: "#E2E8F0" }}>...</span>}
 
-            <button onClick={() => onPageChange(totalPages)} style={{ width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 10, border: "1.5px solid", borderColor: currentPage === totalPages ? "var(--app-accent)" : "var(--app-border)", background: currentPage === totalPages ? "var(--app-accent)" : "#fff", color: currentPage === totalPages ? "#fff" : "var(--app-muted)", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>{totalPages}</button>
+            <button onClick={() => onPageChange(totalPages)} style={{ width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 10, border: "1.5px solid", borderColor: currentPage === totalPages ? "var(--app-accent)" : "var(--app-border)", background: currentPage === totalPages ? "var(--app-accent)" : "#FFFFFF", color: currentPage === totalPages ? "#FFFFFF" : "var(--app-muted)", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>{totalPages}</button>
 
           </>
 
@@ -737,7 +737,7 @@ function Pagination({ totalItems, itemsPerPage, currentPage, onPageChange, onIte
 
           onClick={() => onPageChange(currentPage + 1)}
 
-          style={{ padding: "7px 14px", borderRadius: 10, border: "1.5px solid var(--app-border)", background: currentPage === totalPages ? "#f8fafc" : "#fff", color: currentPage === totalPages ? "#cbd5e1" : "var(--app-muted)", fontSize: 13, fontWeight: 700, cursor: currentPage === totalPages ? "not-allowed" : "pointer", transition: "all 0.2s" }}
+          style={{ padding: "7px 14px", borderRadius: 10, border: "1.5px solid var(--app-border)", background: currentPage === totalPages ? "#F8FAFC" : "#FFFFFF", color: currentPage === totalPages ? "#E2E8F0" : "var(--app-muted)", fontSize: 13, fontWeight: 700, cursor: currentPage === totalPages ? "not-allowed" : "pointer", transition: "all 0.2s" }}
 
         >
 
@@ -763,21 +763,21 @@ function ConfirmModal({ title, message, onConfirm, onCancel, confirmLabel = "Del
 
       <div style={{ background: "var(--app-card)", borderRadius: 18, width: "100%", maxWidth: 400, padding: "28px 28px 22px", boxShadow: "0 32px 80px rgba(var(--app-accent-rgb),0.25)", border: "1px solid var(--app-border)" }}>
 
-        <div style={{ width: 52, height: 52, borderRadius: "50%", background: danger ? "rgba(var(--red-rgb),0.1)" : "rgba(var(--app-accent-rgb),0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, margin: "0 auto 14px" }}>
+        <div style={{ width: 52, height: 52, borderRadius: "50%", background: danger ? "rgba(30, 41, 59,0.1)" : "rgba(var(--app-accent-rgb),0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, margin: "0 auto 14px" }}>
 
-          {danger ? <i className="ti ti-trash" style={{ color: "#EF4444" }} /> : <i className="ti ti-check" style={{ color: "var(--app-accent)" }} />}
+          {danger ? <i className="ti ti-trash" style={{ color: "#64748B" }} /> : <i className="ti ti-check" style={{ color: "var(--app-accent)" }} />}
 
         </div>
 
         <h3 style={{ textAlign: "center", margin: "0 0 8px", fontSize: 16, fontWeight: 800, color: T.text }}>{title}</h3>
 
-        <p style={{ textAlign: "center", color: "#6b7280", fontSize: 13, margin: "0 0 22px" }}>{message}</p>
+        <p style={{ textAlign: "center", color: "#64748B", fontSize: 13, margin: "0 0 22px" }}>{message}</p>
 
         <div style={{ display: "flex", gap: 10 }}>
 
           <button onClick={onCancel} style={{ flex: 1, padding: "10px", background: "var(--app-bg)", border: "1px solid var(--app-border)", borderRadius: 10, fontSize: 13, fontWeight: 600, color: T.text, cursor: "pointer", fontFamily: "inherit" }}>Cancel</button>
 
-          <button onClick={onConfirm} style={{ flex: 1, padding: "10px", background: danger ? "linear-gradient(135deg,#EF4444,#dc2626)" : "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>{confirmLabel}</button>
+          <button onClick={onConfirm} style={{ flex: 1, padding: "10px", background: danger ? "linear-gradient(135deg,#64748B,#64748B)" : "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#FFFFFF", cursor: "pointer", fontFamily: "inherit" }}>{confirmLabel}</button>
 
         </div>
 
@@ -799,13 +799,13 @@ function ActionBtns({ onView, onEdit, onDelete, onShare }) {
 
     <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
 
-      {onView && <button onClick={(e) => { e.stopPropagation(); onView(); }} title="View" style={{ background: "var(--app-bg)", border: "1px solid #e2e8f0", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "var(--app-muted)", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 4 }}>View</button>}
+      {onView && <button onClick={(e) => { e.stopPropagation(); onView(); }} title="View" style={{ background: "var(--app-bg)", border: "1px solid #E2E8F0", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "var(--app-muted)", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 4 }}>View</button>}
 
-      {onShare && <button onClick={(e) => { e.stopPropagation(); onShare(); }} title="Share Onboarding Link" style={{ background: "#dcfce7", border: "1px solid #86efac", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "#166534", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 4 }}><span></span></button>}
+      {onShare && <button onClick={(e) => { e.stopPropagation(); onShare(); }} title="Share Onboarding Link" style={{ background: "#E2E8F0", border: "1px solid #E2E8F0", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "#1E293B", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 4 }}><span></span></button>}
 
-      {onEdit && <button onClick={(e) => { e.stopPropagation(); onEdit(); }} title="Edit" style={{ background: "#fff7ed", border: "1px solid #fed7aa", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "#f59e0b", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 4 }}>Edit</button>}
+      {onEdit && <button onClick={(e) => { e.stopPropagation(); onEdit(); }} title="Edit" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "#64748B", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 4 }}>Edit</button>}
 
-      {onDelete && <button onClick={(e) => { e.stopPropagation(); onDelete(); }} title="Delete" style={{ background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "#ef4444", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 4 }}>Delete</button>}
+      {onDelete && <button onClick={(e) => { e.stopPropagation(); onDelete(); }} title="Delete" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "#64748B", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 4 }}>Delete</button>}
 
     </div>
 
@@ -889,7 +889,7 @@ function LimitReachedModal({ type, limit, onClose, onUpgrade }) {
 
             onClick={onUpgrade}
 
-            style={{ flex: 1, padding: "12px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 12, fontWeight: 800, color: "#fff", cursor: "pointer", boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.3)", fontFamily: "inherit" }}
+            style={{ flex: 1, padding: "12px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 12, fontWeight: 800, color: "#FFFFFF", cursor: "pointer", boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.3)", fontFamily: "inherit" }}
 
           >
 
@@ -922,9 +922,9 @@ function ClientDropdown({ clients, value, onChange, error, onAddClient }) {
   return (
 
     <div style={{ position: "relative", zIndex: open ? 1005 : 1 }}>
-      <div onClick={() => setOpen(!open)} style={{ width: "100%", border: `1.5px solid ${error ? "#EF4444" : open ? "var(--app-accent)" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 36px 10px 14px", fontSize: 13, color: value ? T.text : "var(--app-muted)", background: "var(--app-bg)", cursor: "pointer", userSelect: "none", boxSizing: "border-box", position: "relative", minHeight: 42 }}>
+      <div onClick={() => setOpen(!open)} style={{ width: "100%", border: `1.5px solid ${error ? "#64748B" : open ? "var(--app-accent)" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 36px 10px 14px", fontSize: 13, color: value ? T.text : "var(--app-muted)", background: "var(--app-bg)", cursor: "pointer", userSelect: "none", boxSizing: "border-box", position: "relative", minHeight: 42 }}>
 
-        {value ? (<div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{value[0].toUpperCase()}</div><span>{value}</span>{selected?.companyName && <span style={{ fontSize: 11, color: "var(--app-muted)" }}>({selected.companyName})</span>}</div>) : "-- Select Client --"}
+        {value ? (<div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{value[0].toUpperCase()}</div><span>{value}</span>{selected?.companyName && <span style={{ fontSize: 11, color: "var(--app-muted)" }}>({selected.companyName})</span>}</div>) : "-- Select Client --"}
 
         <span style={{ position: "absolute", right: 12, top: "50%", transform: `translateY(-50%) rotate(${open ? 180 : 0}deg)`, fontSize: 10, color: "var(--app-muted)", transition: "0.2s" }}>▼</span>
 
@@ -936,7 +936,7 @@ function ClientDropdown({ clients, value, onChange, error, onAddClient }) {
 
           <div style={{ padding: "10px 10px 6px" }}><div style={{ position: "relative" }}><span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12 }}></span><input autoFocus placeholder="Search client..." value={search} onChange={e => setSearch(e.target.value)} onClick={e => e.stopPropagation()} style={{ width: "100%", padding: "7px 10px 7px 30px", border: "1.5px solid var(--app-border)", borderRadius: 8, fontSize: 12, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} /></div></div>
 
-          {onAddClient && <div onClick={() => { setOpen(false); setSearch(""); onAddClient(); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: "linear-gradient(90deg,var(--app-border),var(--app-bg))", borderBottom: "2px solid var(--app-border)" }}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 17, fontWeight: 700, flexShrink: 0 }}>+</div><div><div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>Add New Client</div></div></div>}
+          {onAddClient && <div onClick={() => { setOpen(false); setSearch(""); onAddClient(); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: "linear-gradient(90deg,var(--app-border),var(--app-bg))", borderBottom: "2px solid var(--app-border)" }}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 17, fontWeight: 700, flexShrink: 0 }}>+</div><div><div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>Add New Client</div></div></div>}
 
 
 
@@ -968,10 +968,10 @@ function InvoicesListPage({ invoices, onViewInvoice, clients = [], projects = []
   const initials = (name) => (name || "?").trim().split(/\s+/).slice(0, 2).map(w => w[0]).join("").toUpperCase();
   const badgeCfg = (status) => {
     const ok = (status || "").toLowerCase() === "paid";
-    return ok ? { bg: "#dcfce7", fg: "#16a34a" } : { bg: "#fef2f2", fg: "#dc2626" };
+    return ok ? { bg: "#E2E8F0", fg: "#16A34A" } : { bg: "#F8FAFC", fg: "#64748B" };
   };
   return (
-    <div style={{ padding: "16px 14px", background: "#F5F8FA", minHeight: "100%", boxSizing: "border-box", maxWidth: "100%", overflowX: "hidden" }}>
+    <div style={{ padding: "16px 14px", background: "#F8FAFC", minHeight: "100%", boxSizing: "border-box", maxWidth: "100%", overflowX: "hidden" }}>
       {/* Back to Dashboard — top-left, fixed position for every page */}
   <div
         onClick={() => onBack && onBack()}
@@ -979,13 +979,13 @@ function InvoicesListPage({ invoices, onViewInvoice, clients = [], projects = []
       >
         <i className="ti ti-arrow-left" style={{ fontSize: 16 }}></i> Back to Dashboard
       </div>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #2563EB), #0891b2)", borderRadius: 16, padding: "16px 18px", marginBottom: 14, boxShadow: "0 6px 18px rgba(37, 99, 235,0.25)" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #2563EB), #2563EB)", borderRadius: 16, padding: "16px 18px", marginBottom: 14, boxShadow: "0 6px 18px rgba(37, 99, 235, 0.25)" }}>
         <div>
           <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.8)", letterSpacing: 0.5, textTransform: "uppercase" }}>Total Invoices</div>
-          <div style={{ fontSize: 26, fontWeight: 800, color: "#fff" }}>{all.length}</div>
+          <div style={{ fontSize: 26, fontWeight: 800, color: "#FFFFFF" }}>{all.length}</div>
         </div>
         <div style={{ width: 46, height: 46, borderRadius: 13, background: "rgba(255,255,255,0.18)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <i className="ti ti-file-invoice" style={{ fontSize: 22, color: "#fff" }} />
+          <i className="ti ti-file-invoice" style={{ fontSize: 22, color: "#FFFFFF" }} />
         </div>
       </div>
 
@@ -996,7 +996,7 @@ function InvoicesListPage({ invoices, onViewInvoice, clients = [], projects = []
           placeholder="Search invoices..."
           value={search}
           onChange={e => setSearch(e.target.value)}
-          style={{ width: "100%", padding: "12px 12px 12px 38px", border: "none", borderRadius: 12, fontSize: 13, outline: "none", background: "#fff", color: "#1E293B", boxSizing: "border-box", boxShadow: "0 2px 10px rgba(15,28,46,0.06)" }}
+          style={{ width: "100%", padding: "12px 12px 12px 38px", border: "none", borderRadius: 12, fontSize: 13, outline: "none", background: "#FFFFFF", color: "#1E293B", boxSizing: "border-box", boxShadow: "0 2px 10px rgba(15, 23, 42, 0.06)" }}
         />
       </div>
 
@@ -1013,8 +1013,8 @@ function InvoicesListPage({ invoices, onViewInvoice, clients = [], projects = []
               fontWeight: 700,
               cursor: "pointer",
               textTransform: "capitalize",
-              background: filterMode === f ? "#1A2332" : "#fff",
-              color: filterMode === f ? "#fff" : "#64748B",
+              background: filterMode === f ? "#1E293B" : "#FFFFFF",
+              color: filterMode === f ? "#FFFFFF" : "#64748B",
               whiteSpace: "nowrap",
               transition: "all 0.15s ease"
             }}
@@ -1025,7 +1025,7 @@ function InvoicesListPage({ invoices, onViewInvoice, clients = [], projects = []
       </div>
 
       {filtered.length === 0 ? (
-        <div style={{ padding: "40px 16px", textAlign: "center", color: "#64748B", fontSize: 13, fontWeight: 600, background: "#fff", borderRadius: 16, boxShadow: "0 2px 10px rgba(15,28,46,0.05)" }}>
+        <div style={{ padding: "40px 16px", textAlign: "center", color: "#64748B", fontSize: 13, fontWeight: 600, background: "#FFFFFF", borderRadius: 16, boxShadow: "0 2px 10px rgba(15, 23, 42, 0.05)" }}>
           No invoices found.
         </div>
       ) : (
@@ -1039,10 +1039,10 @@ function InvoicesListPage({ invoices, onViewInvoice, clients = [], projects = []
                 key={inv._id || inv.invoiceNo || i}
                 onClick={() => onViewInvoice && onViewInvoice(inv)}
                 style={{
-                  background: "#fff",
+                  background: "#FFFFFF",
                   borderRadius: 16,
                   padding: "16px",
-                  boxShadow: "0 3px 14px rgba(15,28,46,0.07)",
+                  boxShadow: "0 3px 14px rgba(15, 23, 42, 0.07)",
                   cursor: "pointer",
                   boxSizing: "border-box",
                   borderLeft: `4px solid ${bc.fg}`
@@ -1052,14 +1052,14 @@ function InvoicesListPage({ invoices, onViewInvoice, clients = [], projects = []
                   <div style={{ display: "flex", alignItems: "flex-start", gap: 10, minWidth: 0, flex: 1 }}>
                     <div style={{
                       width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
-                      background: "linear-gradient(135deg, var(--app-accent, #2563EB), #0891b2)", color: "#fff",
+                      background: "linear-gradient(135deg, var(--app-accent, #2563EB), #2563EB)", color: "#FFFFFF",
                       display: "flex", alignItems: "center", justifyContent: "center",
                       fontSize: 14, fontWeight: 800
                     }}>
                       {initials(name)}
                     </div>
                     <div style={{ minWidth: 0, flex: 1 }}>
-                      <div style={{ fontWeight: 800, color: "#0f172a", fontSize: 14.5, wordBreak: "break-word" }}>{name}</div>
+                      <div style={{ fontWeight: 800, color: "#0F172A", fontSize: 14.5, wordBreak: "break-word" }}>{name}</div>
                       {matchedProject && (
                         <div style={{ display: "flex", alignItems: "flex-start", gap: 4, marginTop: 3, fontSize: 11.5, color: "#64748B", fontWeight: 600 }}>
                           <i className="ti ti-folder" style={{ fontSize: 12, flexShrink: 0, marginTop: 1 }} />
@@ -1364,11 +1364,11 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
     const s = (status || "Active").toLowerCase();
 
-    if (s === "active") return { bg: "#E8FAF3", color: "#16A34A", dot: "#16A34A", label: "Active" };
+    if (s === "active") return { bg: "#EFF6FF", color: "#16A34A", dot: "#16A34A", label: "Active" };
 
-    if (s === "pending") return { bg: "#FEF5E6", color: "#F5A623", dot: "#F5A623", label: "Pending" };
+    if (s === "pending") return { bg: "#F8FAFC", color: "#64748B", dot: "#64748B", label: "Pending" };
 
-    return { bg: "#F8FAFB", color: "#64748B", dot: "#64748B", label: "Inactive" };
+    return { bg: "#F8FAFC", color: "#64748B", dot: "#64748B", label: "Inactive" };
 
   };
 
@@ -1386,7 +1386,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
   const getAvatarColor = (c, idx = 0) => {
 
-    const colors = ["#F5A623", "#16A34A", "#7C5CFC", "#2563EB", "#F05C5C", "var(--app-accent, #2563EB)", "#E91E63"];
+    const colors = ["#64748B", "#16A34A", "#2563EB", "#2563EB", "#64748B", "var(--app-accent, #2563EB)", "#64748B"];
 
     const key = c._id || c.email || "";
 
@@ -1428,11 +1428,11 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
     return (
 
-      <div key={c._id} onClick={() => { setActiveClientId(c._id); setActiveTab("overview"); }} style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 16px", cursor: "pointer", transition: "all .15s", borderBottom: "1px solid rgba(224,238,240,.5)", position: "relative", background: isActive ? "var(--teal-lighter, #EFF6FF)" : "transparent", borderRight: isActive ? "3px solid  var(--app-accent, var(--app-accent, #2563EB))" : "3px solid transparent" }} onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = "var(--teal-lighter, #EFF6FF)"; }} onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = "transparent"; }}>
+      <div key={c._id} onClick={() => { setActiveClientId(c._id); setActiveTab("overview"); }} style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 16px", cursor: "pointer", transition: "all .15s", borderBottom: "1px solid rgba(226, 232, 240, .5)", position: "relative", background: isActive ? "var(--teal-lighter, #EFF6FF)" : "transparent", borderRight: isActive ? "3px solid  var(--app-accent, var(--app-accent, #2563EB))" : "3px solid transparent" }} onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = "var(--teal-lighter, #EFF6FF)"; }} onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = "transparent"; }}>
 
-        <div style={{ width: 40, height: 40, borderRadius: "50%", background: `linear-gradient(135deg,${color},${color}bb)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800, color: "#fff", flexShrink: 0, position: "relative" }}>
+        <div style={{ width: 40, height: 40, borderRadius: "50%", background: `linear-gradient(135deg,${color},${color}bb)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800, color: "#FFFFFF", flexShrink: 0, position: "relative" }}>
 
-          {c.logoUrl ? <img src={c.logoUrl} alt="" style={{ width: 40, height: 40, borderRadius: "50%", objectFit: "contain", background: "#fff" }} /> : getAvatar(c)}
+          {c.logoUrl ? <img src={c.logoUrl} alt="" style={{ width: 40, height: 40, borderRadius: "50%", objectFit: "contain", background: "#FFFFFF" }} /> : getAvatar(c)}
 
 
 
@@ -1472,7 +1472,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
         {/* Contact Info */}
 
-        <div style={{ background: "#fff", border: "1.5px solid #E2E8F0", borderRadius: 14, overflow: "hidden" }}>
+        <div style={{ background: "#FFFFFF", border: "1.5px solid #E2E8F0", borderRadius: 14, overflow: "hidden" }}>
 
           <div style={{ padding: "13px 16px", borderBottom: "1px solid #E2E8F0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
 
@@ -1507,15 +1507,15 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
               { icon: "ti-user", label: "Contact Person No", val: activeClient.contactPersonNo || "—", bg: "var(--teal-light, var(--teal-light, #EFF6FF))", col: "var(--app-accent, #2563EB)" },
 
-              { icon: "ti-briefcase", label: "Category", val: activeClient.category || activeClient.industry || "—", bg: "#EFF6FF", col: "#7C5CFC" },
+              { icon: "ti-briefcase", label: "Category", val: activeClient.category || activeClient.industry || "—", bg: "#EFF6FF", col: "#2563EB" },
 
               { icon: "ti-phone", label: "Office Phone", val: activeClient.phone || "—", bg: "var(--teal-light, var(--teal-light, #EFF6FF))", col: "var(--app-accent, #2563EB)" },
 
-              { icon: "ti-building-bank", label: "Company Tax / GST", val: activeClient.gstNumber || "—", bg: "#EFF4FF", col: "#2563EB" },
+              { icon: "ti-building-bank", label: "Company Tax / GST", val: activeClient.gstNumber || "—", bg: "#EFF6FF", col: "#2563EB" },
 
-              { icon: "ti-toggle-right", label: "Status", val: activeClient.status || "Active", bg: "#E8FAF3", col: "#16A34A" },
+              { icon: "ti-toggle-right", label: "Status", val: activeClient.status || "Active", bg: "#EFF6FF", col: "#16A34A" },
 
-              { icon: "ti-map-pin", label: "Company Address", val: activeClient.address, bg: "#FEF5E6", col: "#F5A623" },
+              { icon: "ti-map-pin", label: "Company Address", val: activeClient.address, bg: "#F8FAFC", col: "#64748B" },
 
 
 
@@ -1539,19 +1539,19 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
         {/* Projects */}
 
-        <div style={{ background: "#fff", border: "1.5px solid #E2E8F0", borderRadius: 14, overflow: "hidden" }}>
+        <div style={{ background: "#FFFFFF", border: "1.5px solid #E2E8F0", borderRadius: 14, overflow: "hidden" }}>
 
           <div style={{ padding: "13px 16px", borderBottom: "1px solid #E2E8F0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
 
             <span style={{ fontSize: 12, fontWeight: 800, color: "#1E293B", display: "flex", alignItems: "center", gap: 8 }}>
 
-              <div style={{ width: 26, height: 26, borderRadius: 7, background: "#EFF4FF", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: "#2563EB" }}><i className="ti ti-briefcase" /></div>
+              <div style={{ width: 26, height: 26, borderRadius: 7, background: "#EFF6FF", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: "#2563EB" }}><i className="ti ti-briefcase" /></div>
 
               Projects
 
             </span>
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-<button onClick={() => onCreateProject && onCreateProject(activeClient)} style={{ background: "var(--app-accent, #2563EB)", border: "none", borderRadius: 5, padding: isMobileWidth ? "2px 5px" : "4px 10px", fontSize: isMobileWidth ? 7 : 11, fontFamily: "inherit", fontStyle: "normal", letterSpacing: "0.2px", color: "#fff", cursor: "pointer", fontWeight: 500, display: "flex", alignItems: "center", gap: 1, whiteSpace: "nowrap", flexShrink: 0 }}>
+<button onClick={() => onCreateProject && onCreateProject(activeClient)} style={{ background: "var(--app-accent, #2563EB)", border: "none", borderRadius: 5, padding: isMobileWidth ? "2px 5px" : "4px 10px", fontSize: isMobileWidth ? 7 : 11, fontFamily: "inherit", fontStyle: "normal", letterSpacing: "0.2px", color: "#FFFFFF", cursor: "pointer", fontWeight: 500, display: "flex", alignItems: "center", gap: 1, whiteSpace: "nowrap", flexShrink: 0 }}>
   <i className="ti ti-plus" style={{ fontSize: isMobileWidth ? 7 : 11 }} /> {isMobileWidth ? "Add Project" : "Add Project"}
 </button>
               <span onClick={() => setActiveTab("projects")} style={{ fontSize: 11, color: "var(--app-accent)", fontWeight: 700, cursor: "pointer" }}>View all</span>
@@ -1612,13 +1612,13 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
                       <div style={{ width: 60, height: 4, background: "#E2E8F0", borderRadius: 2, overflow: "hidden", marginTop: 4 }}>
 
-                        <div style={{ height: "100%", borderRadius: 2, background: "linear-gradient(90deg, var(--app-accent, var(--app-accent, #2563EB)),#26D0CE)", width: `${pct}%` }} />
+                        <div style={{ height: "100%", borderRadius: 2, background: "linear-gradient(90deg, var(--app-accent, var(--app-accent, #2563EB)),#2563EB)", width: `${pct}%` }} />
 
                       </div>
 
                     </div>
 
-<button onClick={() => onCreateProject && onCreateProject(p, true)} title="Edit" style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "#FFF7ED", border: "1px solid #FED7AA", borderRadius: 6, width: 26, height: 26, color: "#F59E0B", cursor: "pointer" }}><i className="ti ti-edit" style={{ fontSize: 13 }} /></button>
+<button onClick={() => onCreateProject && onCreateProject(p, true)} title="Edit" style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "#F8FAFC", border: "1px solid #E2E8F0", borderRadius: 6, width: 26, height: 26, color: "#64748B", cursor: "pointer" }}><i className="ti ti-edit" style={{ fontSize: 13 }} /></button>
 <button onClick={() => onViewProject && onViewProject(p)} title="View" style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "var(--teal-light, var(--teal-light, #EFF6FF))", border: "none", borderRadius: 6, width: 26, height: 26, color: "var(--app-accent, #2563EB)", cursor: "pointer" }}><i className="ti ti-eye" style={{ fontSize: 13 }} /></button>
 <button onClick={async (e) => {
   e.stopPropagation();
@@ -1630,7 +1630,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
   } catch (err) {
     showToast("❌ Delete failed!");
   }
-}} title="Delete" style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 6, width: 26, height: 26, color: "#EF4444", cursor: "pointer" }}><i className="ti ti-trash" style={{ fontSize: 13 }} /></button>
+}} title="Delete" style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "#F8FAFC", border: "1px solid #E2E8F0", borderRadius: 6, width: 26, height: 26, color: "#64748B", cursor: "pointer" }}><i className="ti ti-trash" style={{ fontSize: 13 }} /></button>
                   </div>
 
                 </div>
@@ -1662,7 +1662,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
       ) : clientProjects.map((p, i) => (
 
-        <div key={p._id || i} style={{ background: "#fff", border: "1.5px solid #E2E8F0", borderRadius: 12, padding: "16px 18px", display: "flex", alignItems: "center", gap: 14, minHeight: 64, flexWrap: "wrap", overflow: "hidden" }}>
+        <div key={p._id || i} style={{ background: "#FFFFFF", border: "1.5px solid #E2E8F0", borderRadius: 12, padding: "16px 18px", display: "flex", alignItems: "center", gap: 14, minHeight: 64, flexWrap: "wrap", overflow: "hidden" }}>
 
           <div style={{ width: 40, height: 40, borderRadius: 10, background: "var(--teal-light, var(--teal-light, #EFF6FF))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>📁</div>
 
@@ -1686,10 +1686,10 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
           <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", flexShrink: 0 }}>
 
-            <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "#E8FAF3", color: "#16A34A" }}>{p.status || "Active"}</span>
+            <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "#EFF6FF", color: "#16A34A" }}>{p.status || "Active"}</span>
 
           {onViewProject && <button onClick={() => onViewProject(p)} title="View" style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "var(--teal-light, var(--teal-light, #EFF6FF))", border: "none", borderRadius: 6, width: 28, height: 28, color: "var(--app-accent, #2563EB)", cursor: "pointer" }}><i className="ti ti-eye" style={{ fontSize: 14 }} /></button>}
-<button onClick={() => onCreateProject && onCreateProject(p, true)} title="Edit" style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "#FFF7ED", border: "1px solid #FED7AA", borderRadius: 6, width: 28, height: 28, color: "#F59E0B", cursor: "pointer" }}><i className="ti ti-edit" style={{ fontSize: 14 }} /></button>
+<button onClick={() => onCreateProject && onCreateProject(p, true)} title="Edit" style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "#F8FAFC", border: "1px solid #E2E8F0", borderRadius: 6, width: 28, height: 28, color: "#64748B", cursor: "pointer" }}><i className="ti ti-edit" style={{ fontSize: 14 }} /></button>
 <button onClick={async (e) => {
   e.stopPropagation();
   if (!window.confirm(`Are you sure you want to delete "${p.name}"?`)) return;
@@ -1700,7 +1700,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
   } catch (err) {
     showToast("❌ Delete failed!");
   }
-}} title="Delete" style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 6, width: 28, height: 28, color: "#EF4444", cursor: "pointer" }}><i className="ti ti-trash" style={{ fontSize: 14 }} /></button></div>
+}} title="Delete" style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "#F8FAFC", border: "1px solid #E2E8F0", borderRadius: 6, width: 28, height: 28, color: "#64748B", cursor: "pointer" }}><i className="ti ti-trash" style={{ fontSize: 14 }} /></button></div>
 
         </div>
 
@@ -1830,7 +1830,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
             background: "var(--app-accent, #2563EB)", border: "none", borderRadius: 8,
 
-            padding: "7px 14px", fontSize: 12, color: "#fff", cursor: "pointer",
+            padding: "7px 14px", fontSize: 12, color: "#FFFFFF", cursor: "pointer",
 
             fontWeight: 700, display: "flex", alignItems: "center", gap: 5
 
@@ -1894,7 +1894,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
                 <div style={{ display: "flex", gap: 6, marginTop: 8 }}>
                   <label
-                    style={{ flex: 1, padding: "4px 0", fontSize: 10, fontWeight: 700, color: "var(--app-accent, #2563EB)", background: "#fff", border: "1px solid #E2E8F0", borderRadius: 6, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 4 }}
+                    style={{ flex: 1, padding: "4px 0", fontSize: 10, fontWeight: 700, color: "var(--app-accent, #2563EB)", background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 6, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 4 }}
                   >
                     <i className="ti ti-edit" style={{ fontSize: 11 }} /> Edit
                     <input
@@ -1979,7 +1979,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
                         showToast("❌ Failed to delete document!");
                       }
                     }}
-                    style={{ flex: 1, padding: "4px 0", fontSize: 10, fontWeight: 700, color: "#EF4444", background: "#fff", border: "1px solid #FECACA", borderRadius: 6, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 4 }}
+                    style={{ flex: 1, padding: "4px 0", fontSize: 10, fontWeight: 700, color: "#64748B", background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 6, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 4 }}
                   >
                     <i className="ti ti-trash" style={{ fontSize: 11 }} /> Delete
                   </button>
@@ -2007,7 +2007,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
       { icon: "ti-user-plus", bg: "var(--teal-light, var(--teal-light, #EFF6FF))", color: "var(--app-accent, #2563EB)", title: `<b>${activeClient?.clientName || activeClient?.name}</b> added as client`, time: activeClient?.createdAt ? new Date(activeClient.createdAt).toLocaleDateString("en-IN") : "—" },
 
-      ...clientProjects.map(p => ({ icon: "ti-briefcase", bg: "#EFF4FF", color: "#2563EB", title: `Project <b>${p.name}</b> created`, time: p.createdAt ? new Date(p.createdAt).toLocaleDateString("en-IN") : "—" })),
+      ...clientProjects.map(p => ({ icon: "ti-briefcase", bg: "#EFF6FF", color: "#2563EB", title: `Project <b>${p.name}</b> created`, time: p.createdAt ? new Date(p.createdAt).toLocaleDateString("en-IN") : "—" })),
 
     ];
 
@@ -2082,7 +2082,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
     return (
       <div>
         {/* Portal Hero Card */}
-        <div style={{ background: "linear-gradient(135deg,#004D5E, var(--app-accent, var(--app-accent, #2563EB)))", borderRadius: 14, padding: 20, color: "#fff", marginBottom: 16 }}>
+        <div style={{ background: "linear-gradient(135deg,#1E293B, var(--app-accent, var(--app-accent, #2563EB)))", borderRadius: 14, padding: 20, color: "#FFFFFF", marginBottom: 16 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
             <div style={{ width: 38, height: 38, borderRadius: 10, background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
               🌐
@@ -2098,7 +2098,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
             <div style={{ fontSize: 10, opacity: .8, wordBreak: "break-all", flex: 1, fontFamily: "monospace" }}>{portalUrl}</div>
             <button
               onClick={handleCopyLink}
-              style={{ background: "rgba(255,255,255,0.15)", border: "none", borderRadius: 6, padding: "4px 8px", color: "#fff", fontSize: 10, fontWeight: 700, cursor: "pointer", flexShrink: 0, fontFamily: "inherit" }}
+              style={{ background: "rgba(255,255,255,0.15)", border: "none", borderRadius: 6, padding: "4px 8px", color: "#FFFFFF", fontSize: 10, fontWeight: 700, cursor: "pointer", flexShrink: 0, fontFamily: "inherit" }}
             >
               Copy
             </button>
@@ -2108,25 +2108,25 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
   <button
     onClick={handleOpenPortal}
-    style={{ padding: "6px 6px", background: "#fff", border: "none", borderRadius: 6, fontSize: 10, fontWeight: 700, color: "#004D5E", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 3 }}
+    style={{ padding: "6px 6px", background: "#FFFFFF", border: "none", borderRadius: 6, fontSize: 10, fontWeight: 700, color: "#1E293B", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 3 }}
   >
     <i className="ti ti-external-link" style={{ fontSize: 11 }} /> Open Portal
   </button>
   <button
     onClick={handleCopyLink}
-    style={{ padding: "6px 6px", background: "rgba(255,255,255,.15)", border: "1px solid rgba(255,255,255,.25)", borderRadius: 6, fontSize: 10, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 3 }}
+    style={{ padding: "6px 6px", background: "rgba(255,255,255,.15)", border: "1px solid rgba(255,255,255,.25)", borderRadius: 6, fontSize: 10, fontWeight: 700, color: "#FFFFFF", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 3 }}
   >
     <i className="ti ti-copy" style={{ fontSize: 11 }} /> Copy Link
   </button>
   <button
     onClick={handleShareWhatsApp}
-    style={{ padding: "6px 6px", background: "#25D366", border: "none", borderRadius: 6, fontSize: 10, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 3 }}
+    style={{ padding: "6px 6px", background: "#16A34A", border: "none", borderRadius: 6, fontSize: 10, fontWeight: 700, color: "#FFFFFF", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 3 }}
   >
     💬 WhatsApp
   </button>
   <button
     onClick={handleSendEmail}
-    style={{ padding: "6px 6px", background: "rgba(255,255,255,.15)", border: "1px solid rgba(255,255,255,.25)", borderRadius: 6, fontSize: 10, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 3 }}
+    style={{ padding: "6px 6px", background: "rgba(255,255,255,.15)", border: "1px solid rgba(255,255,255,.25)", borderRadius: 6, fontSize: 10, fontWeight: 700, color: "#FFFFFF", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 3 }}
   >
     <i className="ti ti-mail" style={{ fontSize: 11 }} /> Email Link
   </button>
@@ -2137,9 +2137,9 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
           {[
             { val: clientProjects.length, label: "Projects", icon: "ti-briefcase", color: "var(--app-accent, #2563EB)" },
             { val: clientProjects.filter(p => (p.status || "").toLowerCase() === "completed").length, label: "Completed", icon: "ti-check", color: "#16A34A" },
-            { val: c.status || "Active", label: "Status", icon: "ti-toggle-right", color: "#F5A623" }
+            { val: c.status || "Active", label: "Status", icon: "ti-toggle-right", color: "#64748B" }
           ].map((s, i) => (
-            <div key={i} style={{ padding: "12px", background: "#fff", borderRadius: 9, border: "1.5px solid #E2E8F0", textAlign: "center" }}>
+            <div key={i} style={{ padding: "12px", background: "#FFFFFF", borderRadius: 9, border: "1.5px solid #E2E8F0", textAlign: "center" }}>
               <i className={`ti ${s.icon}`} style={{ fontSize: 18, color: s.color, display: "block", marginBottom: 4 }} />
               <div style={{ fontSize: 17, fontWeight: 800, color: "#1E293B" }}>{s.val}</div>
               <div style={{ fontSize: 10, color: "#64748B", marginTop: 2 }}>{s.label}</div>
@@ -2148,8 +2148,8 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
         </div>
 
         {/* Portal Access Info */}
-        <div style={{ background: "var(--teal-lighter, #EFF6FF)", border: "1.5px solid #B2EBF2", borderRadius: 10, padding: "12px 14px" }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: "#004D5E", marginBottom: 6, display: "flex", alignItems: "center", gap: 6 }}>
+        <div style={{ background: "var(--teal-lighter, #EFF6FF)", border: "1.5px solid #E2E8F0", borderRadius: 10, padding: "12px 14px" }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: "#1E293B", marginBottom: 6, display: "flex", alignItems: "center", gap: 6 }}>
             <i className="ti ti-info-circle" style={{ fontSize: 14 }} /> Portal Access Info
           </div>
           <div style={{ fontSize: 11, color: "#64748B", lineHeight: 1.6 }}>
@@ -2213,14 +2213,14 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
           <div style={{ color: "#64748B", textAlign: "center", padding: 30, fontSize: 12 }}>No feedback submitted yet.</div>
         ) : (
           clientFeedback.map((fb, i) => (
-            <div key={fb._id || i} style={{ background: "#fff", border: "1.5px solid #E2E8F0", borderRadius: 12, padding: 16, marginBottom: 12 }}>
+            <div key={fb._id || i} style={{ background: "#FFFFFF", border: "1.5px solid #E2E8F0", borderRadius: 12, padding: 16, marginBottom: 12 }}>
 
               <div style={{ display: "flex", gap: 2, marginBottom: 8 }}>
                 {[1, 2, 3, 4, 5].map(star => (
-                  <i key={star} className="ti ti-star-filled" style={{ fontSize: 16, color: (fb.rating || 0) >= star ? "#F59E0B" : "#E2E8F0" }}></i>
+                  <i key={star} className="ti ti-star-filled" style={{ fontSize: 16, color: (fb.rating || 0) >= star ? "#64748B" : "#E2E8F0" }}></i>
                 ))}
               </div>
-              <div style={{ fontSize: 13, color: "#4A5568", marginBottom: 8 }}>{fb.message || "—"}</div>
+              <div style={{ fontSize: 13, color: "#64748B", marginBottom: 8 }}>{fb.message || "—"}</div>
               <div style={{ fontSize: 11, color: "#64748B" }}>{fb.createdAt ? new Date(fb.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : ''}</div>
             </div>
           ))
@@ -2255,16 +2255,16 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
     const badgeCfg = (status) => {
       const s = (status || "Active").toLowerCase();
-      if (s === "active") return { bg: "#dcfce7", fg: "#16a34a" };
-      if (s === "inactive") return { bg: "#fef2f2", fg: "#dc2626" };
-      if (s === "pending") return { bg: "#fef3c7", fg: "#b45309" };
-      return { bg: "#f1f5f9", fg: "#475569" };
+      if (s === "active") return { bg: "#E2E8F0", fg: "#16A34A" };
+      if (s === "inactive") return { bg: "#F8FAFC", fg: "#64748B" };
+      if (s === "pending") return { bg: "#E2E8F0", fg: "#64748B" };
+      return { bg: "#EFF6FF", fg: "#64748B" };
     };
 
     const initials = (name) => (name || "?").trim().split(/\s+/).slice(0, 2).map(w => w[0]).join("").toUpperCase();
 
  return (
-      <div className="clients-list-only-root" style={{ padding: "16px 14px", background: "#F5F8FA", minHeight: "100%", boxSizing: "border-box", maxWidth: "100%", overflowX: "hidden" }}>
+      <div className="clients-list-only-root" style={{ padding: "16px 14px", background: "#F8FAFC", minHeight: "100%", boxSizing: "border-box", maxWidth: "100%", overflowX: "hidden" }}>
 
         {/* Back to Dashboard — top-left, fixed position for every page */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, padding: "4px 4px 16px" }}>
@@ -2277,20 +2277,20 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
           {onAddClient && (
             <button
               onClick={onAddClient}
-              style={{ display: "flex", alignItems: "center", gap: 4, background: "var(--app-accent, #2563EB)", color: "#fff", border: "none", borderRadius: 20, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", boxShadow: "0 3px 10px rgba(37, 99, 235,0.35)", whiteSpace: "nowrap" }}
+              style={{ display: "flex", alignItems: "center", gap: 4, background: "var(--app-accent, #2563EB)", color: "#FFFFFF", border: "none", borderRadius: 20, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", boxShadow: "0 3px 10px rgba(37, 99, 235, 0.35)", whiteSpace: "nowrap" }}
             >
               <i className="ti ti-plus" style={{ fontSize: 13 }}></i> New Client
             </button>
           )}
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #2563EB), #0891b2)", borderRadius: 16, padding: "16px 18px", marginBottom: 14, boxShadow: "0 6px 18px rgba(37, 99, 235,0.25)" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #2563EB), #2563EB)", borderRadius: 16, padding: "16px 18px", marginBottom: 14, boxShadow: "0 6px 18px rgba(37, 99, 235, 0.25)" }}>
           <div>
             <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.8)", letterSpacing: 0.5, textTransform: "uppercase" }}>Total Clients</div>
-            <div style={{ fontSize: 26, fontWeight: 800, color: "#fff" }}>{clients.length}</div>
+            <div style={{ fontSize: 26, fontWeight: 800, color: "#FFFFFF" }}>{clients.length}</div>
           </div>
           <div style={{ width: 46, height: 46, borderRadius: 13, background: "rgba(255,255,255,0.18)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <i className="ti ti-users" style={{ fontSize: 22, color: "#fff" }} />
+            <i className="ti ti-users" style={{ fontSize: 22, color: "#FFFFFF" }} />
           </div>
         </div>
 
@@ -2301,7 +2301,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
             placeholder="Search clients..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            style={{ width: "100%", padding: "12px 12px 12px 38px", border: "none", borderRadius: 12, fontSize: 13, outline: "none", background: "#fff", color: "#1E293B", boxSizing: "border-box", boxShadow: "0 2px 10px rgba(15,28,46,0.06)" }}
+            style={{ width: "100%", padding: "12px 12px 12px 38px", border: "none", borderRadius: 12, fontSize: 13, outline: "none", background: "#FFFFFF", color: "#1E293B", boxSizing: "border-box", boxShadow: "0 2px 10px rgba(15, 23, 42, 0.06)" }}
           />
         </div>
 
@@ -2318,10 +2318,10 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
                 fontWeight: 700,
                 cursor: "pointer",
                 textTransform: "capitalize",
-                background: filterMode === f ? "var(--app-accent, #2563EB)" : "#fff",
-                color: filterMode === f ? "#fff" : "#64748B",
+                background: filterMode === f ? "var(--app-accent, #2563EB)" : "#FFFFFF",
+                color: filterMode === f ? "#FFFFFF" : "#64748B",
                 whiteSpace: "nowrap",
-                boxShadow: filterMode === f ? "0 3px 10px rgba(37, 99, 235,0.35)" : "none",
+                boxShadow: filterMode === f ? "0 3px 10px rgba(37, 99, 235, 0.35)" : "none",
                 transition: "all 0.15s ease"
               }}
             >
@@ -2331,7 +2331,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
         </div>
 
         {mListFiltered.length === 0 ? (
-          <div style={{ padding: "40px 16px", textAlign: "center", color: "#64748B", fontSize: 13, fontWeight: 600, background: "#fff", borderRadius: 16, boxShadow: "0 2px 10px rgba(15,28,46,0.05)" }}>
+          <div style={{ padding: "40px 16px", textAlign: "center", color: "#64748B", fontSize: 13, fontWeight: 600, background: "#FFFFFF", borderRadius: 16, boxShadow: "0 2px 10px rgba(15, 23, 42, 0.05)" }}>
             No clients found.
           </div>
         ) : (
@@ -2344,10 +2344,10 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
                   key={c._id || i}
                   onClick={() => { setActiveClientId(c._id); setActiveTab("overview"); }}
                   style={{
-                    background: "#fff",
+                    background: "#FFFFFF",
                     borderRadius: 16,
                     padding: "16px",
-                    boxShadow: "0 3px 14px rgba(15,28,46,0.07)",
+                    boxShadow: "0 3px 14px rgba(15, 23, 42, 0.07)",
                     cursor: "pointer",
                     boxSizing: "border-box",
                     borderLeft: `4px solid ${bc.fg}`
@@ -2357,14 +2357,14 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
                     <div style={{ display: "flex", alignItems: "flex-start", gap: 10, minWidth: 0, flex: 1 }}>
                       <div style={{
                         width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
-                        background: "linear-gradient(135deg, var(--app-accent, #2563EB), #0891b2)", color: "#fff",
+                        background: "linear-gradient(135deg, var(--app-accent, #2563EB), #2563EB)", color: "#FFFFFF",
                         display: "flex", alignItems: "center", justifyContent: "center",
                         fontSize: 14, fontWeight: 800
                       }}>
                         {initials(name)}
                       </div>
                       <div style={{ minWidth: 0, flex: 1 }}>
-                        <div style={{ fontWeight: 800, color: "#0f172a", fontSize: 14.5, wordBreak: "break-word" }}>{name}</div>
+                        <div style={{ fontWeight: 800, color: "#0F172A", fontSize: 14.5, wordBreak: "break-word" }}>{name}</div>
                         {c.email && (
                           <div style={{ display: "flex", alignItems: "flex-start", gap: 4, marginTop: 3, fontSize: 11.5, color: "#64748B", fontWeight: 600 }}>
                             <i className="ti ti-mail" style={{ fontSize: 12, flexShrink: 0, marginTop: 1 }} />
@@ -2399,7 +2399,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
   }
   return (
     <div className="clients-page-root" style={{ display: "flex", flexDirection: "column", minHeight: "100%", height: "auto", overflowY: "auto", overflowX: "hidden", background: "linear-gradient(135deg,var(--app-bg) 0%,var(--app-bg) 100%)", padding: "24px 28px" }}>
-      {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
+      {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#FFFFFF", border: "1.5px solid #16A34A", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#16A34A", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
 
       {onBack && (
         <div onClick={onBack} style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "var(--app-accent)", fontWeight: 800, fontSize: 14, cursor: "pointer", marginBottom: 14 }}>
@@ -2407,7 +2407,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
         </div>
       )}
       <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 10 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 900, color: "#1A2332", margin: 0 }}>Clients</h1>
+        <h1 style={{ fontSize: 24, fontWeight: 900, color: "#1E293B", margin: 0 }}>Clients</h1>
         <button className="create-btn compact-action-btn" onClick={onAddClient} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
           <i className="ti ti-plus"></i> New Client
         </button>
@@ -2415,17 +2415,17 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
       {/* STAT PILLS — matches Projects page style */}
       <div className="client-stat-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 20 }}>
-        <div style={{ cursor: "pointer", background: "#fff", border: "1.5px solid #E2E8F0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)", boxSizing: "border-box", height: 80, minWidth: 0 }}>
-          <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(37, 99, 235,0.1)", color: "var(--app-accent)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}><i className="ti ti-users" /></div>
-          <div><div style={{ fontSize: 24, fontWeight: 800, color: "#1A2332" }}>{totalClients}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#64748B" }}>All Clients</div></div>
+        <div style={{ cursor: "pointer", background: "#FFFFFF", border: "1.5px solid #E2E8F0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)", boxSizing: "border-box", height: 80, minWidth: 0 }}>
+          <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(37, 99, 235, 0.1)", color: "var(--app-accent)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}><i className="ti ti-users" /></div>
+          <div><div style={{ fontSize: 24, fontWeight: 800, color: "#1E293B" }}>{totalClients}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#64748B" }}>All Clients</div></div>
         </div>
-        <div style={{ cursor: "pointer", background: "#fff", border: "1.5px solid #E2E8F0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)", boxSizing: "border-box", height: 80, minWidth: 0 }}>
-          <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(22,163,74,0.1)", color: "#16a34a", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}><i className="ti ti-user-check" /></div>
-          <div><div style={{ fontSize: 24, fontWeight: 800, color: "#1A2332" }}>{activeClientsCount}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#64748B" }}>Active</div></div>
+        <div style={{ cursor: "pointer", background: "#FFFFFF", border: "1.5px solid #E2E8F0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)", boxSizing: "border-box", height: 80, minWidth: 0 }}>
+          <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(22, 163, 74, 0.1)", color: "#16A34A", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}><i className="ti ti-user-check" /></div>
+          <div><div style={{ fontSize: 24, fontWeight: 800, color: "#1E293B" }}>{activeClientsCount}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#64748B" }}>Active</div></div>
         </div>
-        <div style={{ cursor: "pointer", background: "#fff", border: "1.5px solid #E2E8F0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)", boxSizing: "border-box", height: 80, minWidth: 0 }}>
-          <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(220,38,38,0.1)", color: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}><i className="ti ti-user-off" /></div>
-          <div><div style={{ fontSize: 24, fontWeight: 800, color: "#1A2332" }}>{inactiveClientsCount}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#64748B" }}>Inactive</div></div>
+        <div style={{ cursor: "pointer", background: "#FFFFFF", border: "1.5px solid #E2E8F0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)", boxSizing: "border-box", height: 80, minWidth: 0 }}>
+          <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(100, 116, 139, 0.1)", color: "#64748B", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}><i className="ti ti-user-off" /></div>
+          <div><div style={{ fontSize: 24, fontWeight: 800, color: "#1E293B" }}>{inactiveClientsCount}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#64748B" }}>Inactive</div></div>
         </div>
       </div>
 
@@ -2435,8 +2435,8 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
 
       {/* LEFT-PANEL + DETAIL VIEW (always visible, embedded below stat cards) */}
- <div className="client-detail-layout" style={{ display: "flex", position: "relative", flex: 1, minHeight: 0, maxHeight: isMobileWidth ? "none" : "60vh", background: "#fff", marginTop: 4, border: isMobileWidth ? "none" : "1.5px solid #E2E8F0", borderRadius: isMobileWidth ? 0 : 14, overflow: isMobileWidth ? "visible" : "hidden" }}>
-        <div className="client-list-panel" style={{ width: 260, minWidth: 260, borderRight: "1.5px solid #E2E8F0", display: "flex", flexDirection: "column", background: "#fff", overflow: "hidden" }}>
+ <div className="client-detail-layout" style={{ display: "flex", position: "relative", flex: 1, minHeight: 0, maxHeight: isMobileWidth ? "none" : "60vh", background: "#FFFFFF", marginTop: 4, border: isMobileWidth ? "none" : "1.5px solid #E2E8F0", borderRadius: isMobileWidth ? 0 : 14, overflow: isMobileWidth ? "visible" : "hidden" }}>
+        <div className="client-list-panel" style={{ width: 260, minWidth: 260, borderRight: "1.5px solid #E2E8F0", display: "flex", flexDirection: "column", background: "#FFFFFF", overflow: "hidden" }}>
 
           {/* Search + Add */}
           <div style={{ padding: "14px 12px 8px", borderBottom: "1px solid #E2E8F0", flexShrink: 0 }}>
@@ -2469,7 +2469,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
                     fontWeight: 700,
                     cursor: "pointer",
                     background: filterMode === f ? "var(--app-accent, #2563EB)" : "var(--teal-lighter, #EFF6FF)",
-                    color: filterMode === f ? "#fff" : "#64748B",
+                    color: filterMode === f ? "#FFFFFF" : "#64748B",
                     textTransform: "capitalize",
                     transition: "all 0.15s ease"
                   }}
@@ -2533,19 +2533,19 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
   display: "flex",
   flexDirection: "column",
   minWidth: 0,
-  background: "#fff"
-} : { flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minWidth: 0, background: "#fff", height: "auto", minHeight: "auto" }}>
+  background: "#FFFFFF"
+} : { flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minWidth: 0, background: "#FFFFFF", height: "auto", minHeight: "auto" }}>
                         <button className="client-detail-modal-close" onClick={() => { setActiveClientId(null); setViewClientModal(false); window.__fullClientsList = true; }} style={{ display: "none" }}><i className="ti ti-x"></i></button>
 
 
 
             {/* HERO */}
 
-            <div style={{ background: "#fff", borderBottom: "1.5px solid #E2E8F0", padding: "20px 28px", flexShrink: 0 }}>
+            <div style={{ background: "#FFFFFF", borderBottom: "1.5px solid #E2E8F0", padding: "20px 28px", flexShrink: 0 }}>
 
               <div style={{ display: "flex", alignItems: "flex-start", gap: 16, marginBottom: 16 }}>
 
-                <div style={{ width: 64, height: 64, borderRadius: "50%", background: activeClient.logoUrl ? "#f1f5f9" : `linear-gradient(135deg,${acColor || "#2563EB"},${acColor || "#2563EB"})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, fontWeight: 900, color: "#fff", flexShrink: 0, position: "relative", boxShadow: "0 4px 14px rgba(0,0,0,.15)", overflow: "hidden" }}>
+                <div style={{ width: 64, height: 64, borderRadius: "50%", background: activeClient.logoUrl ? "#EFF6FF" : `linear-gradient(135deg,${acColor || "#2563EB"},${acColor || "#2563EB"})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, fontWeight: 900, color: "#FFFFFF", flexShrink: 0, position: "relative", boxShadow: "0 4px 14px rgba(0,0,0,.15)", overflow: "hidden" }}>
 
                   {activeClient.logoUrl ? <img src={activeClient.logoUrl} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} /> : getAvatar(activeClient)}
 
@@ -2570,9 +2570,9 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
                       {statusDropOpen && (
 
-                        <div style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, background: "#fff", border: "1.5px solid #E2E8F0", borderRadius: 10, boxShadow: "0 8px 24px rgba(0,0,0,.12)", zIndex: 100, minWidth: 160, overflow: "hidden" }}>
+                        <div style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, background: "#FFFFFF", border: "1.5px solid #E2E8F0", borderRadius: 10, boxShadow: "0 8px 24px rgba(0,0,0,.12)", zIndex: 100, minWidth: 160, overflow: "hidden" }}>
 
-                          <div style={{ padding: "6px 12px 4px", fontSize: 9, fontWeight: 700, color: "#64748B", textTransform: "uppercase", letterSpacing: .7, background: "#F8FAFB", borderBottom: "1px solid #E2E8F0" }}>Set Client Status</div>
+                          <div style={{ padding: "6px 12px 4px", fontSize: 9, fontWeight: 700, color: "#64748B", textTransform: "uppercase", letterSpacing: .7, background: "#F8FAFC", borderBottom: "1px solid #E2E8F0" }}>Set Client Status</div>
 
                           {["Active", "Inactive"].map(s => {
 
@@ -2608,7 +2608,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
                     {activeClient.address && <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "var(--teal-light, var(--teal-light, #EFF6FF))", color: "var(--app-accent, #2563EB)" }}><i className="ti ti-map-pin" style={{ fontSize: 10, marginRight: 2 }} />{activeClient.address}</span>}
 
-                    <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "#F8FAFB", color: "#64748B" }}><i className="ti ti-clock" style={{ fontSize: 10, marginRight: 2 }} />Joined {activeClient.createdAt ? new Date(activeClient.createdAt).toLocaleDateString("en-IN") : "—"}</span>
+                    <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "#F8FAFC", color: "#64748B" }}><i className="ti ti-clock" style={{ fontSize: 10, marginRight: 2 }} />Joined {activeClient.createdAt ? new Date(activeClient.createdAt).toLocaleDateString("en-IN") : "—"}</span>
 
                   </div>
 
@@ -2618,7 +2618,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
                   <button onClick={() => openEdit(activeClient)} title="Edit" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 5, padding: isMobileWidth ? "7px" : "7px 14px", width: isMobileWidth ? 30 : "auto", height: isMobileWidth ? 30 : "auto", borderRadius: 9, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all .15s", border: "1.5px solid #E2E8F0", background: "#F8FAFC", color: "#64748B" }} onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--app-accent, #2563EB)"; e.currentTarget.style.color = "var(--app-accent, #2563EB)"; }} onMouseLeave={e => { e.currentTarget.style.borderColor = "#E2E8F0"; e.currentTarget.style.color = "#64748B"; }}><i className="ti ti-edit" style={{ fontSize: 13 }} />{!isMobileWidth && "Edit"}</button>
 
-                  <button onClick={() => setDeleteTarget(activeClient)} title="Delete" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 5, padding: isMobileWidth ? "7px" : "7px 14px", width: isMobileWidth ? 30 : "auto", height: isMobileWidth ? 30 : "auto", borderRadius: 9, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all .15s", border: "1.5px solid #E2E8F0", background: "#F8FAFC", color: "#64748B" }} onMouseEnter={e => { e.currentTarget.style.borderColor = "#F05C5C"; e.currentTarget.style.color = "#F05C5C"; }} onMouseLeave={e => { e.currentTarget.style.borderColor = "#E2E8F0"; e.currentTarget.style.color = "#64748B"; }}><i className="ti ti-trash" style={{ fontSize: 13 }} />{!isMobileWidth && "Delete"}</button>
+                  <button onClick={() => setDeleteTarget(activeClient)} title="Delete" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 5, padding: isMobileWidth ? "7px" : "7px 14px", width: isMobileWidth ? 30 : "auto", height: isMobileWidth ? 30 : "auto", borderRadius: 9, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all .15s", border: "1.5px solid #E2E8F0", background: "#F8FAFC", color: "#64748B" }} onMouseEnter={e => { e.currentTarget.style.borderColor = "#64748B"; e.currentTarget.style.color = "#64748B"; }} onMouseLeave={e => { e.currentTarget.style.borderColor = "#E2E8F0"; e.currentTarget.style.color = "#64748B"; }}><i className="ti ti-trash" style={{ fontSize: 13 }} />{!isMobileWidth && "Delete"}</button>
 
                 </div>
 
@@ -2657,7 +2657,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
             {/* TABS */}
 
-            <div className="client-tabs-row" style={{ background: "#fff", borderBottom: "1.5px solid #E2E8F0", padding: isMobileWidth ? "0 12px" : "0 28px", display: "flex", flexShrink: 0, overflowX: "auto", overflowY: "hidden", WebkitOverflowScrolling: "touch" }}>
+            <div className="client-tabs-row" style={{ background: "#FFFFFF", borderBottom: "1.5px solid #E2E8F0", padding: isMobileWidth ? "0 12px" : "0 28px", display: "flex", flexShrink: 0, overflowX: "auto", overflowY: "hidden", WebkitOverflowScrolling: "touch" }}>
 
               {[
 
@@ -2745,11 +2745,11 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
               {activeClient.logoUrl ? (
 
-                <img src={activeClient.logoUrl} alt="logo" style={{ width: 80, height: 80, borderRadius: 16, objectFit: "contain", background: "#fff", border: "2px solid #E2E8F0" }} />
+                <img src={activeClient.logoUrl} alt="logo" style={{ width: 80, height: 80, borderRadius: 16, objectFit: "contain", background: "#FFFFFF", border: "2px solid #E2E8F0" }} />
 
               ) : (
 
-                <div style={{ width: 80, height: 80, borderRadius: 16, background: `linear-gradient(135deg,${getAvatarColor(activeClient)},${getAvatarColor(activeClient)}bb)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, fontWeight: 900, color: "#fff" }}>
+                <div style={{ width: 80, height: 80, borderRadius: 16, background: `linear-gradient(135deg,${getAvatarColor(activeClient)},${getAvatarColor(activeClient)}bb)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, fontWeight: 900, color: "#FFFFFF" }}>
 
                   {getAvatar(activeClient)}
 
@@ -2868,12 +2868,12 @@ function UnpaidInvoicesListPage({ invoices, onViewInvoice, onBack, onAddInvoice 
   const initials = (name) => (name || "?").trim().split(/\s+/).slice(0, 2).map(w => w[0]).join("").toUpperCase();
   const badgeCfg = (status) => {
     const s = (status || "").toLowerCase();
-    if (s === "overdue") return { bg: "#fef2f2", fg: "#dc2626" };
-    if (s === "sent") return { bg: "#eff6ff", fg: "#2563eb" };
-    return { bg: "#fef2f2", fg: "#dc2626" };
+    if (s === "overdue") return { bg: "#F8FAFC", fg: "#64748B" };
+    if (s === "sent") return { bg: "#EFF6FF", fg: "#2563EB" };
+    return { bg: "#F8FAFC", fg: "#64748B" };
   };
   return (
-    <div style={{ padding: "16px 14px", background: "#F5F8FA", minHeight: "100%", boxSizing: "border-box", maxWidth: "100%", overflowX: "hidden" }}>
+    <div style={{ padding: "16px 14px", background: "#F8FAFC", minHeight: "100%", boxSizing: "border-box", maxWidth: "100%", overflowX: "hidden" }}>
 
       {/* Back to Dashboard — top-left, fixed position for every page */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, padding: "4px 4px 16px" }}>
@@ -2884,19 +2884,19 @@ function UnpaidInvoicesListPage({ invoices, onViewInvoice, onBack, onAddInvoice 
           <i className="ti ti-arrow-left" style={{ fontSize: 16 }}></i> Back to Dashboard
         </div>
         {onAddInvoice && (
-          <button onClick={onAddInvoice} style={{ display: "flex", alignItems: "center", gap: 4, background: "var(--app-accent, #2563EB)", color: "#fff", border: "none", borderRadius: 20, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", boxShadow: "0 3px 10px rgba(37, 99, 235,0.35)", whiteSpace: "nowrap" }}>
+          <button onClick={onAddInvoice} style={{ display: "flex", alignItems: "center", gap: 4, background: "var(--app-accent, #2563EB)", color: "#FFFFFF", border: "none", borderRadius: 20, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", boxShadow: "0 3px 10px rgba(37, 99, 235, 0.35)", whiteSpace: "nowrap" }}>
             <i className="ti ti-plus" style={{ fontSize: 13 }}></i> New Invoice
           </button>
         )}
       </div>
 
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #2563EB), #0891b2)", borderRadius: 16, padding: "16px 18px", marginBottom: 14, boxShadow: "0 6px 18px rgba(37, 99, 235,0.25)" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #2563EB), #2563EB)", borderRadius: 16, padding: "16px 18px", marginBottom: 14, boxShadow: "0 6px 18px rgba(37, 99, 235, 0.25)" }}>
         <div>
           <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.8)", letterSpacing: 0.5, textTransform: "uppercase" }}>Total Unpaid Invoices</div>
-          <div style={{ fontSize: 26, fontWeight: 800, color: "#fff" }}>{unpaid.length}</div>
+          <div style={{ fontSize: 26, fontWeight: 800, color: "#FFFFFF" }}>{unpaid.length}</div>
         </div>
         <div style={{ width: 46, height: 46, borderRadius: 13, background: "rgba(255,255,255,0.18)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <i className="ti ti-file-invoice" style={{ fontSize: 22, color: "#fff" }} />
+          <i className="ti ti-file-invoice" style={{ fontSize: 22, color: "#FFFFFF" }} />
         </div>
       </div>
 
@@ -2907,7 +2907,7 @@ function UnpaidInvoicesListPage({ invoices, onViewInvoice, onBack, onAddInvoice 
           placeholder="Search invoices..."
           value={search}
           onChange={e => setSearch(e.target.value)}
-          style={{ width: "100%", padding: "12px 12px 12px 38px", border: "none", borderRadius: 12, fontSize: 13, outline: "none", background: "#fff", color: "#1E293B", boxSizing: "border-box", boxShadow: "0 2px 10px rgba(15,28,46,0.06)" }}
+          style={{ width: "100%", padding: "12px 12px 12px 38px", border: "none", borderRadius: 12, fontSize: 13, outline: "none", background: "#FFFFFF", color: "#1E293B", boxSizing: "border-box", boxShadow: "0 2px 10px rgba(15, 23, 42, 0.06)" }}
         />
       </div>
 
@@ -2924,8 +2924,8 @@ function UnpaidInvoicesListPage({ invoices, onViewInvoice, onBack, onAddInvoice 
               fontWeight: 700,
               cursor: "pointer",
               textTransform: "capitalize",
-              background: filterMode === f ? "#1A2332" : "#fff",
-              color: filterMode === f ? "#fff" : "#64748B",
+              background: filterMode === f ? "#1E293B" : "#FFFFFF",
+              color: filterMode === f ? "#FFFFFF" : "#64748B",
               whiteSpace: "nowrap",
               transition: "all 0.15s ease"
             }}
@@ -2936,7 +2936,7 @@ function UnpaidInvoicesListPage({ invoices, onViewInvoice, onBack, onAddInvoice 
       </div>
 
       {filtered.length === 0 ? (
-        <div style={{ padding: "40px 16px", textAlign: "center", color: "#64748B", fontSize: 13, fontWeight: 600, background: "#fff", borderRadius: 16, boxShadow: "0 2px 10px rgba(15,28,46,0.05)" }}>
+        <div style={{ padding: "40px 16px", textAlign: "center", color: "#64748B", fontSize: 13, fontWeight: 600, background: "#FFFFFF", borderRadius: 16, boxShadow: "0 2px 10px rgba(15, 23, 42, 0.05)" }}>
           No unpaid invoices found.
         </div>
       ) : (
@@ -2949,10 +2949,10 @@ function UnpaidInvoicesListPage({ invoices, onViewInvoice, onBack, onAddInvoice 
                 key={inv._id || inv.invoiceNo || i}
                 onClick={() => onViewInvoice && onViewInvoice(inv)}
                 style={{
-                  background: "#fff",
+                  background: "#FFFFFF",
                   borderRadius: 16,
                   padding: "16px",
-                  boxShadow: "0 3px 14px rgba(15,28,46,0.07)",
+                  boxShadow: "0 3px 14px rgba(15, 23, 42, 0.07)",
                   cursor: "pointer",
                   boxSizing: "border-box",
                   borderLeft: `4px solid ${bc.fg}`
@@ -2962,14 +2962,14 @@ function UnpaidInvoicesListPage({ invoices, onViewInvoice, onBack, onAddInvoice 
                   <div style={{ display: "flex", alignItems: "flex-start", gap: 10, minWidth: 0, flex: 1 }}>
                     <div style={{
                       width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
-                      background: "linear-gradient(135deg, var(--app-accent, #2563EB), #0891b2)", color: "#fff",
+                      background: "linear-gradient(135deg, var(--app-accent, #2563EB), #2563EB)", color: "#FFFFFF",
                       display: "flex", alignItems: "center", justifyContent: "center",
                       fontSize: 14, fontWeight: 800
                     }}>
                       {initials(name)}
                     </div>
                     <div style={{ minWidth: 0, flex: 1 }}>
-                      <div style={{ fontWeight: 800, color: "#0f172a", fontSize: 14.5, wordBreak: "break-word" }}>{name}</div>
+                      <div style={{ fontWeight: 800, color: "#0F172A", fontSize: 14.5, wordBreak: "break-word" }}>{name}</div>
                       {inv.invoiceNo && (
                         <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 3, fontSize: 11.5, color: "#64748B", fontWeight: 600 }}>
                           <i className="ti ti-hash" style={{ fontSize: 12, flexShrink: 0 }} />
@@ -3016,13 +3016,13 @@ function ProposalsListPage({ proposals, onViewProposal, onBack, onAddProposal })
   const initials = (name) => (name || "P").trim().split(/\s+/).slice(0, 2).map(w => w[0]).join("").toUpperCase();
   const badgeCfg = (status) => {
     const s = (status || "draft").toLowerCase();
-    if (s === "approved") return { bg: "#dcfce7", fg: "#16a34a" };
-    if (s === "sent") return { bg: "#eff6ff", fg: "#2563eb" };
-    if (s === "rejected") return { bg: "#fef2f2", fg: "#dc2626" };
-    return { bg: "#fef2f2", fg: "#dc2626" };
+    if (s === "approved") return { bg: "#E2E8F0", fg: "#16A34A" };
+    if (s === "sent") return { bg: "#EFF6FF", fg: "#2563EB" };
+    if (s === "rejected") return { bg: "#F8FAFC", fg: "#64748B" };
+    return { bg: "#F8FAFC", fg: "#64748B" };
   };
   return (
-    <div style={{ padding: "16px 14px", background: "#F5F8FA", minHeight: "100%", boxSizing: "border-box", maxWidth: "100%", overflowX: "hidden" }}>
+    <div style={{ padding: "16px 14px", background: "#F8FAFC", minHeight: "100%", boxSizing: "border-box", maxWidth: "100%", overflowX: "hidden" }}>
        {/* Back to Dashboard — top-left, fixed position for every page */}
 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, padding: "4px 4px 16px" }}>
         <div
@@ -3032,18 +3032,18 @@ function ProposalsListPage({ proposals, onViewProposal, onBack, onAddProposal })
           <i className="ti ti-arrow-left" style={{ fontSize: 16 }}></i> Back to Dashboard
         </div>
         {onAddProposal && (
-          <button onClick={onAddProposal} style={{ display: "flex", alignItems: "center", gap: 4, background: "var(--app-accent, #2563EB)", color: "#fff", border: "none", borderRadius: 20, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", boxShadow: "0 3px 10px rgba(37, 99, 235,0.35)", whiteSpace: "nowrap" }}>
+          <button onClick={onAddProposal} style={{ display: "flex", alignItems: "center", gap: 4, background: "var(--app-accent, #2563EB)", color: "#FFFFFF", border: "none", borderRadius: 20, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", boxShadow: "0 3px 10px rgba(37, 99, 235, 0.35)", whiteSpace: "nowrap" }}>
             <i className="ti ti-plus" style={{ fontSize: 13 }}></i> New Proposal
           </button>
         )}
-      </div> <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #2563EB), #0891b2)", borderRadius: 16, padding: "16px 18px", marginBottom: 14, boxShadow: "0 6px 18px rgba(37, 99, 235,0.25)" }}>
+      </div> <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #2563EB), #2563EB)", borderRadius: 16, padding: "16px 18px", marginBottom: 14, boxShadow: "0 6px 18px rgba(37, 99, 235, 0.25)" }}>
 
         <div>
           <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.8)", letterSpacing: 0.5, textTransform: "uppercase" }}>Total Proposals</div>
-          <div style={{ fontSize: 26, fontWeight: 800, color: "#fff" }}>{all.length}</div>
+          <div style={{ fontSize: 26, fontWeight: 800, color: "#FFFFFF" }}>{all.length}</div>
         </div>
         <div style={{ width: 46, height: 46, borderRadius: 13, background: "rgba(255,255,255,0.18)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <i className="ti ti-clipboard-list" style={{ fontSize: 22, color: "#fff" }} />
+          <i className="ti ti-clipboard-list" style={{ fontSize: 22, color: "#FFFFFF" }} />
         </div>
       </div>
 
@@ -3054,7 +3054,7 @@ function ProposalsListPage({ proposals, onViewProposal, onBack, onAddProposal })
           placeholder="Search proposals..."
           value={search}
           onChange={e => setSearch(e.target.value)}
-          style={{ width: "100%", padding: "12px 12px 12px 38px", border: "none", borderRadius: 12, fontSize: 13, outline: "none", background: "#fff", color: "#1E293B", boxSizing: "border-box", boxShadow: "0 2px 10px rgba(15,28,46,0.06)" }}
+          style={{ width: "100%", padding: "12px 12px 12px 38px", border: "none", borderRadius: 12, fontSize: 13, outline: "none", background: "#FFFFFF", color: "#1E293B", boxSizing: "border-box", boxShadow: "0 2px 10px rgba(15, 23, 42, 0.06)" }}
         />
       </div>
 
@@ -3071,8 +3071,8 @@ function ProposalsListPage({ proposals, onViewProposal, onBack, onAddProposal })
               fontWeight: 700,
               cursor: "pointer",
               textTransform: "capitalize",
-              background: filterMode === f ? "#1A2332" : "#fff",
-              color: filterMode === f ? "#fff" : "#64748B",
+              background: filterMode === f ? "#1E293B" : "#FFFFFF",
+              color: filterMode === f ? "#FFFFFF" : "#64748B",
               whiteSpace: "nowrap",
               transition: "all 0.15s ease"
             }}
@@ -3083,7 +3083,7 @@ function ProposalsListPage({ proposals, onViewProposal, onBack, onAddProposal })
       </div>
 
       {filtered.length === 0 ? (
-        <div style={{ padding: "40px 16px", textAlign: "center", color: "#64748B", fontSize: 13, fontWeight: 600, background: "#fff", borderRadius: 16, boxShadow: "0 2px 10px rgba(15,28,46,0.05)" }}>
+        <div style={{ padding: "40px 16px", textAlign: "center", color: "#64748B", fontSize: 13, fontWeight: 600, background: "#FFFFFF", borderRadius: 16, boxShadow: "0 2px 10px rgba(15, 23, 42, 0.05)" }}>
           No proposals found.
         </div>
       ) : (
@@ -3096,10 +3096,10 @@ function ProposalsListPage({ proposals, onViewProposal, onBack, onAddProposal })
                 key={p._id || p.id || i}
                 onClick={() => onViewProposal && onViewProposal(p)}
                 style={{
-                  background: "#fff",
+                  background: "#FFFFFF",
                   borderRadius: 16,
                   padding: "16px",
-                  boxShadow: "0 3px 14px rgba(15,28,46,0.07)",
+                  boxShadow: "0 3px 14px rgba(15, 23, 42, 0.07)",
                   cursor: "pointer",
                   boxSizing: "border-box",
                   borderLeft: `4px solid ${bc.fg}`
@@ -3109,14 +3109,14 @@ function ProposalsListPage({ proposals, onViewProposal, onBack, onAddProposal })
                   <div style={{ display: "flex", alignItems: "flex-start", gap: 10, minWidth: 0, flex: 1 }}>
                     <div style={{
                       width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
-                      background: "linear-gradient(135deg, var(--app-accent, #2563EB), #0891b2)", color: "#fff",
+                      background: "linear-gradient(135deg, var(--app-accent, #2563EB), #2563EB)", color: "#FFFFFF",
                       display: "flex", alignItems: "center", justifyContent: "center",
                       fontSize: 14, fontWeight: 800
                     }}>
                       {initials(title)}
                     </div>
                     <div style={{ minWidth: 0, flex: 1 }}>
-                      <div style={{ fontWeight: 800, color: "#0f172a", fontSize: 14.5, wordBreak: "break-word" }}>{title}</div>
+                      <div style={{ fontWeight: 800, color: "#0F172A", fontSize: 14.5, wordBreak: "break-word" }}>{title}</div>
                       {p.reviewComment && (
                         <div style={{ display: "flex", alignItems: "flex-start", gap: 4, marginTop: 3, fontSize: 11.5, color: "#64748B", fontWeight: 600 }}>
                           <i className="ti ti-message-2" style={{ fontSize: 12, flexShrink: 0, marginTop: 1 }} />
@@ -3157,13 +3157,13 @@ function QuotationsListPage({ quotations, onViewQuotation, onBack, onAddQuotatio
   const initials = (name) => (name || "Q").trim().split(/\s+/).slice(0, 2).map(w => w[0]).join("").toUpperCase();
   const badgeCfg = (status) => {
     const s = (status || "draft").toLowerCase();
-    if (s === "approved") return { bg: "#dcfce7", fg: "#16a34a" };
-    if (s === "sent") return { bg: "#eff6ff", fg: "#2563eb" };
-    if (s === "rejected") return { bg: "#fef2f2", fg: "#dc2626" };
-    return { bg: "#fef2f2", fg: "#dc2626" };
+    if (s === "approved") return { bg: "#E2E8F0", fg: "#16A34A" };
+    if (s === "sent") return { bg: "#EFF6FF", fg: "#2563EB" };
+    if (s === "rejected") return { bg: "#F8FAFC", fg: "#64748B" };
+    return { bg: "#F8FAFC", fg: "#64748B" };
   };
   return (
-    <div style={{ padding: "16px 14px", background: "#F5F8FA", minHeight: "100%", boxSizing: "border-box", maxWidth: "100%", overflowX: "hidden" }}>
+    <div style={{ padding: "16px 14px", background: "#F8FAFC", minHeight: "100%", boxSizing: "border-box", maxWidth: "100%", overflowX: "hidden" }}>
      
         {/* Back to Dashboard — top-left, fixed position for every page */}
       <div
@@ -3171,13 +3171,13 @@ function QuotationsListPage({ quotations, onViewQuotation, onBack, onAddQuotatio
         style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 4px 16px", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #2563EB)" }}
       >
         <i className="ti ti-arrow-left" style={{ fontSize: 16 }}></i> Back to Dashboard
-      </div> <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #2563EB), #0891b2)", borderRadius: 16, padding: "16px 18px", marginBottom: 14, boxShadow: "0 6px 18px rgba(37, 99, 235,0.25)" }}>
+      </div> <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #2563EB), #2563EB)", borderRadius: 16, padding: "16px 18px", marginBottom: 14, boxShadow: "0 6px 18px rgba(37, 99, 235, 0.25)" }}>
         <div>
           <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.8)", letterSpacing: 0.5, textTransform: "uppercase" }}>Total Quotations</div>
-          <div style={{ fontSize: 26, fontWeight: 800, color: "#fff" }}>{all.length}</div>
+          <div style={{ fontSize: 26, fontWeight: 800, color: "#FFFFFF" }}>{all.length}</div>
         </div>
         <div style={{ width: 46, height: 46, borderRadius: 13, background: "rgba(255,255,255,0.18)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <i className="ti ti-receipt" style={{ fontSize: 22, color: "#fff" }} />
+          <i className="ti ti-receipt" style={{ fontSize: 22, color: "#FFFFFF" }} />
         </div>
       </div>
 
@@ -3188,7 +3188,7 @@ function QuotationsListPage({ quotations, onViewQuotation, onBack, onAddQuotatio
           placeholder="Search quotations..."
           value={search}
           onChange={e => setSearch(e.target.value)}
-          style={{ width: "100%", padding: "12px 12px 12px 38px", border: "none", borderRadius: 12, fontSize: 13, outline: "none", background: "#fff", color: "#1E293B", boxSizing: "border-box", boxShadow: "0 2px 10px rgba(15,28,46,0.06)" }}
+          style={{ width: "100%", padding: "12px 12px 12px 38px", border: "none", borderRadius: 12, fontSize: 13, outline: "none", background: "#FFFFFF", color: "#1E293B", boxSizing: "border-box", boxShadow: "0 2px 10px rgba(15, 23, 42, 0.06)" }}
         />
       </div>
 
@@ -3205,8 +3205,8 @@ function QuotationsListPage({ quotations, onViewQuotation, onBack, onAddQuotatio
               fontWeight: 700,
               cursor: "pointer",
               textTransform: "capitalize",
-              background: filterMode === f ? "#1A2332" : "#fff",
-              color: filterMode === f ? "#fff" : "#64748B",
+              background: filterMode === f ? "#1E293B" : "#FFFFFF",
+              color: filterMode === f ? "#FFFFFF" : "#64748B",
               whiteSpace: "nowrap",
               transition: "all 0.15s ease"
             }}
@@ -3217,7 +3217,7 @@ function QuotationsListPage({ quotations, onViewQuotation, onBack, onAddQuotatio
       </div>
 
       {filtered.length === 0 ? (
-        <div style={{ padding: "40px 16px", textAlign: "center", color: "#64748B", fontSize: 13, fontWeight: 600, background: "#fff", borderRadius: 16, boxShadow: "0 2px 10px rgba(15,28,46,0.05)" }}>
+        <div style={{ padding: "40px 16px", textAlign: "center", color: "#64748B", fontSize: 13, fontWeight: 600, background: "#FFFFFF", borderRadius: 16, boxShadow: "0 2px 10px rgba(15, 23, 42, 0.05)" }}>
           No quotations found.
         </div>
       ) : (
@@ -3232,10 +3232,10 @@ function QuotationsListPage({ quotations, onViewQuotation, onBack, onAddQuotatio
                 key={q._id || q.id || i}
                 onClick={() => onViewQuotation && onViewQuotation(q)}
                 style={{
-                  background: "#fff",
+                  background: "#FFFFFF",
                   borderRadius: 16,
                   padding: "16px",
-                  boxShadow: "0 3px 14px rgba(15,28,46,0.07)",
+                  boxShadow: "0 3px 14px rgba(15, 23, 42, 0.07)",
                   cursor: "pointer",
                   boxSizing: "border-box",
                   borderLeft: `4px solid ${bc.fg}`
@@ -3245,14 +3245,14 @@ function QuotationsListPage({ quotations, onViewQuotation, onBack, onAddQuotatio
                   <div style={{ display: "flex", alignItems: "flex-start", gap: 10, minWidth: 0, flex: 1 }}>
                     <div style={{
                       width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
-                      background: "linear-gradient(135deg, var(--app-accent, #2563EB), #0891b2)", color: "#fff",
+                      background: "linear-gradient(135deg, var(--app-accent, #2563EB), #2563EB)", color: "#FFFFFF",
                       display: "flex", alignItems: "center", justifyContent: "center",
                       fontSize: 14, fontWeight: 800
                     }}>
                       {initials(client)}
                     </div>
                     <div style={{ minWidth: 0, flex: 1 }}>
-                      <div style={{ fontWeight: 800, color: "#0f172a", fontSize: 14.5, wordBreak: "break-word" }}>{client}</div>
+                      <div style={{ fontWeight: 800, color: "#0F172A", fontSize: 14.5, wordBreak: "break-word" }}>{client}</div>
                       {quoteNo && (
                         <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 3, fontSize: 11.5, color: "#64748B", fontWeight: 600 }}>
                           <i className="ti ti-hash" style={{ fontSize: 12, flexShrink: 0 }} />
@@ -3572,7 +3572,7 @@ if (viewEmp) {
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(15,23,42,0.55)",
+            background: "rgba(15, 23, 42, 0.55)",
             zIndex: 3000,
             display: "flex",
             alignItems: "center",
@@ -3590,7 +3590,7 @@ if (viewEmp) {
               WebkitOverflowScrolling: "touch",
               borderRadius: 20,
               boxShadow: "0 20px 60px rgba(0,0,0,0.35)",
-              background: "#F5F7FA"
+              background: "#F8FAFC"
             }}
           >
         <EmployeeDetail
@@ -3820,13 +3820,13 @@ if (viewEmp) {
 
                   <div style={{ position: "relative" }}>
 
-                    <input type={showEditEmpPass ? "text" : "password"} value={editForm.password || ""} onChange={e => { setEditForm(p => ({ ...p, password: e.target.value })); setEditErr(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${editErr.password ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Leave blank to keep current password" />
+                    <input type={showEditEmpPass ? "text" : "password"} value={editForm.password || ""} onChange={e => { setEditForm(p => ({ ...p, password: e.target.value })); setEditErr(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${editErr.password ? "#64748B" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Leave blank to keep current password" />
 
                     <button type="button" onClick={() => setShowEditEmpPass(!showEditEmpPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showEditEmpPass ? "HIDE" : "SHOW"}</button>
 
                   </div>
 
-                  {editErr.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {editErr.password}</div>}
+                  {editErr.password && <div style={{ fontSize: 11, color: "#64748B", marginTop: 4 }}>Warning {editErr.password}</div>}
 
                 </div>
 
@@ -3836,12 +3836,12 @@ if (viewEmp) {
 
                   <div style={{ position: "relative" }}>
 
-                    <input type={showEditEmpConfirmPass ? "text" : "password"} value={editForm.confirmPassword || ""} onChange={e => { setEditForm(p => ({ ...p, confirmPassword: e.target.value })); setEditErr(p => ({ ...p, confirmPassword: "" })); }} style={{ width: "100%", border: `1.5px solid ${editErr.confirmPassword ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Re-enter new password" />
+                    <input type={showEditEmpConfirmPass ? "text" : "password"} value={editForm.confirmPassword || ""} onChange={e => { setEditForm(p => ({ ...p, confirmPassword: e.target.value })); setEditErr(p => ({ ...p, confirmPassword: "" })); }} style={{ width: "100%", border: `1.5px solid ${editErr.confirmPassword ? "#64748B" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Re-enter new password" />
                     <button type="button" onClick={() => setShowEditEmpConfirmPass(!showEditEmpConfirmPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showEditEmpConfirmPass ? "HIDE" : "SHOW"}</button>
 
                   </div>
 
-                  {editErr.confirmPassword && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {editErr.confirmPassword}</div>}
+                  {editErr.confirmPassword && <div style={{ fontSize: 11, color: "#64748B", marginTop: 4 }}>Warning {editErr.confirmPassword}</div>}
 
                 </div>
 
@@ -3855,7 +3855,7 @@ if (viewEmp) {
 
               <button onClick={() => setEditEmp(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
 
-              <button onClick={saveEdit} disabled={saving} style={{ background: "var(--app-accent-gradient)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer" }}>{saving ? "Saving…" : "Save Changes "}</button>
+              <button onClick={saveEdit} disabled={saving} style={{ background: "var(--app-accent-gradient)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#FFFFFF", cursor: saving ? "not-allowed" : "pointer" }}>{saving ? "Saving…" : "Save Changes "}</button>
 
             </div>
 
@@ -3865,9 +3865,9 @@ if (viewEmp) {
 
         {deleteTarget && (
 
-          <div style={{ position: "fixed", inset: 0, background: "rgba(15,28,46,0.45)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 200, backdropFilter: "blur(4px)" }}>
+          <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.45)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 200, backdropFilter: "blur(4px)" }}>
 
-            <div style={{ background: "#fff", borderRadius: 16, padding: "28px 32px", width: 400, boxShadow: "0 24px 80px rgba(0,0,0,0.18)", border: "1px solid var(--border)" }}>
+            <div style={{ background: "#FFFFFF", borderRadius: 16, padding: "28px 32px", width: 400, boxShadow: "0 24px 80px rgba(0,0,0,0.18)", border: "1px solid var(--border)" }}>
 
               <div style={{ fontSize: 17, fontWeight: 900, color: "var(--text)", marginBottom: 12 }}>Delete Employee</div>
 
@@ -3875,9 +3875,9 @@ if (viewEmp) {
 
               <div style={{ display: "flex", gap: 10, marginTop: 22, justifyContent: "flex-end" }}>
 
-                <button onClick={() => setDeleteTarget(null)} style={{ background: "#f1f5f9", color: "var(--text-mid)", border: "none", padding: "9px 18px", borderRadius: 8, fontFamily: "'Nunito',sans-serif", fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Cancel</button>
+                <button onClick={() => setDeleteTarget(null)} style={{ background: "#EFF6FF", color: "var(--text-mid)", border: "none", padding: "9px 18px", borderRadius: 8, fontFamily: "'Nunito',sans-serif", fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Cancel</button>
 
-                <button onClick={doDelete} style={{ background: "#dc2626", color: "#fff", border: "none", padding: "9px 18px", borderRadius: 8, fontFamily: "'Nunito',sans-serif", fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Delete</button>
+                <button onClick={doDelete} style={{ background: "#64748B", color: "#FFFFFF", border: "none", padding: "9px 18px", borderRadius: 8, fontFamily: "'Nunito',sans-serif", fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Delete</button>
 
               </div>
 
@@ -3905,10 +3905,10 @@ if (viewEmp) {
     const initials = (name) => (name || "?").trim().split(/\s+/).slice(0, 2).map(w => w[0]).join("").toUpperCase();
     const badgeCfg = (status) => {
       const ok = status === "Active" || status === "Approved";
-      return ok ? { bg: "#dcfce7", fg: "#16a34a" } : { bg: "#fef2f2", fg: "#dc2626" };
+      return ok ? { bg: "#E2E8F0", fg: "#16A34A" } : { bg: "#F8FAFC", fg: "#64748B" };
     };
    return (
-      <div style={{ padding: "16px 14px", background: "#F5F8FA", minHeight: "100%", boxSizing: "border-box", maxWidth: "100%", overflowX: "hidden" }}>
+      <div style={{ padding: "16px 14px", background: "#F8FAFC", minHeight: "100%", boxSizing: "border-box", maxWidth: "100%", overflowX: "hidden" }}>
    {/* Back to Dashboard — top-left, fixed position for every page */}
      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, padding: "4px 4px 16px" }}>
        <div
@@ -3918,18 +3918,18 @@ if (viewEmp) {
          <i className="ti ti-arrow-left" style={{ fontSize: 16 }}></i> Back to Dashboard
        </div>
        {onAddEmployeeClick && (
-         <button onClick={onAddEmployeeClick} style={{ display: "flex", alignItems: "center", gap: 4, background: "var(--app-accent, #2563EB)", color: "#fff", border: "none", borderRadius: 20, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", boxShadow: "0 3px 10px rgba(37, 99, 235,0.35)", whiteSpace: "nowrap" }}>
+         <button onClick={onAddEmployeeClick} style={{ display: "flex", alignItems: "center", gap: 4, background: "var(--app-accent, #2563EB)", color: "#FFFFFF", border: "none", borderRadius: 20, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", boxShadow: "0 3px 10px rgba(37, 99, 235, 0.35)", whiteSpace: "nowrap" }}>
            <i className="ti ti-plus" style={{ fontSize: 13 }}></i> New Team Member
          </button>
        )}
      </div>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #2563EB), #0891b2)", borderRadius: 16, padding: "16px 18px", marginBottom: 14, boxShadow: "0 6px 18px rgba(37, 99, 235,0.25)" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #2563EB), #2563EB)", borderRadius: 16, padding: "16px 18px", marginBottom: 14, boxShadow: "0 6px 18px rgba(37, 99, 235, 0.25)" }}>
           <div>
             <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.8)", letterSpacing: 0.5, textTransform: "uppercase" }}>Total Team</div>
-            <div style={{ fontSize: 26, fontWeight: 800, color: "#fff" }}>{employees.length}</div>
+            <div style={{ fontSize: 26, fontWeight: 800, color: "#FFFFFF" }}>{employees.length}</div>
           </div>
           <div style={{ width: 46, height: 46, borderRadius: 13, background: "rgba(255,255,255,0.18)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <i className="ti ti-users" style={{ fontSize: 22, color: "#fff" }} />
+            <i className="ti ti-users" style={{ fontSize: 22, color: "#FFFFFF" }} />
           </div>
         </div>
 
@@ -3940,7 +3940,7 @@ if (viewEmp) {
             placeholder="Search team..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            style={{ width: "100%", padding: "12px 12px 12px 38px", border: "none", borderRadius: 12, fontSize: 13, outline: "none", background: "#fff", color: "#1E293B", boxSizing: "border-box", boxShadow: "0 2px 10px rgba(15,28,46,0.06)" }}
+            style={{ width: "100%", padding: "12px 12px 12px 38px", border: "none", borderRadius: 12, fontSize: 13, outline: "none", background: "#FFFFFF", color: "#1E293B", boxSizing: "border-box", boxShadow: "0 2px 10px rgba(15, 23, 42, 0.06)" }}
           />
         </div>
 
@@ -3956,8 +3956,8 @@ if (viewEmp) {
                 fontSize: 12,
                 fontWeight: 700,
                 cursor: "pointer",
-                background: statusFilter === f ? "#1A2332" : "#fff",
-                color: statusFilter === f ? "#fff" : "#64748B",
+                background: statusFilter === f ? "#1E293B" : "#FFFFFF",
+                color: statusFilter === f ? "#FFFFFF" : "#64748B",
                 whiteSpace: "nowrap",
                 transition: "all 0.15s ease"
               }}
@@ -3968,7 +3968,7 @@ if (viewEmp) {
         </div>
 
         {filtered.length === 0 ? (
-          <div style={{ padding: "40px 16px", textAlign: "center", color: "#64748B", fontSize: 13, fontWeight: 600, background: "#fff", borderRadius: 16, boxShadow: "0 2px 10px rgba(15,28,46,0.05)" }}>
+          <div style={{ padding: "40px 16px", textAlign: "center", color: "#64748B", fontSize: 13, fontWeight: 600, background: "#FFFFFF", borderRadius: 16, boxShadow: "0 2px 10px rgba(15, 23, 42, 0.05)" }}>
             No team members found.
           </div>
         ) : (
@@ -3980,10 +3980,10 @@ if (viewEmp) {
                   key={e._id || i}
                   onClick={() => { setViewEmp(e); loadEmpDocs(e); }}
                   style={{
-                    background: "#fff",
+                    background: "#FFFFFF",
                     borderRadius: 16,
                     padding: "16px",
-                    boxShadow: "0 3px 14px rgba(15,28,46,0.07)",
+                    boxShadow: "0 3px 14px rgba(15, 23, 42, 0.07)",
                     cursor: "pointer",
                     boxSizing: "border-box",
                     borderLeft: `4px solid ${bc.fg}`
@@ -3993,14 +3993,14 @@ if (viewEmp) {
                     <div style={{ display: "flex", alignItems: "flex-start", gap: 10, minWidth: 0, flex: 1 }}>
                       <div style={{
                         width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
-                        background: "linear-gradient(135deg, var(--app-accent, #2563EB), #0891b2)", color: "#fff",
+                        background: "linear-gradient(135deg, var(--app-accent, #2563EB), #2563EB)", color: "#FFFFFF",
                         display: "flex", alignItems: "center", justifyContent: "center",
                         fontSize: 14, fontWeight: 800
                       }}>
                         {initials(e.name)}
                       </div>
                       <div style={{ minWidth: 0, flex: 1 }}>
-                        <div style={{ fontWeight: 800, color: "#0f172a", fontSize: 14.5, wordBreak: "break-word" }}>{e.name || "—"}</div>
+                        <div style={{ fontWeight: 800, color: "#0F172A", fontSize: 14.5, wordBreak: "break-word" }}>{e.name || "—"}</div>
                         {e.email && (
                           <div style={{ display: "flex", alignItems: "flex-start", gap: 4, marginTop: 3, fontSize: 11.5, color: "#64748B", fontWeight: 600 }}>
                             <i className="ti ti-mail" style={{ fontSize: 12, flexShrink: 0, marginTop: 1 }} />
@@ -4044,10 +4044,10 @@ if (viewEmp) {
 
       {/* Share Onboarding Link Card (Kept as requested) */}
 
-      <div className="employees-onboard-card" style={{ background: "var(--app-sidebar)", borderRadius: 16, padding: "20px 24px", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", boxShadow: "0 8px 24px rgba(15, 23, 42,0.2)", marginBottom: 6 }}>
+      <div className="employees-onboard-card" style={{ background: "var(--app-sidebar)", borderRadius: 16, padding: "20px 24px", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", boxShadow: "0 8px 24px rgba(15, 23, 42, 0.2)", marginBottom: 6 }}>
 
         <div style={{ width: 42, height: 42, borderRadius: 12, background: "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
             <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
           </svg>
@@ -4057,13 +4057,13 @@ if (viewEmp) {
 
           <div style={{ fontSize: 10, color: "rgba(255,255,255,0.5)", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>Employee Onboarding Link</div>
 
-          <div className="onboard-link-text" style={{ fontSize: 12, color: "#ffffff", fontFamily: "monospace", wordBreak: "break-all" }}>{onboardingLink}</div>
+          <div className="onboard-link-text" style={{ fontSize: 12, color: "#FFFFFF", fontFamily: "monospace", wordBreak: "break-all" }}>{onboardingLink}</div>
 
         </div>
 
         <div className="onboard-actions" style={{ display: "flex", gap: 8, flexShrink: 0 }}>
 
-          <button onClick={copyLink} style={{ background: linkCopied ? "rgba(34,197,94,0.2)" : "rgba(255,255,255,0.15)", border: `1px solid ${linkCopied ? "rgba(34,197,94,0.5)" : "rgba(255,255,255,0.3)"}`, borderRadius: 9, padding: "9px 16px", color: linkCopied ? "#4ade80" : "#ffffff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{linkCopied ? "Copied!" : "📋 Copy Link"}</button>
+          <button onClick={copyLink} style={{ background: linkCopied ? "rgba(22, 163, 74, 0.2)" : "rgba(255,255,255,0.15)", border: `1px solid ${linkCopied ? "rgba(22, 163, 74, 0.5)" : "rgba(255,255,255,0.3)"}`, borderRadius: 9, padding: "9px 16px", color: linkCopied ? "#16A34A" : "#FFFFFF", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{linkCopied ? "Copied!" : "📋 Copy Link"}</button>
 
           <button onClick={() => {
 
@@ -4079,7 +4079,7 @@ ${onboardingLink}`;
 
             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, "_blank");
 
-          }} style={{ background: "#25D366", border: "none", borderRadius: 9, padding: "9px 16px", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 6 }}>
+          }} style={{ background: "#16A34A", border: "none", borderRadius: 9, padding: "9px 16px", color: "#FFFFFF", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 6 }}>
 
             <span>💬</span> WhatsApp
 
@@ -4091,7 +4091,7 @@ ${onboardingLink}`;
 
 
       <div className="employees-page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 900, color: "#1A2332", margin: 0 }}>Employees</h1>
+        <h1 style={{ fontSize: 24, fontWeight: 900, color: "#1E293B", margin: 0 }}>Employees</h1>
         <button className="create-btn compact-action-btn" onClick={onAddEmployeeClick} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
           <i className="ti ti-plus"></i> New Employee
         </button>
@@ -4099,7 +4099,7 @@ ${onboardingLink}`;
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
 
-        <div style={{ background: "#fff", border: "1px solid var(--border)", borderRadius: 12, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
+        <div style={{ background: "#FFFFFF", border: "1px solid var(--border)", borderRadius: 12, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
 
           <div style={{ width: 46, height: 46, borderRadius: 11, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0, background: "rgba(var(--app-accent-rgb,0,188,212),0.08)", color: "var(--app-accent)" }}><i className="ti ti-users"></i></div>
 
@@ -4107,9 +4107,9 @@ ${onboardingLink}`;
 
         </div>
 
-        <div style={{ background: "#fff", border: "1px solid var(--border)", borderRadius: 12, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
+        <div style={{ background: "#FFFFFF", border: "1px solid var(--border)", borderRadius: 12, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
 
-          <div style={{ width: 46, height: 46, borderRadius: 11, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0, background: "#dcfce7", color: "#16a34a" }}><i className="ti ti-check"></i></div>
+          <div style={{ width: 46, height: 46, borderRadius: 11, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0, background: "#E2E8F0", color: "#16A34A" }}><i className="ti ti-check"></i></div>
 
           <div><div style={{ fontSize: 24, fontWeight: 900, color: "var(--text)", lineHeight: 1 }}>{activeCount}</div><div style={{ fontSize: 11, color: "var(--text-soft)", marginTop: 3, fontWeight: 600 }}>Active</div></div>
 
@@ -4117,9 +4117,9 @@ ${onboardingLink}`;
 
 
 
-        <div style={{ background: "#fff", border: "1px solid var(--border)", borderRadius: 12, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
+        <div style={{ background: "#FFFFFF", border: "1px solid var(--border)", borderRadius: 12, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
 
-          <div style={{ width: 46, height: 46, borderRadius: 11, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0, background: "#fee2e2", color: "#dc2626" }}><i className="ti ti-user-off"></i></div>
+          <div style={{ width: 46, height: 46, borderRadius: 11, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0, background: "#E2E8F0", color: "#64748B" }}><i className="ti ti-user-off"></i></div>
 
           <div><div style={{ fontSize: 24, fontWeight: 900, color: "var(--text)", lineHeight: 1 }}>{inactiveCount}</div><div style={{ fontSize: 11, color: "var(--text-soft)", marginTop: 3, fontWeight: 600 }}>Inactive</div></div>
 
@@ -4135,11 +4135,11 @@ ${onboardingLink}`;
 
           <i className="ti ti-search" style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "var(--text-soft)", fontSize: 16 }}></i>
 
-          <input type="text" placeholder="Search by name, email, role..." value={search} onChange={e => setSearch(e.target.value)} style={{ width: "100%", padding: "10px 12px 10px 38px", background: "#fff", border: "1.5px solid var(--border)", borderRadius: 8, fontFamily: "'Nunito',sans-serif", fontSize: 13, color: "var(--text)", outline: "none", transition: "border-color 0.2s" }} onFocus={e => e.target.style.borderColor = "var(--app-accent, #2563EB)"} onBlur={e => e.target.style.borderColor = "var(--border)"} />
+          <input type="text" placeholder="Search by name, email, role..." value={search} onChange={e => setSearch(e.target.value)} style={{ width: "100%", padding: "10px 12px 10px 38px", background: "#FFFFFF", border: "1.5px solid var(--border)", borderRadius: 8, fontFamily: "'Nunito',sans-serif", fontSize: 13, color: "var(--text)", outline: "none", transition: "border-color 0.2s" }} onFocus={e => e.target.style.borderColor = "var(--app-accent, #2563EB)"} onBlur={e => e.target.style.borderColor = "var(--border)"} />
 
         </div>
 
-        <select value={deptFilter} onChange={e => setDeptFilter(e.target.value)} style={{ padding: "10px 32px 10px 12px", background: "#fff", border: "1.5px solid var(--border)", borderRadius: 8, fontFamily: "'Nunito',sans-serif", fontSize: 13, color: "var(--text-mid)", outline: "none", cursor: "pointer", WebkitAppearance: "none", backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394a3b8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center" }}>
+        <select value={deptFilter} onChange={e => setDeptFilter(e.target.value)} style={{ padding: "10px 32px 10px 12px", background: "#FFFFFF", border: "1.5px solid var(--border)", borderRadius: 8, fontFamily: "'Nunito',sans-serif", fontSize: 13, color: "var(--text-mid)", outline: "none", cursor: "pointer", WebkitAppearance: "none", backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394a3b8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center" }}>
 
           <option>All Departments</option>
 
@@ -4147,7 +4147,7 @@ ${onboardingLink}`;
 
         </select>
 
-        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} style={{ padding: "10px 32px 10px 12px", background: "#fff", border: "1.5px solid var(--border)", borderRadius: 8, fontFamily: "'Nunito',sans-serif", fontSize: 13, color: "var(--text-mid)", outline: "none", cursor: "pointer", WebkitAppearance: "none", backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394a3b8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center" }}>
+        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} style={{ padding: "10px 32px 10px 12px", background: "#FFFFFF", border: "1.5px solid var(--border)", borderRadius: 8, fontFamily: "'Nunito',sans-serif", fontSize: 13, color: "var(--text-mid)", outline: "none", cursor: "pointer", WebkitAppearance: "none", backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394a3b8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center" }}>
 
           <option>All Status</option>
 
@@ -4166,9 +4166,9 @@ ${onboardingLink}`;
 
 
 
-      <div style={{ background: "#fff", border: "1.5px solid #E2E8F0", borderRadius: 14, overflow: "hidden", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+      <div style={{ background: "#FFFFFF", border: "1.5px solid #E2E8F0", borderRadius: 14, overflow: "hidden", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
         <div style={{ padding: "18px 20px 12px" }}>
-          <div style={{ fontSize: 14, fontWeight: 900, color: "#1A2332", marginBottom: 14 }}>All Employees ({filtered.length})</div>
+          <div style={{ fontSize: 14, fontWeight: 900, color: "#1E293B", marginBottom: 14 }}>All Employees ({filtered.length})</div>
         </div>
 
         <div style={{ overflowX: "auto" }}>
@@ -4197,17 +4197,17 @@ ${onboardingLink}`;
 
                   let badgeStyle = { display: "inline-flex", alignItems: "center", gap: 5, padding: "4px 11px", borderRadius: 20, fontSize: 11, fontWeight: 800 };
 
-                  if (st === "Active") { badgeStyle.background = "#dcfce7"; badgeStyle.color = "#16a34a"; }
+                  if (st === "Active") { badgeStyle.background = "#E2E8F0"; badgeStyle.color = "#16A34A"; }
 
-                  else if (st === "On Leave" || st === "Pending") { badgeStyle.background = "#fef3c7"; badgeStyle.color = "#d97706"; }
+                  else if (st === "On Leave" || st === "Pending") { badgeStyle.background = "#E2E8F0"; badgeStyle.color = "#64748B"; }
 
-                  else { badgeStyle.background = "#fee2e2"; badgeStyle.color = "#dc2626"; }
+                  else { badgeStyle.background = "#E2E8F0"; badgeStyle.color = "#64748B"; }
 
                   const dotStyle = { width: 5, height: 5, borderRadius: "50%", background: "currentColor" };
 
 
 
-                  const avColors = ["var(--app-accent, var(--app-accent, #2563EB))", "linear-gradient(135deg,#2563eb,#5b21b6)", "linear-gradient(135deg,#d97706,#b45309)", "linear-gradient(135deg,#16a34a,#15803d)", "linear-gradient(135deg,#dc2626,#991b1b)", "linear-gradient(135deg,#ec4899,#be185d)"];
+                  const avColors = ["var(--app-accent, var(--app-accent, #2563EB))", "linear-gradient(135deg,#2563EB,#64748B)", "linear-gradient(135deg,#64748B,#64748B)", "linear-gradient(135deg,#16A34A,#16A34A)", "linear-gradient(135deg,#64748B,#1E293B)", "linear-gradient(135deg,#64748B,#64748B)"];
 
                   const avBg = avColors[i % avColors.length];
 
@@ -4215,13 +4215,13 @@ ${onboardingLink}`;
 
                   return (
 
-                    <tr key={e._id || i} style={{ cursor: "pointer", borderBottom: "1px solid var(--border)", transition: "background 0.12s" }} onMouseEnter={ev => ev.currentTarget.style.background = "#f8fbff"} onMouseLeave={ev => ev.currentTarget.style.background = "transparent"} onClick={(ev) => { ev.stopPropagation(); setViewEmp(e); loadEmpDocs(e); }}>
+                    <tr key={e._id || i} style={{ cursor: "pointer", borderBottom: "1px solid var(--border)", transition: "background 0.12s" }} onMouseEnter={ev => ev.currentTarget.style.background = "#F8FAFC"} onMouseLeave={ev => ev.currentTarget.style.background = "transparent"} onClick={(ev) => { ev.stopPropagation(); setViewEmp(e); loadEmpDocs(e); }}>
 
                       <td style={{ padding: "13px 16px", verticalAlign: "middle" }}>
 
                         <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
 
-                          <div style={{ width: 38, height: 38, borderRadius: "50%", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 900, color: "#fff", background: avBg }}>{getInitials(e.name)}</div>
+                          <div style={{ width: 38, height: 38, borderRadius: "50%", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 900, color: "#FFFFFF", background: avBg }}>{getInitials(e.name)}</div>
 
                           <div>
 
@@ -4237,7 +4237,7 @@ ${onboardingLink}`;
 
                       <td style={{ padding: "13px 16px", verticalAlign: "middle" }}>
 
-                        <span style={{ background: "#f1f5f9", color: "var(--text-mid)", fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 6 }}>{e.role || "Employee"}</span>
+                        <span style={{ background: "#EFF6FF", color: "var(--text-mid)", fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 6 }}>{e.role || "Employee"}</span>
 
                       </td>
 
@@ -4266,12 +4266,12 @@ ${onboardingLink}`;
                               const empData = employees.find(emp => (emp._id || emp.id) === (e._id || e.id)) || e;
                               openEdit(empData);
                             }}
-                            style={{ width: 30, height: 30, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", border: "none", cursor: "pointer", fontSize: 15, transition: "all 0.15s", background: "#dbeafe", color: "#2563eb", position: "relative", zIndex: 5 }}
+                            style={{ width: 30, height: 30, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", border: "none", cursor: "pointer", fontSize: 15, transition: "all 0.15s", background: "#E2E8F0", color: "#2563EB", position: "relative", zIndex: 5 }}
                           >
                             <i className="ti ti-pencil" style={{ pointerEvents: "none" }}></i>
                           </button>
 
-                          <button onClick={(ev) => { ev.stopPropagation(); setDeleteTarget(e); }} style={{ width: 30, height: 30, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", border: "none", cursor: "pointer", fontSize: 15, transition: "all 0.15s", background: "#fee2e2", color: "#dc2626" }}><i className="ti ti-trash"></i></button>
+                          <button onClick={(ev) => { ev.stopPropagation(); setDeleteTarget(e); }} style={{ width: 30, height: 30, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", border: "none", cursor: "pointer", fontSize: 15, transition: "all 0.15s", background: "#E2E8F0", color: "#64748B" }}><i className="ti ti-trash"></i></button>
 
                         </div>
 
@@ -4343,34 +4343,34 @@ ${onboardingLink}`;
               <div style={{ marginBottom: 14 }}>
                 <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}> PASSWORD</label>
                 <div style={{ position: "relative" }}>
-                  <input type={showEditEmpPass ? "text" : "password"} value={editForm.password || ""} onChange={e => { setEditForm(p => ({ ...p, password: e.target.value })); setEditErr(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${editErr.password ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Leave blank to keep current password" />
+                  <input type={showEditEmpPass ? "text" : "password"} value={editForm.password || ""} onChange={e => { setEditForm(p => ({ ...p, password: e.target.value })); setEditErr(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${editErr.password ? "#64748B" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Leave blank to keep current password" />
                   <button type="button" onClick={() => setShowEditEmpPass(!showEditEmpPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showEditEmpPass ? "HIDE" : "SHOW"}</button>
                 </div>
-                {editErr.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {editErr.password}</div>}
+                {editErr.password && <div style={{ fontSize: 11, color: "#64748B", marginTop: 4 }}>Warning {editErr.password}</div>}
               </div>
               <div style={{ marginBottom: 14 }}>
                 <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>CONFIRM PASSWORD</label>
                 <div style={{ position: "relative" }}>
-                  <input type={showEditEmpConfirmPass ? "text" : "password"} value={editForm.confirmPassword || ""} onChange={e => { setEditForm(p => ({ ...p, confirmPassword: e.target.value })); setEditErr(p => ({ ...p, confirmPassword: "" })); }} style={{ width: "100%", border: `1.5px solid ${editErr.confirmPassword ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Re-enter new password" />
+                  <input type={showEditEmpConfirmPass ? "text" : "password"} value={editForm.confirmPassword || ""} onChange={e => { setEditForm(p => ({ ...p, confirmPassword: e.target.value })); setEditErr(p => ({ ...p, confirmPassword: "" })); }} style={{ width: "100%", border: `1.5px solid ${editErr.confirmPassword ? "#64748B" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Re-enter new password" />
                   <button type="button" onClick={() => setShowEditEmpConfirmPass(!showEditEmpConfirmPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showEditEmpConfirmPass ? "HIDE" : "SHOW"}</button>
                 </div>
-                {editErr.confirmPassword && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {editErr.confirmPassword}</div>}
+                {editErr.confirmPassword && <div style={{ fontSize: 11, color: "#64748B", marginTop: 4 }}>Warning {editErr.confirmPassword}</div>}
               </div>
             </div>
           </div>
 
           <div style={{ display: "flex", gap: 10, marginTop: 22, justifyContent: "flex-end" }}>
 
-            <button onClick={saveEdit} disabled={saving} style={{ background: "var(--app-accent-gradient)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer" }}>{saving ? "Saving…" : "Save Changes "}</button>
+            <button onClick={saveEdit} disabled={saving} style={{ background: "var(--app-accent-gradient)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#FFFFFF", cursor: saving ? "not-allowed" : "pointer" }}>{saving ? "Saving…" : "Save Changes "}</button>
           </div>
         </Mdl>
       )}
 
       {deleteTarget && (
 
-        <div style={{ position: "fixed", inset: 0, background: "rgba(15,28,46,0.45)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 200, backdropFilter: "blur(4px)" }}>
+        <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.45)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 200, backdropFilter: "blur(4px)" }}>
 
-          <div style={{ background: "#fff", borderRadius: 16, padding: "28px 32px", width: 400, boxShadow: "0 24px 80px rgba(0,0,0,0.18)", border: "1px solid var(--border)" }}>
+          <div style={{ background: "#FFFFFF", borderRadius: 16, padding: "28px 32px", width: 400, boxShadow: "0 24px 80px rgba(0,0,0,0.18)", border: "1px solid var(--border)" }}>
 
             <div style={{ fontSize: 17, fontWeight: 900, color: "var(--text)", marginBottom: 12 }}>Delete Employee</div>
 
@@ -4378,9 +4378,9 @@ ${onboardingLink}`;
 
             <div style={{ display: "flex", gap: 10, marginTop: 22, justifyContent: "flex-end" }}>
 
-              <button onClick={() => setDeleteTarget(null)} style={{ background: "#f1f5f9", color: "var(--text-mid)", border: "none", padding: "9px 18px", borderRadius: 8, fontFamily: "'Nunito',sans-serif", fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => setDeleteTarget(null)} style={{ background: "#EFF6FF", color: "var(--text-mid)", border: "none", padding: "9px 18px", borderRadius: 8, fontFamily: "'Nunito',sans-serif", fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Cancel</button>
 
-              <button onClick={doDelete} style={{ background: "#dc2626", color: "#fff", border: "none", padding: "9px 18px", borderRadius: 8, fontFamily: "'Nunito',sans-serif", fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Delete</button>
+              <button onClick={doDelete} style={{ background: "#64748B", color: "#FFFFFF", border: "none", padding: "9px 18px", borderRadius: 8, fontFamily: "'Nunito',sans-serif", fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Delete</button>
 
             </div>
 
@@ -4506,16 +4506,16 @@ function ManagersPage({ managers, setManagers }) {
 
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
 
-      {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
+      {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#FFFFFF", border: "1.5px solid #16A34A", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#16A34A", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
 
 
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>
 
-        {[{ t: "Total Managers", v: managers.length, i: "🧑‍💼", c: "#f59e0b" }, { t: "Active", v: managers.filter(m => m.status === "Active").length, i: "Yes", c: "#22C55E" }, { t: "Inactive", v: managers.filter(m => m.status === "Inactive").length, i: "⛔", c: "#EF4444" }].map(({ t, v, i, c }) => (
-          <div key={t} style={{ background: "#fff", border: "1.5px solid #E2E8F0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+        {[{ t: "Total Managers", v: managers.length, i: "🧑‍💼", c: "#64748B" }, { t: "Active", v: managers.filter(m => m.status === "Active").length, i: "Yes", c: "#16A34A" }, { t: "Inactive", v: managers.filter(m => m.status === "Inactive").length, i: "⛔", c: "#64748B" }].map(({ t, v, i, c }) => (
+          <div key={t} style={{ background: "#FFFFFF", border: "1.5px solid #E2E8F0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
             <div style={{ width: 40, height: 40, borderRadius: 10, background: `${c}15`, color: c, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>{i}</div>
-            <div><div style={{ fontSize: 24, fontWeight: 800, color: "#1A2332" }}>{v}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#64748B" }}>{t}</div></div>
+            <div><div style={{ fontSize: 24, fontWeight: 800, color: "#1E293B" }}>{v}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#64748B" }}>{t}</div></div>
           </div>
         ))}
 
@@ -4547,7 +4547,7 @@ function ManagersPage({ managers, setManagers }) {
 
                 : paginated.map((m, i) => (
 
-                  <tr key={m._id || i} style={{ borderBottom: "1px solid #f3f0ff" }} onMouseEnter={ev => ev.currentTarget.style.background = "var(--app-bg)"} onMouseLeave={ev => ev.currentTarget.style.background = "transparent"}>
+                  <tr key={m._id || i} style={{ borderBottom: "1px solid #EFF6FF" }} onMouseEnter={ev => ev.currentTarget.style.background = "var(--app-bg)"} onMouseLeave={ev => ev.currentTarget.style.background = "transparent"}>
 
                     <td style={{ padding: "12px 14px", color: "var(--app-muted)", fontSize: 11, fontFamily: "monospace" }}>{`MGR${String((currentPage - 1) * itemsPerPage + i + 1).padStart(3, "0")}`}</td>
 
@@ -4555,7 +4555,7 @@ function ManagersPage({ managers, setManagers }) {
 
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
 
-                        <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#f59e0b,#fbbf24)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{(m.managerName || "?")[0].toUpperCase()}</div>
+                        <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#64748B,#64748B)", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{(m.managerName || "?")[0].toUpperCase()}</div>
 
                         <span style={{ fontWeight: 700, color: T.text }}>{m.managerName || "—"}</span>
 
@@ -4563,13 +4563,13 @@ function ManagersPage({ managers, setManagers }) {
 
                     </td>
 
-                    <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{m.email || "—"}</td>
+                    <td style={{ padding: "12px 14px", color: "#64748B", fontSize: 12 }}>{m.email || "—"}</td>
 
-                    <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{m.phone || "—"}</td>
+                    <td style={{ padding: "12px 14px", color: "#64748B", fontSize: 12 }}>{m.phone || "—"}</td>
 
-                    <td style={{ padding: "12px 14px", color: "#f59e0b", fontSize: 12, fontWeight: 600 }}>{m.role || "Manager"}</td>
+                    <td style={{ padding: "12px 14px", color: "#64748B", fontSize: 12, fontWeight: 600 }}>{m.role || "Manager"}</td>
 
-                    <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{m.department || "—"}</td>
+                    <td style={{ padding: "12px 14px", color: "#64748B", fontSize: 12 }}>{m.department || "—"}</td>
 
                     <td style={{ padding: "12px 14px" }}><Badge label={m.status || "Active"} /></td>
 
@@ -4601,15 +4601,15 @@ function ManagersPage({ managers, setManagers }) {
 
         <Mdl title="Manager Profile" onClose={() => setViewMgr(null)} maxWidth={500}>
 
-          <div style={{ display: "flex", alignItems: "center", gap: 14, padding: 16, background: "linear-gradient(135deg,#fffbeb,#fef3c7)", borderRadius: 14, border: "1px solid #fde68a", marginBottom: 18 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 14, padding: 16, background: "linear-gradient(135deg,#F8FAFC,#E2E8F0)", borderRadius: 14, border: "1px solid #E2E8F0", marginBottom: 18 }}>
 
-            <div style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,#f59e0b,#fbbf24)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 20, fontWeight: 800, flexShrink: 0 }}>{(m => m[0].toUpperCase())(viewMgr.managerName || "M")}</div>
+            <div style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,#64748B,#64748B)", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 20, fontWeight: 800, flexShrink: 0 }}>{(m => m[0].toUpperCase())(viewMgr.managerName || "M")}</div>
 
             <div>
 
               <div style={{ fontSize: 17, fontWeight: 800, color: T.text }}>{viewMgr.managerName}</div>
 
-              <div style={{ fontSize: 13, color: "#f59e0b", marginTop: 2 }}>{viewMgr.role || "Manager"}</div>
+              <div style={{ fontSize: 13, color: "#64748B", marginTop: 2 }}>{viewMgr.role || "Manager"}</div>
 
             </div>
 
@@ -4631,9 +4631,9 @@ function ManagersPage({ managers, setManagers }) {
 
           <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
 
-            <button onClick={() => { setViewMgr(null); openEdit(viewMgr); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#f59e0b,#fbbf24)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Edit</button>
+            <button onClick={() => { setViewMgr(null); openEdit(viewMgr); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#64748B,#64748B)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#FFFFFF", cursor: "pointer", fontFamily: "inherit" }}>Edit</button>
 
-            <button onClick={() => { setViewMgr(null); setDeleteTarget(viewMgr); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#EF4444,#dc2626)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}> Delete</button>
+            <button onClick={() => { setViewMgr(null); setDeleteTarget(viewMgr); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#64748B,#64748B)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#FFFFFF", cursor: "pointer", fontFamily: "inherit" }}> Delete</button>
 
           </div>
 
@@ -4669,7 +4669,7 @@ function ManagersPage({ managers, setManagers }) {
 
             <button onClick={() => setEditMgr(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>Cancel</button>
 
-            <button onClick={saveEdit} disabled={saving} style={{ background: "linear-gradient(135deg,#f59e0b,#fbbf24)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: saving ? 0.7 : 1 }}>{saving ? "Saving…" : "Save Changes "}</button>
+            <button onClick={saveEdit} disabled={saving} style={{ background: "linear-gradient(135deg,#64748B,#64748B)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#FFFFFF", cursor: saving ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: saving ? 0.7 : 1 }}>{saving ? "Saving…" : "Save Changes "}</button>
 
           </div>
 
@@ -4893,15 +4893,15 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
 
-      {toastMsg && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toastMsg}</div>}
+      {toastMsg && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#FFFFFF", border: "1.5px solid #16A34A", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#16A34A", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toastMsg}</div>}
 
 
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>
 
-        {[{ t: "Total Subadmins", v: subadmins.length, i: "🛡️", c: "#3b82f6" }, { t: "Active", v: subadmins.filter(s => (s.status || "Active") === "Active").length, i: "Yes", c: "#22C55E" }, { t: "Inactive", v: subadmins.filter(s => s.status === "Inactive").length, i: "⛔", c: "#EF4444" }].map(({ t, v, i, c }) => (
+        {[{ t: "Total Subadmins", v: subadmins.length, i: "🛡️", c: "#2563EB" }, { t: "Active", v: subadmins.filter(s => (s.status || "Active") === "Active").length, i: "Yes", c: "#16A34A" }, { t: "Inactive", v: subadmins.filter(s => s.status === "Inactive").length, i: "⛔", c: "#64748B" }].map(({ t, v, i, c }) => (
 
-          <div key={t} style={{ background: "#fff", borderRadius: 14, padding: "18px 20px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", display: "flex", alignItems: "center", gap: 12 }}>
+          <div key={t} style={{ background: "#FFFFFF", borderRadius: 14, padding: "18px 20px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", display: "flex", alignItems: "center", gap: 12 }}>
 
             <div style={{ width: 40, height: 40, borderRadius: 11, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{i}</div>
 
@@ -4939,7 +4939,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 
                 : filtered.map((s, i) => (
 
-                  <tr key={s._id || i} style={{ borderBottom: "1px solid #f3f0ff" }} onMouseEnter={ev => ev.currentTarget.style.background = "var(--app-bg)"} onMouseLeave={ev => ev.currentTarget.style.background = "transparent"}>
+                  <tr key={s._id || i} style={{ borderBottom: "1px solid #EFF6FF" }} onMouseEnter={ev => ev.currentTarget.style.background = "var(--app-bg)"} onMouseLeave={ev => ev.currentTarget.style.background = "transparent"}>
 
                     <td style={{ padding: "12px 14px", color: "var(--app-muted)", fontSize: 11, fontFamily: "monospace" }}>{`SUB${String(i + 1).padStart(3, "0")}`}</td>
 
@@ -4947,7 +4947,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
 
-                        <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#3b82f6,#60a5fa)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{(s.name || "?")[0].toUpperCase()}</div>
+                        <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#2563EB,#2563EB)", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{(s.name || "?")[0].toUpperCase()}</div>
 
                         <span style={{ fontWeight: 700, color: T.text }}>{s.name || "—"}</span>
 
@@ -4957,11 +4957,11 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 
                     <td style={{ padding: "12px 14px", color: "var(--app-muted)", fontSize: 12, fontWeight: 600 }}>{s.companyName || s.company || "—"}</td>
 
-                    <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{s.email || "—"}</td>
+                    <td style={{ padding: "12px 14px", color: "#64748B", fontSize: 12 }}>{s.email || "—"}</td>
 
-                    <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{s.phone || "—"}</td>
+                    <td style={{ padding: "12px 14px", color: "#64748B", fontSize: 12 }}>{s.phone || "—"}</td>
 
-                    <td style={{ padding: "12px 14px", color: "#3b82f6", fontSize: 12, fontWeight: 600 }}>Subadmin</td>
+                    <td style={{ padding: "12px 14px", color: "#2563EB", fontSize: 12, fontWeight: 600 }}>Subadmin</td>
 
                     <td style={{ padding: "12px 14px" }}><Badge label={s.status || "Active"} /></td>
 
@@ -4997,15 +4997,15 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 
             {/* Header Section */}
 
-            <div style={{ display: "flex", alignItems: "center", gap: 14, padding: 16, background: "linear-gradient(135deg,#eff6ff,#dbeafe)", borderRadius: 14, border: "1px solid #bfdbfe", marginBottom: 18 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 14, padding: 16, background: "linear-gradient(135deg,#EFF6FF,#E2E8F0)", borderRadius: 14, border: "1px solid #E2E8F0", marginBottom: 18 }}>
 
-              <div style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,#3b82f6,#60a5fa)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 20, fontWeight: 800, flexShrink: 0 }}>{(s => s[0].toUpperCase())(viewSub.name || "S")}</div>
+              <div style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,#2563EB,#2563EB)", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 20, fontWeight: 800, flexShrink: 0 }}>{(s => s[0].toUpperCase())(viewSub.name || "S")}</div>
 
               <div>
 
                 <div style={{ fontSize: 17, fontWeight: 800, color: T.text }}>{viewSub.name}</div>
 
-                <div style={{ fontSize: 13, color: "#3b82f6", marginTop: 2 }}>{viewSub.companyName || viewSub.company || "Subadmin"}</div>
+                <div style={{ fontSize: 13, color: "#2563EB", marginTop: 2 }}>{viewSub.companyName || viewSub.company || "Subadmin"}</div>
 
               </div>
 
@@ -5031,7 +5031,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 
               <InfoRow icon="📅" label="Joined" value={viewSub.createdAt ? new Date(viewSub.createdAt).toLocaleDateString() : "—"} />
 
-              <div style={{ gridColumn: "span 2", height: 1, background: "#bfdbfe", margin: "10px 0" }} />
+              <div style={{ gridColumn: "span 2", height: 1, background: "#E2E8F0", margin: "10px 0" }} />
 
               <InfoRow icon="🏢" label="Client Limit" value={viewSub.clientLimit || "Not set (Default 10)"} />
 
@@ -5047,15 +5047,15 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12, marginBottom: 20 }}>
 
-              <div style={{ background: "#f0f9ff", borderRadius: 12, padding: 14, border: "1px solid #bae6fd", textAlign: "center" }}>
+              <div style={{ background: "#EFF6FF", borderRadius: 12, padding: 14, border: "1px solid #E2E8F0", textAlign: "center" }}>
 
                 <div style={{ fontSize: 11, color: "var(--app-accent)", fontWeight: 700, marginBottom: 4 }}>QUOTATIONS</div>
 
-                <div style={{ fontSize: 22, fontWeight: 800, color: "#0ea5e9" }}>{relatedQuotations.length}</div>
+                <div style={{ fontSize: 22, fontWeight: 800, color: "#2563EB" }}>{relatedQuotations.length}</div>
 
               </div>
 
-              <div style={{ background: "var(--app-bg)", borderRadius: 12, padding: 14, border: "1px solid #e2e8f0", textAlign: "center" }}>
+              <div style={{ background: "var(--app-bg)", borderRadius: 12, padding: 14, border: "1px solid #E2E8F0", textAlign: "center" }}>
 
                 <div style={{ fontSize: 11, color: "var(--app-muted)", fontWeight: 700, marginBottom: 4 }}>EMPLOYEES</div>
 
@@ -5063,11 +5063,11 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 
               </div>
 
-              <div style={{ background: "#fff7ed", borderRadius: 12, padding: 14, border: "1px solid #fed7aa", textAlign: "center" }}>
+              <div style={{ background: "#F8FAFC", borderRadius: 12, padding: 14, border: "1px solid #E2E8F0", textAlign: "center" }}>
 
-                <div style={{ fontSize: 11, color: "#c2410c", fontWeight: 700, marginBottom: 4 }}>MANAGERS</div>
+                <div style={{ fontSize: 11, color: "#64748B", fontWeight: 700, marginBottom: 4 }}>MANAGERS</div>
 
-                <div style={{ fontSize: 22, fontWeight: 800, color: "#f59e0b" }}>{relatedManagers.length}</div>
+                <div style={{ fontSize: 22, fontWeight: 800, color: "#64748B" }}>{relatedManagers.length}</div>
 
               </div>
 
@@ -5087,21 +5087,21 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 
                 </h4>
 
-                <div style={{ maxHeight: 150, overflowY: "auto", border: "1px solid #e0f2fe", borderRadius: 10, background: "#f0f9ff" }}>
+                <div style={{ maxHeight: 150, overflowY: "auto", border: "1px solid #EFF6FF", borderRadius: 10, background: "#EFF6FF" }}>
 
                   {relatedQuotations.map((q, idx) => (
 
-                    <div key={idx} style={{ padding: "10px 14px", borderBottom: "1px solid #e0f2fe", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div key={idx} style={{ padding: "10px 14px", borderBottom: "1px solid #EFF6FF", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
 
                       <div>
 
                         <div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{q.quotationNumber || q.quoteNumber || `Quote #${idx + 1}`}</div>
 
-                        <div style={{ fontSize: 11, color: "#64748b" }}>{q.client || q.clientName || "—"}</div>
+                        <div style={{ fontSize: 11, color: "#64748B" }}>{q.client || q.clientName || "—"}</div>
 
                       </div>
 
-                      <div style={{ fontSize: 12, fontWeight: 700, color: "#0ea5e9" }}>{q.amount || q.total || "—"}</div>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: "#2563EB" }}>{q.amount || q.total || "—"}</div>
 
                     </div>
 
@@ -5135,13 +5135,13 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
 
-                        <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-muted),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700 }}>{(e.name || "?")[0].toUpperCase()}</div>
+                        <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-muted),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 11, fontWeight: 700 }}>{(e.name || "?")[0].toUpperCase()}</div>
 
                         <div>
 
                           <div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{e.name}</div>
 
-                          <div style={{ fontSize: 11, color: "#64748b" }}>{e.role || e.department || "—"}</div>
+                          <div style={{ fontSize: 11, color: "#64748B" }}>{e.role || e.department || "—"}</div>
 
                         </div>
 
@@ -5173,21 +5173,21 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 
                 </h4>
 
-                <div style={{ maxHeight: 150, overflowY: "auto", border: "1px solid #fed7aa", borderRadius: 10, background: "#fff7ed" }}>
+                <div style={{ maxHeight: 150, overflowY: "auto", border: "1px solid #E2E8F0", borderRadius: 10, background: "#F8FAFC" }}>
 
                   {relatedManagers.map((m, idx) => (
 
-                    <div key={idx} style={{ padding: "10px 14px", borderBottom: "1px solid #fed7aa", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div key={idx} style={{ padding: "10px 14px", borderBottom: "1px solid #E2E8F0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
 
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
 
-                        <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#f59e0b,#fbbf24)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700 }}>{(m.managerName || m.name || "?")[0].toUpperCase()}</div>
+                        <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#64748B,#64748B)", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 11, fontWeight: 700 }}>{(m.managerName || m.name || "?")[0].toUpperCase()}</div>
 
                         <div>
 
                           <div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{m.managerName || m.name}</div>
 
-                          <div style={{ fontSize: 11, color: "#64748b" }}>{m.department || "—"}</div>
+                          <div style={{ fontSize: 11, color: "#64748B" }}>{m.department || "—"}</div>
 
                         </div>
 
@@ -5209,9 +5209,9 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 
             <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
 
-              <button onClick={() => { setViewSub(null); openEdit(viewSub); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#3b82f6,#60a5fa)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Edit</button>
+              <button onClick={() => { setViewSub(null); openEdit(viewSub); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#2563EB,#2563EB)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#FFFFFF", cursor: "pointer", fontFamily: "inherit" }}>Edit</button>
 
-              <button onClick={() => { setViewSub(null); setDeleteTarget(viewSub); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#EF4444,#dc2626)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}> Delete </button>
+              <button onClick={() => { setViewSub(null); setDeleteTarget(viewSub); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#64748B,#64748B)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#FFFFFF", cursor: "pointer", fontFamily: "inherit" }}> Delete </button>
 
             </div>
 
@@ -5247,7 +5247,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 
             <button onClick={() => setEditSub(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>Cancel</button>
 
-            <button onClick={saveEdit} disabled={saving} style={{ background: "linear-gradient(135deg,#3b82f6,#60a5fa)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: saving ? 0.7 : 1 }}>{saving ? "Saving…" : "Save Changes "}</button>
+            <button onClick={saveEdit} disabled={saving} style={{ background: "linear-gradient(135deg,#2563EB,#2563EB)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#FFFFFF", cursor: saving ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: saving ? 0.7 : 1 }}>{saving ? "Saving…" : "Save Changes "}</button>
 
           </div>
 
@@ -5451,10 +5451,10 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
     const initials = (name) => (name || "?").trim().split(/\s+/).slice(0, 2).map(w => w[0]).join("").toUpperCase();
     const badgeCfg = (status) => {
       const ok = (status || "Active").toLowerCase() === "active";
-      return ok ? { bg: "#dcfce7", fg: "#16a34a" } : { bg: "#fef2f2", fg: "#dc2626" };
+      return ok ? { bg: "#E2E8F0", fg: "#16A34A" } : { bg: "#F8FAFC", fg: "#64748B" };
     };
 return (
-      <div style={{ padding: "16px 14px", background: "#F5F8FA", minHeight: "100%", boxSizing: "border-box", maxWidth: "100%", overflowX: "hidden" }}>
+      <div style={{ padding: "16px 14px", background: "#F8FAFC", minHeight: "100%", boxSizing: "border-box", maxWidth: "100%", overflowX: "hidden" }}>
    {/* Back to Dashboard — top-left, fixed position for every page */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, padding: "4px 4px 16px" }}>
         <div
@@ -5464,23 +5464,23 @@ return (
           <i className="ti ti-arrow-left" style={{ fontSize: 16 }}></i> Back to Dashboard
         </div>
         {onCreateProject && (
-          <button onClick={onCreateProject} style={{ display: "flex", alignItems: "center", gap: 4, background: "var(--app-accent, #2563EB)", color: "#fff", border: "none", borderRadius: 20, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", boxShadow: "0 3px 10px rgba(37, 99, 235,0.35)", whiteSpace: "nowrap" }}>
+          <button onClick={onCreateProject} style={{ display: "flex", alignItems: "center", gap: 4, background: "var(--app-accent, #2563EB)", color: "#FFFFFF", border: "none", borderRadius: 20, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", boxShadow: "0 3px 10px rgba(37, 99, 235, 0.35)", whiteSpace: "nowrap" }}>
             <i className="ti ti-plus" style={{ fontSize: 13 }}></i> New Project
           </button>
         )}
       </div>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #2563EB), #0891b2)", borderRadius: 16, padding: "16px 18px", marginBottom: 16, boxShadow: "0 6px 18px rgba(37, 99, 235,0.25)" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #2563EB), #2563EB)", borderRadius: 16, padding: "16px 18px", marginBottom: 16, boxShadow: "0 6px 18px rgba(37, 99, 235, 0.25)" }}>
           <div>
             <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.8)", letterSpacing: 0.5, textTransform: "uppercase" }}>Total Projects</div>
-            <div style={{ fontSize: 26, fontWeight: 800, color: "#fff" }}>{plist.length}</div>
+            <div style={{ fontSize: 26, fontWeight: 800, color: "#FFFFFF" }}>{plist.length}</div>
           </div>
           <div style={{ width: 46, height: 46, borderRadius: 13, background: "rgba(255,255,255,0.18)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <i className="ti ti-folder" style={{ fontSize: 22, color: "#fff" }} />
+            <i className="ti ti-folder" style={{ fontSize: 22, color: "#FFFFFF" }} />
           </div>
         </div>
 
         {plist.length === 0 ? (
-          <div style={{ padding: "40px 16px", textAlign: "center", color: "#64748B", fontSize: 13, fontWeight: 600, background: "#fff", borderRadius: 16, boxShadow: "0 2px 10px rgba(15,28,46,0.05)" }}>
+          <div style={{ padding: "40px 16px", textAlign: "center", color: "#64748B", fontSize: 13, fontWeight: 600, background: "#FFFFFF", borderRadius: 16, boxShadow: "0 2px 10px rgba(15, 23, 42, 0.05)" }}>
             No projects found.
           </div>
         ) : (
@@ -5492,10 +5492,10 @@ return (
                   key={p._id || p.id || i}
                   onClick={() => onViewProject && onViewProject(p)}
                   style={{
-                    background: "#fff",
+                    background: "#FFFFFF",
                     borderRadius: 16,
                     padding: "16px",
-                    boxShadow: "0 3px 14px rgba(15,28,46,0.07)",
+                    boxShadow: "0 3px 14px rgba(15, 23, 42, 0.07)",
                     cursor: "pointer",
                     boxSizing: "border-box",
                     borderLeft: `4px solid ${bc.fg}`
@@ -5505,14 +5505,14 @@ return (
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                       <div style={{
                         width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
-                        background: "linear-gradient(135deg, var(--app-accent, #2563EB), #0891b2)", color: "#fff",
+                        background: "linear-gradient(135deg, var(--app-accent, #2563EB), #2563EB)", color: "#FFFFFF",
                         display: "flex", alignItems: "center", justifyContent: "center",
                         fontSize: 14, fontWeight: 800
                       }}>
                         {initials(p.name)}
                       </div>
                       <div>
-                        <div style={{ fontWeight: 800, color: "#0f172a", fontSize: 14.5 }}>{p.name || "—"}</div>
+                        <div style={{ fontWeight: 800, color: "#0F172A", fontSize: 14.5 }}>{p.name || "—"}</div>
 
                       </div>
                     </div>
@@ -5614,9 +5614,9 @@ return (
 
         <Mdl title="Project Details" onClose={() => setViewProj(null)} maxWidth={620}>
 
-          <div style={{ background: "#fff", borderRadius: 16 }}>
+          <div style={{ background: "#FFFFFF", borderRadius: 16 }}>
 
-            <div style={{ background: "#f8f7ff", padding: "20px 24px", borderRadius: 16, marginBottom: 18, border: "1px solid #f3efff" }}>
+            <div style={{ background: "#F8FAFC", padding: "20px 24px", borderRadius: 16, marginBottom: 18, border: "1px solid #EFF6FF" }}>
 
               <h2 style={{ margin: 0, fontSize: 24, fontWeight: 800, color: "var(--app-sidebar)", marginBottom: 8 }}>{viewProj.name}</h2>
 
@@ -5694,9 +5694,9 @@ return (
 
                   return assignedEmployees.length > 0 ? assignedEmployees.map((emp, idx) => (
 
-                    <div key={idx} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: "#f8f7ff", borderRadius: 12, border: "1px solid #f3efff" }}>
+                    <div key={idx} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: "#F8FAFC", borderRadius: 12, border: "1px solid #EFF6FF" }}>
 
-                      <div style={{ width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 13, fontWeight: 700 }}>{emp[0].toUpperCase()}</div>
+                      <div style={{ width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 13, fontWeight: 700 }}>{emp[0].toUpperCase()}</div>
 
                       <span style={{ fontSize: 13, fontWeight: 700, color: "var(--app-sidebar)" }}>{emp}</span>
 
@@ -5740,11 +5740,11 @@ return (
 
             <div style={{ display: "flex", gap: 10 }}>
 
-              <button onClick={(e) => { e.stopPropagation(); setViewProj(null); openEdit(viewProj); }} style={{ flex: 1, padding: "11px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 12, color: "#fff", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13 }}>Edit</button>
+              <button onClick={(e) => { e.stopPropagation(); setViewProj(null); openEdit(viewProj); }} style={{ flex: 1, padding: "11px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 12, color: "#FFFFFF", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13 }}>Edit</button>
 
-              <button onClick={(e) => { e.stopPropagation(); setViewProj(null); setAssignModal(viewProj); setAssignTo(Array.isArray(viewProj.assignedTo) ? viewProj.assignedTo : (viewProj.assignedTo ? [viewProj.assignedTo] : [])); }} style={{ flex: 1, padding: "11px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 12, color: "#fff", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13 }}>👤 Assign</button>
+              <button onClick={(e) => { e.stopPropagation(); setViewProj(null); setAssignModal(viewProj); setAssignTo(Array.isArray(viewProj.assignedTo) ? viewProj.assignedTo : (viewProj.assignedTo ? [viewProj.assignedTo] : [])); }} style={{ flex: 1, padding: "11px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 12, color: "#FFFFFF", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13 }}>👤 Assign</button>
 
-              <button onClick={(e) => { e.stopPropagation(); setViewProj(null); setDeleteTarget(viewProj); }} style={{ flex: 1, padding: "11px", background: "linear-gradient(135deg,#ef4444,#dc2626)", border: "none", borderRadius: 12, color: "#fff", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13 }}> Delete</button>
+              <button onClick={(e) => { e.stopPropagation(); setViewProj(null); setDeleteTarget(viewProj); }} style={{ flex: 1, padding: "11px", background: "linear-gradient(135deg,#64748B,#64748B)", border: "none", borderRadius: 12, color: "#FFFFFF", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13 }}> Delete</button>
 
             </div>
 
@@ -5802,7 +5802,7 @@ return (
 
                       <span>{emp.name}</span>
 
-                      {emp.department && <span style={{ fontSize: 11, color: "#a78bba", background: "var(--app-border)", padding: "2px 6px", borderRadius: 4 }}>{emp.department}</span>}
+                      {emp.department && <span style={{ fontSize: 11, color: "#64748B", background: "var(--app-border)", padding: "2px 6px", borderRadius: 4 }}>{emp.department}</span>}
 
                     </label>
 
@@ -5822,9 +5822,9 @@ return (
 
                   {assignTo.map(name => (
 
-                    <div key={name} style={{ display: "flex", alignItems: "center", gap: 6, background: "var(--app-border)", border: "1px solid #e2e8f0", borderRadius: 8, padding: "4px 10px" }}>
+                    <div key={name} style={{ display: "flex", alignItems: "center", gap: 6, background: "var(--app-border)", border: "1px solid #E2E8F0", borderRadius: 8, padding: "4px 10px" }}>
 
-                      <div style={{ width: 18, height: 18, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 8, fontWeight: 700 }}>{name ? name[0].toUpperCase() : "?"}</div>
+                      <div style={{ width: 18, height: 18, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 8, fontWeight: 700 }}>{name ? name[0].toUpperCase() : "?"}</div>
 
                       <span style={{ fontSize: 12, fontWeight: 600, color: "var(--app-muted)" }}>{name}</span>
 
@@ -5832,7 +5832,7 @@ return (
 
                         onClick={(e) => { e.stopPropagation(); setAssignTo(assignTo.filter(n => n !== name)); }}
 
-                        style={{ background: "none", border: "none", cursor: "pointer", color: "#ef4444", fontSize: 14, padding: "0 2px", fontWeight: 700 }}
+                        style={{ background: "none", border: "none", cursor: "pointer", color: "#64748B", fontSize: 14, padding: "0 2px", fontWeight: 700 }}
 
                       >
 
@@ -5856,7 +5856,7 @@ return (
 
             <button onClick={() => setAssignModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>Cancel</button>
 
-            <button onClick={doAssign} style={{ background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", color: "#fff", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Save Assignment </button>
+            <button onClick={doAssign} style={{ background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", color: "#FFFFFF", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Save Assignment </button>
 
           </div>
 
@@ -5896,7 +5896,7 @@ function SearchDropdown({ label, items, displayKey, value, onChange, error, plac
 
       <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>{label.toUpperCase()}</label>
 
-      <div onClick={() => setOpen(!open)} style={{ width: "100%", border: `1.5px solid ${error ? "#EF4444" : open ? "var(--app-accent)" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 36px 10px 14px", fontSize: 13, color: value ? T.text : "var(--app-muted)", background: "var(--app-bg)", cursor: "pointer", position: "relative", userSelect: "none", minHeight: 42, boxSizing: "border-box" }}>
+      <div onClick={() => setOpen(!open)} style={{ width: "100%", border: `1.5px solid ${error ? "#64748B" : open ? "var(--app-accent)" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 36px 10px 14px", fontSize: 13, color: value ? T.text : "var(--app-muted)", background: "var(--app-bg)", cursor: "pointer", position: "relative", userSelect: "none", minHeight: 42, boxSizing: "border-box" }}>
 
         {value || placeholder || "-- Select --"}
 
@@ -5906,13 +5906,13 @@ function SearchDropdown({ label, items, displayKey, value, onChange, error, plac
 
       {open && (
 
-        <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "#fff", border: "1.5px solid var(--app-border)", borderRadius: 12, boxShadow: "0 8px 32px rgba(var(--app-accent-rgb, 124, 58, 237),0.15)", zIndex: 999, overflow: "hidden" }}>
+        <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "#FFFFFF", border: "1.5px solid var(--app-border)", borderRadius: 12, boxShadow: "0 8px 32px rgba(var(--app-accent-rgb, 124, 58, 237),0.15)", zIndex: 999, overflow: "hidden" }}>
 
           <div style={{ maxHeight: 180, overflowY: "auto" }}>
 
             {filtered.length === 0 ? <div style={{ padding: 14, textAlign: "center", color: "var(--app-muted)", fontSize: 13 }}>No results</div>
 
-              : filtered.map((item, i) => { const name = item[displayKey] || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "var(--app-border)" : "transparent", borderBottom: "1px solid var(--app-bg)" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "var(--app-border)" : "transparent"}><div style={{ width: 26, height: 26, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{name[0]?.toUpperCase() || "?"}</div><span style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</span>{isSel && <span style={{ marginLeft: "auto", color: "var(--app-accent)" }}>✓</span>}</div>); })}
+              : filtered.map((item, i) => { const name = item[displayKey] || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "var(--app-border)" : "transparent", borderBottom: "1px solid var(--app-bg)" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "var(--app-border)" : "transparent"}><div style={{ width: 26, height: 26, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{name[0]?.toUpperCase() || "?"}</div><span style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</span>{isSel && <span style={{ marginLeft: "auto", color: "var(--app-accent)" }}>✓</span>}</div>); })}
 
           </div>
 
@@ -5922,7 +5922,7 @@ function SearchDropdown({ label, items, displayKey, value, onChange, error, plac
 
       {open && <div style={{ position: "fixed", inset: 0, zIndex: 998 }} onClick={() => { setOpen(false); setSearch(""); }} />}
 
-      {error && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {error}</div>}
+      {error && <div style={{ fontSize: 11, color: "#64748B", marginTop: 4 }}>Warning {error}</div>}
 
     </div>
 
@@ -5982,7 +5982,7 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
 
 
 
-  const tsStats = [{ t: "Total", v: trackList.length, i: "📁", c: "var(--app-accent)" }, { t: "In Progress", v: trackList.filter(p => p.status === "In Progress").length, i: "⚡", c: "var(--app-muted)" }, { t: "Completed", v: trackList.filter(p => p.status === "Completed").length, i: "Yes", c: "#22C55E" }, { t: "Pending", v: trackList.filter(p => p.status === "Pending").length, i: "🕚", c: "#F59E0B" }, { t: "On Hold", v: trackList.filter(p => p.status === "On Hold").length, i: "⏸️", c: "var(--app-accent)" }];
+  const tsStats = [{ t: "Total", v: trackList.length, i: "📁", c: "var(--app-accent)" }, { t: "In Progress", v: trackList.filter(p => p.status === "In Progress").length, i: "⚡", c: "var(--app-muted)" }, { t: "Completed", v: trackList.filter(p => p.status === "Completed").length, i: "Yes", c: "#16A34A" }, { t: "Pending", v: trackList.filter(p => p.status === "Pending").length, i: "🕚", c: "#64748B" }, { t: "On Hold", v: trackList.filter(p => p.status === "On Hold").length, i: "⏸️", c: "var(--app-accent)" }];
 
   const openAdd = () => { setTsForm(EMPTY); setTsErr({}); setTsEditId(null); setTsModal("add"); };
 
@@ -5992,17 +5992,17 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
 
   const deleteTs = async (id) => { if (!window.confirm("Delete?")) return; try { await axios.delete(`${BASE_URL}/api/project-status/${id}`); } catch { } setTrackList(prev => prev.filter(p => (p._id || p.id) !== id)); showToast(" Delete Deleted!"); };
 
-  const B2 = (color) => ({ background: "var(--app-accent-gradient)", color: "#ffffff", border: "none", borderRadius: 12, padding: "12px 22px", fontWeight: 800, fontSize: 13, cursor: "pointer", fontFamily: "inherit", boxShadow: "0 6px 20px rgba(var(--app-accent-rgb, 124, 58, 237), 0.25)", transition: "all 0.25s cubic-bezier(0.4,0,0.2,1)" });
+  const B2 = (color) => ({ background: "var(--app-accent-gradient)", color: "#FFFFFF", border: "none", borderRadius: 12, padding: "12px 22px", fontWeight: 800, fontSize: 13, cursor: "pointer", fontFamily: "inherit", boxShadow: "0 6px 20px rgba(var(--app-accent-rgb, 124, 58, 237), 0.25)", transition: "all 0.25s cubic-bezier(0.4,0,0.2,1)" });
 
   return (
 
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
 
-      {tsToast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{tsToast}</div>}
+      {tsToast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#FFFFFF", border: "1.5px solid #16A34A", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#16A34A", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{tsToast}</div>}
 
       <div className="dash-stats" style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 12 }}>
 
-        {tsStats.map(({ t, v, i, c }) => (<div key={t} style={{ background: "#fff", borderRadius: 14, padding: "18px 20px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", position: "relative", overflow: "hidden" }}><div style={{ width: 38, height: 38, borderRadius: 10, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, marginBottom: 8 }}>{i}</div><div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 2 }}>{t.toUpperCase()}</div><div style={{ fontSize: 24, fontWeight: 800, color: c }}>{v}</div></div>))}
+        {tsStats.map(({ t, v, i, c }) => (<div key={t} style={{ background: "#FFFFFF", borderRadius: 14, padding: "18px 20px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", position: "relative", overflow: "hidden" }}><div style={{ width: 38, height: 38, borderRadius: 10, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, marginBottom: 8 }}>{i}</div><div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 2 }}>{t.toUpperCase()}</div><div style={{ fontSize: 24, fontWeight: 800, color: c }}>{v}</div></div>))}
 
       </div>
 
@@ -6012,7 +6012,7 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
 
           <div style={{ position: "relative" }}><span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>Search</span><input placeholder="Search…" value={tsSearch} onChange={e => setTsSearch(e.target.value)} style={{ padding: "9px 14px 9px 34px", border: "1.5px solid var(--app-border)", borderRadius: 10, fontSize: 13, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", width: 240, color: T.text }} /></div>
 
-          {["All", "In Progress", "Pending", "Completed", "On Hold"].map(f => (<button key={f} onClick={() => setTsFilter(f)} style={{ padding: "7px 13px", borderRadius: 9, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", border: "1.5px solid", borderColor: tsFilter === f ? "var(--app-accent)" : "var(--app-border)", background: tsFilter === f ? "rgba(var(--app-accent-rgb, 124, 58, 237),0.1)" : "#fff", color: tsFilter === f ? "var(--app-accent)" : "var(--app-muted)" }}>{f}</button>))}
+          {["All", "In Progress", "Pending", "Completed", "On Hold"].map(f => (<button key={f} onClick={() => setTsFilter(f)} style={{ padding: "7px 13px", borderRadius: 9, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", border: "1.5px solid", borderColor: tsFilter === f ? "var(--app-accent)" : "var(--app-border)", background: tsFilter === f ? "rgba(var(--app-accent-rgb, 124, 58, 237),0.1)" : "#FFFFFF", color: tsFilter === f ? "var(--app-accent)" : "var(--app-muted)" }}>{f}</button>))}
 
         </div>
 
@@ -6036,13 +6036,13 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
 
               {paginated.length === 0 ? <tr><td colSpan={10} style={{ padding: 40, textAlign: "center", color: "var(--app-muted)" }}>No company names found</td></tr>
 
-                : paginated.map((p, i) => (<tr key={p._id || p.id || i} style={{ borderBottom: "1px solid #f3f0ff" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                : paginated.map((p, i) => (<tr key={p._id || p.id || i} style={{ borderBottom: "1px solid #EFF6FF" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
 
                   <td style={{ padding: "11px 12px", fontFamily: "monospace", fontSize: 11, color: "var(--app-muted)" }}>{p.projectId || p.id || `PRJ${String((currentPage - 1) * itemsPerPage + i + 1).padStart(3, "0")}`}</td>
 
                   <td style={{ padding: "11px 12px", fontWeight: 700, color: T.text }}>{p.name}</td>
 
-                  <td style={{ padding: "11px 12px" }}><div style={{ display: "flex", alignItems: "center", gap: 6 }}><div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 9, fontWeight: 700, flexShrink: 0 }}>{(p.client || "?")[0].toUpperCase()}</div><span style={{ color: T.text, fontSize: 12 }}>{p.client || "—"}</span></div></td>
+                  <td style={{ padding: "11px 12px" }}><div style={{ display: "flex", alignItems: "center", gap: 6 }}><div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 9, fontWeight: 700, flexShrink: 0 }}>{(p.client || "?")[0].toUpperCase()}</div><span style={{ color: T.text, fontSize: 12 }}>{p.client || "—"}</span></div></td>
 
                   <td style={{ padding: "11px 12px", color: "var(--app-muted)", fontSize: 12 }}>{p.manager || "—"}</td>
 
@@ -6110,7 +6110,7 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
 
                   </td>
 
-                  <td style={{ padding: "11px 12px", minWidth: 130 }}><div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ flex: 1, background: "var(--app-border)", borderRadius: 6, height: 7 }}><div style={{ width: `${p.progress || p.pct || 0}%`, background: p.progress === 100 || p.pct === 100 ? "linear-gradient(90deg,#22C55E,#4ade80)" : "linear-gradient(90deg,var(--app-accent),var(--app-accent))", borderRadius: 6, height: "100%" }} /></div><span style={{ fontSize: 12, fontWeight: 700, color: sc(p.status), width: 32, textAlign: "right" }}>{p.progress || p.pct || 0}%</span></div></td>
+                  <td style={{ padding: "11px 12px", minWidth: 130 }}><div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ flex: 1, background: "var(--app-border)", borderRadius: 6, height: 7 }}><div style={{ width: `${p.progress || p.pct || 0}%`, background: p.progress === 100 || p.pct === 100 ? "linear-gradient(90deg,#16A34A,#16A34A)" : "linear-gradient(90deg,var(--app-accent),var(--app-accent))", borderRadius: 6, height: "100%" }} /></div><span style={{ fontSize: 12, fontWeight: 700, color: sc(p.status), width: 32, textAlign: "right" }}>{p.progress || p.pct || 0}%</span></div></td>
 
                   <td style={{ padding: "11px 12px", maxWidth: 180 }}><span style={{ fontSize: 12, color: "var(--app-muted)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", display: "block" }} title={p.notes || p.note}>{(p.notes || p.note) ? `📝 ${p.notes || p.note}` : "—"}</span></td>
 
@@ -6130,7 +6130,7 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
 
                         window.open(wpUrl, "_blank");
 
-                      }} style={{ padding: "6px", background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: 7, cursor: "pointer", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      }} style={{ padding: "6px", background: "#EFF6FF", border: "1px solid #E2E8F0", borderRadius: 7, cursor: "pointer", color: "#2563EB", display: "flex", alignItems: "center", justifyContent: "center" }}>
 
                         <span></span>
 
@@ -6160,7 +6160,7 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
 
           <Fld label="Project Name *" value={tsForm.name} onChange={v => { setTsForm({ ...tsForm, name: v }); setTsErr(p => ({ ...p, name: "" })); }} error={tsErr.name} />
 
-          <div style={{ marginBottom: 14 }}><label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>COMPANY NAME *</label><ClientDropdown clients={clientNames.length ? clients : []} value={tsForm.client} onChange={v => { setTsForm({ ...tsForm, client: v }); setTsErr(p => ({ ...p, client: "" })); }} error={tsErr.client} />{tsErr.client && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning{tsErr.client}</div>}</div>
+          <div style={{ marginBottom: 14 }}><label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>COMPANY NAME *</label><ClientDropdown clients={clientNames.length ? clients : []} value={tsForm.client} onChange={v => { setTsForm({ ...tsForm, client: v }); setTsErr(p => ({ ...p, client: "" })); }} error={tsErr.client} />{tsErr.client && <div style={{ fontSize: 11, color: "#64748B", marginTop: 4 }}>Warning{tsErr.client}</div>}</div>
 
           <SearchDropdown label="Manager" items={managerNames} displayKey="name" value={tsForm.manager} onChange={v => setTsForm({ ...tsForm, manager: v })} placeholder="-- Select Manager --" />
 
@@ -6346,7 +6346,7 @@ function InterviewPage({ companyId, companyName }) {
 
   const counts = { total: candidates.length, pending: candidates.filter(c => (c.status || "Pending").toLowerCase() === "pending").length, hired: candidates.filter(c => (c.status || "").toLowerCase() === "hired").length, rejected: candidates.filter(c => (c.status || "").toLowerCase() === "rejected").length };
 
-  const sColor = { pending: "#F59E0B", hired: "#22C55E", rejected: "#EF4444" };
+  const sColor = { pending: "#64748B", hired: "#16A34A", rejected: "#64748B" };
 
   const sC = (s = "pending") => sColor[s.toLowerCase()] || "var(--app-accent)";
 
@@ -6354,19 +6354,19 @@ function InterviewPage({ companyId, companyName }) {
 
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
 
-      {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
+      {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#FFFFFF", border: "1.5px solid #16A34A", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#16A34A", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
 
-      <div style={{ background: "var(--app-sidebar)", borderRadius: 16, padding: "20px 24px", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", boxShadow: "0 8px 24px rgba(15, 23, 42,0.25)" }}>
+      <div style={{ background: "var(--app-sidebar)", borderRadius: 16, padding: "20px 24px", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", boxShadow: "0 8px 24px rgba(15, 23, 42, 0.25)" }}>
 
         <div style={{ width: 42, height: 42, borderRadius: 12, background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}></div>
 
-        <div style={{ flex: 1, minWidth: 0 }}><div style={{ fontSize: 10, color: "rgba(255,255,255,0.5)", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>Candidate Application Link</div><div style={{ fontSize: 12, color: "#ffffff", fontFamily: "monospace", wordBreak: "break-all" }}>{appLink}</div></div>
+        <div style={{ flex: 1, minWidth: 0 }}><div style={{ fontSize: 10, color: "rgba(255,255,255,0.5)", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>Candidate Application Link</div><div style={{ fontSize: 12, color: "#FFFFFF", fontFamily: "monospace", wordBreak: "break-all" }}>{appLink}</div></div>
 
         <div className="onboard-actions" style={{ display: "flex", gap: 8, flexShrink: 0 }}>
 
-          <button onClick={copyLink} style={{ background: linkCopied ? "rgba(34,197,94,0.2)" : "rgba(255,255,255,0.15)", border: `1px solid ${linkCopied ? "rgba(34,197,94,0.5)" : "rgba(255,255,255,0.3)"}`, borderRadius: 9, padding: "9px 16px", color: linkCopied ? "#4ade80" : "#ffffff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{linkCopied ? "Copied!" : "📋 Copy Link"}</button>
+          <button onClick={copyLink} style={{ background: linkCopied ? "rgba(22, 163, 74, 0.2)" : "rgba(255,255,255,0.15)", border: `1px solid ${linkCopied ? "rgba(22, 163, 74, 0.5)" : "rgba(255,255,255,0.3)"}`, borderRadius: 9, padding: "9px 16px", color: linkCopied ? "#16A34A" : "#FFFFFF", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{linkCopied ? "Copied!" : "📋 Copy Link"}</button>
 
-          <button onClick={() => window.open(appLink, "_blank")} style={{ background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 9, padding: "9px 16px", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>View Preview Form</button>
+          <button onClick={() => window.open(appLink, "_blank")} style={{ background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 9, padding: "9px 16px", color: "#FFFFFF", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>View Preview Form</button>
 
         </div>
 
@@ -6374,16 +6374,16 @@ function InterviewPage({ companyId, companyName }) {
 
       <div className="dash-stats" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12 }}>
 
-        {[{ t: "Total", v: counts.total, i: "🎯", c: "var(--app-accent)" }, { t: "Pending", v: counts.pending, i: "⏳", c: "#F59E0B" }, { t: "Hired", v: counts.hired, i: "✅", c: "#22C55E" }, { t: "Rejected", v: counts.rejected, i: "❌", c: "#EF4444" }].map(({ t, v, i, c }) => (
-          <div key={t} style={{ background: "#fff", border: "1.5px solid #E2E8F0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+        {[{ t: "Total", v: counts.total, i: "🎯", c: "var(--app-accent)" }, { t: "Pending", v: counts.pending, i: "⏳", c: "#64748B" }, { t: "Hired", v: counts.hired, i: "✅", c: "#16A34A" }, { t: "Rejected", v: counts.rejected, i: "❌", c: "#64748B" }].map(({ t, v, i, c }) => (
+          <div key={t} style={{ background: "#FFFFFF", border: "1.5px solid #E2E8F0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
             <div style={{ width: 40, height: 40, borderRadius: 10, background: `${c}15`, color: c, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>{i}</div>
-            <div><div style={{ fontSize: 24, fontWeight: 800, color: "#1A2332" }}>{v}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#64748B" }}>{t}</div></div>
+            <div><div style={{ fontSize: 24, fontWeight: 800, color: "#1E293B" }}>{v}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#64748B" }}>{t}</div></div>
           </div>
         ))}
 
       </div>
 
-      <div style={{ background: "#fff", borderRadius: 16, padding: 22, boxShadow: "0 4px 24px rgba(var(--app-accent-rgb, 124, 58, 237),0.08)", border: "1px solid var(--app-border)" }}>
+      <div style={{ background: "#FFFFFF", borderRadius: 16, padding: 22, boxShadow: "0 4px 24px rgba(var(--app-accent-rgb, 124, 58, 237),0.08)", border: "1px solid var(--app-border)" }}>
 
         <h3 style={{ margin: "0 0 16px", fontSize: 15, fontWeight: 700, color: "var(--app-sidebar)" }}>All Candidates ({displayed.length})</h3>
 
@@ -6391,7 +6391,7 @@ function InterviewPage({ companyId, companyName }) {
 
           <div style={{ position: "relative", flex: 1, minWidth: 200 }}><span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}></span><input placeholder="Search name, role, email, mobile..." value={search} onChange={e => setSearch(e.target.value)} style={{ width: "100%", padding: "9px 14px 9px 34px", border: "1.5px solid var(--app-border)", borderRadius: 10, fontSize: 13, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", color: "var(--app-sidebar)", boxSizing: "border-box" }} /></div>
 
-          {["all", "pending", "hired", "rejected"].map(f => (<button key={f} onClick={() => setFilter(f)} style={{ padding: "7px 14px", borderRadius: 20, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", border: "1.5px solid", borderColor: filter === f ? (f === "all" ? "var(--app-accent)" : sC(f)) : "var(--app-border)", background: filter === f ? `${f === "all" ? "var(--app-accent)" : sC(f)}15` : "#fff", color: filter === f ? (f === "all" ? "var(--app-accent)" : sC(f)) : "var(--app-muted)", transition: "all 0.15s" }}>{f === "all" ? "🎯 All" : f === "pending" ? "⏳ Pending" : f === "hired" ? "Yes Hired" : "❌ Rejected"}</button>))}
+          {["all", "pending", "hired", "rejected"].map(f => (<button key={f} onClick={() => setFilter(f)} style={{ padding: "7px 14px", borderRadius: 20, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", border: "1.5px solid", borderColor: filter === f ? (f === "all" ? "var(--app-accent)" : sC(f)) : "var(--app-border)", background: filter === f ? `${f === "all" ? "var(--app-accent)" : sC(f)}15` : "#FFFFFF", color: filter === f ? (f === "all" ? "var(--app-accent)" : sC(f)) : "var(--app-muted)", transition: "all 0.15s" }}>{f === "all" ? "🎯 All" : f === "pending" ? "⏳ Pending" : f === "hired" ? "Yes Hired" : "❌ Rejected"}</button>))}
 
         </div>
 
@@ -6411,27 +6411,27 @@ function InterviewPage({ companyId, companyName }) {
 
                   const finalResumeUrl = resumeUrl; return (
 
-                    <tr key={c._id || c.id || i} style={{ borderBottom: "1px solid #f3f0ff", transition: "background 0.15s" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                    <tr key={c._id || c.id || i} style={{ borderBottom: "1px solid #EFF6FF", transition: "background 0.15s" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
 
                       <td style={{ padding: "12px 12px", color: "var(--app-muted)", fontSize: 11, fontFamily: "monospace" }}>{String((currentPage - 1) * itemsPerPage + i + 1).padStart(3, "0")}</td>
 
-                      <td style={{ padding: "12px 12px" }}><div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{(c.name || "?")[0].toUpperCase()}</div><span style={{ fontWeight: 700, color: "var(--app-sidebar)" }}>{c.name || "—"}</span></div></td>
+                      <td style={{ padding: "12px 12px" }}><div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{(c.name || "?")[0].toUpperCase()}</div><span style={{ fontWeight: 700, color: "var(--app-sidebar)" }}>{c.name || "—"}</span></div></td>
 
                       <td style={{ padding: "12px 12px" }}><div style={{ fontSize: 12, color: "var(--app-muted)" }}>{c.email || "—"}</div><div style={{ fontSize: 11, color: "var(--app-muted)", marginTop: 2 }}>{c.mobile || ""}</div></td>
 
-                      <td style={{ padding: "12px 12px" }}>{(c.experience || "").toLowerCase() === "fresher" ? <span style={{ background: "rgba(34,197,94,0.12)", color: "#22C55E", border: "1px solid rgba(34,197,94,0.25)", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>🎓 Fresher</span> : <span style={{ background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.12)", color: "var(--app-accent)", border: "1px solid rgba(var(--app-accent-rgb, 124, 58, 237),0.25)", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>💼 {c.years || "?"}yrs</span>}</td>
+                      <td style={{ padding: "12px 12px" }}>{(c.experience || "").toLowerCase() === "fresher" ? <span style={{ background: "rgba(22, 163, 74, 0.12)", color: "#16A34A", border: "1px solid rgba(22, 163, 74, 0.25)", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>🎓 Fresher</span> : <span style={{ background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.12)", color: "var(--app-accent)", border: "1px solid rgba(var(--app-accent-rgb, 124, 58, 237),0.25)", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>💼 {c.years || "?"}yrs</span>}</td>
 
                       <td style={{ padding: "12px 12px", fontWeight: 600, color: "var(--app-sidebar)", fontSize: 12 }}>{c.role || "—"}</td>
 
-                      <td style={{ padding: "12px 12px", fontSize: 12, color: "var(--app-muted)" }}>{c.interviewerName || <span style={{ color: "#ddd" }}>—</span>}</td>
+                      <td style={{ padding: "12px 12px", fontSize: 12, color: "var(--app-muted)" }}>{c.interviewerName || <span style={{ color: "#E2E8F0" }}>—</span>}</td>
 
                       <td style={{ padding: "12px 12px", fontSize: 12, color: "var(--app-muted)", fontFamily: "monospace", whiteSpace: "nowrap" }}>{fmt(c.date || c.createdAt)}</td>
 
-                      <td style={{ padding: "12px 12px" }}><select value={status} onChange={e => updateStatus(idx, e.target.value)} style={{ background: status === "hired" ? "rgba(34,197,94,0.1)" : status === "rejected" ? "rgba(239,68,68,0.1)" : "rgba(245,158,11,0.1)", border: `1.5px solid ${sC(status)}44`, borderRadius: 8, padding: "5px 10px", color: sC(status), fontSize: 12, fontWeight: 700, cursor: "pointer", outline: "none", fontFamily: "inherit" }}><option value="pending">⏳ Pending</option><option value="hired">Yes Hired</option><option value="rejected">❌ Rejected</option></select></td>
+                      <td style={{ padding: "12px 12px" }}><select value={status} onChange={e => updateStatus(idx, e.target.value)} style={{ background: status === "hired" ? "rgba(22, 163, 74, 0.1)" : status === "rejected" ? "rgba(100, 116, 139, 0.1)" : "rgba(100, 116, 139, 0.1)", border: `1.5px solid ${sC(status)}44`, borderRadius: 8, padding: "5px 10px", color: sC(status), fontSize: 12, fontWeight: 700, cursor: "pointer", outline: "none", fontFamily: "inherit" }}><option value="pending">⏳ Pending</option><option value="hired">Yes Hired</option><option value="rejected">❌ Rejected</option></select></td>
 
-                      <td style={{ padding: "12px 12px" }}>{finalResumeUrl ? <button onClick={() => setViewModal({ ...c, _resolvedResumeUrl: finalResumeUrl })} style={{ background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.1)", border: "1px solid rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "var(--app-accent)", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap" }}>📄</button> : <span style={{ fontSize: 11, color: "#ddd" }}>—</span>}</td>
+                      <td style={{ padding: "12px 12px" }}>{finalResumeUrl ? <button onClick={() => setViewModal({ ...c, _resolvedResumeUrl: finalResumeUrl })} style={{ background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.1)", border: "1px solid rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "var(--app-accent)", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap" }}>📄</button> : <span style={{ fontSize: 11, color: "#E2E8F0" }}>—</span>}</td>
 
-                      <td style={{ padding: "12px 12px" }}><div style={{ display: "flex", gap: 5 }}><button onClick={() => setViewModal({ ...c, _resolvedResumeUrl: finalResumeUrl })} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: "var(--app-muted)", cursor: "pointer", fontWeight: 600, fontFamily: "inherit" }}>👤</button><button onClick={() => deleteCandidate(idx)} style={{ background: "#fee2e2", border: "1px solid #fecaca", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: "#ef4444", cursor: "pointer", fontWeight: 600, fontFamily: "inherit" }}> Delete</button></div></td>
+                      <td style={{ padding: "12px 12px" }}><div style={{ display: "flex", gap: 5 }}><button onClick={() => setViewModal({ ...c, _resolvedResumeUrl: finalResumeUrl })} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: "var(--app-muted)", cursor: "pointer", fontWeight: 600, fontFamily: "inherit" }}>👤</button><button onClick={() => deleteCandidate(idx)} style={{ background: "#E2E8F0", border: "1px solid #E2E8F0", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: "#64748B", cursor: "pointer", fontWeight: 600, fontFamily: "inherit" }}> Delete</button></div></td>
 
                     </tr>
 
@@ -6453,9 +6453,9 @@ function InterviewPage({ companyId, companyName }) {
 
       {viewModal && (
 
-        <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42,0.55)", backdropFilter: "blur(8px)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+        <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.55)", backdropFilter: "blur(8px)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
 
-          <div style={{ background: "#fff", borderRadius: 20, width: "100%", maxWidth: 820, maxHeight: "90vh", overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 32px 80px rgba(var(--app-accent-rgb, 124, 58, 237),0.25)" }}>
+          <div style={{ background: "#FFFFFF", borderRadius: 20, width: "100%", maxWidth: 820, maxHeight: "90vh", overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 32px 80px rgba(var(--app-accent-rgb, 124, 58, 237),0.25)" }}>
 
             <div style={{ padding: "16px 22px", borderBottom: "1px solid var(--app-border)", display: "flex", justifyContent: "space-between", alignItems: "center", background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))", flexShrink: 0 }}>
 
@@ -6469,7 +6469,7 @@ function InterviewPage({ companyId, companyName }) {
 
               <div style={{ display: "flex", alignItems: "center", gap: 14, padding: 16, background: "linear-gradient(135deg,var(--app-bg),var(--app-bg))", borderRadius: 14, border: "1px solid var(--app-border)", marginBottom: 18 }}>
 
-                <div style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 20, fontWeight: 800, flexShrink: 0 }}>
+                <div style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 20, fontWeight: 800, flexShrink: 0 }}>
 
                   {(viewModal.name || "?")[0].toUpperCase()}
 
@@ -6515,9 +6515,9 @@ function InterviewPage({ companyId, companyName }) {
 
                         const errorDiv = document.createElement('div');
 
-                        errorDiv.style.cssText = 'padding: 50px; text-align: center; color: #ef4444; font-size: 14px; background: #fef2f2; border: 1.5px solid #fecaca; border-radius: 12px; margin: 20px;';
+                        errorDiv.style.cssText = 'padding: 50px; text-align: center; color: #64748B; font-size: 14px; background: #F8FAFC; border: 1.5px solid #E2E8F0; border-radius: 12px; margin: 20px;';
 
-                        errorDiv.innerHTML = '📄 Resume file not found<br><span style="font-size: 12px; color: #991b1b;">The resume file may have been deleted or moved</span>';
+                        errorDiv.innerHTML = '📄 Resume file not found<br><span style="font-size: 12px; color: #1E293B;">The resume file may have been deleted or moved</span>';
 
                         e.target.parentNode.appendChild(errorDiv);
 
@@ -6525,9 +6525,9 @@ function InterviewPage({ companyId, companyName }) {
 
                     />
 
-                    <div style={{ padding: "12px", background: "#fff", borderTop: "1px solid var(--app-border)", display: "flex", justifyContent: "center" }}>
+                    <div style={{ padding: "12px", background: "#FFFFFF", borderTop: "1px solid var(--app-border)", display: "flex", justifyContent: "center" }}>
 
-                      <a href={viewModal._resolvedResumeUrl} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "var(--app-accent)", color: "#fff", padding: "8px 16px", borderRadius: 8, textDecoration: "none", fontSize: 13, fontWeight: 600, fontFamily: "inherit" }}>
+                      <a href={viewModal._resolvedResumeUrl} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "var(--app-accent)", color: "#FFFFFF", padding: "8px 16px", borderRadius: 8, textDecoration: "none", fontSize: 13, fontWeight: 600, fontFamily: "inherit" }}>
 
                         Open in New Tab
 
@@ -6645,13 +6645,13 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
 
   return (
 
-    <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42,0.6)", backdropFilter: "blur(10px)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }} onClick={onClose}>
+    <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.6)", backdropFilter: "blur(10px)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }} onClick={onClose}>
 
-      <div style={{ background: "#fff", borderRadius: 22, width: "100%", maxWidth: 420, maxHeight: "90vh", boxShadow: "0 32px 80px rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", display: "flex", flexDirection: "column", overflow: "hidden" }} onClick={e => e.stopPropagation()}>
+      <div style={{ background: "#FFFFFF", borderRadius: 22, width: "100%", maxWidth: 420, maxHeight: "90vh", boxShadow: "0 32px 80px rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", display: "flex", flexDirection: "column", overflow: "hidden" }} onClick={e => e.stopPropagation()}>
 
         <div style={{ background: "var(--app-accent)", padding: "28px 28px 22px", textAlign: "center", flexShrink: 0, position: "relative" }}>
 
-          <button onClick={onClose} style={{ position: "absolute", top: 14, right: 14, background: "rgba(255,255,255,0.2)", border: "none", width: 30, height: 30, borderRadius: 8, color: "#fff", fontSize: 16, cursor: "pointer" }}>✕</button>
+          <button onClick={onClose} style={{ position: "absolute", top: 14, right: 14, background: "rgba(255,255,255,0.2)", border: "none", width: 30, height: 30, borderRadius: 8, color: "#FFFFFF", fontSize: 16, cursor: "pointer" }}>✕</button>
 
           <div style={{ display: "flex", justifyContent: "center", alignItems: "flex-end", gap: 8, margin: "0 auto 12px", position: "relative", width: "fit-content" }}>
 
@@ -6661,7 +6661,7 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
 
             ) : (
 
-              <div style={{ width: 72, height: 72, borderRadius: 16, background: "rgba(255,255,255,0.22)", border: "3px solid rgba(255,255,255,0.45)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 24, fontWeight: 800 }}>{initials}</div>
+              <div style={{ width: 72, height: 72, borderRadius: 16, background: "rgba(255,255,255,0.22)", border: "3px solid rgba(255,255,255,0.45)", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 24, fontWeight: 800 }}>{initials}</div>
 
             )}
 
@@ -6683,13 +6683,13 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
 
           </div>
 
-          <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#fff" }}>{displayName}</h2>
+          <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#FFFFFF" }}>{displayName}</h2>
 
           <p style={{ margin: "4px 0 0", fontSize: 12, color: "rgba(255,255,255,0.65)" }}>{user?.email || "—"}</p>
 
           {user?.role && !user.role.toLowerCase().includes("subadmin") && (
 
-            <span style={{ display: "inline-block", marginTop: 8, background: "rgba(255,255,255,0.18)", border: "1px solid rgba(255,255,255,0.28)", borderRadius: 100, padding: "3px 12px", fontSize: 10, fontWeight: 700, color: "#fff", letterSpacing: 1, textTransform: "uppercase" }}>{user.role}</span>
+            <span style={{ display: "inline-block", marginTop: 8, background: "rgba(255,255,255,0.18)", border: "1px solid rgba(255,255,255,0.28)", borderRadius: 100, padding: "3px 12px", fontSize: 10, fontWeight: 700, color: "#FFFFFF", letterSpacing: 1, textTransform: "uppercase" }}>{user.role}</span>
 
           )}
 
@@ -6725,9 +6725,9 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
 
 
 
-            <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", background: "#fdf4ff", borderRadius: 9, border: "1px solid #fae8ff", marginBottom: 16 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", background: "#F8FAFC", borderRadius: 9, border: "1px solid #EFF6FF", marginBottom: 16 }}>
 
-              <div style={{ width: 30, height: 30, borderRadius: 8, background: "rgba(37, 99, 235,0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0 }}>🏢</div>
+              <div style={{ width: 30, height: 30, borderRadius: 8, background: "rgba(37, 99, 235, 0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0 }}>🏢</div>
 
               <div style={{ flex: 1 }}>
 
@@ -6747,7 +6747,7 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
 
                       <input value={upiId} onChange={e => setUpiId(e.target.value)} placeholder="UPI ID (e.g. name@okaxis)" style={{ flex: 1, padding: "4px 8px", fontSize: 11, border: "1.5px solid var(--app-border)", borderRadius: 6, outline: "none" }} />
 
-                      <button onClick={saveCompDetails} style={{ background: "#22c55e", border: "none", color: "#fff", padding: "4px 10px", borderRadius: 6, fontSize: 10, fontWeight: 700, cursor: "pointer" }}>Save</button>
+                      <button onClick={saveCompDetails} style={{ background: "#16A34A", border: "none", color: "#FFFFFF", padding: "4px 10px", borderRadius: 6, fontSize: 10, fontWeight: 700, cursor: "pointer" }}>Save</button>
 
                     </div>
 
@@ -6791,13 +6791,13 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
 
 
 
-        <div style={{ padding: "12px 24px 18px", borderTop: "1px solid var(--app-border)", flexShrink: 0, background: "#faf8ff" }}>
+        <div style={{ padding: "12px 24px 18px", borderTop: "1px solid var(--app-border)", flexShrink: 0, background: "#F8FAFC" }}>
 
           <div style={{ display: "flex", gap: 10 }}>
 
-            <button onClick={onClose} style={{ flex: 1, padding: "10px", background: "#fff", border: "1.5px solid var(--app-border)", borderRadius: 9, fontSize: 13, fontWeight: 600, color: "var(--app-sidebar)", cursor: "pointer", fontFamily: "inherit" }}>Close</button>
+            <button onClick={onClose} style={{ flex: 1, padding: "10px", background: "#FFFFFF", border: "1.5px solid var(--app-border)", borderRadius: 9, fontSize: 13, fontWeight: 600, color: "var(--app-sidebar)", cursor: "pointer", fontFamily: "inherit" }}>Close</button>
 
-            <button onClick={onLogout} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#EF4444,#dc2626)", border: "none", borderRadius: 9, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>🚪 Logout</button>
+            <button onClick={onLogout} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#64748B,#64748B)", border: "none", borderRadius: 9, fontSize: 13, fontWeight: 700, color: "#FFFFFF", cursor: "pointer", fontFamily: "inherit" }}>🚪 Logout</button>
 
           </div>
 
@@ -6913,7 +6913,7 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
 
           borderRadius: 11,
 
-          color: "#ffffff",
+          color: "#FFFFFF",
 
           fontWeight: on ? 800 : 700,
 
@@ -7068,7 +7068,7 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
 
 
 
-          <button onClick={onLogout} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '14px', background: 'rgba(255,255,255,0.12)', border: 'none', borderRadius: '14px', fontSize: '14px', fontWeight: '800', color: '#fff', cursor: 'pointer', transition: 'all 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'} onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.12)'}>
+          <button onClick={onLogout} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '14px', background: 'rgba(255,255,255,0.12)', border: 'none', borderRadius: '14px', fontSize: '14px', fontWeight: '800', color: '#FFFFFF', cursor: 'pointer', transition: 'all 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'} onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.12)'}>
 
             <i className="ti ti-logout" style={{ fontSize: 18 }}></i> Logout
 
@@ -7122,7 +7122,7 @@ function PackagesPage({ packages, onSubscribe, THEME }) {
 
     <div style={{
 
-      background: `linear-gradient(135deg, #f8fafc 0%, ${THEME.bg} 100%)`,
+      background: `linear-gradient(135deg, #F8FAFC 0%, ${THEME.bg} 100%)`,
 
       borderRadius: 24,
 
@@ -7148,9 +7148,9 @@ function PackagesPage({ packages, onSubscribe, THEME }) {
 
         <div style={{ display: "inline-block", padding: "6px 16px", background: `${THEME.accent}12`, borderRadius: 100, color: THEME.accent, fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: 1.2, marginBottom: 14 }}>💎 Choose Plan</div>
 
-        <h1 style={{ fontSize: 34, fontWeight: 900, color: "#1e293b", margin: "0 0 10px", letterSpacing: "-1px", lineHeight: 1 }}>Choose your Plan</h1>
+        <h1 style={{ fontSize: 34, fontWeight: 900, color: "#1E293B", margin: "0 0 10px", letterSpacing: "-1px", lineHeight: 1 }}>Choose your Plan</h1>
 
-        <p style={{ color: "#64748b", fontWeight: 600, fontSize: 14, maxWidth: 400, margin: "0 auto" }}>Select the best plan for your business growth.</p>
+        <p style={{ color: "#64748B", fontWeight: 600, fontSize: 14, maxWidth: 400, margin: "0 auto" }}>Select the best plan for your business growth.</p>
 
       </div>
 
@@ -7162,7 +7162,7 @@ function PackagesPage({ packages, onSubscribe, THEME }) {
 
           <div style={{ fontSize: 54, marginBottom: 20, opacity: 0.5 }}>📦</div>
 
-          <h2 style={{ fontSize: 22, fontWeight: 800, color: "#94a3b8", marginBottom: 8 }}>No Packages Available</h2>
+          <h2 style={{ fontSize: 22, fontWeight: 800, color: "#64748B", marginBottom: 8 }}>No Packages Available</h2>
 
         </div>
 
@@ -7203,7 +7203,7 @@ function PackagesPage({ packages, onSubscribe, THEME }) {
 
                 style={{
 
-                  background: "#fff",
+                  background: "#FFFFFF",
 
                   border: isPro ? `2px solid ${THEME.accent}` : `1.5px solid ${THEME.border}`,
 
@@ -7239,7 +7239,7 @@ function PackagesPage({ packages, onSubscribe, THEME }) {
 
                     position: "absolute", top: -12, left: "50%", transform: "translateX(-50%)",
 
-                    background: THEME.accent, color: "#fff", padding: "4px 16px", borderRadius: 100,
+                    background: THEME.accent, color: "#FFFFFF", padding: "4px 16px", borderRadius: 100,
 
                     fontSize: 9, fontWeight: 900, letterSpacing: 1, textTransform: "uppercase",
 
@@ -7255,27 +7255,27 @@ function PackagesPage({ packages, onSubscribe, THEME }) {
 
 
 
-                <div style={{ fontSize: 20, fontWeight: 900, color: "#1e293b", marginBottom: 4, letterSpacing: "-0.4px" }}>{p.title}</div>
+                <div style={{ fontSize: 20, fontWeight: 900, color: "#1E293B", marginBottom: 4, letterSpacing: "-0.4px" }}>{p.title}</div>
 
-                <div style={{ fontSize: 11, color: "#94a3b8", marginBottom: 20, fontWeight: 700, textTransform: "uppercase" }}>Monthly Plan</div>
+                <div style={{ fontSize: 11, color: "#64748B", marginBottom: 20, fontWeight: 700, textTransform: "uppercase" }}>Monthly Plan</div>
 
 
 
                 <div style={{ display: "flex", alignItems: "flex-end", gap: 4, marginBottom: 8 }}>
 
-                  <span style={{ fontSize: 42, fontWeight: 900, color: "#1e293b", lineHeight: 1, letterSpacing: "-2px" }}>
+                  <span style={{ fontSize: 42, fontWeight: 900, color: "#1E293B", lineHeight: 1, letterSpacing: "-2px" }}>
 
                     {p.type === "free" ? "Free" : p.price ? `Rs.${parseFloat(p.price).toLocaleString("en-IN")}` : "Custom"}
 
                   </span>
 
-                  {p.price > 0 && <span style={{ fontSize: 13, color: "#94a3b8", marginBottom: 6, fontWeight: 600 }}>/mo</span>}
+                  {p.price > 0 && <span style={{ fontSize: 13, color: "#64748B", marginBottom: 6, fontWeight: 600 }}>/mo</span>}
 
                 </div>
 
 
 
-                <div style={{ height: 1, background: "#f1f5f9", margin: "20px 0" }} />
+                <div style={{ height: 1, background: "#EFF6FF", margin: "20px 0" }} />
 
 
 
@@ -7287,7 +7287,7 @@ function PackagesPage({ packages, onSubscribe, THEME }) {
 
                       <div style={{ width: 18, height: 18, borderRadius: "50%", background: `${THEME.accent}12`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, color: THEME.accent, fontWeight: 900, flexShrink: 0 }}>✓</div>
 
-                      <span style={{ fontSize: 13, color: "#475569", fontWeight: 600 }}>{f}</span>
+                      <span style={{ fontSize: 13, color: "#64748B", fontWeight: 600 }}>{f}</span>
 
                     </div>
 
@@ -7309,11 +7309,11 @@ function PackagesPage({ packages, onSubscribe, THEME }) {
 
                     fontFamily: "inherit",
 
-                    background: isPro ? THEME.accent : "#f8fafc",
+                    background: isPro ? THEME.accent : "#F8FAFC",
 
                     border: isPro ? "none" : `1.5px solid ${THEME.border}`,
 
-                    color: isPro ? "#fff" : "#1e293b"
+                    color: isPro ? "#FFFFFF" : "#1E293B"
 
                   }}
 
@@ -7321,7 +7321,7 @@ function PackagesPage({ packages, onSubscribe, THEME }) {
 
                     if (isPro) e.currentTarget.style.filter = "brightness(1.1)";
 
-                    else e.currentTarget.style.background = "#f1f5f9";
+                    else e.currentTarget.style.background = "#EFF6FF";
 
                   }}
 
@@ -7329,7 +7329,7 @@ function PackagesPage({ packages, onSubscribe, THEME }) {
 
                     if (isPro) e.currentTarget.style.filter = "brightness(1)";
 
-                    else e.currentTarget.style.background = "#f8fafc";
+                    else e.currentTarget.style.background = "#F8FAFC";
 
                   }}
 
@@ -7505,10 +7505,10 @@ function VendorsPage({ vendors, setVendors, onAddVendorClick }) {
 
     <div style={{ display: "flex", flexDirection: "column", gap: 14, width: "100%", maxWidth: "100%", overflowX: "hidden", boxSizing: "border-box" }}>
 
-      {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
+      {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#FFFFFF", border: "1.5px solid #16A34A", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#16A34A", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 900, color: "#1A2332", margin: 0 }}>Vendors</h1>
+        <h1 style={{ fontSize: 24, fontWeight: 900, color: "#1E293B", margin: 0 }}>Vendors</h1>
         <button className="create-btn compact-action-btn" onClick={onAddVendorClick} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
           <i className="ti ti-plus"></i> New Vendor
         </button>
@@ -7525,16 +7525,16 @@ function VendorsPage({ vendors, setVendors, onAddVendorClick }) {
           }, 0);
           return (
             <>
-              <div style={{ background: "#fff", border: "1px solid var(--border)", borderRadius: 12, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
+              <div style={{ background: "#FFFFFF", border: "1px solid var(--border)", borderRadius: 12, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
                 <div style={{ width: 46, height: 46, borderRadius: 11, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0, background: "rgba(var(--app-accent-rgb,0,188,212),0.08)", color: "var(--app-accent)" }}><i className="ti ti-truck-delivery"></i></div>
                 <div><div style={{ fontSize: 24, fontWeight: 900, color: "var(--text)", lineHeight: 1 }}>{totalVendors}</div><div style={{ fontSize: 11, color: "var(--text-soft)", marginTop: 3, fontWeight: 600 }}>Total Vendors</div></div>
               </div>
-              <div style={{ background: "#fff", border: "1px solid var(--border)", borderRadius: 12, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
-                <div style={{ width: 46, height: 46, borderRadius: 11, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0, background: "#dcfce7", color: "#16a34a" }}><i className="ti ti-cash"></i></div>
+              <div style={{ background: "#FFFFFF", border: "1px solid var(--border)", borderRadius: 12, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
+                <div style={{ width: 46, height: 46, borderRadius: 11, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0, background: "#E2E8F0", color: "#16A34A" }}><i className="ti ti-cash"></i></div>
                 <div><div style={{ fontSize: 24, fontWeight: 900, color: "var(--text)", lineHeight: 1 }}>{formatCurrency(totalPaid)}</div><div style={{ fontSize: 11, color: "var(--text-soft)", marginTop: 3, fontWeight: 600 }}>Total Paid</div></div>
               </div>
-              <div style={{ background: "#fff", border: "1px solid var(--border)", borderRadius: 12, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
-                <div style={{ width: 46, height: 46, borderRadius: 11, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0, background: "#fee2e2", color: "#dc2626" }}><i className="ti ti-alert-circle"></i></div>
+              <div style={{ background: "#FFFFFF", border: "1px solid var(--border)", borderRadius: 12, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
+                <div style={{ width: 46, height: 46, borderRadius: 11, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0, background: "#E2E8F0", color: "#64748B" }}><i className="ti ti-alert-circle"></i></div>
                 <div><div style={{ fontSize: 24, fontWeight: 900, color: "var(--text)", lineHeight: 1 }}>{formatCurrency(totalOutstanding)}</div><div style={{ fontSize: 11, color: "var(--text-soft)", marginTop: 3, fontWeight: 600 }}>Outstanding Balance</div></div>
               </div>
             </>
@@ -7574,17 +7574,17 @@ function VendorsPage({ vendors, setVendors, onAddVendorClick }) {
 
                   return (
 
-                    <tr key={v._id || i} onClick={() => setViewVendor(v)} style={{ borderBottom: "1px solid #f3f0ff", cursor: "pointer" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                    <tr key={v._id || i} onClick={() => setViewVendor(v)} style={{ borderBottom: "1px solid #EFF6FF", cursor: "pointer" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
 
                       <td style={{ padding: "12px 14px", fontWeight: 700, color: T.text }}>{v.vendorName}</td>
 
                       <td style={{ padding: "12px 14px", color: "var(--app-muted)" }}>{v.vendorProduct}</td>
 
-                      <td style={{ padding: "12px 14px", color: "#6b7280" }}>{formatCurrency(total, v.currency)}</td>
+                      <td style={{ padding: "12px 14px", color: "#64748B" }}>{formatCurrency(total, v.currency)}</td>
 
-                      <td style={{ padding: "12px 14px", color: "#22C55E", fontWeight: 600 }}>{formatCurrency(paid, v.currency)}</td>
+                      <td style={{ padding: "12px 14px", color: "#16A34A", fontWeight: 600 }}>{formatCurrency(paid, v.currency)}</td>
 
-                      <td style={{ padding: "12px 14px", color: balance > 0 ? "#EF4444" : "#22C55E", fontWeight: 700 }}>{formatCurrency(balance, v.currency)}</td>
+                      <td style={{ padding: "12px 14px", color: balance > 0 ? "#64748B" : "#16A34A", fontWeight: 700 }}>{formatCurrency(balance, v.currency)}</td>
 
                       <td style={{ padding: "12px 14px" }}><Badge label={v.modeOfPayment} /></td>
 
@@ -7620,7 +7620,7 @@ function VendorsPage({ vendors, setVendors, onAddVendorClick }) {
 
           <div style={{ display: "flex", alignItems: "center", gap: 14, padding: 16, background: "linear-gradient(135deg,var(--app-bg),var(--app-bg))", borderRadius: 14, border: "1px solid var(--app-border)", marginBottom: 18 }}>
 
-            <div style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 20, fontWeight: 800, flexShrink: 0 }}>{(viewVendor.vendorName || "?")[0].toUpperCase()}</div>
+            <div style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 20, fontWeight: 800, flexShrink: 0 }}>{(viewVendor.vendorName || "?")[0].toUpperCase()}</div>
 
             <div>
 
@@ -7646,9 +7646,9 @@ function VendorsPage({ vendors, setVendors, onAddVendorClick }) {
 
           <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
 
-            <button onClick={() => { setViewVendor(null); openEdit(viewVendor); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Edit</button>
+            <button onClick={() => { setViewVendor(null); openEdit(viewVendor); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#FFFFFF", cursor: "pointer", fontFamily: "inherit" }}>Edit</button>
 
-            <button onClick={() => { setViewVendor(null); setDeleteTarget(viewVendor); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#EF4444,#dc2626)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}> Delete</button>
+            <button onClick={() => { setViewVendor(null); setDeleteTarget(viewVendor); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#64748B,#64748B)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#FFFFFF", cursor: "pointer", fontFamily: "inherit" }}> Delete</button>
 
           </div>
 
@@ -7686,7 +7686,7 @@ function VendorsPage({ vendors, setVendors, onAddVendorClick }) {
 
             <button onClick={() => setEditVendor(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
 
-            <button onClick={saveEdit} disabled={saving} style={{ background: "var(--app-accent-gradient)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer" }}>{saving ? "Saving…" : "Save Changes "}</button>
+            <button onClick={saveEdit} disabled={saving} style={{ background: "var(--app-accent-gradient)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#FFFFFF", cursor: saving ? "not-allowed" : "pointer" }}>{saving ? "Saving…" : "Save Changes "}</button>
 
           </div>
 
@@ -7998,7 +7998,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
         style={{
           position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
           width: "100vw", height: "100vh",
-          background: "rgba(15,28,46,0.55)",
+          background: "rgba(15, 23, 42, 0.55)",
           zIndex: 999999, display: "flex", alignItems: "flex-end", justifyContent: "center",
         }}
       >
@@ -8010,7 +8010,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
           }}
         >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-            <div style={{ fontSize: 17, fontWeight: 800, color: "#fff" }}>{title}</div>
+            <div style={{ fontSize: 17, fontWeight: 800, color: "#FFFFFF" }}>{title}</div>
             <span onClick={closeMobilePopup} style={{ fontSize: 20, cursor: "pointer", color: "rgba(255,255,255,0.8)" }}>✕</span>
           </div>
           {children}
@@ -8145,57 +8145,57 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
     };
 
     return (
-      <div style={{ position: "fixed", inset: 0, background: "rgba(15,10,41,0.45)", zIndex: 9999, display: "flex", alignItems: "flex-end", justifyContent: "center" }} onClick={onClose}>
-        <div style={{ background: "#fff", borderRadius: "20px 20px 0 0", width: "100%", maxWidth: 480, maxHeight: "88vh", overflowY: "auto", padding: 20 }} onClick={e => e.stopPropagation()}>
+      <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.45)", zIndex: 9999, display: "flex", alignItems: "flex-end", justifyContent: "center" }} onClick={onClose}>
+        <div style={{ background: "#FFFFFF", borderRadius: "20px 20px 0 0", width: "100%", maxWidth: 480, maxHeight: "88vh", overflowY: "auto", padding: 20 }} onClick={e => e.stopPropagation()}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-            <div style={{ fontSize: 16, fontWeight: 800, color: "#0f172a" }}>Add Task</div>
-            <button onClick={onClose} style={{ background: "none", border: "none", fontSize: 20, color: "#94a3b8", cursor: "pointer" }}>&times;</button>
+            <div style={{ fontSize: 16, fontWeight: 800, color: "#0F172A" }}>Add Task</div>
+            <button onClick={onClose} style={{ background: "none", border: "none", fontSize: 20, color: "#64748B", cursor: "pointer" }}>&times;</button>
           </div>
           <form onSubmit={handleSave} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             <div>
-              <label style={{ fontSize: 12, fontWeight: 700, color: "#64748b" }}>Project</label>
-              <select value={selProjectId} onChange={e => { setSelProjectId(e.target.value); setMilestone(""); }} required style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid #e2e8f0", marginTop: 4 }}>
+              <label style={{ fontSize: 12, fontWeight: 700, color: "#64748B" }}>Project</label>
+              <select value={selProjectId} onChange={e => { setSelProjectId(e.target.value); setMilestone(""); }} required style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid #E2E8F0", marginTop: 4 }}>
                 <option value="">Select project</option>
                 {(projects || []).map(p => <option key={p._id} value={p._id}>{p.name || p.title}</option>)}
               </select>
             </div>
             <div>
-              <label style={{ fontSize: 12, fontWeight: 700, color: "#64748b" }}>Task Title</label>
-              <input value={title} onChange={e => setTitle(e.target.value)} required style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid #e2e8f0", marginTop: 4 }} />
+              <label style={{ fontSize: 12, fontWeight: 700, color: "#64748B" }}>Task Title</label>
+              <input value={title} onChange={e => setTitle(e.target.value)} required style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid #E2E8F0", marginTop: 4 }} />
             </div>
             <div>
-              <label style={{ fontSize: 12, fontWeight: 700, color: "#64748b" }}>Description</label>
-              <textarea value={description} onChange={e => setDescription(e.target.value)} rows={2} style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid #e2e8f0", marginTop: 4 }} />
+              <label style={{ fontSize: 12, fontWeight: 700, color: "#64748B" }}>Description</label>
+              <textarea value={description} onChange={e => setDescription(e.target.value)} rows={2} style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid #E2E8F0", marginTop: 4 }} />
             </div>
             <div>
-              <label style={{ fontSize: 12, fontWeight: 700, color: "#64748b" }}>Milestone</label>
-              <select value={milestone} onChange={e => setMilestone(e.target.value)} required disabled={!selProjectId} style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid #e2e8f0", marginTop: 4 }}>
+              <label style={{ fontSize: 12, fontWeight: 700, color: "#64748B" }}>Milestone</label>
+              <select value={milestone} onChange={e => setMilestone(e.target.value)} required disabled={!selProjectId} style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid #E2E8F0", marginTop: 4 }}>
                 <option value="">Select milestone</option>
                 {milestonesArr.map((m, i) => <option key={i} value={m.name || m.title || m}>{m.name || m.title || m}</option>)}
               </select>
             </div>
             <div style={{ display: "flex", gap: 12 }}>
               <div style={{ flex: 1 }}>
-                <label style={{ fontSize: 12, fontWeight: 700, color: "#64748b" }}>Priority</label>
-                <select value={priority} onChange={e => setPriority(e.target.value)} style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid #e2e8f0", marginTop: 4 }}>
+                <label style={{ fontSize: 12, fontWeight: 700, color: "#64748B" }}>Priority</label>
+                <select value={priority} onChange={e => setPriority(e.target.value)} style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid #E2E8F0", marginTop: 4 }}>
                   <option value="low">Low</option>
                   <option value="medium">Medium</option>
                   <option value="high">High</option>
                 </select>
               </div>
               <div style={{ flex: 1 }}>
-                <label style={{ fontSize: 12, fontWeight: 700, color: "#64748b" }}>Due Date</label>
-                <input type="date" value={due} onChange={e => setDue(e.target.value)} style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid #e2e8f0", marginTop: 4 }} />
+                <label style={{ fontSize: 12, fontWeight: 700, color: "#64748B" }}>Due Date</label>
+                <input type="date" value={due} onChange={e => setDue(e.target.value)} style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid #E2E8F0", marginTop: 4 }} />
               </div>
             </div>
             <div>
-              <label style={{ fontSize: 12, fontWeight: 700, color: "#64748b" }}>Assign To</label>
-              <select value={assignTo} onChange={e => setAssignTo(e.target.value)} style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid #e2e8f0", marginTop: 4 }}>
+              <label style={{ fontSize: 12, fontWeight: 700, color: "#64748B" }}>Assign To</label>
+              <select value={assignTo} onChange={e => setAssignTo(e.target.value)} style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid #E2E8F0", marginTop: 4 }}>
                 <option value="">Unassigned</option>
                 {(employees || []).map((emp, i) => <option key={i} value={emp.name || emp.employeeName}>{emp.name || emp.employeeName}</option>)}
               </select>
             </div>
-            <button type="submit" disabled={saving} style={{ marginTop: 8, background: "var(--app-accent, #2563EB)", color: "#fff", border: "none", borderRadius: 12, padding: "12px 0", fontSize: 14, fontWeight: 800, cursor: "pointer" }}>
+            <button type="submit" disabled={saving} style={{ marginTop: 8, background: "var(--app-accent, #2563EB)", color: "#FFFFFF", border: "none", borderRadius: 12, padding: "12px 0", fontSize: 14, fontWeight: 800, cursor: "pointer" }}>
               {saving ? "Saving..." : "Save Task"}
             </button>
           </form>
@@ -8276,26 +8276,26 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
     };
 
     const statusGroups = [
-      { key: "unpaid", label: "Unpaid", color: "#d97706", bg: "#fff7ed" },
-      { key: "overdue", label: "Overdue", color: "#dc2626", bg: "#fef2f2" },
-      { key: "partpaid", label: "Part Paid", color: "#2563eb", bg: "#eff6ff" },
-      { key: "paid", label: "Paid", color: "#16a34a", bg: "#f0fdf4" },
+      { key: "unpaid", label: "Unpaid", color: "#64748B", bg: "#F8FAFC" },
+      { key: "overdue", label: "Overdue", color: "#64748B", bg: "#F8FAFC" },
+      { key: "partpaid", label: "Part Paid", color: "#2563EB", bg: "#EFF6FF" },
+      { key: "paid", label: "Paid", color: "#16A34A", bg: "#F8FAFC" },
     ];
 
     return (
       <div style={{ padding: "0 16px", marginTop: 16 }}>
         {/* Teal action section */}
-        <div style={{ background: "var(--app-accent, #2563EB)", borderRadius: 18, padding: 20, boxShadow: "0 8px 24px rgba(37, 99, 235,0.25)" }}>
+        <div style={{ background: "var(--app-accent, #2563EB)", borderRadius: 18, padding: 20, boxShadow: "0 8px 24px rgba(37, 99, 235, 0.25)" }}>
           <div style={{ display: "flex", gap: 12 }}>
             <button
               onClick={() => { setJumpProject(null); setJumpInvoice(null); setInvoicePrefill(null); setSidebarNavClickId(id => id + 1); setActive("invoices"); }}
-              style={{ flex: 1, background: "#fff", color: "var(--app-accent, #2563EB)", border: "none", borderRadius: 12, padding: "12px 0", fontSize: 14, fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
+              style={{ flex: 1, background: "#FFFFFF", color: "var(--app-accent, #2563EB)", border: "none", borderRadius: 12, padding: "12px 0", fontSize: 14, fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
             >
               <i className="ti ti-file-invoice"></i> Create Invoice
             </button>
             <button
               onClick={() => setShowDashboardAddTaskModal(true)}
-              style={{ flex: 1, background: "rgba(255,255,255,0.18)", color: "#fff", border: "1.5px solid rgba(255,255,255,0.5)", borderRadius: 12, padding: "12px 0", fontSize: 14, fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
+              style={{ flex: 1, background: "rgba(255,255,255,0.18)", color: "#FFFFFF", border: "1.5px solid rgba(255,255,255,0.5)", borderRadius: 12, padding: "12px 0", fontSize: 14, fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
             >
               <i className="ti ti-plus"></i> Add Task
             </button>
@@ -8303,55 +8303,55 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
         </div>
         {showDashboardAddTaskModal && (
           <div style={{ position: "fixed", inset: 0, zIndex: 99999, background: "rgba(0,0,0,0.55)", display: "flex", alignItems: "center", justifyContent: "center", padding: "0 12px" }}>
-            <div style={{ background: "#fff", borderRadius: 20, width: "100%", maxWidth: 460, padding: 24, boxShadow: "0 20px 60px rgba(0,0,0,0.25)", boxSizing: "border-box", maxHeight: "92vh", overflowY: "auto" }}>
-              <h3 style={{ margin: "0 0 18px", fontSize: 18, fontWeight: 800, color: "#0f172a" }}>Add New Task</h3>
+            <div style={{ background: "#FFFFFF", borderRadius: 20, width: "100%", maxWidth: 460, padding: 24, boxShadow: "0 20px 60px rgba(0,0,0,0.25)", boxSizing: "border-box", maxHeight: "92vh", overflowY: "auto" }}>
+              <h3 style={{ margin: "0 0 18px", fontSize: 18, fontWeight: 800, color: "#0F172A" }}>Add New Task</h3>
               <form onSubmit={handleDashboardAddTask}>
 
                 {/* Task Name */}
                 <div style={{ marginBottom: 12 }}>
-                  <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", marginBottom: 4 }}>Task Name *</label>
+                  <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748B", marginBottom: 4 }}>Task Name *</label>
                   <input
                     type="text"
                     value={dashboardTaskTitle}
                     onChange={e => setDashboardTaskTitle(e.target.value)}
                     placeholder="Enter task title"
                     required
-                    style={{ width: "100%", padding: "10px", borderRadius: 8, border: "1.5px solid #e2e8f0", outline: "none", boxSizing: "border-box", fontSize: 13 }}
+                    style={{ width: "100%", padding: "10px", borderRadius: 8, border: "1.5px solid #E2E8F0", outline: "none", boxSizing: "border-box", fontSize: 13 }}
                   />
                 </div>
 
                 {/* Description */}
                 <div style={{ marginBottom: 12 }}>
-                  <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", marginBottom: 4 }}>Description</label>
+                  <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748B", marginBottom: 4 }}>Description</label>
                   <textarea
                     value={dashboardTaskDesc}
                     onChange={e => setDashboardTaskDesc(e.target.value)}
                     placeholder="Enter details..."
-                    style={{ width: "100%", padding: "10px", borderRadius: 8, border: "1.5px solid #e2e8f0", outline: "none", resize: "vertical", minHeight: 64, boxSizing: "border-box", fontSize: 13 }}
+                    style={{ width: "100%", padding: "10px", borderRadius: 8, border: "1.5px solid #E2E8F0", outline: "none", resize: "vertical", minHeight: 64, boxSizing: "border-box", fontSize: 13 }}
                   />
                 </div>
 
                 {/* Priority + Due Date */}
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
                   <div>
-                    <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", marginBottom: 4 }}>Priority</label>
-                    <select value={dashboardTaskPriority} onChange={e => setDashboardTaskPriority(e.target.value)} style={{ width: "100%", padding: "10px", borderRadius: 8, border: "1.5px solid #e2e8f0", outline: "none", boxSizing: "border-box", fontSize: 13 }}>
+                    <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748B", marginBottom: 4 }}>Priority</label>
+                    <select value={dashboardTaskPriority} onChange={e => setDashboardTaskPriority(e.target.value)} style={{ width: "100%", padding: "10px", borderRadius: 8, border: "1.5px solid #E2E8F0", outline: "none", boxSizing: "border-box", fontSize: 13 }}>
                       <option value="low">Low</option>
                       <option value="medium">Medium</option>
                       <option value="high">High</option>
                     </select>
                   </div>
                   <div>
-                    <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", marginBottom: 4 }}>Due Date</label>
-                    <input type="date" value={dashboardTaskDue} onChange={e => setDashboardTaskDue(e.target.value)} style={{ width: "100%", padding: "9px", borderRadius: 8, border: "1.5px solid #e2e8f0", outline: "none", boxSizing: "border-box", background: "#fff", fontFamily: "inherit", fontSize: 13, cursor: "pointer" }} />
+                    <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748B", marginBottom: 4 }}>Due Date</label>
+                    <input type="date" value={dashboardTaskDue} onChange={e => setDashboardTaskDue(e.target.value)} style={{ width: "100%", padding: "9px", borderRadius: 8, border: "1.5px solid #E2E8F0", outline: "none", boxSizing: "border-box", background: "#FFFFFF", fontFamily: "inherit", fontSize: 13, cursor: "pointer" }} />
                   </div>
                 </div>
 
                 {/* Status + Milestone */}
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
                   <div>
-                    <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", marginBottom: 4 }}>Status</label>
-                    <select value={dashboardTaskStatus} onChange={e => setDashboardTaskStatus(e.target.value)} style={{ width: "100%", padding: "10px", borderRadius: 8, border: "1.5px solid #e2e8f0", outline: "none", boxSizing: "border-box", fontSize: 13 }}>
+                    <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748B", marginBottom: 4 }}>Status</label>
+                    <select value={dashboardTaskStatus} onChange={e => setDashboardTaskStatus(e.target.value)} style={{ width: "100%", padding: "10px", borderRadius: 8, border: "1.5px solid #E2E8F0", outline: "none", boxSizing: "border-box", fontSize: 13 }}>
                       <option value="Not Started">Not Started</option>
                       <option value="In Progress">In Progress</option>
                       <option value="Completed">Completed</option>
@@ -8359,12 +8359,12 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                     </select>
                   </div>
                   <div>
-                    <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", marginBottom: 4 }}>Link to Milestone *</label>
+                    <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748B", marginBottom: 4 }}>Link to Milestone *</label>
                     <select
                       required
                       value={dashboardTaskMilestone}
                       onChange={e => setDashboardTaskMilestone(e.target.value)}
-                      style={{ width: "100%", padding: "10px", borderRadius: 8, border: "1.5px solid #e2e8f0", outline: "none", boxSizing: "border-box", fontSize: 13 }}
+                      style={{ width: "100%", padding: "10px", borderRadius: 8, border: "1.5px solid #E2E8F0", outline: "none", boxSizing: "border-box", fontSize: 13 }}
                     >
                       <option value="">-- Select Milestone --</option>
                     </select>
@@ -8373,11 +8373,11 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                 {/* Team Members */}
                 <div style={{ marginBottom: 16 }}>
-                  <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", marginBottom: 4 }}>Select Team Members</label>
-                  <div style={{ width: "100%", maxHeight: 150, overflowY: "auto", padding: "8px", borderRadius: 8, border: "1.5px solid #e2e8f0", boxSizing: "border-box", background: "#fff" }}>
-                    <div style={{ fontSize: 12, color: "#94a3b8", padding: "4px" }}>No employees assigned to this project.</div>
+                  <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748B", marginBottom: 4 }}>Select Team Members</label>
+                  <div style={{ width: "100%", maxHeight: 150, overflowY: "auto", padding: "8px", borderRadius: 8, border: "1.5px solid #E2E8F0", boxSizing: "border-box", background: "#FFFFFF" }}>
+                    <div style={{ fontSize: 12, color: "#64748B", padding: "4px" }}>No employees assigned to this project.</div>
                   </div>
-                  <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 4 }}></div>
+                  <div style={{ fontSize: 11, color: "#64748B", marginTop: 4 }}></div>
                 </div>
 
                 {/* Actions */}
@@ -8385,13 +8385,13 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                   <button
                     type="button"
                     onClick={() => setShowDashboardAddTaskModal(false)}
-                    style={{ padding: "10px 20px", borderRadius: 10, border: "1.5px solid #e2e8f0", background: "#fff", color: "#64748b", fontWeight: 700, fontSize: 13, cursor: "pointer" }}
+                    style={{ padding: "10px 20px", borderRadius: 10, border: "1.5px solid #E2E8F0", background: "#FFFFFF", color: "#64748B", fontWeight: 700, fontSize: 13, cursor: "pointer" }}
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    style={{ padding: "10px 24px", borderRadius: 10, border: "none", background: "#2563EB", color: "#fff", fontWeight: 800, fontSize: 13, cursor: "pointer" }}
+                    style={{ padding: "10px 24px", borderRadius: 10, border: "none", background: "#2563EB", color: "#FFFFFF", fontWeight: 800, fontSize: 13, cursor: "pointer" }}
                   >
                     Add Task
                   </button>
@@ -8405,7 +8405,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
           {!mobShowInvoiceList ? (
             <>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-                <div style={{ fontSize: 15, fontWeight: 800, color: "#0f172a" }}>Projects</div>
+                <div style={{ fontSize: 15, fontWeight: 800, color: "#0F172A" }}>Projects</div>
               </div>
 
               <div style={{ display: "flex", flexDirection: "column" }}>
@@ -8416,9 +8416,9 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                   const status = p.status || "Active";
                   const statusMeta = (() => {
                     const s = status.toLowerCase();
-                    if (s === "on hold" || s === "paused") return { color: "#d97706", bg: "#fff7ed" };
-                    if (s === "cancelled") return { color: "#dc2626", bg: "#fef2f2" };
-                    return { color: "#16a34a", bg: "#dcfce7" };
+                    if (s === "on hold" || s === "paused") return { color: "#64748B", bg: "#F8FAFC" };
+                    if (s === "cancelled") return { color: "#64748B", bg: "#F8FAFC" };
+                    return { color: "#16A34A", bg: "#E2E8F0" };
                   })();
 
                   // ── Same Budget Used calculation as ModernProjectDetails.jsx ──
@@ -8452,11 +8452,11 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                     <div
                       key={p._id || idx}
                       onClick={() => { setJumpProject(p); setProjectDetailsReadOnly(false); setSidebarOverride("dashboard"); setActive("project-details"); }}
-                      style={{ padding: "12px 14px", borderBottom: "1px solid #B2EBF2", cursor: "pointer", display: "flex", flexDirection: "column", gap: 10 }}
+                      style={{ padding: "12px 14px", borderBottom: "1px solid #E2E8F0", cursor: "pointer", display: "flex", flexDirection: "column", gap: 10 }}
                     >
                       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
                         <div style={{ minWidth: 0 }}>
-                          <div style={{ fontSize: 14.5, fontWeight: 800, color: "#0f172a", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                          <div style={{ fontSize: 14.5, fontWeight: 800, color: "#0F172A", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                             {p.name}
                           </div>
                           {clientLabelP ? (
@@ -8466,12 +8466,12 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                         <span style={{ background: statusMeta.bg, color: statusMeta.color, padding: "6px 14px", borderRadius: 20, fontSize: 12.5, fontWeight: 700, flexShrink: 0 }}>{status}</span>
                       </div>
                       <div>
-                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "#0f172a", marginBottom: 3 }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "#0F172A", marginBottom: 3 }}>
                           <span>Budget Used</span>
-                          <span style={{ fontWeight: 700, color: "#0f172a" }}>{budgetPct}%</span>
+                          <span style={{ fontWeight: 700, color: "#0F172A" }}>{budgetPct}%</span>
                         </div>
-                        <div style={{ height: 5, background: "#ffffff", borderRadius: 4, overflow: "hidden" }}>
-                          <div style={{ width: `${budgetPct}%`, height: "100%", background: "#2563eb", borderRadius: 4 }} />
+                        <div style={{ height: 5, background: "#FFFFFF", borderRadius: 4, overflow: "hidden" }}>
+                          <div style={{ width: `${budgetPct}%`, height: "100%", background: "#2563EB", borderRadius: 4 }} />
                         </div>
                       </div> </div>
                   );
@@ -8479,7 +8479,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
               {allProjects.length > 3 && (
                 <button
                   onClick={() => setMobShowAllProjects(v => !v)}
-                  style={{ width: "100%", marginTop: 14, background: "#fff", border: "1.5px solid var(--app-accent, #2563EB)", color: "var(--app-accent, #2563EB)", borderRadius: 12, padding: "10px 0", fontSize: 13, fontWeight: 800, cursor: "pointer" }}
+                  style={{ width: "100%", marginTop: 14, background: "#FFFFFF", border: "1.5px solid var(--app-accent, #2563EB)", color: "var(--app-accent, #2563EB)", borderRadius: 12, padding: "10px 0", fontSize: 13, fontWeight: 800, cursor: "pointer" }}
                 >
                   {mobShowAllProjects ? "▲ See Less" : `▼ See All ${allProjects.length} Projects`}
                 </button>
@@ -8488,22 +8488,22 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
           ) : (
             <>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-                <div style={{ fontSize: 15, fontWeight: 800, color: "#0f172a" }}>Invoice List</div>
+                <div style={{ fontSize: 15, fontWeight: 800, color: "#0F172A" }}>Invoice List</div>
                 <div onClick={() => setMobShowInvoiceList(false)} style={{ fontSize: 12, fontWeight: 700, color: "var(--app-accent, #2563EB)", cursor: "pointer" }}>Back to Projects</div>
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                 {statusGroups.map(g => {
                   const list = invoicesByStatus(g.key);
                   return (
-                    <div key={g.key} style={{ background: "#fff", borderRadius: 14, padding: 16, border: "1px solid rgba(0,0,0,0.08)", height: 260, overflowY: "auto", boxSizing: "border-box" }}>
+                    <div key={g.key} style={{ background: "#FFFFFF", borderRadius: 14, padding: 16, border: "1px solid rgba(0,0,0,0.08)", height: 260, overflowY: "auto", boxSizing: "border-box" }}>
                       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: list.length ? 10 : 0 }}>
                         <span style={{ background: g.bg, color: g.color, padding: "4px 10px", borderRadius: 8, fontSize: 11, fontWeight: 800 }}>{g.label}</span>
-                        <span style={{ fontSize: 12, color: "rgba(15,28,46,0.5)", fontWeight: 700 }}>{list.length}</span>
+                        <span style={{ fontSize: 12, color: "rgba(15, 23, 42, 0.5)", fontWeight: 700 }}>{list.length}</span>
                       </div>
                       {list.slice(0, 5).map((inv, i) => (
                         <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 12, padding: "6px 0", borderTop: i === 0 ? "1px solid rgba(0,0,0,0.05)" : "none" }}>
                           <span style={{ fontWeight: 600 }}>{inv.clientName || inv.client || "Client"}</span>
-                          <span style={{ color: "rgba(15,28,46,0.5)" }}>{formatCurrency(inv.grandTotal, inv.currency)}</span>
+                          <span style={{ color: "rgba(15, 23, 42, 0.5)" }}>{formatCurrency(inv.grandTotal, inv.currency)}</span>
                         </div>
                       ))}
                     </div>
@@ -8525,12 +8525,12 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
       <div
         style={{
           position: "absolute", top: "100%", left: 0, right: 0, marginTop: 8,
-          background: "#fff", borderRadius: 14, border: "1px solid rgba(0,0,0,0.08)",
+          background: "#FFFFFF", borderRadius: 14, border: "1px solid rgba(0,0,0,0.08)",
           boxShadow: "0 8px 28px rgba(0,0,0,0.15)", padding: 18, zIndex: 50,
           maxHeight: 320, overflowY: "auto",
         }}
       >
-        <div style={{ fontSize: 14, fontWeight: 800, color: "#0f172a", marginBottom: 10 }}>{title}</div>
+        <div style={{ fontSize: 14, fontWeight: 800, color: "#0F172A", marginBottom: 10 }}>{title}</div>
         {children}
       </div>
     );
@@ -8540,7 +8540,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
   const MobileSection = ({ id, title, icon, children, defaultOpenDesktop = true }) => {
     const isOpen = isDesktopWidth ? defaultOpenDesktop : !!mobileOpenSections[id];
     return (
-      <div style={{ background: "#ffffff", borderRadius: 16, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", overflow: "hidden" }}>
+      <div style={{ background: "#FFFFFF", borderRadius: 16, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", overflow: "hidden" }}>
         <div
           onClick={() => !isDesktopWidth && toggleMobileSection(id)}
           style={{
@@ -8548,7 +8548,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
             padding: "16px 20px", cursor: isDesktopWidth ? "default" : "pointer", userSelect: "none",
           }}
         >
-          <div style={{ fontSize: 16, fontWeight: 800, color: "#0f172a", display: "flex", alignItems: "center", gap: 8 }}>
+          <div style={{ fontSize: 16, fontWeight: 800, color: "#0F172A", display: "flex", alignItems: "center", gap: 8 }}>
             {icon} {title}
           </div>
           {!isDesktopWidth && (
@@ -8582,11 +8582,11 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
 
 
-  const [appTheme, setAppTheme] = useState(() => localStorage.getItem("appTheme") || "teal");
+  const [appTheme, setAppTheme] = useState("professional");
 
   const [showThemePicker, setShowThemePicker] = useState(false);
 
-  const [customColor, setCustomColor] = useState(() => localStorage.getItem("appCustomColor") || "#2563EB");
+  const [customColor, setCustomColor] = useState("#2563EB");
 
   const [showColorPicker, setShowColorPicker] = useState(false);
 
@@ -8634,7 +8634,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
 
   const hexToRgb = (hex) => {
-    if (!hex || hex.startsWith("var")) return "0, 188, 212"; // Default teal if invalid
+    if (!hex || hex.startsWith("var")) return "37, 99, 235";
 
     const r = parseInt(hex.slice(1, 3), 16);
 
@@ -8650,60 +8650,28 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
   // Generate full theme from a single hex color
 
-  const generateThemeFromColor = (hex) => {
-
-    const [h, s, l] = hexToHsl(hex);
-
-    // Ensure accent is rich and dark enough for white text
-
-    const accentL = Math.min(l, 50); // Lowered lightness for better visibility
-
-    const accentS = Math.max(s, 70); // Higher saturation for "punchy" color
-
-    const accentColor = hslToHex(h, accentS, accentL);
+  const generateThemeFromColor = () => PROFESSIONAL_THEME;
 
 
 
-    return {
-
-      sidebar: accentColor, // Use the vibrant color directly for sidebar as requested
-
-      accent: accentColor,
-
-      bg: hslToHex(h, 30, 95), // Clearer tinted background
-
-      muted: hslToHex(h, 60, 30), // Much darker muted text (30% vs 35%)
-
-      border: hslToHex(h, 40, 80), // Stronger borders (80% lightness vs 85%)
-
-      dot: accentColor
-
-    };
-
+  const PROFESSIONAL_THEME = {
+    label: "Professional",
+    sidebar: "#0F172A",
+    accent: "#2563EB",
+    bg: "#F8FAFC",
+    muted: "#64748B",
+    border: "#E2E8F0",
+    dot: "#2563EB",
+    primary: "#0F172A",
+    card: "#FFFFFF",
+    text: "#1E293B",
+    accentLight: "#EFF6FF",
+    success: "#16A34A",
   };
 
-
-
   const THEMES = {
-
-    purple: { label: "Purple", sidebar: "#7c3aed", accent: "#7c3aed", bg: "#f5f3ff", muted: "#7c3aed", border: "#ddd6fe", dot: "#7c3aed" },
-
-    ocean: { label: "Ocean", sidebar: "#0284c7", accent: "#0284c7", bg: "#f0f9ff", muted: "#0369a1", border: "#93c5fd", dot: "#0284c7" },
-
-    forest: { label: "Forest", sidebar: "#16a34a", accent: "#16a34a", bg: "#f0fdf4", muted: "#15803d", border: "#86efac", dot: "#16a34a" },
-
-    sunset: { label: "Sunset", sidebar: "#ea580c", accent: "#ea580c", bg: "#fff7ed", muted: "#c2410c", border: "#fdba74", dot: "#ea580c" },
-
-    rose: { label: "Rose", sidebar: "#e11d48", accent: "#e11d48", bg: "#fff1f2", muted: "#be123c", border: "#fda4af", dot: "#e11d48" },
-
-    slate: { label: "Slate", sidebar: "#475569", accent: "#475569", bg: "#f8fafc", muted: "#334155", border: "#94a3b8", dot: "#475569" },
-
-    mint: { label: "Mint", sidebar: "#2563eb", accent: "#2563eb", bg: "#f0fdfa", muted: "#0f766e", border: "#5eead4", dot: "#2563eb" },
-
-    candy: { label: "Candy", sidebar: "#c026d3", accent: "#c026d3", bg: "#fdf4ff", muted: "#a21caf", border: "#f5d0fe", dot: "#c026d3" },
-
-    teal: { label: "Teal", sidebar: "#2563EB", accent: "#2563EB", bg: "#F8FAFC", muted: "#64748B", border: "#E2E8F0", dot: "#2563EB" },
-
+    professional: PROFESSIONAL_THEME,
+    teal: PROFESSIONAL_THEME,
   };
 
 
@@ -8787,7 +8755,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
 
 
-  const currentTheme = appTheme === "custom" ? generateThemeFromColor(customColor) : (THEMES[appTheme] || THEMES.teal);
+  const currentTheme = THEMES.professional;
 
 
   const headerLogoRef = useRef();
@@ -11084,7 +11052,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
       background: isVar ? `var(--app-accent-gradient, linear-gradient(135deg, ${color}, ${color}))` : `linear-gradient(135deg, ${color}, ${color}ee)`,
 
-      color: "#fff",
+      color: "#FFFFFF",
 
       border: "none",
 
@@ -11222,7 +11190,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
         {/* Mobile Topbar */}
 
-        <div className="mob-topbar no-print mob-topbar-dashboard-hidden" style={{ display: (validActive === "dashboard" && !isDesktopWidth) ? "none" : "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", background: "#fff", borderBottom: "1px solid var(--app-border)", position: "sticky", top: 0, zIndex: 100, boxShadow: "0 2px 8px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)" }}>
+        <div className="mob-topbar no-print mob-topbar-dashboard-hidden" style={{ display: (validActive === "dashboard" && !isDesktopWidth) ? "none" : "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", background: "#FFFFFF", borderBottom: "1px solid var(--app-border)", position: "sticky", top: 0, zIndex: 100, boxShadow: "0 2px 8px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)" }}>
 
           {!enforceMySubscriptions ? (
 
@@ -11250,7 +11218,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                 {enforceMySubscriptions && (
 
-                  <button onClick={handleLogout} style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 8, padding: "6px 12px", color: "#ef4444", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Logout</button>
+                  <button onClick={handleLogout} style={{ background: "rgba(100, 116, 139, 0.1)", border: "1px solid rgba(100, 116, 139, 0.2)", borderRadius: 8, padding: "6px 12px", color: "#64748B", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Logout</button>
 
                 )}
 
@@ -11260,11 +11228,11 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                     {companyLogo ? (
 
-                      <img src={companyLogo} alt="logo" style={{ height: 38, width: "auto", maxWidth: "100px", objectFit: "contain", flexShrink: 0, display: "block", borderRadius: 10, background: "#fff", border: "1.5px solid var(--app-border)" }} />
+                      <img src={companyLogo} alt="logo" style={{ height: 38, width: "auto", maxWidth: "100px", objectFit: "contain", flexShrink: 0, display: "block", borderRadius: 10, background: "#FFFFFF", border: "1.5px solid var(--app-border)" }} />
 
                     ) : (
 
-                      <div style={{ width: 38, height: 38, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", color: "#fff", fontWeight: 800, fontSize: 13 }}>{initials}</div>
+                      <div style={{ width: 38, height: 38, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", color: "#FFFFFF", fontWeight: 800, fontSize: 13 }}>{initials}</div>
 
                     )}
 
@@ -11300,45 +11268,45 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
               <div className="topbar-icon" onClick={() => { const next = !showNotifPanel; setShowNotifPanel(next); fetchPendingLeaves(); fetchNotifications(); if (next) markAllNotificationsRead(); }} style={{ position: 'relative', cursor: 'pointer' }}>
                 <i className="ti ti-bell"></i>
                 {unreadNotifCount > 0 && (
-                  <span style={{ position: 'absolute', top: -6, right: -6, minWidth: 16, height: 16, padding: '0 3px', background: '#EF4444', borderRadius: 10, border: '1.5px solid #fff', zIndex: 2, boxSizing: 'border-box', color: '#fff', fontSize: 9, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1 }}>{unreadNotifCount > 99 ? '99+' : unreadNotifCount}</span>
+                  <span style={{ position: 'absolute', top: -6, right: -6, minWidth: 16, height: 16, padding: '0 3px', background: '#64748B', borderRadius: 10, border: '1.5px solid #FFFFFF', zIndex: 2, boxSizing: 'border-box', color: '#FFFFFF', fontSize: 9, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1 }}>{unreadNotifCount > 99 ? '99+' : unreadNotifCount}</span>
                 )}
                 {showNotifPanel && (
-                  <div onClick={e => e.stopPropagation()} style={{ position: 'absolute', top: 44, right: 0, width: 380, background: '#fff', borderRadius: 16, boxShadow: '0 8px 32px rgba(0,0,0,0.18)', border: '1px solid #E2E8F0', zIndex: 99999, overflow: 'hidden' }}>
+                  <div onClick={e => e.stopPropagation()} style={{ position: 'absolute', top: 44, right: 0, width: 380, background: '#FFFFFF', borderRadius: 16, boxShadow: '0 8px 32px rgba(0,0,0,0.18)', border: '1px solid #E2E8F0', zIndex: 99999, overflow: 'hidden' }}>
                     <div style={{ padding: '16px 20px', borderBottom: '1px solid #E2E8F0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--app-accent, var(--app-accent, #2563EB))' }}>
-                      <div style={{ fontSize: 15, fontWeight: 800, color: '#fff', display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <div style={{ fontSize: 15, fontWeight: 800, color: '#FFFFFF', display: 'flex', alignItems: 'center', gap: 8 }}>
                         <i className="ti ti-bell"></i> Notifications
-                        {pendingLeaves.length > 0 && <span style={{ background: '#EF4444', color: '#fff', borderRadius: 20, padding: '2px 8px', fontSize: 10, fontWeight: 800 }}>{pendingLeaves.length}</span>}
+                        {pendingLeaves.length > 0 && <span style={{ background: '#64748B', color: '#FFFFFF', borderRadius: 20, padding: '2px 8px', fontSize: 10, fontWeight: 800 }}>{pendingLeaves.length}</span>}
                       </div>
-                      <button onClick={() => setShowNotifPanel(false)} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', borderRadius: 8, width: 26, height: 26, cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+                      <button onClick={() => setShowNotifPanel(false)} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#FFFFFF', borderRadius: 8, width: 26, height: 26, cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
                     </div>
                     <div style={{ maxHeight: 420, overflowY: 'auto', padding: '12px 16px' }}>
-                      <div style={{ fontSize: 11, fontWeight: 800, color: '#718096', textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 10 }}>
+                      <div style={{ fontSize: 11, fontWeight: 800, color: '#64748B', textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 10 }}>
                         <i className="ti ti-user-x" style={{ marginRight: 5, color: 'var(--app-accent)' }}></i> Leave Requests
                       </div>
                       {pendingLeaves.length === 0 ? (
-                        <div style={{ textAlign: 'center', padding: '20px 0', color: '#A0AEC0', fontSize: 13 }}>
+                        <div style={{ textAlign: 'center', padding: '20px 0', color: '#64748B', fontSize: 13 }}>
                           <i className="ti ti-bell-off" style={{ fontSize: 28, display: 'block', marginBottom: 8, opacity: 0.4 }}></i>
                           No pending notifications
                         </div>
                       ) : (
                         pendingLeaves.map((l, i) => {
                           const initials = l.employeeName ? l.employeeName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'EE';
-                          const colors = ['#f59e0b', '#a855f7', '#0ea5e9', '#ec4899', '#22c55e'];
+                          const colors = ['#64748B', '#64748B', '#2563EB', '#64748B', '#16A34A'];
                           const bg = colors[i % colors.length];
                           const detail = `${l.type || 'Leave'} · ${l.from || ''} ${l.to ? '- ' + l.to : ''}`;
                           return (
-                            <div key={l._id || i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', borderBottom: i === pendingLeaves.length - 1 ? 'none' : '1px solid #F0F4F8' }}>
-                              <div style={{ width: 38, height: 38, borderRadius: '50%', background: bg, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 800, flexShrink: 0 }}>{initials}</div>
+                            <div key={l._id || i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', borderBottom: i === pendingLeaves.length - 1 ? 'none' : '1px solid #EFF6FF' }}>
+                              <div style={{ width: 38, height: 38, borderRadius: '50%', background: bg, color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 800, flexShrink: 0 }}>{initials}</div>
                               <div style={{ flex: 1, minWidth: 0 }}>
-                                <div style={{ fontSize: 13, fontWeight: 700, color: '#1A2332' }}>{l.employeeName}</div>
-                                <div style={{ fontSize: 11, color: '#718096', marginTop: 2 }}>{detail}</div>
-                                <span style={{ display: 'inline-block', marginTop: 4, background: '#FEF3C7', color: '#D97706', borderRadius: 20, padding: '2px 8px', fontSize: 10, fontWeight: 800 }}>Pending</span>
+                                <div style={{ fontSize: 13, fontWeight: 700, color: '#1E293B' }}>{l.employeeName}</div>
+                                <div style={{ fontSize: 11, color: '#64748B', marginTop: 2 }}>{detail}</div>
+                                <span style={{ display: 'inline-block', marginTop: 4, background: '#E2E8F0', color: '#64748B', borderRadius: 20, padding: '2px 8px', fontSize: 10, fontWeight: 800 }}>Pending</span>
                               </div>
                               <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flexShrink: 0 }}>
-                                <button onClick={() => handleApproveLeave(l._id)} style={{ background: '#DCFCE7', color: '#166534', border: 'none', padding: '5px 10px', borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
+                                <button onClick={() => handleApproveLeave(l._id)} style={{ background: '#E2E8F0', color: '#1E293B', border: 'none', padding: '5px 10px', borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
                                   <i className="ti ti-check"></i> Approve
                                 </button>
-                                <button onClick={() => handleRejectLeave(l._id)} style={{ background: '#FEF2F2', color: '#DC2626', border: 'none', padding: '5px 10px', borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
+                                <button onClick={() => handleRejectLeave(l._id)} style={{ background: '#F8FAFC', color: '#64748B', border: 'none', padding: '5px 10px', borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
                                   <i className="ti ti-x"></i> Reject
                                 </button>
                               </div>
@@ -11417,7 +11385,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
               {/* Profile Toggle (re-using topbar logic) */}
 
-              <div data-profile-anchor="true" onClick={(e) => { e.stopPropagation(); setProfileDropdownOpen(v => !v); setShowProfile(false); }} className="mob-topbar-hide" style={{ background: "#fff", border: "1.5px solid var(--app-border)", borderRadius: 12, padding: "6px 12px", display: "flex", alignItems: "center", gap: 8, cursor: "pointer", flexShrink: 0, marginLeft: 8 }}>
+              <div data-profile-anchor="true" onClick={(e) => { e.stopPropagation(); setProfileDropdownOpen(v => !v); setShowProfile(false); }} className="mob-topbar-hide" style={{ background: "#FFFFFF", border: "1.5px solid var(--app-border)", borderRadius: 12, padding: "6px 12px", display: "flex", alignItems: "center", gap: 8, cursor: "pointer", flexShrink: 0, marginLeft: 8 }}>
 
                 <div onClick={(e) => { e.stopPropagation(); headerLogoRef.current?.click(); }} style={{ cursor: "pointer" }} title="Click to upload logo">
 
@@ -11427,7 +11395,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                   ) : (
 
-                    <div style={{ width: 28, height: 28, background: "var(--teal)", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 10 }}>{initials}</div>
+                    <div style={{ width: 28, height: 28, background: "var(--teal)", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontWeight: 800, fontSize: 10 }}>{initials}</div>
 
                   )}
 
@@ -11455,7 +11423,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                   { icon: "ti-users", label: "Clients", key: "clients" },
                   { icon: "ti-settings", label: "Settings", key: "settings" },
                 ].map((n, i) => n.key === "add" ? (
-                  <div key={i} onClick={() => setShowMobileAddMenu(true)} style={{ width: 52, height: 52, borderRadius: "50%", background: "var(--app-accent, #2563EB)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 24, lineHeight: 1, boxShadow: "0 10px 24px rgba(37, 99, 235,0.5)", position: "absolute", top: -30, left: "50%", transform: "translateX(-50%)" }}>+</div>
+                  <div key={i} onClick={() => setShowMobileAddMenu(true)} style={{ width: 52, height: 52, borderRadius: "50%", background: "var(--app-accent, #2563EB)", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 24, lineHeight: 1, boxShadow: "0 10px 24px rgba(37, 99, 235, 0.5)", position: "absolute", top: -30, left: "50%", transform: "translateX(-50%)" }}>+</div>
                 ) : (
                   <div key={i} onClick={() => {
                     if (n.key === "dashboard") {
@@ -11480,7 +11448,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                       setActiveClientIdForReturn(null);
                     }
                     setActive(n.key);
-                  }} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, color: "#fff", padding: "4px 10px" }}>
+                  }} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, color: "#FFFFFF", padding: "4px 10px" }}>
                     <i className={`ti ${n.icon}`} style={{ fontSize: 19 }}></i>
                     <span style={{ fontSize: 9.5, fontWeight: 700 }}>{n.label}</span>
                   </div>
@@ -11490,16 +11458,16 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
             )}
 
             {trialToast && (
-              <div style={{ position: "fixed", top: 24, left: "50%", transform: "translateX(-50%)", width: "max-content", maxWidth: "90vw", zIndex: 9999, background: "#fff", border: "1.5px solid #2563EB", borderRadius: 14, padding: "14px 26px", fontSize: 14, fontWeight: 800, color: "#2563EB", boxShadow: "0 10px 32px rgba(37, 99, 235,0.25), 0 4px 12px rgba(0,0,0,0.1)", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, textAlign: "center" }}>
+              <div style={{ position: "fixed", top: 24, left: "50%", transform: "translateX(-50%)", width: "max-content", maxWidth: "90vw", zIndex: 9999, background: "#FFFFFF", border: "1.5px solid #2563EB", borderRadius: 14, padding: "14px 26px", fontSize: 14, fontWeight: 800, color: "#2563EB", boxShadow: "0 10px 32px rgba(37, 99, 235, 0.25), 0 4px 12px rgba(0,0,0,0.1)", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, textAlign: "center" }}>
                 <i className="ti ti-circle-check" style={{ fontSize: 18, color: "#2563EB" }}></i> Free Trial Activated
               </div>
             )}
             {/* Trial toast trigger runs once via useEffect below, not inline during render */}
 
             {subscriptionChecked && !isInFreeTrial() && !subscription && (
-              <div style={{ background: '#FEE2E2', color: '#DC2626', padding: '10px 20px', borderRadius: 10, marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 13, fontWeight: 700 }}>
+              <div style={{ background: '#E2E8F0', color: '#64748B', padding: '10px 20px', borderRadius: 10, marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 13, fontWeight: 700 }}>
                 <span><i className="ti ti-alert-circle" style={{ marginRight: 8 }}></i>Choose a subscription plan to continue.</span>
-                <button onClick={() => { setForceUpgradeTab(true); setActive('mysubscriptions'); }} style={{ background: '#DC2626', color: '#fff', border: 'none', borderRadius: 8, padding: '5px 14px', fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>Upgrade Now</button>
+                <button onClick={() => { setForceUpgradeTab(true); setActive('mysubscriptions'); }} style={{ background: '#64748B', color: '#FFFFFF', border: 'none', borderRadius: 8, padding: '5px 14px', fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>Upgrade Now</button>
               </div>
             )}
             <EmployeeSubscriptionWarning user={user} trigger={subscription?.updatedAt || subscription?._id} onRenew={() => { setForceUpgradeTab(true); setActive("mysubscriptions"); setTimeout(() => { const el = document.querySelector('.plan-card, .plans-grid, [class*="upgrade"]'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 400); }} />
@@ -11534,26 +11502,26 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                     <div
                       data-profile-anchor="true"
                       onClick={(e) => { e.stopPropagation(); setProfileDropdownOpen(v => !v); setShowProfile(false); }}
-                      style={{ fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", height: 28 }}
+                      style={{ fontSize: 13, fontWeight: 700, color: "#FFFFFF", cursor: "pointer", display: "flex", alignItems: "center", height: 28 }}
                     >
                       {(user?.companyName || user?.name || "Business")}
                     </div>
                     <div style={{ position: "relative" }}>
                       <div onClick={() => { setMobNotifExpanded(v => !v); fetchPendingLeaves(); }} style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(255,255,255,0.18)", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
-                        <i className="ti ti-bell" style={{ fontSize: 16, color: "#fff" }}></i>
+                        <i className="ti ti-bell" style={{ fontSize: 16, color: "#FFFFFF" }}></i>
                         {pendingLeaves.length > 0 && (
-                          <span style={{ position: "absolute", top: 3, right: 4, width: 7, height: 7, borderRadius: "50%", background: "#ff4d6d", boxShadow: "0 0 0 2px #2563EB" }}></span>
+                          <span style={{ position: "absolute", top: 3, right: 4, width: 7, height: 7, borderRadius: "50%", background: "#64748B", boxShadow: "0 0 0 2px #2563EB" }}></span>
                         )}
                       </div>
                     </div>
                   </div>
 
                   {/* WHITE LOGO/MENU STRIP — sits below the teal name/bell strip, stays fixed while scrolling */}
-                  <div style={{ background: "#fff", padding: "18px 20px", display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, zIndex: 200, boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
+                  <div style={{ background: "#FFFFFF", padding: "18px 20px", display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, zIndex: 200, boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
                   <div
   onClick={() => headerLogoRef.current?.click()}
   title="Click to upload logo"
-  style={{ width: 35, height: 35, borderRadius: 10, background: "#ffffff", boxShadow: "0 2px 8px rgba(0,0,0,0.12)", border: "1px solid rgba(0,0,0,0.06)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0, cursor: "pointer" }}
+  style={{ width: 35, height: 35, borderRadius: 10, background: "#FFFFFF", boxShadow: "0 2px 8px rgba(0,0,0,0.12)", border: "1px solid rgba(0,0,0,0.06)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0, cursor: "pointer" }}
 >
   {companyLogo ? (
     <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
@@ -11586,7 +11554,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                     margin: "0",
                     padding: "18px 18px 60px",
 
-                    color: "#fff",
+                    color: "#FFFFFF",
                     overflow: "hidden"
                   }}>
                     {/* decorative mesh blobs */}
@@ -11615,15 +11583,15 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                       <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
                         <div style={{ flex: 1, background: "rgba(255,255,255,0.14)", borderRadius: 14, padding: "12px 14px", backdropFilter: "blur(6px)" }}>
                           <div style={{ fontSize: 11, color: "rgba(255,255,255,0.75)", fontWeight: 600, marginBottom: 4 }}>This Month</div>
-                          <div style={{ fontSize: 16, fontWeight: 800, color: "#fff" }}>Rs.{(totalRevenue || 0).toLocaleString()}</div>
+                          <div style={{ fontSize: 16, fontWeight: 800, color: "#FFFFFF" }}>Rs.{(totalRevenue || 0).toLocaleString()}</div>
                         </div>
                         <div style={{ flex: 1, background: "rgba(255,255,255,0.14)", borderRadius: 14, padding: "12px 14px", backdropFilter: "blur(6px)" }}>
                           <div style={{ fontSize: 11, color: "rgba(255,255,255,0.75)", fontWeight: 600, marginBottom: 4 }}>Projects</div>
-                          <div style={{ fontSize: 16, fontWeight: 800, color: "#fff" }}>{projectsWithProgress.length || 0}</div>
+                          <div style={{ fontSize: 16, fontWeight: 800, color: "#FFFFFF" }}>{projectsWithProgress.length || 0}</div>
                         </div>
                         <div style={{ flex: 1, background: "rgba(255,255,255,0.14)", borderRadius: 14, padding: "12px 14px", backdropFilter: "blur(6px)" }}>
                           <div style={{ fontSize: 11, color: "rgba(255,255,255,0.75)", fontWeight: 600, marginBottom: 4 }}>Clients</div>
-                          <div style={{ fontSize: 16, fontWeight: 800, color: "#fff" }}>{clients.length || 0}</div>
+                          <div style={{ fontSize: 16, fontWeight: 800, color: "#FFFFFF" }}>{clients.length || 0}</div>
                         </div>
                       </div>
                     </div>
@@ -11651,11 +11619,11 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                               <div
                                 key={p._id || p.id || i}
                                 onClick={() => { setJumpProject(p); setProjectDetailsReadOnly(false); setActive("project-details"); }}
-                                style={{ flex: "0 0 auto", width: 380, boxSizing: "border-box", background: "#fff", borderRadius: 18, boxShadow: "0 10px 30px rgba(15,10,41,0.1)", border: "1px solid rgba(0,0,0,0.03)", padding: "14px 16px", display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }}
+                                style={{ flex: "0 0 auto", width: 380, boxSizing: "border-box", background: "#FFFFFF", borderRadius: 18, boxShadow: "0 10px 30px rgba(15, 23, 42, 0.1)", border: "1px solid rgba(0,0,0,0.03)", padding: "14px 16px", display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }}
                               >
                                 <div style={{ position: "relative", width: 44, height: 44, flexShrink: 0, alignSelf: "center" }}>
                                   <svg width="44" height="44" viewBox="0 0 44 44">
-                                    <circle cx="22" cy="22" r="18" fill="none" stroke="#f1f5f9" strokeWidth="4" />
+                                    <circle cx="22" cy="22" r="18" fill="none" stroke="#EFF6FF" strokeWidth="4" />
                                     <circle
                                       cx="22" cy="22" r="18" fill="none"
                                       stroke="var(--app-accent)" strokeWidth="4"
@@ -11665,7 +11633,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                                       transform="rotate(-90 22 22)"
                                     />
                                   </svg>
-                                  <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10.5, fontWeight: 800, color: "#0f172a" }}>
+                                  <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10.5, fontWeight: 800, color: "#0F172A" }}>
                                     {pct}%
                                   </div>
                                 </div>
@@ -11678,17 +11646,17 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                                     if (!pQuote) return null;
                                     return (
                                       <div style={{ marginTop: 4, paddingTop: 6 }}>
-                                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9.5, color: "#94a3b8" }}>
+                                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9.5, color: "#64748B" }}>
                                           <span>Quotation No.</span>
-                                          <span style={{ fontWeight: 700, color: "#0f172a" }}>{pQuote.qt?.quoteNo || pQuote.quoteNo || "—"}</span>
+                                          <span style={{ fontWeight: 700, color: "#0F172A" }}>{pQuote.qt?.quoteNo || pQuote.quoteNo || "—"}</span>
                                         </div>
-                                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9.5, color: "#94a3b8", marginTop: 2 }}>
+                                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9.5, color: "#64748B", marginTop: 2 }}>
                                           <span>Quotation Amount</span>
-                                          <span style={{ fontWeight: 700, color: "#0f172a" }}>{formatCurrency(pQuote.total || pQuote.qt?.total, pQuote.qt?.currency)}</span>
+                                          <span style={{ fontWeight: 700, color: "#0F172A" }}>{formatCurrency(pQuote.total || pQuote.qt?.total, pQuote.qt?.currency)}</span>
                                         </div>
-                                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9.5, color: "#94a3b8", marginTop: 2 }}>
+                                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9.5, color: "#64748B", marginTop: 2 }}>
                                           <span>Sent To</span>
-                                          <span style={{ fontWeight: 700, color: "#0f172a" }}>{pQuote.qt?.client || pQuote.client || pQuote.clientName || "—"}</span>
+                                          <span style={{ fontWeight: 700, color: "#0F172A" }}>{pQuote.qt?.client || pQuote.client || pQuote.clientName || "—"}</span>
                                         </div>
                                       </div>
                                     );
@@ -11706,13 +11674,13 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                       <div style={{ display: "flex", gap: 12 }}>
                         <button
                           onClick={() => { setJumpProject(null); setJumpInvoice(null); setInvoicePrefill(null); if (typeof window !== "undefined" && window.innerWidth < 769) { setShowMobileInvoiceModal(true); } else { setActive("invoiceDetails"); } }}
-                          style={{ flex: 1, background: "var(--app-accent, #2563EB)", color: "#fff", border: "none", borderRadius: 12, padding: "12px 0", fontSize: 13.5, fontWeight: 800, cursor: "pointer", boxShadow: "0 4px 12px rgba(37, 99, 235,0.3)" }}
+                          style={{ flex: 1, background: "var(--app-accent, #2563EB)", color: "#FFFFFF", border: "none", borderRadius: 12, padding: "12px 0", fontSize: 13.5, fontWeight: 800, cursor: "pointer", boxShadow: "0 4px 12px rgba(37, 99, 235, 0.3)" }}
                         >
                           Create Invoice
                         </button>
                         <button
                           onClick={() => setShowDashboardAddTaskModal(true)}
-                          style={{ flex: 1, background: "var(--app-accent, #2563EB)", color: "#fff", border: "none", borderRadius: 12, padding: "12px 0", fontSize: 13.5, fontWeight: 800, cursor: "pointer", boxShadow: "0 4px 12px rgba(37, 99, 235,0.3)" }}
+                          style={{ flex: 1, background: "var(--app-accent, #2563EB)", color: "#FFFFFF", border: "none", borderRadius: 12, padding: "12px 0", fontSize: 13.5, fontWeight: 800, cursor: "pointer", boxShadow: "0 4px 12px rgba(37, 99, 235, 0.3)" }}
                         >
                           Add Task
                         </button>
@@ -11720,47 +11688,47 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                     </div>
                     {showDashboardAddTaskModal && (
                       <div style={{ position: "fixed", inset: 0, zIndex: 99999, background: "rgba(0,0,0,0.55)", display: "flex", alignItems: "center", justifyContent: "center", padding: "0 12px" }}>
-                        <div style={{ background: "#fff", borderRadius: 20, width: "100%", maxWidth: 460, padding: 24, boxShadow: "0 20px 60px rgba(0,0,0,0.25)", boxSizing: "border-box", maxHeight: "92vh", overflowY: "auto" }}>
-                          <h3 style={{ margin: "0 0 18px", fontSize: 18, fontWeight: 800, color: "#0f172a" }}>Add New Task</h3>
+                        <div style={{ background: "#FFFFFF", borderRadius: 20, width: "100%", maxWidth: 460, padding: 24, boxShadow: "0 20px 60px rgba(0,0,0,0.25)", boxSizing: "border-box", maxHeight: "92vh", overflowY: "auto" }}>
+                          <h3 style={{ margin: "0 0 18px", fontSize: 18, fontWeight: 800, color: "#0F172A" }}>Add New Task</h3>
                           <form onSubmit={handleDashboardAddTask}>
                             <div style={{ marginBottom: 12 }}>
-                              <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", marginBottom: 4 }}>Task Name *</label>
+                              <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748B", marginBottom: 4 }}>Task Name *</label>
                               <input
                                 type="text"
                                 value={dashboardTaskTitle}
                                 onChange={e => setDashboardTaskTitle(e.target.value)}
                                 placeholder="Enter task title"
                                 required
-                                style={{ width: "100%", padding: "10px", borderRadius: 8, border: "1.5px solid #e2e8f0", outline: "none", boxSizing: "border-box", fontSize: 13 }}
+                                style={{ width: "100%", padding: "10px", borderRadius: 8, border: "1.5px solid #E2E8F0", outline: "none", boxSizing: "border-box", fontSize: 13 }}
                               />
                             </div>
                             <div style={{ marginBottom: 12 }}>
-                              <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", marginBottom: 4 }}>Description</label>
+                              <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748B", marginBottom: 4 }}>Description</label>
                               <textarea
                                 value={dashboardTaskDesc}
                                 onChange={e => setDashboardTaskDesc(e.target.value)}
                                 placeholder="Enter details..."
-                                style={{ width: "100%", padding: "10px", borderRadius: 8, border: "1.5px solid #e2e8f0", outline: "none", resize: "vertical", minHeight: 64, boxSizing: "border-box", fontSize: 13 }}
+                                style={{ width: "100%", padding: "10px", borderRadius: 8, border: "1.5px solid #E2E8F0", outline: "none", resize: "vertical", minHeight: 64, boxSizing: "border-box", fontSize: 13 }}
                               />
                             </div>
                             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
                               <div>
-                                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", marginBottom: 4 }}>Priority</label>
-                                <select value={dashboardTaskPriority} onChange={e => setDashboardTaskPriority(e.target.value)} style={{ width: "100%", padding: "10px", borderRadius: 8, border: "1.5px solid #e2e8f0", outline: "none", boxSizing: "border-box", fontSize: 13 }}>
+                                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748B", marginBottom: 4 }}>Priority</label>
+                                <select value={dashboardTaskPriority} onChange={e => setDashboardTaskPriority(e.target.value)} style={{ width: "100%", padding: "10px", borderRadius: 8, border: "1.5px solid #E2E8F0", outline: "none", boxSizing: "border-box", fontSize: 13 }}>
                                   <option value="low">Low</option>
                                   <option value="medium">Medium</option>
                                   <option value="high">High</option>
                                 </select>
                               </div>
                               <div>
-                                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", marginBottom: 4 }}>Due Date</label>
-                                <input type="date" value={dashboardTaskDue} onChange={e => setDashboardTaskDue(e.target.value)} style={{ width: "100%", padding: "9px", borderRadius: 8, border: "1.5px solid #e2e8f0", outline: "none", boxSizing: "border-box", background: "#fff", fontFamily: "inherit", fontSize: 13, cursor: "pointer" }} />
+                                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748B", marginBottom: 4 }}>Due Date</label>
+                                <input type="date" value={dashboardTaskDue} onChange={e => setDashboardTaskDue(e.target.value)} style={{ width: "100%", padding: "9px", borderRadius: 8, border: "1.5px solid #E2E8F0", outline: "none", boxSizing: "border-box", background: "#FFFFFF", fontFamily: "inherit", fontSize: 13, cursor: "pointer" }} />
                               </div>
                             </div>
                             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
                               <div>
-                                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", marginBottom: 4 }}>Status</label>
-                                <select value={dashboardTaskStatus} onChange={e => setDashboardTaskStatus(e.target.value)} style={{ width: "100%", padding: "10px", borderRadius: 8, border: "1.5px solid #e2e8f0", outline: "none", boxSizing: "border-box", fontSize: 13 }}>
+                                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748B", marginBottom: 4 }}>Status</label>
+                                <select value={dashboardTaskStatus} onChange={e => setDashboardTaskStatus(e.target.value)} style={{ width: "100%", padding: "10px", borderRadius: 8, border: "1.5px solid #E2E8F0", outline: "none", boxSizing: "border-box", fontSize: 13 }}>
                                   <option value="Not Started">Not Started</option>
                                   <option value="In Progress">In Progress</option>
                                   <option value="Completed">Completed</option>
@@ -11768,21 +11736,21 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                                 </select>
                               </div>
                               <div>
-                                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", marginBottom: 4 }}>Link to Milestone *</label>
+                                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748B", marginBottom: 4 }}>Link to Milestone *</label>
                                 <select
                                   required
                                   value={dashboardTaskMilestone}
                                   onChange={e => setDashboardTaskMilestone(e.target.value)}
-                                  style={{ width: "100%", padding: "10px", borderRadius: 8, border: "1.5px solid #e2e8f0", outline: "none", boxSizing: "border-box", fontSize: 13 }}
+                                  style={{ width: "100%", padding: "10px", borderRadius: 8, border: "1.5px solid #E2E8F0", outline: "none", boxSizing: "border-box", fontSize: 13 }}
                                 >
                                   <option value="">-- Select Milestone --</option>
                                 </select>
                               </div>
                             </div>
                             <div style={{ marginBottom: 16 }}>
-                              <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", marginBottom: 4 }}>Select Team Members</label>
-                              <div style={{ width: "100%", maxHeight: 150, overflowY: "auto", padding: "8px", borderRadius: 8, border: "1.5px solid #e2e8f0", boxSizing: "border-box", background: "#fff" }}>
-                                <div style={{ fontSize: 12, color: "#94a3b8", padding: "4px" }}>No employees assigned to this project.</div>
+                              <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748B", marginBottom: 4 }}>Select Team Members</label>
+                              <div style={{ width: "100%", maxHeight: 150, overflowY: "auto", padding: "8px", borderRadius: 8, border: "1.5px solid #E2E8F0", boxSizing: "border-box", background: "#FFFFFF" }}>
+                                <div style={{ fontSize: 12, color: "#64748B", padding: "4px" }}>No employees assigned to this project.</div>
                               </div>
 
                             </div>
@@ -11790,13 +11758,13 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                               <button
                                 type="button"
                                 onClick={() => setShowDashboardAddTaskModal(false)}
-                                style={{ padding: "10px 20px", borderRadius: 10, border: "1.5px solid #e2e8f0", background: "#fff", color: "#64748b", fontWeight: 700, fontSize: 13, cursor: "pointer" }}
+                                style={{ padding: "10px 20px", borderRadius: 10, border: "1.5px solid #E2E8F0", background: "#FFFFFF", color: "#64748B", fontWeight: 700, fontSize: 13, cursor: "pointer" }}
                               >
                                 Cancel
                               </button>
                               <button
                                 type="submit"
-                                style={{ padding: "10px 24px", borderRadius: 10, border: "none", background: "#2563EB", color: "#fff", fontWeight: 800, fontSize: 13, cursor: "pointer" }}
+                                style={{ padding: "10px 24px", borderRadius: 10, border: "none", background: "#2563EB", color: "#FFFFFF", fontWeight: 800, fontSize: 13, cursor: "pointer" }}
                               >
                                 Add Task
                               </button>
@@ -11805,11 +11773,11 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                         </div>
                       </div>
                     )}
-                    <div style={{ marginTop: 14, height: 8, background: "rgba(37, 99, 235,0.12)", marginLeft: -16, marginRight: -16 }} />
+                    <div style={{ marginTop: 14, height: 8, background: "rgba(37, 99, 235, 0.12)", marginLeft: -16, marginRight: -16 }} />
 
                     {!mobShowInvoiceList && (
                       <div style={{ marginTop: 14, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                        <span style={{ fontSize: 14, fontWeight: 800, color: "#0f172a" }}>Projects</span>
+                        <span style={{ fontSize: 14, fontWeight: 800, color: "#0F172A" }}>Projects</span>
                         {projectsWithProgress.length > 3 && (
                           <span
                             onClick={() => setMobShowAllProjects(v => !v)}
@@ -11827,7 +11795,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                     >
                       <MobIdleInvoiceArmer projectsWithProgress={projectsWithProgress} invoices={invoices} mobShowInvoiceList={mobShowInvoiceList} setMobShowInvoiceList={setMobShowInvoiceList} />
                       {!mobShowInvoiceList && (
-                        <div style={{ background: "#EFF6FF", border: "1px solid #B2EBF2", borderRadius: 12, overflow: "hidden" }}>
+                        <div style={{ background: "#EFF6FF", border: "1px solid #E2E8F0", borderRadius: 12, overflow: "hidden" }}>
                           {(mobShowAllProjects ? projectsWithProgress : projectsWithProgress.slice(0, 3)).map((p, idx) => {
                             const parseAmt = (val) => {
                               if (val === undefined || val === null) return 0;
@@ -11870,19 +11838,19 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                             const status = p.status || "Active";
                             const statusMeta = (() => {
                               const s = status.toLowerCase();
-                              if (s === "on hold" || s === "paused") return { color: "#d97706", bg: "#fff7ed" };
-                              if (s === "cancelled") return { color: "#dc2626", bg: "#fef2f2" };
-                              return { color: "#16a34a", bg: "#dcfce7" };
+                              if (s === "on hold" || s === "paused") return { color: "#64748B", bg: "#F8FAFC" };
+                              if (s === "cancelled") return { color: "#64748B", bg: "#F8FAFC" };
+                              return { color: "#16A34A", bg: "#E2E8F0" };
                             })();
 
                             return (
                               <div
                                 key={p._id || idx}
                                 onClick={() => { setJumpProject(p); setProjectDetailsReadOnly(false); setSidebarOverride("dashboard"); setActive("project-details"); }}
-                                style={{ padding: "12px 14px", borderBottom: idx === (mobShowAllProjects ? projectsWithProgress : projectsWithProgress.slice(0, 3)).length - 1 ? "none" : "1px solid #B2EBF2", cursor: "pointer", display: "flex", flexDirection: "row", alignItems: "center", gap: 14 }}
+                                style={{ padding: "12px 14px", borderBottom: idx === (mobShowAllProjects ? projectsWithProgress : projectsWithProgress.slice(0, 3)).length - 1 ? "none" : "1px solid #E2E8F0", cursor: "pointer", display: "flex", flexDirection: "row", alignItems: "center", gap: 14 }}
                               >
                                 <div style={{ minWidth: 0, flexShrink: 0, width: "28%" }}>
-                                  <div style={{ fontSize: 14.5, fontWeight: 800, color: "#0f172a", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                  <div style={{ fontSize: 14.5, fontWeight: 800, color: "#0F172A", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                                     {p.name}
                                   </div>
                                   {clientLabelP ? (
@@ -11890,19 +11858,19 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                                   ) : null}
                                 </div>
                                 <div style={{ flex: 1, minWidth: 0 }}>
-                                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, fontWeight: 700, color: "#0f172a", marginBottom: 3 }}>
+                                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, fontWeight: 700, color: "#0F172A", marginBottom: 3 }}>
                                     <span>Budget Used</span>
-                                    <span style={{ fontWeight: 700, color: "#0f172a" }}>{budgetPct}%</span>
+                                    <span style={{ fontWeight: 700, color: "#0F172A" }}>{budgetPct}%</span>
                                   </div>
-                                  <div style={{ height: 5, background: "#ffffff", borderRadius: 4, overflow: "hidden" }}>
-                                    <div style={{ width: `${budgetPct}%`, height: "100%", background: "#2563eb", borderRadius: 4 }} />
+                                  <div style={{ height: 5, background: "#FFFFFF", borderRadius: 4, overflow: "hidden" }}>
+                                    <div style={{ width: `${budgetPct}%`, height: "100%", background: "#2563EB", borderRadius: 4 }} />
                                   </div>
                                 </div>
                                 <span style={{ background: statusMeta.bg, color: statusMeta.color, padding: "6px 14px", borderRadius: 20, fontSize: 12.5, fontWeight: 700, flexShrink: 0 }}>{status}</span> </div>
                             );
                           })}
                           {projectsWithProgress.length === 0 && (
-                            <div style={{ padding: "16px 0", textAlign: "center", color: "#94a3b8", fontSize: 13, width: "100%" }}>No projects yet</div>
+                            <div style={{ padding: "16px 0", textAlign: "center", color: "#64748B", fontSize: 13, width: "100%" }}>No projects yet</div>
                           )}
                         </div>
                       )}
@@ -11910,7 +11878,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                     {mobShowInvoiceList && (invoices || []).length > 0 && (
                       <div style={{ marginTop: 4 }}>
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-                          <span style={{ fontSize: 15, fontWeight: 800, color: "#0f172a" }}>Invoices</span>
+                          <span style={{ fontSize: 15, fontWeight: 800, color: "#0F172A" }}>Invoices</span>
                           {(invoices || []).filter(inv => (inv.status || "").toLowerCase() !== "paid").length > 3 && (
                             <span
                               onClick={() => setMobShowAllInvoicesList(v => !v)}
@@ -11920,14 +11888,14 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                             </span>
                           )}
                         </div>
-                        <div style={{ background: "#EFF6FF", border: "1px solid #B2EBF2", borderRadius: 12, overflow: "hidden" }}>
+                        <div style={{ background: "#EFF6FF", border: "1px solid #E2E8F0", borderRadius: 12, overflow: "hidden" }}>
                           {(() => {
                             const statusMeta = (raw) => {
                               const s = (raw || "").toLowerCase();
-                              if (s === "paid") return { label: "Paid", color: "#16a34a", bg: "#dcfce7" };
-                              if (s === "overdue") return { label: "Overdue", color: "#dc2626", bg: "#fef2f2" };
-                              if (s === "part paid" || s === "partpaid" || s === "part-paid") return { label: "Part Paid", color: "#2563eb", bg: "#eff6ff" };
-                              return { label: "Unpaid", color: "#d97706", bg: "#fff7ed" };
+                              if (s === "paid") return { label: "Paid", color: "#16A34A", bg: "#E2E8F0" };
+                              if (s === "overdue") return { label: "Overdue", color: "#64748B", bg: "#F8FAFC" };
+                              if (s === "part paid" || s === "partpaid" || s === "part-paid") return { label: "Part Paid", color: "#2563EB", bg: "#EFF6FF" };
+                              return { label: "Unpaid", color: "#64748B", bg: "#F8FAFC" };
                             };
                             const allRows = (invoices || [])
                               .filter(inv => (inv.status || "").toLowerCase() !== "paid");
@@ -11944,14 +11912,14 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                                     setMobShowInvoiceList(false);
                                     setActive("invoices");
                                   }}
-                                  style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: "12px 14px", borderBottom: i === rows.length - 1 ? "none" : "1px solid #B2EBF2", cursor: "pointer" }}
+                                  style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: "12px 14px", borderBottom: i === rows.length - 1 ? "none" : "1px solid #E2E8F0", cursor: "pointer" }}
                                 >
                                   <div style={{ minWidth: 0 }}>
-                                    <div style={{ fontSize: 12.5, fontWeight: 700, color: "#0f172a", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                    <div style={{ fontSize: 12.5, fontWeight: 700, color: "#0F172A", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                                       {inv.invoiceNo ? `Invoice ${inv.invoiceNo}` : (inv.clientName || inv.client || "Invoice")}
                                     </div>
                                     {inv.clientName || inv.client ? (
-                                      <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 2 }}>{inv.clientName || inv.client}</div>
+                                      <div style={{ fontSize: 11, color: "#64748B", marginTop: 2 }}>{inv.clientName || inv.client}</div>
                                     ) : null}
                                   </div>
                                   <span style={{ background: meta.bg, color: meta.color, padding: "4px 10px", borderRadius: 20, fontSize: 11, fontWeight: 800, flexShrink: 0 }}>{meta.label}</span>
@@ -11967,7 +11935,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                   </div>
 
                   {/* FLOATING STAT STRIP — draggable reorder, sits below hero (no overlap) */}
-                  <div style={{ margin: "16px 16px 0", fontSize: 15, fontWeight: 800, color: "#0f172a" }}>Quick Actions</div>
+                  <div style={{ margin: "16px 16px 0", fontSize: 15, fontWeight: 800, color: "#0F172A" }}>Quick Actions</div>
                   <div style={{ margin: "8px 16px 0", position: "relative", zIndex: 5, display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12 }}>
                     {mobStatCardOrder.map((s, i) => (
                       <div
@@ -11997,11 +11965,11 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                         }}
                         style={{ animationDelay: `${i * 60}ms`, background: "transparent", borderRadius: 0, padding: "4px 4px", boxShadow: "none", textAlign: "center", border: "none", cursor: "grab", opacity: draggingStatCard === s.id ? 0.4 : 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}
                       >
-                        <div style={{ width: 56, height: 56, borderRadius: 16, background: s.grad, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 8px", color: "#fff", fontSize: 22, boxShadow: "0 6px 14px rgba(0,0,0,0.15)" }}>
+                        <div style={{ width: 56, height: 56, borderRadius: 16, background: s.grad, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 8px", color: "#FFFFFF", fontSize: 22, boxShadow: "0 6px 14px rgba(0,0,0,0.15)" }}>
                           <i className={`ti ${s.icon}`}></i>
                         </div>
-                        <div style={{ fontSize: 13, fontWeight: 600, color: "#0f0a29" }}>{s.label}</div>
-                        <div style={{ fontSize: 10.5, color: "#94a3b8", fontWeight: 600, marginTop: 1 }}>{s.val}</div>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: "#0F172A" }}>{s.label}</div>
+                        <div style={{ fontSize: 10.5, color: "#64748B", fontWeight: 600, marginTop: 1 }}>{s.val}</div>
                       </div>))}
                     {mobSecondRowOrder.map((s, i) => (
                       <div
@@ -12041,11 +12009,11 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                           setActive(s.page);
                         }} style={{ animationDelay: `${i * 60}ms`, background: "transparent", borderRadius: 0, padding: "4px 4px", boxShadow: "none", textAlign: "center", border: "none", cursor: "grab", opacity: draggingSecondRow === s.id ? 0.4 : 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}
                       >
-                        <div style={{ width: 56, height: 56, borderRadius: 16, background: s.grad, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 8px", fontSize: 22, boxShadow: "0 6px 14px rgba(0,0,0,0.15)" }}>
+                        <div style={{ width: 56, height: 56, borderRadius: 16, background: s.grad, color: "#FFFFFF", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 8px", fontSize: 22, boxShadow: "0 6px 14px rgba(0,0,0,0.15)" }}>
                           <i className={`ti ${s.icon}`}></i>
                         </div>
-                        <div style={{ fontSize: 13, fontWeight: 600, color: "#0f0a29" }}>{s.label}</div>
-                        <div style={{ fontSize: 10.5, color: "#94a3b8", fontWeight: 600, marginTop: 1 }}>{s.val}</div>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: "#0F172A" }}>{s.label}</div>
+                        <div style={{ fontSize: 10.5, color: "#64748B", fontWeight: 600, marginTop: 1 }}>{s.val}</div>
                       </div>
                     ))}
                   </div>
@@ -12067,7 +12035,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                             style={{ padding: 14, background: "#EFF6FF", borderRadius: 10, cursor: "pointer" }}
                           >
                             <div style={{ fontWeight: 700 }}>{c.name || c.clientName || c.companyName}</div>
-                            <div style={{ fontSize: 12, color: "#94a3b8" }}>{c.status || "-"}</div>
+                            <div style={{ fontSize: 12, color: "#64748B" }}>{c.status || "-"}</div>
                           </div>
                         ))}
                       </div>
@@ -12076,7 +12044,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
 
                   <MobilePopup id="mobClients" title="Clients">
-                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 4, color: "#fff" }}>{clients.length} total</div>
+                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 4, color: "#FFFFFF" }}>{clients.length} total</div>
                     <div style={{ fontSize: 13, color: "rgba(255,255,255,0.75)", marginBottom: 16 }}>{clients.filter(c => (c.status || "").toLowerCase() === "active").length} Active Clients</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                       {clients.map((c, i) => (
@@ -12089,14 +12057,14 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                           }}
                           style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(255,255,255,0.2)", paddingBottom: 8, cursor: "pointer" }}
                         >
-                          <span style={{ fontWeight: 600, color: "#fff" }}>{c.name || c.clientName || c.companyName || "Client"}</span>
+                          <span style={{ fontWeight: 600, color: "#FFFFFF" }}>{c.name || c.clientName || c.companyName || "Client"}</span>
                           <span style={{ color: "rgba(255,255,255,0.75)" }}>{c.status || "-"}</span>
                         </div>
                       ))}
                     </div>
                   </MobilePopup>
                   <MobilePopup id="mobProjects" title="Projects">
-                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16, color: "#fff" }}>{projects.length} total</div>
+                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16, color: "#FFFFFF" }}>{projects.length} total</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                       {projectsWithProgress.map((p, i) => (
                         <div
@@ -12110,14 +12078,14 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                           }}
                           style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(255,255,255,0.2)", paddingBottom: 8, cursor: "pointer" }}
                         >
-                          <span style={{ fontWeight: 600, color: "#fff" }}>{p.name}</span>
+                          <span style={{ fontWeight: 600, color: "#FFFFFF" }}>{p.name}</span>
                           <span style={{ color: "rgba(255,255,255,0.75)" }}>{p.progress || 0}%</span>
                         </div>
                       ))}</div>
                   </MobilePopup>
 
                   <MobilePopup id="mobTeam" title="Team">
-                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16, color: "#fff" }}>{employees.length} staff</div>
+                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16, color: "#FFFFFF" }}>{employees.length} staff</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                       {employees.map((e, i) => (
                         <div
@@ -12128,7 +12096,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                           }}
                           style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(255,255,255,0.2)", paddingBottom: 8, cursor: "pointer" }}
                         >
-                          <span style={{ fontWeight: 600, color: "#fff" }}>{e.name}</span>
+                          <span style={{ fontWeight: 600, color: "#FFFFFF" }}>{e.name}</span>
                           <span style={{ color: "rgba(255,255,255,0.75)" }}>{e.role || "Employee"}</span>
                         </div>
                       ))}    </div>
@@ -12137,12 +12105,12 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
 
                   <MobilePopup id="mobRevenue" title="Revenue This Month">
-                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 4, color: "#fff" }}></div>
+                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 4, color: "#FFFFFF" }}></div>
                     <div style={{ fontSize: 13, color: "rgba(255,255,255,0.75)" }}>Total income this year: {formatShortCurrency(income.reduce((sum, i) => sum + (Number(i.amount) || 0), 0))}</div>
                   </MobilePopup>
 
                   <MobilePopup id="mobUnpaidInvoices" title="Unpaid Invoices">
-                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16, color: "#fff" }}>{invoices.filter(i => (i.status || "").toLowerCase() === "pending" || (i.status || "").toLowerCase() === "overdue").length} pending</div>
+                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16, color: "#FFFFFF" }}>{invoices.filter(i => (i.status || "").toLowerCase() === "pending" || (i.status || "").toLowerCase() === "overdue").length} pending</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                       {invoices.filter(i => (i.status || "").toLowerCase() === "pending" || (i.status || "").toLowerCase() === "overdue").map((inv, i) => (
                         <div
@@ -12154,7 +12122,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                           }}
                           style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(255,255,255,0.2)", paddingBottom: 8, cursor: "pointer" }}
                         >
-                          <span style={{ fontWeight: 600, color: "#fff" }}>{inv.clientName || inv.client || "Client"}</span>
+                          <span style={{ fontWeight: 600, color: "#FFFFFF" }}>{inv.clientName || inv.client || "Client"}</span>
                           <span style={{ color: "rgba(255,255,255,0.75)" }}>{formatCurrency(inv.grandTotal, inv.currency)}</span>
                         </div>
                       ))} </div>
@@ -12166,11 +12134,11 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                   {/* QUICK ACTION CARDS — proper dashboard-card style, tap opens popup */}
                   {
                     <div style={{ margin: "16px 16px 0", position: "relative", zIndex: 1 }}>
-                      <div style={{ background: "#fff", borderRadius: 18, boxShadow: "0 10px 30px rgba(15,10,41,0.12)", border: "1px solid rgba(0,0,0,0.03)", overflow: "hidden" }}>
-                        <div onClick={() => setClientResponsesExpanded(v => !v)} style={{ padding: "14px 16px", borderBottom: clientResponsesExpanded ? "1px solid #f1f5f9" : "none", background: "#fff", display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer" }}>
+                      <div style={{ background: "#FFFFFF", borderRadius: 18, boxShadow: "0 10px 30px rgba(15, 23, 42, 0.12)", border: "1px solid rgba(0,0,0,0.03)", overflow: "hidden" }}>
+                        <div onClick={() => setClientResponsesExpanded(v => !v)} style={{ padding: "14px 16px", borderBottom: clientResponsesExpanded ? "1px solid #EFF6FF" : "none", background: "#FFFFFF", display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer" }}>
                           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                             <i className="ti ti-clipboard-check" style={{ color: "var(--app-accent)" }}></i>
-                            <span style={{ fontSize: 14, fontWeight: 800, color: "#0f172a" }}>Recent Activity</span>
+                            <span style={{ fontSize: 14, fontWeight: 800, color: "#0F172A" }}>Recent Activity</span>
                           </div>
                           <span style={{ fontSize: 13, color: "var(--app-accent)", fontWeight: 800 }}>
                             {clientResponsesExpanded ? "▲" : "▼"}
@@ -12206,7 +12174,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                                 .slice(0, 20);
 
                               if (combined.length === 0) {
-                                return <div style={{ textAlign: "center", padding: "16px 0", color: "#A0AEC0", fontSize: 13 }}>No client responses yet</div>;
+                                return <div style={{ textAlign: "center", padding: "16px 0", color: "#64748B", fontSize: 13 }}>No client responses yet</div>;
                               }
 
                               return combined.map((item, i) => {
@@ -12214,21 +12182,21 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                                   const a = item.data;
                                   const isApproved = a.status === "approved";
                                   return (
-                                    <div key={item.key || i} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "10px 0", borderBottom: i === combined.length - 1 ? "none" : "1px solid #F0F4F8" }}>
-                                      <div style={{ width: 30, height: 30, borderRadius: "50%", background: isApproved ? "#DCFCE7" : "#FEE2E2", color: isApproved ? "#16a34a" : "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 14 }}>
+                                    <div key={item.key || i} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "10px 0", borderBottom: i === combined.length - 1 ? "none" : "1px solid #EFF6FF" }}>
+                                      <div style={{ width: 30, height: 30, borderRadius: "50%", background: isApproved ? "#E2E8F0" : "#E2E8F0", color: isApproved ? "#16A34A" : "#64748B", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 14 }}>
                                         <i className={`ti ${isApproved ? "ti-check" : "ti-x"}`}></i>
                                       </div>
                                       <div style={{ flex: 1, minWidth: 0 }}>
-                                        <div style={{ fontSize: 12.5, fontWeight: 700, color: "#1A2332" }}>
-                                          {a.title || "Update"} — <span style={{ color: isApproved ? "#16a34a" : "#dc2626" }}>{isApproved ? "Approved" : "Rejected"}</span>
+                                        <div style={{ fontSize: 12.5, fontWeight: 700, color: "#1E293B" }}>
+                                          {a.title || "Update"} — <span style={{ color: isApproved ? "#16A34A" : "#64748B" }}>{isApproved ? "Approved" : "Rejected"}</span>
                                         </div>
-                                        {a.desc && <div style={{ fontSize: 11, color: "#718096", marginTop: 2 }}>{a.desc}</div>}
+                                        {a.desc && <div style={{ fontSize: 11, color: "#64748B", marginTop: 2 }}>{a.desc}</div>}
                                         {!isApproved && a.rejectReason && (
-                                          <div style={{ fontSize: 11, color: "#dc2626", marginTop: 3, background: "#FEF2F2", padding: "4px 8px", borderRadius: 6 }}>
+                                          <div style={{ fontSize: 11, color: "#64748B", marginTop: 3, background: "#F8FAFC", padding: "4px 8px", borderRadius: 6 }}>
                                             Reason: {a.rejectReason}
                                           </div>
                                         )}
-                                        <div style={{ fontSize: 10, color: "#A0AEC0", marginTop: 3 }}>
+                                        <div style={{ fontSize: 10, color: "#64748B", marginTop: 3 }}>
                                           {a.respondedAt ? new Date(a.respondedAt).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : ''}
                                         </div>
                                       </div>
@@ -12245,25 +12213,25 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                                 const inv = item.data;
                                 const s = (inv.status || "").toLowerCase();
                                 const cfg = s === "paid"
-                                  ? { icon: "ti-cash", bg: "#DCFCE7", color: "#16a34a", label: "Paid" }
+                                  ? { icon: "ti-cash", bg: "#E2E8F0", color: "#16A34A", label: "Paid" }
                                   : s === "overdue"
-                                    ? { icon: "ti-alert-circle", bg: "#FEE2E2", color: "#dc2626", label: "Overdue" }
+                                    ? { icon: "ti-alert-circle", bg: "#E2E8F0", color: "#64748B", label: "Overdue" }
                                     : s === "sent"
-                                      ? { icon: "ti-send", bg: "#DBEAFE", color: "#1d4ed8", label: "Sent" }
-                                      : { icon: "ti-clock", bg: "#FEF3C7", color: "#b45309", label: "Pending" };
+                                      ? { icon: "ti-send", bg: "#E2E8F0", color: "#2563EB", label: "Sent" }
+                                      : { icon: "ti-clock", bg: "#E2E8F0", color: "#64748B", label: "Pending" };
                                 return (
-                                  <div key={item.key || i} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "10px 0", borderBottom: i === combined.length - 1 ? "none" : "1px solid #F0F4F8" }}>
+                                  <div key={item.key || i} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "10px 0", borderBottom: i === combined.length - 1 ? "none" : "1px solid #EFF6FF" }}>
                                     <div style={{ width: 30, height: 30, borderRadius: "50%", background: cfg.bg, color: cfg.color, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 14 }}>
                                       <i className={`ti ${cfg.icon}`}></i>
                                     </div>
                                     <div style={{ flex: 1, minWidth: 0 }}>
-                                      <div style={{ fontSize: 12.5, fontWeight: 700, color: "#1A2332" }}>
+                                      <div style={{ fontSize: 12.5, fontWeight: 700, color: "#1E293B" }}>
                                         Invoice {inv.invoiceNo || ""} — <span style={{ color: cfg.color }}>{cfg.label}</span>
                                       </div>
-                                      <div style={{ fontSize: 11, color: "#718096", marginTop: 2 }}>
+                                      <div style={{ fontSize: 11, color: "#64748B", marginTop: 2 }}>
                                         {inv.clientName || inv.client || "Client"}
                                       </div>
-                                      <div style={{ fontSize: 10, color: "#A0AEC0", marginTop: 3 }}>
+                                      <div style={{ fontSize: 10, color: "#64748B", marginTop: 3 }}>
                                         {inv.date ? new Date(inv.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : ''}
                                       </div>
                                     </div>
@@ -12285,7 +12253,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                   {/* QUICK ACTION CARDS — proper dashboard-card style, tap opens popup */}
                   <div style={{ padding: "22px 16px 6px", display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 10 }}></div>
-                  <MobilePopup id="qaQuote" title="Quotations"> <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16, color: "#fff" }}>{(quotations || []).length} total</div>
+                  <MobilePopup id="qaQuote" title="Quotations"> <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16, color: "#FFFFFF" }}>{(quotations || []).length} total</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                       {(quotations || []).map((q, i) => (
                         <div
@@ -12299,11 +12267,11 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                           style={{ borderBottom: "1px solid rgba(255,255,255,0.2)", paddingBottom: 10, cursor: "pointer" }}
                         >
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-                            <span style={{ fontWeight: 700, fontSize: 13, color: "#fff" }}>{formatCurrency(q.total || q.qt?.total || q.amount, q.qt?.currency)}</span>
-                            <span style={{ color: (q.status || "").toLowerCase() === "approved" ? "#bbf7d0" : "rgba(255,255,255,0.75)", fontWeight: (q.status || "").toLowerCase() === "approved" ? 800 : 600, fontSize: 11 }}>{(q.status || "draft").toUpperCase()}</span>
+                            <span style={{ fontWeight: 700, fontSize: 13, color: "#FFFFFF" }}>{formatCurrency(q.total || q.qt?.total || q.amount, q.qt?.currency)}</span>
+                            <span style={{ color: (q.status || "").toLowerCase() === "approved" ? "#E2E8F0" : "rgba(255,255,255,0.75)", fontWeight: (q.status || "").toLowerCase() === "approved" ? 800 : 600, fontSize: 11 }}>{(q.status || "draft").toUpperCase()}</span>
                           </div>
                           {q.reviewComment && (
-                            <div style={{ fontSize: 11, color: "#fff", marginTop: 3 }}>
+                            <div style={{ fontSize: 11, color: "#FFFFFF", marginTop: 3 }}>
                               <i className="ti ti-message-2" style={{ fontSize: 11 }}></i> {q.reviewComment}
                             </div>
                           )}
@@ -12313,7 +12281,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                   </MobilePopup>
 
                   <MobilePopup id="qaProposal" title="Proposals">
-                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16, color: "#fff" }}>{(proposalsList || []).length} total</div>
+                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16, color: "#FFFFFF" }}>{(proposalsList || []).length} total</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                       {(proposalsList || []).map((p, i) => (
                         <div
@@ -12321,11 +12289,11 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                           onClick={() => { closeMobilePopup(); setProposalViewEntry(p); setSidebarOverride("dashboard"); setActive("proposals"); }}
                           style={{ borderBottom: "1px solid rgba(255,255,255,0.2)", paddingBottom: 10, cursor: "pointer" }}
                         >            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-                            <span style={{ fontWeight: 700, fontSize: 13, color: "#fff" }}>{p.title || "Proposal"}</span>
-                            <span style={{ color: (p.status || "").toLowerCase() === "approved" ? "#bbf7d0" : "rgba(255,255,255,0.75)", fontWeight: (p.status || "").toLowerCase() === "approved" ? 800 : 600, fontSize: 11 }}>{(p.status || "draft").toUpperCase()}</span>
+                            <span style={{ fontWeight: 700, fontSize: 13, color: "#FFFFFF" }}>{p.title || "Proposal"}</span>
+                            <span style={{ color: (p.status || "").toLowerCase() === "approved" ? "#E2E8F0" : "rgba(255,255,255,0.75)", fontWeight: (p.status || "").toLowerCase() === "approved" ? 800 : 600, fontSize: 11 }}>{(p.status || "draft").toUpperCase()}</span>
                           </div>
                           {p.reviewComment && (
-                            <div style={{ fontSize: 11, color: "#fff", marginTop: 3 }}>
+                            <div style={{ fontSize: 11, color: "#FFFFFF", marginTop: 3 }}>
                               <i className="ti ti-message-2" style={{ fontSize: 11 }}></i> {p.reviewComment}
                             </div>
                           )}
@@ -12335,7 +12303,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                   </MobilePopup>
 
                   <MobilePopup id="qaInvoice" title="Invoices">
-                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16, color: "#fff" }}>{invoices.length} total</div>
+                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16, color: "#FFFFFF" }}>{invoices.length} total</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                       {invoices.slice(0, 10).map((inv, i) => (
                         <div
@@ -12346,7 +12314,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                           }}
                           style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(255,255,255,0.2)", paddingBottom: 8, cursor: "pointer" }}
                         >
-                          <span style={{ fontWeight: 600, color: "#fff" }}>{inv.clientName || inv.client || "Client"}</span>
+                          <span style={{ fontWeight: 600, color: "#FFFFFF" }}>{inv.clientName || inv.client || "Client"}</span>
                           <span style={{ color: "rgba(255,255,255,0.75)" }}>{formatCurrency(inv.grandTotal, inv.currency)}</span>
                         </div>
                       ))} </div>
@@ -12358,7 +12326,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                       {clients.slice(0, 10).map((c, i) => (
                         <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 8 }}>
                           <span style={{ fontWeight: 600 }}>{c.name || c.companyName || "Client"}</span>
-                          <span style={{ color: "rgba(15,28,46,0.5)" }}>{c.status || "-"}</span>
+                          <span style={{ color: "rgba(15, 23, 42, 0.5)" }}>{c.status || "-"}</span>
                         </div>
                       ))}
                     </div>
@@ -12370,7 +12338,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                       {projectsWithProgress.slice(0, 10).map((p, i) => (
                         <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 8 }}>
                           <span style={{ fontWeight: 600 }}>{p.name}</span>
-                          <span style={{ color: "rgba(15,28,46,0.5)" }}>{p.progress || 0}%</span>
+                          <span style={{ color: "rgba(15, 23, 42, 0.5)" }}>{p.progress || 0}%</span>
                         </div>
                       ))}
                     </div>
@@ -12381,13 +12349,13 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                   {showMobileAddMenu && (
                     <div
                       onClick={() => setShowMobileAddMenu(false)}
-                      style={{ position: "fixed", inset: 0, background: "rgba(15,10,41,0.55)", zIndex: 4500, display: "flex", alignItems: "flex-end", justifyContent: "center" }}
+                      style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.55)", zIndex: 4500, display: "flex", alignItems: "flex-end", justifyContent: "center" }}
                     >
                       <div
                         onClick={(e) => e.stopPropagation()}
-                        style={{ background: "#fff", borderRadius: "20px 20px 0 0", width: "100%", maxWidth: 480, padding: "20px 16px 28px", boxShadow: "0 -4px 24px rgba(0,0,0,0.2)" }}
+                        style={{ background: "#FFFFFF", borderRadius: "20px 20px 0 0", width: "100%", maxWidth: 480, padding: "20px 16px 28px", boxShadow: "0 -4px 24px rgba(0,0,0,0.2)" }}
                       >
-                        <div style={{ width: 40, height: 4, borderRadius: 2, background: "#e2e8f0", margin: "0 auto 18px" }} />
+                        <div style={{ width: 40, height: 4, borderRadius: 2, background: "#E2E8F0", margin: "0 auto 18px" }} />
                         {[
                           { icon: "ti-building", label: "Add Client", action: () => { setNcError({}); setShowClientPass(false); setOpenedFromMobileAddMenu(true); setActive("addClient"); } },
                           { icon: "ti-file-invoice", label: "Add Invoice", action: () => { setJumpProject(null); setJumpInvoice(null); setInvoicePrefill(null); setSidebarNavClickId(id => id + 1); setOpenedFromMobileAddMenu(true); setActive("invoices"); } },
@@ -12397,12 +12365,12 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                             key={idx}
                             onClick={() => { setShowMobileAddMenu(false); opt.action(); }}
                             style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 12px", borderRadius: 14, cursor: "pointer", marginBottom: idx < 2 ? 8 : 0 }}
-                            onTouchStart={e => e.currentTarget.style.background = "#f8fafc"}
+                            onTouchStart={e => e.currentTarget.style.background = "#F8FAFC"}
                           >
-                            <div style={{ width: 44, height: 44, borderRadius: 12, background: "var(--app-accent)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>
+                            <div style={{ width: 44, height: 44, borderRadius: 12, background: "var(--app-accent)", color: "#FFFFFF", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>
                               <i className={`ti ${opt.icon}`}></i>
                             </div>
-                            <div style={{ fontSize: 15, fontWeight: 700, color: "#0f172a" }}>+ {opt.label}</div>
+                            <div style={{ fontSize: 15, fontWeight: 700, color: "#0F172A" }}>+ {opt.label}</div>
                           </div>
                         ))}
                       </div>
@@ -12422,7 +12390,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                         position: "absolute", bottom: 56, right: 0,
 
-                        background: "#fff", borderRadius: 18, padding: 20,
+                        background: "#FFFFFF", borderRadius: 18, padding: 20,
 
                         boxShadow: "0 20px 60px rgba(0,0,0,0.18)", border: "1.5px solid var(--app-border)",
 
@@ -12446,7 +12414,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                                 border: appTheme === key ? `2.5px solid ${t.dot}` : "2px solid var(--app-border)",
 
-                                borderRadius: 12, padding: "10px 6px", background: appTheme === key ? `${t.dot}15` : "#fafafa",
+                                borderRadius: 12, padding: "10px 6px", background: appTheme === key ? `${t.dot}15` : "#F8FAFC",
 
                                 cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 6,
 
@@ -12456,7 +12424,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                               <div style={{ width: 28, height: 28, borderRadius: "50%", background: t.dot, boxShadow: `0 3px 8px ${t.dot}50` }} />
 
-                              <span style={{ fontSize: 10, fontWeight: 700, color: appTheme === key ? t.dot : "#64748b" }}>
+                              <span style={{ fontSize: 10, fontWeight: 700, color: appTheme === key ? t.dot : "#64748B" }}>
 
                                 {t.label}
 
@@ -12474,7 +12442,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                         <div style={{ marginTop: 16, borderTop: "1.5px solid var(--app-border)", paddingTop: 14 }}>
 
-                          <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", marginBottom: 10, textTransform: "uppercase", letterSpacing: 0.5 }}>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: "#64748B", marginBottom: 10, textTransform: "uppercase", letterSpacing: 0.5 }}>
 
                             🎯 Custom Color
 
@@ -12538,13 +12506,13 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                             <div style={{ flex: 1 }}>
 
-                              <div style={{ fontSize: 12, fontWeight: 700, color: appTheme === "custom" ? customColor : "#64748b" }}>
+                              <div style={{ fontSize: 12, fontWeight: 700, color: appTheme === "custom" ? customColor : "#64748B" }}>
 
                                 {appTheme === "custom" ? "Custom Active" : "Pick any color"}
 
                               </div>
 
-                              <div style={{ fontSize: 10, color: "#94a3b8", marginTop: 2 }}>
+                              <div style={{ fontSize: 10, color: "#64748B", marginTop: 2 }}>
 
                                 {customColor.toUpperCase()}
 
@@ -12557,9 +12525,9 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                               <div style={{
 
                                 width: 20, height: 20, borderRadius: "50%",
-                                background: "#22c55e", boxShadow: "0 0 6px #22c55e80",
+                                background: "#16A34A", boxShadow: "0 0 6px #16A34A80",
                                 display: "flex", alignItems: "center", justifyContent: "center",
-                                color: "#fff", fontSize: 12, fontWeight: 900, flexShrink: 0
+                                color: "#FFFFFF", fontSize: 12, fontWeight: 900, flexShrink: 0
 
                               }}>✓</div>
 
@@ -12573,7 +12541,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                           <div style={{ display: "flex", gap: 6, marginTop: 10, flexWrap: "wrap" }}>
 
-                            {["#2563eb", "#0891b2", "#059669", "#d97706", "#dc2626", "#db2777", "#7c2d12", "#4f46e5", "#0f766e", "#b91c1c"].map(c => (
+                            {["#2563EB", "#2563EB", "#16A34A", "#64748B", "#64748B", "#64748B", "#1E293B", "#2563EB", "#16A34A", "#1E293B"].map(c => (
 
                               <div key={c} onClick={() => { setCustomColor(c); setAppTheme("custom"); setShowThemePicker(false); }}
 
@@ -12581,7 +12549,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                                   width: 22, height: 22, borderRadius: 6, background: c, cursor: "pointer",
 
-                                  border: customColor === c && appTheme === "custom" ? "2px solid #fff" : "2px solid transparent",
+                                  border: customColor === c && appTheme === "custom" ? "2px solid #FFFFFF" : "2px solid transparent",
 
                                   boxShadow: customColor === c && appTheme === "custom" ? `0 0 0 2px ${c}, 0 2px 8px ${c}50` : `0 1px 4px ${c}30`,
 
@@ -12607,7 +12575,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                         background: appTheme === "custom"
                           ? `linear-gradient(135deg, ${customColor}, ${customColor}dd)`
                           : `linear-gradient(135deg, ${THEMES[appTheme]?.accent}, ${THEMES[appTheme]?.dot})`,
-                        border: "none", color: "#fff", fontSize: 20, cursor: "pointer",
+                        border: "none", color: "#FFFFFF", fontSize: 20, cursor: "pointer",
                         boxShadow: `0 6px 20px ${appTheme === "custom" ? customColor : (THEMES[appTheme]?.dot || "var(--app-accent)")}60`,
                         display: "flex", alignItems: "center", justifyContent: "center",
                         transition: "all 0.2s"
@@ -12703,27 +12671,27 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                               <div
                                 onMouseEnter={() => isDesktopWidth && setHoverPopupSection('revenue')}
                                 onMouseLeave={() => isDesktopWidth && setHoverPopupSection(null)}
-                                style={{ position: "relative", background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}
+                                style={{ position: "relative", background: "#FFFFFF", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}
                               >
                                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
                                   <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                                    <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(37, 99, 235,0.1)", color: "#2563EB", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
+                                    <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(37, 99, 235, 0.1)", color: "#2563EB", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
                                       <i className="ti ti-currency-rupee"></i>
                                     </div>
-                                    <div style={{ fontSize: 26, fontWeight: 800, color: "#0f172a" }}>
+                                    <div style={{ fontSize: 26, fontWeight: 800, color: "#0F172A" }}>
                                       {formatShortCurrency(totalIncome)}
                                     </div>
                                   </div>
                                   {totalIncome > 0 && (
-                                    <div style={{ background: "#e6fbf9", color: "#2563EB", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
+                                    <div style={{ background: "#EFF6FF", color: "#2563EB", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
                                       <i className="ti ti-trending-up"></i> Active
                                     </div>
                                   )}
                                 </div>
-                                <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Revenue This Month</div>
+                                <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15, 23, 42, 0.6)" }}>Revenue This Month</div>
                                 <HoverPopup id="revenue" title="Revenue This Month">
                                   <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 4 }}>{formatShortCurrency(totalIncome)}</div>
-                                  <div style={{ fontSize: 12, color: "rgba(15,28,46,0.5)" }}>Total income this year: {formatShortCurrency(totalIncome)}</div>
+                                  <div style={{ fontSize: 12, color: "rgba(15, 23, 42, 0.5)" }}>Total income this year: {formatShortCurrency(totalIncome)}</div>
                                 </HoverPopup>
                               </div>
 
@@ -12735,27 +12703,27 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                                 style={{ position: "relative" }}
                               >
                                 <MobileCardArrow id="clients" />
-                                <div style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}>
+                                <div style={{ background: "#FFFFFF", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}>
                                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
                                     <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                                      <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(22,163,74,0.1)", color: "#16a34a", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
+                                      <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(22, 163, 74, 0.1)", color: "#16A34A", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
                                         <i className="ti ti-users"></i>
                                       </div>
-                                      <div style={{ fontSize: 26, fontWeight: 800, color: "#0f172a" }}>
+                                      <div style={{ fontSize: 26, fontWeight: 800, color: "#0F172A" }}>
                                         {clients.length}
                                       </div>
                                     </div>
                                     {clients.length > 0 && (
-                                      <div style={{ background: "#dcfce7", color: "#166534", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
+                                      <div style={{ background: "#E2E8F0", color: "#1E293B", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
                                         <i className="ti ti-trending-up"></i> {clients.filter(c => (c.status || "").toLowerCase() === "active").length} active
                                       </div>
                                     )}
                                   </div>
-                                  <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Total Clients</div>
+                                  <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15, 23, 42, 0.6)" }}>Total Clients</div>
                                 </div>
                                 <HoverPopup id="clients" title="Total Clients">
                                   <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 4 }}>{clients.length} total</div>
-                                  <div style={{ fontSize: 12, color: "rgba(15,28,46,0.5)", marginBottom: 12 }}>{clients.filter(c => (c.status || "").toLowerCase() === "active").length} Active Clients</div>
+                                  <div style={{ fontSize: 12, color: "rgba(15, 23, 42, 0.5)", marginBottom: 12 }}>{clients.filter(c => (c.status || "").toLowerCase() === "active").length} Active Clients</div>
                                   <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                                     {clients.slice(0, 8).map((c, i) => (
                                       <div
@@ -12768,18 +12736,18 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                                         style={{ display: "flex", justifyContent: "space-between", fontSize: 12, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 6, cursor: "pointer" }}
                                       >
                                         <span style={{ fontWeight: 600 }}>{c.name || c.companyName || "Client"}</span>
-                                        <span style={{ color: "rgba(15,28,46,0.5)" }}>{c.status || "-"}</span>
+                                        <span style={{ color: "rgba(15, 23, 42, 0.5)" }}>{c.status || "-"}</span>
                                       </div>
                                     ))}
                                   </div>   </HoverPopup>
                                 <MobilePopup id="clients" title="Total Clients">
                                   <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 4 }}>{clients.length} total</div>
-                                  <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", marginBottom: 16 }}>{clients.filter(c => (c.status || "").toLowerCase() === "active").length} Active Clients</div>
+                                  <div style={{ fontSize: 13, color: "rgba(15, 23, 42, 0.5)", marginBottom: 16 }}>{clients.filter(c => (c.status || "").toLowerCase() === "active").length} Active Clients</div>
                                   <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                                     {clients.map((c, i) => (
                                       <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 8 }}>
                                         <span style={{ fontWeight: 600 }}>{c.name || c.companyName || "Client"}</span>
-                                        <span style={{ color: "rgba(15,28,46,0.5)" }}>{c.status || "-"}</span>
+                                        <span style={{ color: "rgba(15, 23, 42, 0.5)" }}>{c.status || "-"}</span>
                                       </div>
                                     ))}
                                   </div>
@@ -12797,33 +12765,33 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                                 <MobileCardArrow id="activeProjects" />
                                 <div
                                   onClick={(e) => { e.stopPropagation(); if (!isDesktopWidth) openMobilePopup('activeProjects'); }}
-                                  style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column", cursor: "pointer" }}
+                                  style={{ background: "#FFFFFF", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column", cursor: "pointer" }}
                                 >
                                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
                                     <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                                      <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(37,99,235,0.1)", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
+                                      <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(37, 99, 235, 0.1)", color: "#2563EB", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
                                         <i className="ti ti-folder"></i>
                                       </div>
-                                      <div style={{ fontSize: 26, fontWeight: 800, color: "#0f172a" }}>
+                                      <div style={{ fontSize: 26, fontWeight: 800, color: "#0F172A" }}>
                                         {projects.length}
                                       </div>
                                     </div>
                                     {projects.length > 0 && (
-                                      <div style={{ background: "#f1f5f9", color: "#64748b", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
+                                      <div style={{ background: "#EFF6FF", color: "#64748B", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
                                         {activeProjCount} Active
                                       </div>
                                     )}
                                   </div>
-                                  <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Projects</div>
+                                  <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15, 23, 42, 0.6)" }}>Projects</div>
                                 </div>
                                 {(() => {
                                   const statusMeta = (raw) => {
                                     const s = (raw || "").toLowerCase().replace(/[\s_-]/g, "");
-                                    if (["active", "inprogress", "inreview", "started"].includes(s)) return { label: "Active", color: "#16a34a" };
-                                    if (["onhold", "hold", "paused", "suspended"].includes(s)) return { label: "On Hold", color: "#2563eb" };
-                                    if (["completed", "done", "delivered", "closed"].includes(s)) return { label: "Completed", color: "#2563eb" };
-                                    if (["overdue", "late"].includes(s)) return { label: "Overdue", color: "#dc2626" };
-                                    return { label: raw || "On Hold", color: "#2563eb" };
+                                    if (["active", "inprogress", "inreview", "started"].includes(s)) return { label: "Active", color: "#16A34A" };
+                                    if (["onhold", "hold", "paused", "suspended"].includes(s)) return { label: "On Hold", color: "#2563EB" };
+                                    if (["completed", "done", "delivered", "closed"].includes(s)) return { label: "Completed", color: "#2563EB" };
+                                    if (["overdue", "late"].includes(s)) return { label: "Overdue", color: "#64748B" };
+                                    return { label: raw || "On Hold", color: "#2563EB" };
                                   };
                                   return (
                                     <>
@@ -12832,7 +12800,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                                         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                                           {projectsWithProgress.slice(0, 8).map((p, i) => {
                                             const meta = statusMeta(p.status);
-                                            const badgeBg = meta.color === "#16a34a" ? "#dcfce7" : meta.color === "#2563eb" ? "#eff6ff" : meta.color === "#2563eb" ? "#dbeafe" : meta.color === "#dc2626" ? "#fee2e2" : "#eff6ff";
+                                            const badgeBg = meta.color === "#16A34A" ? "#E2E8F0" : meta.color === "#2563EB" ? "#EFF6FF" : meta.color === "#2563EB" ? "#E2E8F0" : meta.color === "#64748B" ? "#E2E8F0" : "#EFF6FF";
                                             return (
                                               <div
                                                 key={p._id || p.id || i}
@@ -12849,10 +12817,10 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                                                   <div style={{ fontWeight: 700, fontSize: 13 }}>{p.name}</div>
                                                   <span style={{ background: badgeBg, color: meta.color, padding: "2px 10px", borderRadius: 20, fontSize: 11, fontWeight: 800, flexShrink: 0 }}>{meta.label}</span>
                                                 </div>
-                                                <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)", marginTop: 3 }}>
+                                                <div style={{ fontSize: 11, color: "rgba(15, 23, 42, 0.5)", marginTop: 3 }}>
                                                   Due {(p.end || p.deadline) ? new Date(p.end || p.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "TBA"}
                                                 </div>
-                                                <div style={{ height: 4, background: "#f1f5f9", borderRadius: 3, marginTop: 6, overflow: "hidden" }}>
+                                                <div style={{ height: 4, background: "#EFF6FF", borderRadius: 3, marginTop: 6, overflow: "hidden" }}>
                                                   <div style={{ width: `${p.progress || 0}%`, height: "100%", background: meta.color, borderRadius: 3 }}></div>
                                                 </div>
                                               </div>
@@ -12866,17 +12834,17 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                                         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                                           {projectsWithProgress.map((p, idx) => {
                                             const meta = statusMeta(p.status);
-                                            const badgeBg = meta.color === "#16a34a" ? "#dcfce7" : meta.color === "#2563eb" ? "#eff6ff" : meta.color === "#2563eb" ? "#dbeafe" : meta.color === "#dc2626" ? "#fee2e2" : "#eff6ff";
+                                            const badgeBg = meta.color === "#16A34A" ? "#E2E8F0" : meta.color === "#2563EB" ? "#EFF6FF" : meta.color === "#2563EB" ? "#E2E8F0" : meta.color === "#64748B" ? "#E2E8F0" : "#EFF6FF";
                                             return (
                                               <div key={p._id || p.id || idx} style={{ borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 10 }}>
                                                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
                                                   <div style={{ fontWeight: 700, fontSize: 13 }}>{p.name}</div>
                                                   <span style={{ background: badgeBg, color: meta.color, padding: "2px 10px", borderRadius: 20, fontSize: 11, fontWeight: 800, flexShrink: 0 }}>{meta.label}</span>
                                                 </div>
-                                                <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)", marginTop: 3 }}>
+                                                <div style={{ fontSize: 11, color: "rgba(15, 23, 42, 0.5)", marginTop: 3 }}>
                                                   Due {(p.end || p.deadline) ? new Date(p.end || p.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "TBA"}
                                                 </div>
-                                                <div style={{ height: 4, background: "#f1f5f9", borderRadius: 3, marginTop: 6, overflow: "hidden" }}>
+                                                <div style={{ height: 4, background: "#EFF6FF", borderRadius: 3, marginTop: 6, overflow: "hidden" }}>
                                                   <div style={{ width: `${p.progress || 0}%`, height: "100%", background: meta.color, borderRadius: 3 }}></div>
                                                 </div>
                                               </div>
@@ -12900,24 +12868,24 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                                 <MobileCardArrow id="unpaidInvoices" />
                                 <div
                                   onClick={() => !isDesktopWidth && openMobilePopup('unpaidInvoices')}
-                                  style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column", cursor: isDesktopWidth ? "default" : "pointer" }}
+                                  style={{ background: "#FFFFFF", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column", cursor: isDesktopWidth ? "default" : "pointer" }}
                                 >
                                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
                                     <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                                      <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(220,38,38,0.1)", color: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
+                                      <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(100, 116, 139, 0.1)", color: "#64748B", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
                                         <i className="ti ti-file-invoice"></i>
                                       </div>
-                                      <div style={{ fontSize: 26, fontWeight: 800, color: "#0f172a" }}>
+                                      <div style={{ fontSize: 26, fontWeight: 800, color: "#0F172A" }}>
                                         {pendingInvCount}
                                       </div>
                                     </div>
                                     {pendingInvCount > 0 && (
-                                      <div style={{ background: "#fef2f2", color: "#991b1b", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
+                                      <div style={{ background: "#F8FAFC", color: "#1E293B", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
                                         <i className="ti ti-trending-down"></i> {invoices.filter(i => (i.status || "").toLowerCase() === "overdue").length > 0 ? "overdue" : "pending"}
                                       </div>
                                     )}
                                   </div>
-                                  <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Unpaid Invoices</div>
+                                  <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15, 23, 42, 0.6)" }}>Unpaid Invoices</div>
                                 </div>
                                 <HoverPopup id="unpaidInvoices" title="Unpaid Invoices">
                                   <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 12 }}>{pendingInvCount} pending</div>
@@ -12932,7 +12900,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                                         style={{ display: "flex", justifyContent: "space-between", fontSize: 12, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 6, cursor: "pointer" }}
                                       >
                                         <span style={{ fontWeight: 600 }}>{inv.clientName || inv.client || "Client"}</span>
-                                        <span style={{ color: "rgba(15,28,46,0.5)" }}>{formatCurrency(inv.grandTotal, inv.currency)}</span>
+                                        <span style={{ color: "rgba(15, 23, 42, 0.5)" }}>{formatCurrency(inv.grandTotal, inv.currency)}</span>
                                       </div>
                                     ))}</div>
                                 </HoverPopup>
@@ -12942,7 +12910,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                                     {invoices.filter(i => (i.status || "").toLowerCase() === "pending" || (i.status || "").toLowerCase() === "overdue").map((inv, i) => (
                                       <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 8 }}>
                                         <span style={{ fontWeight: 600 }}>{inv.clientName || inv.client || "Client"}</span>
-                                        <span style={{ color: "rgba(15,28,46,0.5)" }}>{formatCurrency(inv.grandTotal, inv.currency)}</span>
+                                        <span style={{ color: "rgba(15, 23, 42, 0.5)" }}>{formatCurrency(inv.grandTotal, inv.currency)}</span>
                                       </div>
                                     ))}
                                   </div>
@@ -12957,23 +12925,23 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                                 style={{ position: "relative" }}
                               >
                                 <MobileCardArrow id="employees" />
-                                <div style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}>
+                                <div style={{ background: "#FFFFFF", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}>
                                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
                                     <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                                      <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(37, 99, 235,0.1)", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
+                                      <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(37, 99, 235, 0.1)", color: "#2563EB", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
                                         <i className="ti ti-user-circle"></i>
                                       </div>
-                                      <div style={{ fontSize: 26, fontWeight: 800, color: "#0f172a" }}>
+                                      <div style={{ fontSize: 26, fontWeight: 800, color: "#0F172A" }}>
                                         {employees.length}
                                       </div>
                                     </div>
                                     {employees.length > 0 && (
-                                      <div style={{ background: "#eff6ff", color: "#2563eb", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
+                                      <div style={{ background: "#EFF6FF", color: "#2563EB", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
                                         <i className="ti ti-trending-up"></i> {employees.length}
                                       </div>
                                     )}
                                   </div>
-                                  <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Employees</div>
+                                  <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15, 23, 42, 0.6)" }}>Employees</div>
                                 </div>
                                 <HoverPopup id="employees" title="Employees">
                                   <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 12 }}>{employees.length} staff</div>
@@ -12988,7 +12956,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                                         style={{ display: "flex", justifyContent: "space-between", fontSize: 12, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 6, cursor: "pointer" }}
                                       >
                                         <span style={{ fontWeight: 600 }}>{e.name}</span>
-                                        <span style={{ color: "rgba(15,28,46,0.5)" }}>{e.role || "Employee"}</span>
+                                        <span style={{ color: "rgba(15, 23, 42, 0.5)" }}>{e.role || "Employee"}</span>
                                       </div>
                                     ))}    </div>
                                 </HoverPopup>
@@ -12998,7 +12966,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                                     {employees.map((e, i) => (
                                       <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 8 }}>
                                         <span style={{ fontWeight: 600 }}>{e.name}</span>
-                                        <span style={{ color: "rgba(15,28,46,0.5)" }}>{e.role || "Employee"}</span>
+                                        <span style={{ color: "rgba(15, 23, 42, 0.5)" }}>{e.role || "Employee"}</span>
                                       </div>
                                     ))}
                                   </div>
@@ -13026,27 +12994,27 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                                   {/* Total Revenue Bar Chart Placeholder */}
 
-                                  <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+                                  <div style={{ background: "#FFFFFF", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
 
                                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
 
                                       <div>
 
-                                        <div style={{ fontSize: 13, color: "rgba(15,28,46,0.6)", fontWeight: 700, marginBottom: 4 }}>Total Revenue</div>
+                                        <div style={{ fontSize: 13, color: "rgba(15, 23, 42, 0.6)", fontWeight: 700, marginBottom: 4 }}>Total Revenue</div>
 
-                                        <div style={{ fontSize: 24, fontWeight: 800, color: "#0f172a" }}>{formatShortCurrency(totalIncome)} <span style={{ fontSize: 13, fontWeight: 600, color: "rgba(15,28,46,0.4)" }}>this year</span></div>
+                                        <div style={{ fontSize: 24, fontWeight: 800, color: "#0F172A" }}>{formatShortCurrency(totalIncome)} <span style={{ fontSize: 13, fontWeight: 600, color: "rgba(15, 23, 42, 0.4)" }}>this year</span></div>
 
                                       </div>
 
                                       <div style={{ display: "flex", gap: 16, fontSize: 12, fontWeight: 700 }}>
 
-                                        <div style={{ display: "flex", alignItems: "center", gap: 6, color: "rgba(15,28,46,0.8)" }}>
+                                        <div style={{ display: "flex", alignItems: "center", gap: 6, color: "rgba(15, 23, 42, 0.8)" }}>
 
                                           <div style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--app-accent)" }}></div> Revenue
 
                                         </div>
 
-                                        <div style={{ display: "flex", alignItems: "center", gap: 6, color: "rgba(15,28,46,0.8)" }}>
+                                        <div style={{ display: "flex", alignItems: "center", gap: 6, color: "rgba(15, 23, 42, 0.8)" }}>
 
 
 
@@ -13075,9 +13043,9 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                                           <div key={i} style={{ flex: 1, display: "flex", gap: 4, height: "100%", alignItems: "flex-end", padding: "0 4px" }}>
 
-                                            <div style={{ flex: 1, background: "rgba(15,28,46,0.06)", height: "2px", borderRadius: "4px 4px 0 0" }}></div>
+                                            <div style={{ flex: 1, background: "rgba(15, 23, 42, 0.06)", height: "2px", borderRadius: "4px 4px 0 0" }}></div>
 
-                                            <div style={{ flex: 1, background: "rgba(15,28,46,0.03)", height: "2px", borderRadius: "4px 4px 0 0" }}></div>
+                                            <div style={{ flex: 1, background: "rgba(15, 23, 42, 0.03)", height: "2px", borderRadius: "4px 4px 0 0" }}></div>
 
                                           </div>
 
@@ -13086,7 +13054,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                                     </div>
 
-                                    <div style={{ display: "flex", justifyContent: "space-between", padding: "0 10px", fontSize: 11, color: "rgba(15,28,46,0.4)", fontWeight: 700 }}>
+                                    <div style={{ display: "flex", justifyContent: "space-between", padding: "0 10px", fontSize: 11, color: "rgba(15, 23, 42, 0.4)", fontWeight: 700 }}>
 
                                       <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span>
 
@@ -13096,11 +13064,11 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                                   {/* Active Projects (moved directly under the chart, no gap) */}
 
-                                  <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+                                  <div style={{ background: "#FFFFFF", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
 
                                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
 
-                                      <div style={{ fontSize: 16, fontWeight: 800, color: "#0f172a", display: "flex", alignItems: "center", gap: 8 }}>
+                                      <div style={{ fontSize: 16, fontWeight: 800, color: "#0F172A", display: "flex", alignItems: "center", gap: 8 }}>
 
                                         <i className="ti ti-folder" style={{ color: "var(--app-accent)" }}></i> Active Projects
 
@@ -13124,7 +13092,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                                         const progress = p.progress || 25;
 
-                                        const barColor = progress > 70 ? "#16a34a" : progress > 40 ? "#f59e0b" : "#dc2626";
+                                        const barColor = progress > 70 ? "#16A34A" : progress > 40 ? "#64748B" : "#64748B";
 
                                         const badgeText = "IN PROGRESS";
 
@@ -13140,9 +13108,9 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                                               <div>
 
-                                                <div style={{ fontSize: 14, fontWeight: 700, color: "#0f172a" }}>{p.name || p.title}</div>
+                                                <div style={{ fontSize: 14, fontWeight: 700, color: "#0F172A" }}>{p.name || p.title}</div>
 
-                                                <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)", marginTop: 2 }}>{clients.find(c => c._id === p.clientId)?.clientName || "Internal"} Due {p.deadline ? new Date(p.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "TBA"}</div>
+                                                <div style={{ fontSize: 11, color: "rgba(15, 23, 42, 0.5)", marginTop: 2 }}>{clients.find(c => c._id === p.clientId)?.clientName || "Internal"} Due {p.deadline ? new Date(p.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "TBA"}</div>
 
                                               </div>
 
@@ -13178,7 +13146,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                                       {projects.filter(p => p.status === "Active" || p.status === "Pending").length === 0 && (
 
-                                        <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", textAlign: "center", padding: "10px 0" }}>No active projects</div>
+                                        <div style={{ fontSize: 13, color: "rgba(15, 23, 42, 0.5)", textAlign: "center", padding: "10px 0" }}>No active projects</div>
 
                                       )}
 
@@ -13196,9 +13164,9 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                                   {/* Quick Access */}
 
-                                  <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+                                  <div style={{ background: "#FFFFFF", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
 
-                                    <div style={{ fontSize: 16, fontWeight: 800, color: "#0f172a", marginBottom: 20, display: "flex", alignItems: "center", gap: 8 }}>
+                                    <div style={{ fontSize: 16, fontWeight: 800, color: "#0F172A", marginBottom: 20, display: "flex", alignItems: "center", gap: 8 }}>
 
                                       <i className="ti ti-bolt" style={{ color: "#2563EB" }}></i> Quick Access
 
@@ -13208,23 +13176,23 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                                       {[
 
-                                        { icon: "ti-users", color: "#2563EB", bg: "rgba(37, 99, 235,0.1)", label: "Clients", sub: `${clients.length} total`, act: "clients" },
+                                        { icon: "ti-users", color: "#2563EB", bg: "rgba(37, 99, 235, 0.1)", label: "Clients", sub: `${clients.length} total`, act: "clients" },
 
-                                        { icon: "ti-user-circle", color: "#2563eb", bg: "rgba(37, 99, 235,0.1)", label: "Employees", sub: `${employees.length} staff`, act: "employees" },
+                                        { icon: "ti-user-circle", color: "#2563EB", bg: "rgba(37, 99, 235, 0.1)", label: "Employees", sub: `${employees.length} staff`, act: "employees" },
 
-                                        { icon: "ti-file-invoice", color: "#16a34a", bg: "rgba(22,163,74,0.1)", label: "Invoices", sub: `${pendingInvCount} unpaid`, act: "invoices" },
+                                        { icon: "ti-file-invoice", color: "#16A34A", bg: "rgba(22, 163, 74, 0.1)", label: "Invoices", sub: `${pendingInvCount} unpaid`, act: "invoices" },
 
-                                        { icon: "ti-receipt", color: "#2563eb", bg: "rgba(37,99,235,0.1)", label: "Quotations", sub: "Builder", act: "quotations" },
+                                        { icon: "ti-receipt", color: "#2563EB", bg: "rgba(37, 99, 235, 0.1)", label: "Quotations", sub: "Builder", act: "quotations" },
 
-                                        { icon: "ti-report-money", color: "#d97706", bg: "rgba(217,119,6,0.1)", label: "Proposals", sub: "Creator", act: "proposals" },
+                                        { icon: "ti-report-money", color: "#64748B", bg: "rgba(100, 116, 139, 0.1)", label: "Proposals", sub: "Creator", act: "proposals" },
 
-                                        { icon: "ti-template", color: "#db2777", bg: "rgba(219,39,119,0.1)", label: "Templates", sub: "Designer", act: "templates" },
+                                        { icon: "ti-template", color: "#64748B", bg: "rgba(100, 116, 139, 0.1)", label: "Templates", sub: "Designer", act: "templates" },
 
-                                        { icon: "ti-messages", color: "#2563EB", bg: "rgba(37, 99, 235,0.1)", label: "Messages", sub: "Internal", act: "messaging" },
+                                        { icon: "ti-messages", color: "#2563EB", bg: "rgba(37, 99, 235, 0.1)", label: "Messages", sub: "Internal", act: "messaging" },
 
-                                        { icon: "ti-world", color: "#16a34a", bg: "rgba(22,163,74,0.1)", label: "Client Portal", sub: "External", act: "clients" },
+                                        { icon: "ti-world", color: "#16A34A", bg: "rgba(22, 163, 74, 0.1)", label: "Client Portal", sub: "External", act: "clients" },
 
-                                        { icon: "ti-wallet", color: "#2563eb", bg: "rgba(37,99,235,0.1)", label: "Accounts", sub: "Income/Exp", act: "accounts" },
+                                        { icon: "ti-wallet", color: "#2563EB", bg: "rgba(37, 99, 235, 0.1)", label: "Accounts", sub: "Income/Exp", act: "accounts" },
 
 
 
@@ -13245,34 +13213,34 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                                             <i className={`ti ${q.icon}`}></i>
                                           </div>
                                           <div>
-                                            <div style={{ fontSize: 13, fontWeight: 700, color: "#0f172a" }}>{q.label}</div>
-                                            <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)", marginTop: 2 }}>{q.sub}</div>
+                                            <div style={{ fontSize: 13, fontWeight: 700, color: "#0F172A" }}>{q.label}</div>
+                                            <div style={{ fontSize: 11, color: "rgba(15, 23, 42, 0.5)", marginTop: 2 }}>{q.sub}</div>
                                           </div>
                                         </div>
                                       ))}
                                       <div
                                         onClick={() => { const ph = (user?.phone || "").replace(/\D/g, ""); window.open(ph ? "https://wa.me/" + ph : "https://web.whatsapp.com/", "_blank"); }}
                                         style={{ display: "flex", alignItems: "center", gap: 12, padding: 12, borderRadius: 12, border: "1px solid rgba(0,0,0,0.05)", cursor: "pointer", transition: "all 0.2s" }}
-                                        onMouseEnter={e => e.currentTarget.style.background = "rgba(37,211,102,0.06)"}
+                                        onMouseEnter={e => e.currentTarget.style.background = "rgba(22, 163, 74, 0.06)"}
                                         onMouseLeave={e => e.currentTarget.style.background = "transparent"}
                                       >
-                                        <div style={{ width: 34, height: 34, borderRadius: 10, background: "rgba(37,211,102,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>
+                                        <div style={{ width: 34, height: 34, borderRadius: 10, background: "rgba(22, 163, 74, 0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>
                                           💬
                                         </div>
                                         <div>
-                                          <div style={{ fontSize: 13, fontWeight: 700, color: "#0f172a" }}>WhatsApp</div>
-                                          <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)", marginTop: 2 }}>Open Chat</div>
+                                          <div style={{ fontSize: 13, fontWeight: 700, color: "#0F172A" }}>WhatsApp</div>
+                                          <div style={{ fontSize: 11, color: "rgba(15, 23, 42, 0.5)", marginTop: 2 }}>Open Chat</div>
                                         </div>
                                       </div>                              </div>
                                   </div>
 
                                   {/* Team Section */}
 
-                                  <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", height: "100%", display: "flex", flexDirection: "column" }}>
+                                  <div style={{ background: "#FFFFFF", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", height: "100%", display: "flex", flexDirection: "column" }}>
 
                                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
 
-                                      <div style={{ fontSize: 16, fontWeight: 800, color: "#0f172a", display: "flex", alignItems: "center", gap: 8 }}>
+                                      <div style={{ fontSize: 16, fontWeight: 800, color: "#0F172A", display: "flex", alignItems: "center", gap: 8 }}>
 
                                         <i className="ti ti-user-circle" style={{ color: "#2563EB" }}></i> Team
 
@@ -13291,7 +13259,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                                       {employees.slice(0, 3).map(e => (
                                         <div key={e._id} style={{ display: "flex", alignItems: "center", gap: 12 }}>
 
-                                          <div style={{ width: 38, height: 38, borderRadius: "50%", background: "linear-gradient(135deg,  var(--app-accent, var(--app-accent, #2563EB)), #2563EB)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 800 }}>
+                                          <div style={{ width: 38, height: 38, borderRadius: "50%", background: "linear-gradient(135deg,  var(--app-accent, var(--app-accent, #2563EB)), #2563EB)", color: "#FFFFFF", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 800 }}>
 
                                             {(e.name || "E")[0].toUpperCase()}
 
@@ -13299,19 +13267,19 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                                           <div style={{ flex: 1 }}>
 
-                                            <div style={{ fontSize: 14, fontWeight: 700, color: "#0f172a" }}>{e.name}</div>
+                                            <div style={{ fontSize: 14, fontWeight: 700, color: "#0F172A" }}>{e.name}</div>
 
-                                            <div style={{ fontSize: 12, color: "rgba(15,28,46,0.5)" }}>{e.role || "Employee"}</div>
+                                            <div style={{ fontSize: 12, color: "rgba(15, 23, 42, 0.5)" }}>{e.role || "Employee"}</div>
 
                                           </div>
 
-                                          <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#16a34a" }}></div>
+                                          <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#16A34A" }}></div>
 
                                         </div>
 
                                       ))}
 
-                                      {employees.length === 0 && <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", textAlign: "center" }}>No team members</div>}
+                                      {employees.length === 0 && <div style={{ fontSize: 13, color: "rgba(15, 23, 42, 0.5)", textAlign: "center" }}>No team members</div>}
 
                                     </div>
 
@@ -13334,15 +13302,15 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                                 <div style={{ display: "flex", flexDirection: "column", gap: 8, height: "100%" }}>
 
 
-                                  <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", height: "100%", display: "flex", flexDirection: "column" }}>
+                                  <div style={{ background: "#FFFFFF", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", height: "100%", display: "flex", flexDirection: "column" }}>
 
                                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
 
-                                      <div style={{ fontSize: 16, fontWeight: 800, color: "#0f172a", display: "flex", alignItems: "center", gap: 8 }}>
+                                      <div style={{ fontSize: 16, fontWeight: 800, color: "#0F172A", display: "flex", alignItems: "center", gap: 8 }}>
 
                                         <i className="ti ti-user-x" style={{ color: "var(--app-accent)" }}></i> Leave Requests
 
-                                        <span style={{ background: "#fff7ed", color: "#ea580c", padding: "4px 8px", borderRadius: 6, fontSize: 10, fontWeight: 800 }}>{pendingLeaves.length} PENDING</span>
+                                        <span style={{ background: "#F8FAFC", color: "#64748B", padding: "4px 8px", borderRadius: 6, fontSize: 10, fontWeight: 800 }}>{pendingLeaves.length} PENDING</span>
 
                                       </div>
 
@@ -13360,7 +13328,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                                         const initials = l.employeeName ? l.employeeName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : "EE";
 
-                                        const colors = ["#f59e0b", "#a855f7", "#0ea5e9", "#ec4899", "#22c55e"];
+                                        const colors = ["#64748B", "#64748B", "#2563EB", "#64748B", "#16A34A"];
 
                                         const bg = colors[i % colors.length];
 
@@ -13394,7 +13362,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                                           <div key={l._id || i} style={{ display: "flex", alignItems: "center", gap: 12, paddingBottom: 16, borderBottom: i === pendingLeaves.length - 1 ? "none" : "1px solid rgba(0,0,0,0.04)" }}>
 
-                                            <div style={{ width: 36, height: 36, borderRadius: "50%", background: bg, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800 }}>
+                                            <div style={{ width: 36, height: 36, borderRadius: "50%", background: bg, color: "#FFFFFF", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800 }}>
 
                                               {initials}
 
@@ -13402,21 +13370,21 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                                             <div style={{ flex: 1 }}>
 
-                                              <div style={{ fontSize: 14, fontWeight: 700, color: "#0f172a" }}>{l.employeeName}</div>
+                                              <div style={{ fontSize: 14, fontWeight: 700, color: "#0F172A" }}>{l.employeeName}</div>
 
-                                              <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)" }}>{detail}</div>
+                                              <div style={{ fontSize: 11, color: "rgba(15, 23, 42, 0.5)" }}>{detail}</div>
 
                                             </div>
 
                                             <div style={{ display: "flex", gap: 8 }}>
 
-                                              <button onClick={() => handleApproveLeave(l._id)} style={{ background: "#dcfce7", color: "#166534", border: "none", padding: "6px 12px", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>
+                                              <button onClick={() => handleApproveLeave(l._id)} style={{ background: "#E2E8F0", color: "#1E293B", border: "none", padding: "6px 12px", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>
 
                                                 <i className="ti ti-check"></i> Approve
 
                                               </button>
 
-                                              <button onClick={() => handleRejectLeave(l._id)} style={{ background: "#fef2f2", color: "#dc2626", border: "none", padding: "6px 10px", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+                                              <button onClick={() => handleRejectLeave(l._id)} style={{ background: "#F8FAFC", color: "#64748B", border: "none", padding: "6px 10px", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
 
                                                 <i className="ti ti-x"></i>
 
@@ -13432,7 +13400,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                                       {pendingLeaves.length === 0 && (
 
-                                        <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", textAlign: "center", padding: "10px 0" }}>No pending leave requests.</div>
+                                        <div style={{ fontSize: 13, color: "rgba(15, 23, 42, 0.5)", textAlign: "center", padding: "10px 0" }}>No pending leave requests.</div>
 
                                       )}
 
@@ -13452,15 +13420,15 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                                   {/* Overdue Tasks */}
 
-                                  <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+                                  <div style={{ background: "#FFFFFF", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
 
                                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
 
-                                      <div style={{ fontSize: 16, fontWeight: 800, color: "#0f172a", display: "flex", alignItems: "center", gap: 8 }}>
+                                      <div style={{ fontSize: 16, fontWeight: 800, color: "#0F172A", display: "flex", alignItems: "center", gap: 8 }}>
 
                                         <i className="ti ti-alert-circle" style={{ color: "var(--app-accent, #2563EB)" }}></i> Overdue Tasks
 
-                                        <span style={{ background: "#fef2f2", color: "#dc2626", padding: "4px 8px", borderRadius: 6, fontSize: 10, fontWeight: 800 }}>
+                                        <span style={{ background: "#F8FAFC", color: "#64748B", padding: "4px 8px", borderRadius: 6, fontSize: 10, fontWeight: 800 }}>
 
                                           {tasks.filter(t => (t.status || "").toLowerCase() !== "completed" && new Date(t.deadline) < new Date()).length}
 
@@ -13486,19 +13454,19 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                                           <div style={{ flex: 1 }}>
 
-                                            <div style={{ fontSize: 13, fontWeight: 700, color: "#0f172a", marginBottom: 2 }}>{t.title}</div>
+                                            <div style={{ fontSize: 13, fontWeight: 700, color: "#0F172A", marginBottom: 2 }}>{t.title}</div>
 
-                                            <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)" }}>{employees.find(e => e._id === t.assignee)?.name || "Unassigned"} Due {t.deadline ? new Date(t.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "TBA"}</div>
+                                            <div style={{ fontSize: 11, color: "rgba(15, 23, 42, 0.5)" }}>{employees.find(e => e._id === t.assignee)?.name || "Unassigned"} Due {t.deadline ? new Date(t.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "TBA"}</div>
 
                                           </div>
 
-                                          <div style={{ background: "#fef2f2", color: "#dc2626", padding: "4px 8px", borderRadius: 6, fontSize: 9, fontWeight: 800, letterSpacing: "0.5px" }}>HIGH</div>
+                                          <div style={{ background: "#F8FAFC", color: "#64748B", padding: "4px 8px", borderRadius: 6, fontSize: 9, fontWeight: 800, letterSpacing: "0.5px" }}>HIGH</div>
 
                                         </div>
 
                                       ))}
 
-                                      {tasks.filter(t => (t.status || "").toLowerCase() !== "completed" && new Date(t.deadline) < new Date()).length === 0 && <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", padding: "10px 0" }}>No overdue tasks.</div>}
+                                      {tasks.filter(t => (t.status || "").toLowerCase() !== "completed" && new Date(t.deadline) < new Date()).length === 0 && <div style={{ fontSize: 13, color: "rgba(15, 23, 42, 0.5)", padding: "10px 0" }}>No overdue tasks.</div>}
 
                                     </div>
 
@@ -13506,15 +13474,15 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                                   {/* Doc Requests (Dynamic from backend) */}
 
-                                  <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+                                  <div style={{ background: "#FFFFFF", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
 
                                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
 
-                                      <div style={{ fontSize: 16, fontWeight: 800, color: "#0f172a", display: "flex", alignItems: "center", gap: 8 }}>
+                                      <div style={{ fontSize: 16, fontWeight: 800, color: "#0F172A", display: "flex", alignItems: "center", gap: 8 }}>
 
                                         <i className="ti ti-file-description" style={{ color: "var(--app-accent, #2563EB)" }}></i> Doc Requests
 
-                                        <span style={{ background: "#fff7ed", color: "#ea580c", padding: "4px 8px", borderRadius: 6, fontSize: 10, fontWeight: 800 }}>{employeeDocs.filter(d => d.status === "PENDING").length} PENDING</span>
+                                        <span style={{ background: "#F8FAFC", color: "#64748B", padding: "4px 8px", borderRadius: 6, fontSize: 10, fontWeight: 800 }}>{employeeDocs.filter(d => d.status === "PENDING").length} PENDING</span>
 
                                       </div>
 
@@ -13534,19 +13502,19 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                                         const styleConfig =
 
-                                          d.docType === "pan" ? { bg: "#f1f5f9", c: "#0ea5e9" } :
+                                          d.docType === "pan" ? { bg: "#EFF6FF", c: "#2563EB" } :
 
-                                            d.docType === "passbook" ? { bg: "#eff6ff", c: "#a855f7" } :
+                                            d.docType === "passbook" ? { bg: "#EFF6FF", c: "#64748B" } :
 
-                                              d.docType === "aadhaar" ? { bg: "#dcfce7", c: "#22c55e" } :
+                                              d.docType === "aadhaar" ? { bg: "#E2E8F0", c: "#16A34A" } :
 
-                                                { bg: "#fef3c7", c: "#d97706" };
+                                                { bg: "#E2E8F0", c: "#64748B" };
 
 
 
                                         const isPending = d.status === "PENDING";
 
-                                        const statusColor = d.status === "APPROVED" ? "#16a34a" : d.status === "REJECTED" ? "#dc2626" : "#ea580c";
+                                        const statusColor = d.status === "APPROVED" ? "#16A34A" : d.status === "REJECTED" ? "#64748B" : "#64748B";
 
 
 
@@ -13562,15 +13530,15 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                                             <div style={{ flex: 1 }}>
 
-                                              <div style={{ fontSize: 13, fontWeight: 700, color: "#0f172a" }}>{docName}</div>
+                                              <div style={{ fontSize: 13, fontWeight: 700, color: "#0F172A" }}>{docName}</div>
 
-                                              <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)" }}>{d.employeeName}</div>
+                                              <div style={{ fontSize: 11, color: "rgba(15, 23, 42, 0.5)" }}>{d.employeeName}</div>
 
                                             </div>
 
                                             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
 
-                                              <a href={d.url} target="_blank" rel="noreferrer" style={{ background: "#f1f5f9", color: "#64748b", padding: "6px 12px", borderRadius: 6, fontSize: 11, fontWeight: 700, textDecoration: "none", display: "flex", alignItems: "center", gap: 4 }}>
+                                              <a href={d.url} target="_blank" rel="noreferrer" style={{ background: "#EFF6FF", color: "#64748B", padding: "6px 12px", borderRadius: 6, fontSize: 11, fontWeight: 700, textDecoration: "none", display: "flex", alignItems: "center", gap: 4 }}>
 
                                                 <i className="ti ti-eye"></i> View
 
@@ -13580,13 +13548,13 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                                                 <>
 
-                                                  <button onClick={() => handleApproveDoc(d._id)} style={{ background: "#dcfce7", color: "#166534", border: "none", padding: "6px 12px", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+                                                  <button onClick={() => handleApproveDoc(d._id)} style={{ background: "#E2E8F0", color: "#1E293B", border: "none", padding: "6px 12px", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
 
                                                     Approve
 
                                                   </button>
 
-                                                  <button onClick={() => handleRejectDoc(d._id)} style={{ background: "#fef2f2", color: "#dc2626", border: "none", padding: "6px 10px", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+                                                  <button onClick={() => handleRejectDoc(d._id)} style={{ background: "#F8FAFC", color: "#64748B", border: "none", padding: "6px 10px", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
 
                                                     Reject
 
@@ -13610,7 +13578,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                                       {employeeDocs.length === 0 && (
 
-                                        <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", textAlign: "center", padding: "10px 0" }}>No document requests.</div>
+                                        <div style={{ fontSize: 13, color: "rgba(15, 23, 42, 0.5)", textAlign: "center", padding: "10px 0" }}>No document requests.</div>
 
                                       )}
 
@@ -13994,7 +13962,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
             {showAddClientModal && (
               <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 10000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }} onClick={() => setShowAddClientModal(false)}>
-                <div style={{ background: "#fff", borderRadius: 16, width: "100%", maxWidth: 720, maxHeight: "90vh", overflowY: "auto" }} onClick={e => e.stopPropagation()}>
+                <div style={{ background: "#FFFFFF", borderRadius: 16, width: "100%", maxWidth: 720, maxHeight: "90vh", overflowY: "auto" }} onClick={e => e.stopPropagation()}>
                   <AddClientView
                     onBack={() => { setReturnToProposals(false); setShowAddClientModal(false); }}
                     onClientAdded={(client, replaceTempId) => {
@@ -14228,8 +14196,8 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
             }} onAddProject={() => { setJumpProject(null); setSidebarOverride("invoices"); setActive("create-project"); }} />}
 {showMobileProposalModal && (
-              <div style={{ position: "fixed", inset: 0, zIndex: 9000, background: "rgba(15,23,42,0.5)", display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}>
-                <div style={{ background: "var(--app-bg, #f5f7fb)", width: "100%", maxWidth: 520, maxHeight: "90vh", overflowY: "auto", overflowX: "hidden", borderRadius: 18, padding: "12px", boxSizing: "border-box" }}>
+              <div style={{ position: "fixed", inset: 0, zIndex: 9000, background: "rgba(15, 23, 42, 0.5)", display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}>
+                <div style={{ background: "var(--app-bg, #F8FAFC)", width: "100%", maxWidth: 520, maxHeight: "90vh", overflowY: "auto", overflowX: "hidden", borderRadius: 18, padding: "12px", boxSizing: "border-box" }}>
                   <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 8 }}>
                     <button onClick={() => setShowMobileProposalModal(false)} style={{ background: "none", border: "none", fontSize: 22, cursor: "pointer", color: "var(--app-muted)" }}>✕</button>
                   </div>
@@ -14247,8 +14215,8 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
               </div>
             )}
             {showMobileQuotationModal && (
-              <div style={{ position: "fixed", inset: 0, zIndex: 9000, background: "rgba(15,23,42,0.5)", display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}>
-                <div style={{ background: "var(--app-bg, #f5f7fb)", width: "100%", maxWidth: 520, maxHeight: "90vh", overflowY: "auto", overflowX: "hidden", borderRadius: 18, padding: "12px", boxSizing: "border-box" }}>
+              <div style={{ position: "fixed", inset: 0, zIndex: 9000, background: "rgba(15, 23, 42, 0.5)", display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}>
+                <div style={{ background: "var(--app-bg, #F8FAFC)", width: "100%", maxWidth: 520, maxHeight: "90vh", overflowY: "auto", overflowX: "hidden", borderRadius: 18, padding: "12px", boxSizing: "border-box" }}>
                   <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 8 }}>
                     <button onClick={() => setShowMobileQuotationModal(false)} style={{ background: "none", border: "none", fontSize: 22, cursor: "pointer", color: "var(--app-muted)" }}>✕</button>
                   </div>
@@ -14266,8 +14234,8 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
               </div>
             )}
     {showMobileEditProjectModal && jumpProject && (
-              <div style={{ position: "fixed", inset: 0, zIndex: 9000, background: "rgba(15,23,42,0.5)", display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}>
-                <div style={{ background: "var(--app-bg, #f5f7fb)", width: "100%", maxWidth: 520, maxHeight: "90vh", overflowY: "auto", overflowX: "hidden", borderRadius: 18, padding: "12px", boxSizing: "border-box" }}>
+              <div style={{ position: "fixed", inset: 0, zIndex: 9000, background: "rgba(15, 23, 42, 0.5)", display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}>
+                <div style={{ background: "var(--app-bg, #F8FAFC)", width: "100%", maxWidth: 520, maxHeight: "90vh", overflowY: "auto", overflowX: "hidden", borderRadius: 18, padding: "12px", boxSizing: "border-box" }}>
                   <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 8 }}>
                     <button onClick={() => setShowMobileEditProjectModal(false)} style={{ background: "none", border: "none", fontSize: 22, cursor: "pointer", color: "var(--app-muted)" }}>✕</button>
                   </div>
@@ -14296,8 +14264,8 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
               </div>
             )}
             {showMobileInvoiceModal && (
-              <div style={{ position: "fixed", inset: 0, zIndex: 9000, background: "rgba(15,23,42,0.5)", display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}>
-            <div className="mobile-invoice-modal-scope" style={{ background: "var(--app-bg, #f5f7fb)", width: "100%", maxWidth: 520, maxHeight: "90vh", overflowY: "auto", overflowX: "hidden", borderRadius: 18, padding: "12px", boxSizing: "border-box" }}>
+              <div style={{ position: "fixed", inset: 0, zIndex: 9000, background: "rgba(15, 23, 42, 0.5)", display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}>
+            <div className="mobile-invoice-modal-scope" style={{ background: "var(--app-bg, #F8FAFC)", width: "100%", maxWidth: 520, maxHeight: "90vh", overflowY: "auto", overflowX: "hidden", borderRadius: 18, padding: "12px", boxSizing: "border-box" }}>
               <style>{`
                 .mobile-invoice-modal-scope, .mobile-invoice-modal-scope * { box-sizing: border-box !important; max-width: 100% !important; }
                 .mobile-invoice-modal-scope .invoice-creator-split-container { display: block !important; grid-template-columns: 1fr !important; gap: 0 !important; }
@@ -14330,11 +14298,11 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
   width: 100% !important;
 }
 .mobile-invoice-modal-scope tr {
-  border: 1px solid var(--app-border, #e5e7eb) !important;
+  border: 1px solid var(--app-border, #E2E8F0) !important;
   border-radius: 10px !important;
   padding: 10px !important;
   margin-bottom: 10px !important;
-  background: #fff !important;
+  background: #FFFFFF !important;
 }
 .mobile-invoice-modal-scope td {
   padding: 4px 0 !important;
@@ -14346,13 +14314,13 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
   justify-content: space-between !important;
   font-weight: 700 !important;
   padding-top: 6px !important;
-  border-top: 1px dashed var(--app-border, #e5e7eb) !important;
+  border-top: 1px dashed var(--app-border, #E2E8F0) !important;
   margin-top: 6px !important;
 }
 .mobile-invoice-modal-scope .inv-creator-item-total::before {
   content: "Total: ";
   font-weight: 600;
-  color: #64748b;
+  color: #64748B;
   font-size: 11px;
 }
 .mobile-invoice-modal-scope .inv-creator-del-row-btn {
@@ -14363,10 +14331,10 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
   justify-content: center !important;
   gap: 6px !important;
   padding: 8px !important;
-  border: 1px solid #fecaca !important;
+  border: 1px solid #E2E8F0 !important;
   border-radius: 8px !important;
-  background: #fef2f2 !important;
-  color: #dc2626 !important;
+  background: #F8FAFC !important;
+  color: #64748B !important;
 }
 .mobile-invoice-modal-scope .inv-creator-del-row-btn::after {
   content: "Delete";
@@ -14640,9 +14608,9 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                   zIndex: 10050,
 
-                  background: "#fff",
+                  background: "#FFFFFF",
 
-                  border: "1px solid #e2e8f0",
+                  border: "1px solid #E2E8F0",
 
                   borderRadius: 12,
 
@@ -14660,17 +14628,17 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                 {/* Current Account Header */}
 
-                <div style={{ padding: "12px 14px", borderBottom: "1px solid #f1f5f9", background: "linear-gradient(135deg,var(--app-bg),var(--app-bg))" }}>
+                <div style={{ padding: "12px 14px", borderBottom: "1px solid #EFF6FF", background: "linear-gradient(135deg,var(--app-bg),var(--app-bg))" }}>
 
                   <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
 
                     {companyLogo ? (
 
-                      <img src={companyLogo} alt="logo" style={{ height: 38, width: "auto", maxWidth: "100px", objectFit: "contain", flexShrink: 0, background: "#fff", display: "block", borderRadius: 10, border: "1px solid #f1f5f9" }} />
+                      <img src={companyLogo} alt="logo" style={{ height: 38, width: "auto", maxWidth: "100px", objectFit: "contain", flexShrink: 0, background: "#FFFFFF", display: "block", borderRadius: 10, border: "1px solid #EFF6FF" }} />
 
                     ) : (
 
-                      <div style={{ width: 38, height: 38, borderRadius: 10, background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 14 }}>{initials}</div>
+                      <div style={{ width: 38, height: 38, borderRadius: 10, background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontWeight: 800, fontSize: 14 }}>{initials}</div>
 
                     )}
 
@@ -14736,7 +14704,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                             gap: 10,
 
-                            borderBottom: "1px solid #f8fafc",
+                            borderBottom: "1px solid #F8FAFC",
 
                             textAlign: "left",
 
@@ -14748,9 +14716,9 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                         >
 
-                          <div style={{ width: 32, height: 32, borderRadius: 8, background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 12, flexShrink: 0 }}>
+                          <div style={{ width: 32, height: 32, borderRadius: 8, background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontWeight: 700, fontSize: 12, flexShrink: 0 }}>
 
-                            {account?.logoUrl ? <img src={account.logoUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "contain", padding: 2, background: "#fff" }} /> : <span>{accInitials}</span>}
+                            {account?.logoUrl ? <img src={account.logoUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "contain", padding: 2, background: "#FFFFFF" }} /> : <span>{accInitials}</span>}
 
                           </div>
 
@@ -14758,7 +14726,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                             <div style={{ fontSize: 12, fontWeight: 700, color: T.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{accName}</div>
 
-                            <div style={{ fontSize: 10, color: "#94a3b8", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{account?.email}</div>
+                            <div style={{ fontSize: 10, color: "#64748B", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{account?.email}</div>
 
                           </div>
 
@@ -14778,7 +14746,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                 {/* Menu Options */}
 
-                <div style={{ borderTop: "1px solid #f1f5f9" }}>
+                <div style={{ borderTop: "1px solid #EFF6FF" }}>
 
                   <button
 
@@ -14886,7 +14854,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                           gap: 10,
 
-                          borderTop: "1px solid #f8fafc",
+                          borderTop: "1px solid #F8FAFC",
 
                         }}
 
@@ -14930,7 +14898,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                       fontFamily: "inherit",
 
-                      color: "#ef4444",
+                      color: "#64748B",
 
                       display: "flex",
 
@@ -14938,11 +14906,11 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                       gap: 10,
 
-                      borderTop: "1px solid #f8fafc",
+                      borderTop: "1px solid #F8FAFC",
 
                     }}
 
-                    onMouseEnter={e => e.currentTarget.style.background = "#fef2f2"}
+                    onMouseEnter={e => e.currentTarget.style.background = "#F8FAFC"}
 
                     onMouseLeave={e => e.currentTarget.style.background = "transparent"}
 
@@ -14980,7 +14948,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                     border: "1.5px solid rgba(255,255,255,0.35)",
 
-                    color: "#fff",
+                    color: "#FFFFFF",
 
                     borderRadius: 10,
 
@@ -15046,11 +15014,11 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                 <div style={{ textAlign: "center", padding: "5px 0" }}>
 
-                  <div style={{ width: 54, height: 54, background: "linear-gradient(135deg,#dcfce7,#bbf7d0)", color: "#16a34a", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, margin: "0 auto 14px", boxShadow: "0 6px 15px rgba(22,163,74,0.12)" }}>✓</div>
+                  <div style={{ width: 54, height: 54, background: "linear-gradient(135deg,#E2E8F0,#E2E8F0)", color: "#16A34A", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, margin: "0 auto 14px", boxShadow: "0 6px 15px rgba(22, 163, 74, 0.12)" }}>✓</div>
 
                   <h3 style={{ fontSize: 18, fontWeight: 800, color: T.text, marginBottom: 8 }}>Registration Successful!</h3>
 
-                  <p style={{ fontSize: 13, color: "#64748b", marginBottom: 16, lineHeight: 1.4, maxWidth: 340, margin: "0 auto 16px" }}>
+                  <p style={{ fontSize: 13, color: "#64748B", marginBottom: 16, lineHeight: 1.4, maxWidth: 340, margin: "0 auto 16px" }}>
 
                     The client account for <strong style={{ color: T.primary }}>{clientSuccessData.name}</strong> has been created.
 
@@ -15060,21 +15028,21 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
 
 
-                  <div style={{ background: "linear-gradient(135deg,#f8fafc,#f1f5f9)", border: "1.5px solid #e2e8f0", borderRadius: 12, padding: "16px", marginBottom: 20, textAlign: "left", boxShadow: "inset 0 1px 3px rgba(0,0,0,0.02)" }}>
+                  <div style={{ background: "linear-gradient(135deg,#F8FAFC,#EFF6FF)", border: "1.5px solid #E2E8F0", borderRadius: 12, padding: "16px", marginBottom: 20, textAlign: "left", boxShadow: "inset 0 1px 3px rgba(0,0,0,0.02)" }}>
 
                     <div style={{ marginBottom: 12 }}>
 
-                      <div style={{ fontSize: 9, color: "#64748b", fontWeight: 800, textTransform: "uppercase", marginBottom: 4, letterSpacing: 0.8 }}>LOGIN EMAIL</div>
+                      <div style={{ fontSize: 9, color: "#64748B", fontWeight: 800, textTransform: "uppercase", marginBottom: 4, letterSpacing: 0.8 }}>LOGIN EMAIL</div>
 
-                      <div style={{ fontSize: 14, fontWeight: 700, color: T.text, background: "#fff", padding: "6px 12px", borderRadius: 8, border: "1px solid #e2e8f0" }}>{clientSuccessData.email}</div>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: T.text, background: "#FFFFFF", padding: "6px 12px", borderRadius: 8, border: "1px solid #E2E8F0" }}>{clientSuccessData.email}</div>
 
                     </div>
 
                     <div>
 
-                      <div style={{ fontSize: 9, color: "#64748b", fontWeight: 800, textTransform: "uppercase", marginBottom: 4, letterSpacing: 0.8 }}>TEMPORARY PASSWORD</div>
+                      <div style={{ fontSize: 9, color: "#64748B", fontWeight: 800, textTransform: "uppercase", marginBottom: 4, letterSpacing: 0.8 }}>TEMPORARY PASSWORD</div>
 
-                      <div style={{ fontSize: 14, fontWeight: 700, color: "var(--app-muted)", background: "#fff", padding: "6px 12px", borderRadius: 8, border: "1px solid #e2e8f0", fontFamily: "monospace" }}>{clientSuccessData.password || "Not set (optional)"}</div>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: "var(--app-muted)", background: "#FFFFFF", padding: "6px 12px", borderRadius: 8, border: "1px solid #E2E8F0", fontFamily: "monospace" }}>{clientSuccessData.password || "Not set (optional)"}</div>
 
                     </div>
 
@@ -15096,7 +15064,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                       }}
 
-                      style={{ width: "100%", background: "var(--app-accent-gradient)", color: "#fff", border: "none", borderRadius: 10, padding: "11px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13, boxShadow: "0 6px 15px rgba(var(--app-accent-rgb),0.2)", transition: "all 0.2s" }}
+                      style={{ width: "100%", background: "var(--app-accent-gradient)", color: "#FFFFFF", border: "none", borderRadius: 10, padding: "11px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13, boxShadow: "0 6px 15px rgba(var(--app-accent-rgb),0.2)", transition: "all 0.2s" }}
 
                     >
 
@@ -15118,7 +15086,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                       }}
 
-                      style={{ width: "100%", background: "#25D366", color: "#fff", border: "none", borderRadius: 10, padding: "11px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13, boxShadow: "0 6px 15px rgba(37,211,102,0.2)" }}
+                      style={{ width: "100%", background: "#16A34A", color: "#FFFFFF", border: "none", borderRadius: 10, padding: "11px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13, boxShadow: "0 6px 15px rgba(22, 163, 74, 0.2)" }}
 
                     >
 
@@ -15132,7 +15100,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                       onClick={() => { setModal(null); setClientSuccessData(null); }}
 
-                      style={{ width: "100%", background: "transparent", border: "1.2px solid var(--app-border)", color: "#64748b", borderRadius: 10, padding: "10px", fontWeight: 700, cursor: "pointer", fontSize: 12, marginTop: 6 }}
+                      style={{ width: "100%", background: "transparent", border: "1.2px solid var(--app-border)", color: "#64748B", borderRadius: 10, padding: "10px", fontWeight: 700, cursor: "pointer", fontSize: 12, marginTop: 6 }}
 
                     >
 
@@ -15194,7 +15162,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                         borderRadius: 20,
 
-                        background: "#fff",
+                        background: "#FFFFFF",
 
                         border: "2.5px dashed var(--app-border)",
 
@@ -15248,7 +15216,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                           <div style={{
                             padding: nc.logoUrl ? 4 : 24,
                             borderRadius: 20,
-                            background: "#fff",
+                            background: "#FFFFFF",
                             border: "2.5px dashed var(--app-border)",
                             display: "flex",
                             alignItems: "center",
@@ -15301,13 +15269,13 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                         width: 36, height: 36, borderRadius: "50%",
 
-                        background: "var(--app-accent)", color: "#fff",
+                        background: "var(--app-accent)", color: "#FFFFFF",
 
                         display: "flex", alignItems: "center", justifyContent: "center",
 
                         fontSize: 16, boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.4)",
 
-                        border: "3px solid #fff"
+                        border: "3px solid #FFFFFF"
 
                       }}>📷</div>
 
@@ -15319,7 +15287,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                   <div style={{ marginBottom: 16 }}>
 
-                    <div style={{ fontSize: 11, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 8 }}>Client Type <span style={{ color: '#EF5350' }}>*</span></div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 8 }}>Client Type <span style={{ color: '#64748B' }}>*</span></div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
 
@@ -15327,15 +15295,15 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                         <div key={t.val} onClick={() => setNc(p => ({ ...p, clientType: t.val }))}
 
-                          style={{ border: `2px solid ${nc.clientType === t.val ? ' var(--app-accent, var(--app-accent, #2563EB))' : '#E0E6EA'}`, borderRadius: 10, padding: '12px 8px', textAlign: 'center', cursor: 'pointer', background: nc.clientType === t.val ? 'var(--teal-light, var(--teal-light, #EFF6FF))' : '#F4F6F8', transition: 'all .15s', position: 'relative' }}>
+                          style={{ border: `2px solid ${nc.clientType === t.val ? ' var(--app-accent, var(--app-accent, #2563EB))' : '#E2E8F0'}`, borderRadius: 10, padding: '12px 8px', textAlign: 'center', cursor: 'pointer', background: nc.clientType === t.val ? 'var(--teal-light, var(--teal-light, #EFF6FF))' : '#F8FAFC', transition: 'all .15s', position: 'relative' }}>
 
                           {nc.clientType === t.val && <span style={{ position: 'absolute', top: 6, right: 6, width: 14, height: 14, borderRadius: '50%', background: ' var(--app-accent, var(--app-accent, #2563EB))', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}></span>}
 
                           <div style={{ fontSize: 22, marginBottom: 4 }}>{t.icon}</div>
 
-                          <div style={{ fontSize: 12, fontWeight: 700, color: nc.clientType === t.val ? '#007B8A' : '#1A2332' }}>{t.label}</div>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: nc.clientType === t.val ? '#16A34A' : '#1E293B' }}>{t.label}</div>
 
-                          <div style={{ fontSize: 10, color: '#94A3B0', marginTop: 2 }}>{t.sub}</div>
+                          <div style={{ fontSize: 10, color: '#64748B', marginTop: 2 }}>{t.sub}</div>
 
                         </div>
                       ))}
@@ -15348,9 +15316,9 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                   {/* ── BASIC INFO ── */}
 
-                  <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
+                  <div style={{ background: '#F8FAFC', borderRadius: 12, border: '1px solid #E2E8F0', padding: '14px 16px', marginBottom: 14 }}>
 
-                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, var(--app-accent, #2563EB))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-building" style={{ color: '#fff', fontSize: 16 }}></i></span> Basic Info</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, var(--app-accent, #2563EB))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-building" style={{ color: '#FFFFFF', fontSize: 16 }}></i></span> Basic Info</div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
 
@@ -15376,9 +15344,9 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                   {/* ── PRIMARY CONTACT ── */}
 
-                  <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
+                  <div style={{ background: '#F8FAFC', borderRadius: 12, border: '1px solid #E2E8F0', padding: '14px 16px', marginBottom: 14 }}>
 
-                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, var(--app-accent, #2563EB))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-phone-call" style={{ color: '#fff', fontSize: 16 }}></i></span> Primary Contact</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, var(--app-accent, #2563EB))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-phone-call" style={{ color: '#FFFFFF', fontSize: 16 }}></i></span> Primary Contact</div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
 
@@ -15402,9 +15370,9 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                   {/* ── ADDRESS ── */}
 
-                  <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
+                  <div style={{ background: '#F8FAFC', borderRadius: 12, border: '1px solid #E2E8F0', padding: '14px 16px', marginBottom: 14 }}>
 
-                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, var(--app-accent, #2563EB))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-map-pin" style={{ color: '#fff', fontSize: 16 }}></i></span> Address</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, var(--app-accent, #2563EB))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-map-pin" style={{ color: '#FFFFFF', fontSize: 16 }}></i></span> Address</div>
 
                     <div style={{ marginBottom: 12 }}><Fld label="Street / Building Address" value={nc.address} onChange={v => setNc({ ...nc, address: v })} /></div>
 
@@ -15426,10 +15394,10 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                   {/* ── ONLINE PRESENCE ── */}
 
                   {/* ── ONLINE PRESENCE ── */}
-                  <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
+                  <div style={{ background: '#F8FAFC', borderRadius: 12, border: '1px solid #E2E8F0', padding: '14px 16px', marginBottom: 14 }}>
                     <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
                       <span style={{ background: ' var(--app-accent, var(--app-accent, #2563EB))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <i className="ti ti-link" style={{ color: '#fff', fontSize: 16 }}></i>
+                        <i className="ti ti-link" style={{ color: '#FFFFFF', fontSize: 16 }}></i>
                       </span>
                       Online Presence
                     </div>
@@ -15443,9 +15411,9 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                   {/* ── BILLING & TERMS ── */}
 
-                  <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
+                  <div style={{ background: '#F8FAFC', borderRadius: 12, border: '1px solid #E2E8F0', padding: '14px 16px', marginBottom: 14 }}>
 
-                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, var(--app-accent, #2563EB))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-credit-card" style={{ color: '#fff', fontSize: 16 }}></i></span> Billing & Terms</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, var(--app-accent, #2563EB))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-credit-card" style={{ color: '#FFFFFF', fontSize: 16 }}></i></span> Billing & Terms</div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
 
@@ -15465,7 +15433,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                   {/* ── PORTAL ACCESS ── */}
 
-                  <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
+                  <div style={{ background: '#F8FAFC', borderRadius: 12, border: '1px solid #E2E8F0', padding: '14px 16px', marginBottom: 14 }}>
 
                     <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Search Portal Access</div>
 
@@ -15473,7 +15441,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                       <input type={showClientPass ? 'text' : 'password'} value={nc.password} onChange={e => setNc({ ...nc, password: e.target.value })}
 
-                        style={{ width: '100%', border: `1.5px solid ${ncError.password ? '#EF4444' : 'var(--app-border)'}`, borderRadius: 10, padding: '10px 46px 10px 14px', fontSize: 13, color: T.text, background: 'var(--app-bg)', boxSizing: 'border-box', outline: 'none' }}
+                        style={{ width: '100%', border: `1.5px solid ${ncError.password ? '#64748B' : 'var(--app-border)'}`, borderRadius: 10, padding: '10px 46px 10px 14px', fontSize: 13, color: T.text, background: 'var(--app-bg)', boxSizing: 'border-box', outline: 'none' }}
 
                         placeholder="Set client portal password *" />
 
@@ -15481,7 +15449,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                     </div>
 
-                    {ncError.password && <div style={{ fontSize: 11, color: '#EF4444', marginTop: 4 }}>Warning {ncError.password}</div>}
+                    {ncError.password && <div style={{ fontSize: 11, color: '#64748B', marginTop: 4 }}>Warning {ncError.password}</div>}
 
                   </div>
 
@@ -15489,13 +15457,13 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                   {/* ── INTERNAL NOTES ── */}
 
-                  <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
+                  <div style={{ background: '#F8FAFC', borderRadius: 12, border: '1px solid #E2E8F0', padding: '14px 16px', marginBottom: 14 }}>
 
-                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, var(--app-accent, #2563EB))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-notes" style={{ color: '#fff', fontSize: 16 }}></i></span> Internal Notes</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, var(--app-accent, #2563EB))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-notes" style={{ color: '#FFFFFF', fontSize: 16 }}></i></span> Internal Notes</div>
 
                     <textarea value={nc.notes} onChange={e => setNc({ ...nc, notes: e.target.value })}
 
-                      style={{ width: '100%', border: '1.5px solid #E0E6EA', borderRadius: 10, padding: '10px 14px', fontSize: 13, color: T.text, background: '#fff', boxSizing: 'border-box', outline: 'none', minHeight: 70, resize: 'vertical', fontFamily: 'inherit' }}
+                      style={{ width: '100%', border: '1.5px solid #E2E8F0', borderRadius: 10, padding: '10px 14px', fontSize: 13, color: T.text, background: '#FFFFFF', boxSizing: 'border-box', outline: 'none', minHeight: 70, resize: 'vertical', fontFamily: 'inherit' }}
 
                       placeholder="Any internal context,  instructions, or notes..." />
 
@@ -15538,11 +15506,11 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                       value={ne.role === "Custom" ? "" : ne.role}
                       onChange={e => setNe({ ...ne, role: e.target.value })}
                       placeholder="Enter custom role/position"
-                      style={{ width: "100%", border: `1.5px solid ${neError.role ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none", fontFamily: "inherit" }}
+                      style={{ width: "100%", border: `1.5px solid ${neError.role ? "#64748B" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none", fontFamily: "inherit" }}
                       autoFocus
                     />
                     <button type="button" onClick={() => setNe({ ...ne, role: "" })} style={{ marginTop: 6, background: "none", border: "none", color: "var(--app-accent)", fontSize: 11, fontWeight: 700, cursor: "pointer", padding: 0 }}>← Back to dropdown</button>
-                    {neError.role && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {neError.role}</div>}
+                    {neError.role && <div style={{ fontSize: 11, color: "#64748B", marginTop: 4 }}>Warning {neError.role}</div>}
                   </div>
                 ) : (
                   <Fld label="Role / Position" value={ne.role} onChange={v => setNe({ ...ne, role: v })} options={[...DEPARTMENT_OPTIONS, "Custom"]} error={neError.role} dataField="role" />
@@ -15588,18 +15556,18 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                 <div style={{ marginBottom: 14 }}>
                   <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>PASSWORD *</label>
                   <div style={{ position: "relative" }}>
-                    <input id="emp-fld-password" type={showEmpPass ? "text" : "password"} value={ne.password} onChange={e => { setNe({ ...ne, password: e.target.value }); setNeError(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${neError.password ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Set employee login password" />
+                    <input id="emp-fld-password" type={showEmpPass ? "text" : "password"} value={ne.password} onChange={e => { setNe({ ...ne, password: e.target.value }); setNeError(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${neError.password ? "#64748B" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Set employee login password" />
                     <button type="button" onClick={() => setShowEmpPass(!showEmpPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showEmpPass ? "HIDE" : "SHOW"}</button>
                   </div>
-                  {neError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {neError.password}</div>}
+                  {neError.password && <div style={{ fontSize: 11, color: "#64748B", marginTop: 4 }}>Warning {neError.password}</div>}
                 </div>
                 <div style={{ marginBottom: 14 }}>
                   <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>CONFIRM PASSWORD *</label>
                   <div style={{ position: "relative" }}>
-                    <input type={showEmpConfirmPass ? "text" : "password"} value={ne.confirmPassword || ""} onChange={e => { setNe({ ...ne, confirmPassword: e.target.value }); setNeError(p => ({ ...p, confirmPassword: "" })); }} style={{ width: "100%", border: `1.5px solid ${neError.confirmPassword ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Re-enter password" />
+                    <input type={showEmpConfirmPass ? "text" : "password"} value={ne.confirmPassword || ""} onChange={e => { setNe({ ...ne, confirmPassword: e.target.value }); setNeError(p => ({ ...p, confirmPassword: "" })); }} style={{ width: "100%", border: `1.5px solid ${neError.confirmPassword ? "#64748B" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Re-enter password" />
                     <button type="button" onClick={() => setShowEmpConfirmPass(!showEmpConfirmPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showEmpConfirmPass ? "HIDE" : "SHOW"}</button>
                   </div>
-                  {neError.confirmPassword && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {neError.confirmPassword}</div>}
+                  {neError.confirmPassword && <div style={{ fontSize: 11, color: "#64748B", marginTop: 4 }}>Warning {neError.confirmPassword}</div>}
                 </div>
               </div>
 
@@ -15621,10 +15589,10 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                 <div style={{ marginBottom: 14 }}>
                   <label style={{ display: "block", fontSize: 11, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>CLIENT *</label>
                   {(prefillClient || (editProject && editProject._fromClientPage)) ? (
-                    <div style={{ border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px 14px", fontSize: 13, color: "var(--app-text, #333)", background: "var(--app-bg)", fontWeight: 600, display: "flex", alignItems: "center", gap: 8 }}>
+                    <div style={{ border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px 14px", fontSize: 13, color: "var(--app-text, #1E293B)", background: "var(--app-bg)", fontWeight: 600, display: "flex", alignItems: "center", gap: 8 }}>
                       <span style={{ fontSize: 16 }}>👤</span>
                       <span>{np.client}</span>
-                      <span style={{ marginLeft: "auto", fontSize: 10, color: "var(--app-accent)", background: "rgba(37, 99, 235,0.08)", borderRadius: 6, padding: "2px 8px", fontWeight: 700 }}>Auto-filled</span>
+                      <span style={{ marginLeft: "auto", fontSize: 10, color: "var(--app-accent)", background: "rgba(37, 99, 235, 0.08)", borderRadius: 6, padding: "2px 8px", fontWeight: 700 }}>Auto-filled</span>
                     </div>
                   ) : (
                     <ClientDropdown
@@ -15649,7 +15617,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                       onAddClient={() => { setModal("client"); setNcError({}); setShowClientPass(false); }}
                     />
                   )}
-                  {npError.client && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {npError.client}</div>}
+                  {npError.client && <div style={{ fontSize: 11, color: "#64748B", marginTop: 4 }}>Warning {npError.client}</div>}
                 </div>
 
                 <Fld label="Contact Person Name" value={np.contactPersonName} onChange={v => setNp({ ...np, contactPersonName: v })} />
@@ -15807,13 +15775,13 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                 <div style={{ position: "relative" }}>
 
-                  <input type={showMgrPass ? "text" : "password"} value={nm.password} onChange={e => { setNm({ ...nm, password: e.target.value }); setNmError(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${nmError.password ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Set manager password" />
+                  <input type={showMgrPass ? "text" : "password"} value={nm.password} onChange={e => { setNm({ ...nm, password: e.target.value }); setNmError(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${nmError.password ? "#64748B" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Set manager password" />
 
                   <button type="button" onClick={() => setShowMgrPass(!showMgrPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showMgrPass ? "HIDE" : "SHOW"}</button>
 
                 </div>
 
-                {nmError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {nmError.password}</div>}
+                {nmError.password && <div style={{ fontSize: 11, color: "#64748B", marginTop: 4 }}>Warning {nmError.password}</div>}
 
               </div>
 
@@ -15861,13 +15829,13 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                 <div style={{ position: "relative" }}>
 
-                  <input type={showSubPass ? "text" : "password"} value={ns.password} onChange={e => { setNs({ ...ns, password: e.target.value }); setNsError(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${nsError.password ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Set subadmin password" />
+                  <input type={showSubPass ? "text" : "password"} value={ns.password} onChange={e => { setNs({ ...ns, password: e.target.value }); setNsError(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${nsError.password ? "#64748B" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Set subadmin password" />
 
                   <button type="button" onClick={() => setShowSubPass(!showSubPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showSubPass ? "HIDE" : "SHOW"}</button>
 
                 </div>
 
-                {nsError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {nsError.password}</div>}
+                {nsError.password && <div style={{ fontSize: 11, color: "#64748B", marginTop: 4 }}>Warning {nsError.password}</div>}
 
               </div>
 
@@ -15901,9 +15869,9 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
 
 
-              <div style={{ background: "#f8fafc", padding: 18, borderRadius: 16, border: "1px solid #f1f5f9", margin: "14px 0" }}>
+              <div style={{ background: "#F8FAFC", padding: 18, borderRadius: 16, border: "1px solid #EFF6FF", margin: "14px 0" }}>
 
-                <div style={{ fontSize: 11, color: "#64748b", fontWeight: 800, letterSpacing: 1, marginBottom: 12 }}>PRICING OPTIONS</div>
+                <div style={{ fontSize: 11, color: "#64748B", fontWeight: 800, letterSpacing: 1, marginBottom: 12 }}>PRICING OPTIONS</div>
 
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }} className="modal-2col">
 
@@ -15921,9 +15889,9 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
 
 
-              <div style={{ background: "#fdf2f8", padding: 18, borderRadius: 16, border: "#fce7f3", margin: "14px 0" }}>
+              <div style={{ background: "#F8FAFC", padding: 18, borderRadius: 16, border: "#F8FAFC", margin: "14px 0" }}>
 
-                <div style={{ fontSize: 11, color: "#be185d", fontWeight: 800, letterSpacing: 1, marginBottom: 12 }}>BUSINESS MANAGEMENT</div>
+                <div style={{ fontSize: 11, color: "#64748B", fontWeight: 800, letterSpacing: 1, marginBottom: 12 }}>BUSINESS MANAGEMENT</div>
 
                 <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
 
@@ -15943,11 +15911,11 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                         borderRadius: 12,
 
-                        border: npkg.businessLimit === mode ? "1.5px solid #2563eb" : "1.5px solid #e2e8f0",
+                        border: npkg.businessLimit === mode ? "1.5px solid #2563EB" : "1.5px solid #E2E8F0",
 
-                        background: npkg.businessLimit === mode ? "#eff6ff" : "#fff",
+                        background: npkg.businessLimit === mode ? "#EFF6FF" : "#FFFFFF",
 
-                        color: npkg.businessLimit === mode ? "#2563eb" : "#64748b",
+                        color: npkg.businessLimit === mode ? "#2563EB" : "#64748B",
 
                         fontSize: 13,
 
@@ -15971,7 +15939,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
 
 
-                <div style={{ fontSize: 11, color: "#be185d", fontWeight: 800, letterSpacing: 1, marginBottom: 12, marginTop: 12 }}>RESOURCE LIMITS</div>
+                <div style={{ fontSize: 11, color: "#64748B", fontWeight: 800, letterSpacing: 1, marginBottom: 12, marginTop: 12 }}>RESOURCE LIMITS</div>
 
                 <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "14px" }}>
 
@@ -16157,7 +16125,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                           <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: T.text }}>
 
-                            <span style={{ color: "#22c55e" }}>✓</span> {f}
+                            <span style={{ color: "#16A34A" }}>✓</span> {f}
 
                           </div>
 
@@ -16207,9 +16175,9 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
 
 
-                <div style={{ background: "#f8fafc", padding: 18, borderRadius: 16, border: "1px solid #f1f5f9", margin: "14px 0" }}>
+                <div style={{ background: "#F8FAFC", padding: 18, borderRadius: 16, border: "1px solid #EFF6FF", margin: "14px 0" }}>
 
-                  <div style={{ fontSize: 11, color: "#64748b", fontWeight: 800, letterSpacing: 1, marginBottom: 12 }}>BUSINESS MANAGEMENT</div>
+                  <div style={{ fontSize: 11, color: "#64748B", fontWeight: 800, letterSpacing: 1, marginBottom: 12 }}>BUSINESS MANAGEMENT</div>
 
                   <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
 
@@ -16229,11 +16197,11 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                           borderRadius: 12,
 
-                          border: editPkgForm.businessLimit === mode ? "1.5px solid #2563eb" : "1.5px solid #e2e8f0",
+                          border: editPkgForm.businessLimit === mode ? "1.5px solid #2563EB" : "1.5px solid #E2E8F0",
 
-                          background: editPkgForm.businessLimit === mode ? "#eff6ff" : "#fff",
+                          background: editPkgForm.businessLimit === mode ? "#EFF6FF" : "#FFFFFF",
 
-                          color: editPkgForm.businessLimit === mode ? "#2563eb" : "#64748b",
+                          color: editPkgForm.businessLimit === mode ? "#2563EB" : "#64748B",
 
                           fontSize: 13,
 
@@ -16257,7 +16225,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
 
 
-                  <div style={{ fontSize: 11, color: "#64748b", fontWeight: 800, letterSpacing: 1, marginBottom: 12, marginTop: 12 }}>PACKAGE LIMITS</div>
+                  <div style={{ fontSize: 11, color: "#64748B", fontWeight: 800, letterSpacing: 1, marginBottom: 12, marginTop: 12 }}>PACKAGE LIMITS</div>
 
                   <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "14px" }}>
 
@@ -16359,7 +16327,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
               <Mdl title="Project Details" onClose={() => setViewProject(null)} maxWidth={550}>
 
-                <div style={{ background: "#fff", borderRadius: 16 }}>
+                <div style={{ background: "#FFFFFF", borderRadius: 16 }}>
 
                   {/* Header Info */}
 
@@ -16387,7 +16355,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                   <div style={{ display: "flex", alignItems: "center", gap: 12, padding: 16, background: "var(--app-bg)", borderRadius: 16, border: "1px solid var(--app-border)", marginBottom: 18 }}>
 
-                    <div style={{ width: 42, height: 42, background: "#fff", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.08)" }}>💰</div>
+                    <div style={{ width: 42, height: 42, background: "#FFFFFF", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.08)" }}>💰</div>
 
                     <div>
 
@@ -16417,7 +16385,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                           <div key={idx} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: "var(--app-bg)", borderRadius: 12, border: "1px solid var(--app-border)" }}>
 
-                            <div style={{ width: 30, height: 30, borderRadius: "50%", background: "var(--app-accent-gradient)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 13, fontWeight: 700 }}>{emp[0].toUpperCase()}</div>
+                            <div style={{ width: 30, height: 30, borderRadius: "50%", background: "var(--app-accent-gradient)", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 13, fontWeight: 700 }}>{emp[0].toUpperCase()}</div>
 
                             <span style={{ fontSize: 13, fontWeight: 700, color: "var(--app-sidebar)" }}>{emp}</span>
 
@@ -16437,7 +16405,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                   <div style={{ display: "flex", alignItems: "center", gap: 12, padding: 16, background: "var(--app-bg)", borderRadius: 16, border: "1px solid var(--app-border)", marginBottom: 24 }}>
 
-                    <div style={{ width: 42, height: 42, background: "#fff", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.08)" }}>🎯</div>
+                    <div style={{ width: 42, height: 42, background: "#FFFFFF", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.08)" }}>🎯</div>
 
                     <div>
 
@@ -16453,7 +16421,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                   <div style={{ display: "flex", gap: 10 }}>
 
-                    <button onClick={() => setViewProject(null)} style={{ flex: 1, padding: "11px", background: "var(--app-accent-gradient)", border: "none", borderRadius: 12, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>✕</button>
+                    <button onClick={() => setViewProject(null)} style={{ flex: 1, padding: "11px", background: "var(--app-accent-gradient)", border: "none", borderRadius: 12, fontSize: 13, fontWeight: 700, color: "#FFFFFF", cursor: "pointer", fontFamily: "inherit" }}>✕</button>
 
                   </div>
 
@@ -16589,7 +16557,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                     }
 
-                  }} style={{ flex: 1, padding: "11px", background: (!uploadTargetUser || uploadIsSending) ? "var(--app-border)" : "var(--app-accent)", border: "none", borderRadius: 12, fontSize: 13, fontWeight: 700, color: (!uploadTargetUser || uploadIsSending) ? "var(--app-muted)" : "#fff", cursor: (!uploadTargetUser || uploadIsSending) ? "not-allowed" : "pointer", fontFamily: "inherit", transition: "all 0.2s" }}>
+                  }} style={{ flex: 1, padding: "11px", background: (!uploadTargetUser || uploadIsSending) ? "var(--app-border)" : "var(--app-accent)", border: "none", borderRadius: 12, fontSize: 13, fontWeight: 700, color: (!uploadTargetUser || uploadIsSending) ? "var(--app-muted)" : "#FFFFFF", cursor: (!uploadTargetUser || uploadIsSending) ? "not-allowed" : "pointer", fontFamily: "inherit", transition: "all 0.2s" }}>
 
                     {uploadIsSending ? "Uploading..." : "Upload File"}
 

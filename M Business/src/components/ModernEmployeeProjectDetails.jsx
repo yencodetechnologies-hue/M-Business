@@ -4,14 +4,14 @@ import { BASE_URL, FRONTEND_URL } from '../config';
 
 // ── palette -------------------------------------------------------
 const P = {
-  primary: ' var(--app-accent, var(--app-accent, #2563EB))', primaryDark: '#2563EB', primaryLight: 'var(--teal-light, var(--teal-light, #EFF6FF))', primaryMid: '#B2EBF2',
-  textDark: '#1A2332', textMid: '#4A5568', textLight: '#718096',
-  bg: '#F0F4F8', white: '#FFFFFF', border: '#E2E8F0',
-  green: '#16A34A', greenLight: '#D1FAE5',
-  orange: '#F59E0B', orangeLight: '#FEF3C7',
-  red: '#FF6B6B', redLight: '#FEE2E2',
-  purple: '#8B5CF6', purpleLight: '#EFF6FF',
-  radius: '14px', shadow: '0 2px 12px rgba(37, 99, 235,.08)', shadowLg: '0 8px 32px rgba(37, 99, 235,.14)',
+  primary: ' var(--app-accent, var(--app-accent, #2563EB))', primaryDark: '#2563EB', primaryLight: 'var(--teal-light, var(--teal-light, #EFF6FF))', primaryMid: '#E2E8F0',
+  textDark: '#1E293B', textMid: '#64748B', textLight: '#64748B',
+  bg: '#EFF6FF', white: '#FFFFFF', border: '#E2E8F0',
+  green: '#16A34A', greenLight: '#E2E8F0',
+  orange: '#64748B', orangeLight: '#E2E8F0',
+  red: '#64748B', redLight: '#E2E8F0',
+  purple: '#2563EB', purpleLight: '#EFF6FF',
+  radius: '14px', shadow: '0 2px 12px rgba(37, 99, 235, .08)', shadowLg: '0 8px 32px rgba(37, 99, 235, .14)',
 };
 
 // ── CSS ------------------------------------------------------------
@@ -26,24 +26,24 @@ const CSS = `
 
 /* HERO */
 .epd2-hero { background:linear-gradient(135deg,${P.primary},${P.primaryDark}); border-radius:${P.radius}; padding:22px 26px; margin-bottom:20px; }
-.epd2-hero h1 { font-size:22px; font-weight:900; color:#fff; margin:0 0 4px; }
+.epd2-hero h1 { font-size:22px; font-weight:900; color:#FFFFFF; margin:0 0 4px; }
 .epd2-hero-sub { font-size:13px; color:rgba(255,255,255,.8); margin-bottom:14px; }
 .epd2-hero-meta { display:flex; gap:18px; margin-bottom:14px; flex-wrap:wrap; }
 .epd2-meta-item { display:flex; align-items:center; gap:6px; font-size:12px; color:rgba(255,255,255,.85); font-weight:600; }
 .epd2-meta-item i { font-size:14px; }
 .epd2-prog-hero { display:flex; align-items:center; gap:16px; }
-.epd2-prog-num { font-size:32px; font-weight:900; color:#fff; }
+.epd2-prog-num { font-size:32px; font-weight:900; color:#FFFFFF; }
 .epd2-prog-bar-wrap { flex:1; }
 .epd2-prog-lbl { font-size:11px; color:rgba(255,255,255,.75); font-weight:700; text-transform:uppercase; letter-spacing:.7px; margin-bottom:6px; }
 .epd2-prog-bg { background:rgba(255,255,255,.25); border-radius:20px; height:10px; overflow:hidden; }
-.epd2-prog-fill { height:100%; border-radius:20px; background:#fff; transition:width .4s ease; }
+.epd2-prog-fill { height:100%; border-radius:20px; background:#FFFFFF; transition:width .4s ease; }
 
 /* BADGE (hero) */
 .epd2-badge { display:inline-flex; align-items:center; gap:5px; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:700; }
 .epd2-badge::before { content:""; width:6px; height:6px; border-radius:50%; background:currentColor; }
-.epd2-badge-active { background:rgba(255,255,255,.25); color:#fff; }
-.epd2-badge-hold { background:${P.orangeLight}; color:#92400E; }
-.epd2-badge-completed { background:#DBEAFE; color:#1E40AF; }
+.epd2-badge-active { background:rgba(255,255,255,.25); color:#FFFFFF; }
+.epd2-badge-hold { background:${P.orangeLight}; color:#1E293B; }
+.epd2-badge-completed { background:#E2E8F0; color:#2563EB; }
 
 /* GRID */
 .epd2-grid { display:grid; grid-template-columns:1fr 320px; gap:22px; align-items:start; }
@@ -59,7 +59,7 @@ const CSS = `
 .epd2-btn { display:inline-flex; align-items:center; gap:7px; padding:9px 18px; border-radius:10px; font-family:'Nunito',sans-serif; font-size:13px; font-weight:700; cursor:pointer; border:none; transition:all .15s; }
 .epd2-btn-outline { background:transparent; border:1.5px solid ${P.border}; color:${P.textMid}; }
 .epd2-btn-outline:hover { border-color:${P.primary}; color:${P.primary}; background:${P.primaryLight}; }
-.epd2-btn-primary { background:${P.primary}; color:#fff; box-shadow:0 4px 12px rgba(37, 99, 235,.2); }
+.epd2-btn-primary { background:${P.primary}; color:#FFFFFF; box-shadow:0 4px 12px rgba(37, 99, 235, .2); }
 .epd2-btn-primary:hover { background:${P.primaryDark}; }
 .epd2-btn-sm { padding:6px 12px; font-size:12px; }
 
@@ -72,23 +72,23 @@ const CSS = `
 .epd2-uf.bl { border-left-color:${P.red}; }
 .epd2-uf.gn { border-left-color:${P.orange}; }
 .epd2-uf.dl { border-left-color:${P.purple}; }
-.epd2-uf.unread { box-shadow:0 4px 20px rgba(37, 99, 235,.18); }
+.epd2-uf.unread { box-shadow:0 4px 20px rgba(37, 99, 235, .18); }
 .epd2-uf:hover { box-shadow:${P.shadowLg}; }
 .epd2-uf-inner { padding:16px 18px; }
 .epd2-uf-top { display:flex; align-items:center; gap:8px; margin-bottom:10px; flex-wrap:wrap; }
 .epd2-uf-badge { padding:3px 10px; border-radius:20px; font-size:11px; font-weight:700; display:inline-flex; align-items:center; gap:5px; }
 .epd2-uf-badge.prog { background:${P.primaryLight}; color:${P.primaryDark}; }
-.epd2-uf-badge.ms   { background:${P.greenLight}; color:#065F46; }
-.epd2-uf-badge.bl   { background:${P.redLight}; color:#991B1B; }
-.epd2-uf-badge.gn   { background:${P.orangeLight}; color:#92400E; }
-.epd2-uf-badge.dl   { background:${P.purpleLight}; color:#5B21B6; }
-.epd2-uf-new { background:${P.red}; color:#fff; font-size:10px; font-weight:800; padding:2px 8px; border-radius:20px; margin-left:auto; }
-.epd2-uf-internal { background:${P.redLight}; color:#991B1B; font-size:10px; font-weight:700; padding:2px 8px; border-radius:20px; }
+.epd2-uf-badge.ms   { background:${P.greenLight}; color:#1E293B; }
+.epd2-uf-badge.bl   { background:${P.redLight}; color:#1E293B; }
+.epd2-uf-badge.gn   { background:${P.orangeLight}; color:#1E293B; }
+.epd2-uf-badge.dl   { background:${P.purpleLight}; color:#64748B; }
+.epd2-uf-new { background:${P.red}; color:#FFFFFF; font-size:10px; font-weight:800; padding:2px 8px; border-radius:20px; margin-left:auto; }
+.epd2-uf-internal { background:${P.redLight}; color:#1E293B; font-size:10px; font-weight:700; padding:2px 8px; border-radius:20px; }
 .epd2-uf-title { font-size:14px; font-weight:800; color:${P.textDark}; margin-bottom:7px; line-height:1.3; }
 .epd2-uf-body { font-size:13px; color:${P.textMid}; line-height:1.6; }
 .epd2-uf-prog-box { background:${P.bg}; border-radius:10px; padding:11px 14px; margin:10px 0; }
 .epd2-uf-ms-box { display:flex; align-items:center; gap:10px; background:${P.greenLight}; border-radius:10px; padding:10px 14px; margin:10px 0; }
-.epd2-uf-blocker-box { background:${P.redLight}; border:1.5px solid #FCA5A5; border-radius:10px; padding:10px 14px; margin:10px 0; font-size:12px; font-weight:700; color:#991B1B; display:flex; align-items:center; gap:8px; }
+.epd2-uf-blocker-box { background:${P.redLight}; border:1.5px solid #E2E8F0; border-radius:10px; padding:10px 14px; margin:10px 0; font-size:12px; font-weight:700; color:#1E293B; display:flex; align-items:center; gap:8px; }
 .epd2-uf-atts { display:flex; flex-wrap:wrap; gap:6px; margin:8px 0; }
 .epd2-uf-att { display:inline-flex; align-items:center; gap:6px; background:${P.bg}; border:1.5px solid ${P.border}; border-radius:8px; padding:5px 10px; font-size:11px; font-weight:700; color:${P.textDark}; cursor:pointer; }
 .epd2-uf-att:hover { background:${P.primaryLight}; border-color:${P.primary}; color:${P.primary}; }
@@ -116,7 +116,7 @@ const CSS = `
 .epd2-task-due.late { color:${P.red}; }
 
 /* AVATAR */
-.epd2-av { border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; color:#fff; flex-shrink:0; }
+.epd2-av { border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; color:#FFFFFF; flex-shrink:0; }
 .epd2-av-sm { width:28px; height:28px; font-size:10px; }
 .epd2-av-md { width:36px; height:36px; font-size:13px; }
 
@@ -143,11 +143,11 @@ const CSS = `
 .epd2-fg { margin-bottom:16px; }
 .epd2-fg label { display:block; font-size:11px; font-weight:800; color:${P.textMid}; text-transform:uppercase; letter-spacing:.7px; margin-bottom:6px; }
 .epd2-fg input, .epd2-fg select { width:100%; padding:11px 14px; border:1.5px solid ${P.border}; border-radius:10px; font-family:'Nunito',sans-serif; font-size:14px; color:${P.textDark}; background:${P.bg}; outline:none; transition:border .15s; }
-.epd2-fg input:focus, .epd2-fg select:focus { border-color:${P.primary}; background:#fff; }
+.epd2-fg input:focus, .epd2-fg select:focus { border-color:${P.primary}; background:#FFFFFF; }
 
 /* TOAST */
 .epd2-toasts { position:fixed; bottom:24px; right:24px; z-index:99999; display:flex; flex-direction:column; gap:10px; pointer-events:none; }
-.epd2-toast { background:${P.textDark}; color:#fff; padding:13px 20px; border-radius:12px; font-size:13px; font-weight:600; display:flex; align-items:center; gap:10px; box-shadow:0 8px 24px rgba(0,0,0,.2); animation:epdToast .22s ease; min-width:220px; pointer-events:all; }
+.epd2-toast { background:${P.textDark}; color:#FFFFFF; padding:13px 20px; border-radius:12px; font-size:13px; font-weight:600; display:flex; align-items:center; gap:10px; box-shadow:0 8px 24px rgba(0,0,0,.2); animation:epdToast .22s ease; min-width:220px; pointer-events:all; }
 @keyframes epdToast { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:none} }
 .epd2-toast i { font-size:17px; }
 .epd2-toast.success i { color:${P.green}; }
@@ -163,7 +163,7 @@ function getInitials(name) {
   return p.length >= 2 ? (p[0][0] + p[1][0]).toUpperCase() : name.substring(0, 2).toUpperCase();
 }
 
-const AV_COLORS = [' var(--app-accent, var(--app-accent, #2563EB))', '#8B5CF6', '#F59E0B', '#16A34A', '#EC4899', '#3B82F6', '#EF4444', '#10B981'];
+const AV_COLORS = [' var(--app-accent, var(--app-accent, #2563EB))', '#2563EB', '#64748B', '#16A34A', '#64748B', '#2563EB', '#64748B', '#16A34A'];
 function avColor(name, i = 0) {
   if (!name) return AV_COLORS[i % AV_COLORS.length];
   return AV_COLORS[(name.charCodeAt(0) + i) % AV_COLORS.length];
@@ -497,7 +497,7 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
         </div>
         <div className="epd2-hero-sub">
           {clientName} &nbsp;·&nbsp; {category} &nbsp;·&nbsp; Your role:{' '}
-          <strong style={{ color: '#fff' }}>{myRole}</strong>
+          <strong style={{ color: '#FFFFFF' }}>{myRole}</strong>
         </div>
         <div className="epd2-hero-meta">
           {(project.start || project.end || project.deadline) && (
@@ -615,9 +615,9 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
                         <i className="ti ti-check" style={{ fontSize: 12 }}></i>
                       </div>
                       <div>
-                        <div style={{ fontSize: 13, fontWeight: 800, color: '#065F46' }}>{upd.milestone}</div>
+                        <div style={{ fontSize: 13, fontWeight: 800, color: '#1E293B' }}>{upd.milestone}</div>
                         {upd.milestoneDate && (
-                          <div style={{ fontSize: 11, color: '#059669' }}>{fmtDate(upd.milestoneDate)}</div>
+                          <div style={{ fontSize: 11, color: '#16A34A' }}>{fmtDate(upd.milestoneDate)}</div>
                         )}
                       </div>
                     </div>
@@ -642,7 +642,7 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
                         const isImage = attType.startsWith('image/') || /\.(jpe?g|png|gif|webp|svg)$/i.test(attName) || /\.(jpe?g|png|gif|webp|svg)$/i.test(attUrl);
                         return isImage && attUrl ? (
                           <a key={i} href={attUrl} target="_blank" rel="noopener noreferrer" className="epd2-uf-att-img-link">
-                            <img src={attUrl} alt={attName} style={{ maxWidth: 260, maxHeight: 260, borderRadius: 8, display: 'block', marginBottom: 4, border: '1px solid #e2e8f0' }} />
+                            <img src={attUrl} alt={attName} style={{ maxWidth: 260, maxHeight: 260, borderRadius: 8, display: 'block', marginBottom: 4, border: '1px solid #E2E8F0' }} />
                           </a>
                         ) : (
                           <a key={i} href={attUrl || '#'} target="_blank" rel="noopener noreferrer" className="epd2-uf-att" style={{ textDecoration: 'none' }}>
@@ -658,8 +658,8 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 10, flexWrap: 'wrap' }} onClick={(e) => e.stopPropagation()}>
                     <span style={{
                       display: 'inline-block', padding: '3px 10px', borderRadius: 20, fontSize: 10, fontWeight: 800, textTransform: 'uppercase',
-                      background: upd.status === 'Approved' ? '#DCFCE7' : upd.status === 'Reviewed' ? '#FEF3C7' : '#F1F5F9',
-                      color: upd.status === 'Approved' ? '#15803D' : upd.status === 'Reviewed' ? '#B45309' : '#64748B',
+                      background: upd.status === 'Approved' ? '#E2E8F0' : upd.status === 'Reviewed' ? '#E2E8F0' : '#EFF6FF',
+                      color: upd.status === 'Approved' ? '#16A34A' : upd.status === 'Reviewed' ? '#64748B' : '#64748B',
                     }}>{upd.status || 'Pending'}</span>
 
                     {(!upd.status || upd.status === 'Pending') && (
@@ -687,7 +687,7 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
                         value={reviewCommentDraft}
                         onChange={(e) => setReviewCommentDraft(e.target.value)}
                         placeholder="Enter your review comments or reason..."
-                        style={{ width: '100%', minHeight: 70, borderRadius: 8, border: '1.5px solid #e2e8f0', padding: '8px 10px', fontSize: 12.5, fontFamily: 'inherit', outline: 'none', resize: 'vertical', boxSizing: 'border-box' }}
+                        style={{ width: '100%', minHeight: 70, borderRadius: 8, border: '1.5px solid #E2E8F0', padding: '8px 10px', fontSize: 12.5, fontFamily: 'inherit', outline: 'none', resize: 'vertical', boxSizing: 'border-box' }}
                       />
                       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 8 }}>
                         <button className="epd2-btn epd2-btn-outline epd2-btn-sm" onClick={() => { setReviewingUpdateId(null); setReviewCommentDraft(''); }}>Cancel</button>
@@ -703,7 +703,7 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
                   )}
 
                   {upd.status === 'Reviewed' && upd.reviewComment && (
-                    <div style={{ marginTop: 10, padding: '10px 12px', borderRadius: 8, background: '#FFFBEB', border: '1px solid #FDE68A', fontSize: 12.5, color: '#92400E' }}>
+                    <div style={{ marginTop: 10, padding: '10px 12px', borderRadius: 8, background: '#F8FAFC', border: '1px solid #E2E8F0', fontSize: 12.5, color: '#1E293B' }}>
                       <strong>Review note:</strong> {upd.reviewComment}
                     </div>
                   )}
@@ -765,7 +765,7 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
                         className={`epd2-task-chk ${isDoneT ? 'done' : ''}`}
                         onClick={() => toggleTask(tid)}
                       >
-                        {isDoneT && <i className="ti ti-check" style={{ color: '#fff', fontSize: 11, fontWeight: 900 }}></i>}
+                        {isDoneT && <i className="ti ti-check" style={{ color: '#FFFFFF', fontSize: 11, fontWeight: 900 }}></i>}
                       </div>
                       <div className={`epd2-task-prio ${priCls}`}></div>
                       <div className={`epd2-task-name ${isDoneT ? 'done' : ''}`}>{t.name || t.title}</div>
@@ -886,7 +886,7 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
                   const isDoneM = m.done === true || m.status === 'done' || m.status === 'completed';
                   const firstNotDone = milestones.findIndex(x => !x.done && x.status !== 'done' && x.status !== 'completed');
                   const isActive = !isDoneM && i === firstNotDone;
-                  const dotColor = isDoneM ? P.green : isActive ? P.primary : '#fff';
+                  const dotColor = isDoneM ? P.green : isActive ? P.primary : '#FFFFFF';
                   const dotBorder = isDoneM ? P.green : isActive ? P.primary : P.border;
                   const textColor = isDoneM ? P.green : isActive ? P.primary : P.textLight;
                   const valText = isDoneM ? 'Done' : isActive ? 'Active' : (m.date ? fmtDate(m.date) : 'Pending');
@@ -899,7 +899,7 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
                         width: 30, height: 30, borderRadius: '50%', margin: '0 auto 8px', position: 'relative', zIndex: 1,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         background: dotColor, border: `2px solid ${dotBorder}`,
-                        color: isDoneM || isActive ? '#fff' : P.textLight,
+                        color: isDoneM || isActive ? '#FFFFFF' : P.textLight,
                         fontSize: 12, fontWeight: 800,
                       }}>
                         {isDoneM ? <i className="ti ti-check" style={{ fontSize: 14 }}></i> : i + 1}
@@ -956,7 +956,7 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
               </button>
               <button type="submit" className="epd2-btn epd2-btn-primary" disabled={logSaving}>
                 {logSaving
-                  ? <><div style={{ width: 14, height: 14, border: '2px solid rgba(255,255,255,.4)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin2 .8s linear infinite' }}></div> Saving…</>
+                  ? <><div style={{ width: 14, height: 14, border: '2px solid rgba(255,255,255,.4)', borderTopColor: '#FFFFFF', borderRadius: '50%', animation: 'spin2 .8s linear infinite' }}></div> Saving…</>
                   : <><i className="ti ti-check"></i> Save Log</>
                 }
               </button>

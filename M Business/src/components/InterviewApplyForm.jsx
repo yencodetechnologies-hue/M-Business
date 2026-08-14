@@ -78,7 +78,7 @@ function RoleDropdown({ role, setRole, error, setErrors }) {
         top: pos.top,
         left: pos.left,
         width: pos.width,
-        background: "#fff",
+        background: "#FFFFFF",
         border: "1.5px solid var(--app-accent)",
         borderRadius: 12,
         zIndex: 999999,
@@ -97,7 +97,7 @@ function RoleDropdown({ role, setRole, error, setErrors }) {
           style={{
             width: "100%", padding: "8px 12px",
             border: "1.5px solid var(--app-border)", borderRadius: 8,
-            fontSize: 13, background: "#fff",
+            fontSize: 13, background: "#FFFFFF",
             fontFamily: "'DM Sans',sans-serif", color: "var(--app-text)",
             outline: "none", boxSizing: "border-box",
           }}
@@ -112,12 +112,12 @@ function RoleDropdown({ role, setRole, error, setErrors }) {
             style={{
               padding: "10px 16px", fontSize: 13, cursor: "pointer",
               borderBottom: "1px solid var(--app-border)",
-              background: role === r ? "var(--app-bg)" : "#fff",
+              background: role === r ? "var(--app-bg)" : "#FFFFFF",
               color: role === r ? "var(--app-accent)" : "var(--app-text)",
               fontWeight: role === r ? 700 : 400,
             }}
             onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"}
-            onMouseLeave={e => e.currentTarget.style.background = role === r ? "var(--app-bg)" : "#fff"}
+            onMouseLeave={e => e.currentTarget.style.background = role === r ? "var(--app-bg)" : "#FFFFFF"}
           >
             {r}
           </div>
@@ -134,7 +134,7 @@ function RoleDropdown({ role, setRole, error, setErrors }) {
   return (
     <div className="fade-up d5">
       <label style={sty.label}>
-        Current / Desired Role <span style={{ color: "#ef4444" }}>*</span>
+        Current / Desired Role <span style={{ color: "#64748B" }}>*</span>
       </label>
 
       {/* Trigger */}
@@ -145,7 +145,7 @@ function RoleDropdown({ role, setRole, error, setErrors }) {
           ...sty.input(error),
           display: "flex", alignItems: "center", justifyContent: "space-between",
           cursor: "pointer", userSelect: "none",
-          borderColor: open ? "var(--app-accent)" : error ? "#ef4444" : "var(--app-border)",
+          borderColor: open ? "var(--app-accent)" : error ? "#64748B" : "var(--app-border)",
           boxShadow: open ? "0 0 0 3px rgba(var(--app-accent-rgb, 124, 58, 237),0.12)" : "none",
         }}
       >
@@ -306,28 +306,28 @@ export default function InterviewApplyForm() {
 
           {/* Name */}
           <div className="fade-up d1">
-            <label style={sty.label}>Full Name <span style={{ color: "#ef4444" }}>*</span></label>
+            <label style={sty.label}>Full Name <span style={{ color: "#64748B" }}>*</span></label>
             <input {...inp("name", "text", "Your full name")} />
             {errors.name && <p style={sty.err}>{errors.name}</p>}
           </div>
 
           {/* Email */}
           <div className="fade-up d2">
-            <label style={sty.label}>Email Address <span style={{ color: "#ef4444" }}>*</span></label>
+            <label style={sty.label}>Email Address <span style={{ color: "#64748B" }}>*</span></label>
             <input {...inp("email", "email", "email.com")} />
             {errors.email && <p style={sty.err}>{errors.email}</p>}
           </div>
 
           {/* Mobile */}
           <div className="fade-up d3">
-            <label style={sty.label}>Mobile Number <span style={{ color: "#ef4444" }}>*</span></label>
+            <label style={sty.label}>Mobile Number <span style={{ color: "#64748B" }}>*</span></label>
             <input {...inp("mobile", "tel", "")} />
             {errors.mobile && <p style={sty.err}>{errors.mobile}</p>}
           </div>
 
           {/* Experience */}
           <div className="fade-up d4">
-            <label style={sty.label}>Experience Level <span style={{ color: "#ef4444" }}>*</span></label>
+            <label style={sty.label}>Experience Level <span style={{ color: "#64748B" }}>*</span></label>
             <div style={{ display: "flex", gap: 12 }}>
               {["Fresher", "Experienced"].map(val => (
                 <button key={val} type="button" onClick={() => setExp(val)} style={{
@@ -346,7 +346,7 @@ export default function InterviewApplyForm() {
           {/* Years */}
           {exp === "Experienced" && (
             <div className="fade-up d1">
-              <label style={sty.label}>Years of Experience <span style={{ color: "#ef4444" }}>*</span></label>
+              <label style={sty.label}>Years of Experience <span style={{ color: "#64748B" }}>*</span></label>
               <input {...inp("years", "number", "e.g. 3")} min="0" max="50" />
               {errors.years && <p style={sty.err}>{errors.years}</p>}
             </div>
@@ -365,7 +365,7 @@ export default function InterviewApplyForm() {
           {/* Resume Upload */}
           <div className="fade-up d7">
             <label style={sty.label}>
-              Resume (PDF / DOC / DOCX) <span style={{ color: "#ef4444" }}>*</span>
+              Resume (PDF / DOC / DOCX) <span style={{ color: "#64748B" }}>*</span>
             </label>
             <input
               ref={fileInputRef} type="file" accept=".pdf,.doc,.docx"
@@ -378,7 +378,7 @@ export default function InterviewApplyForm() {
               onKeyDown={e => e.key === "Enter" && openFilePicker(e)}
               onDragEnter={onDragEnter} onDragLeave={onDragLeave} onDragOver={onDragOver} onDrop={onDrop}
               style={{
-                border: `2px ${resumeFile ? "solid" : "dashed"} ${drag ? "var(--app-accent)" : resumeFile ? "var(--app-accent)" : errors.resume ? "#ef4444" : "var(--app-border)"}`,
+                border: `2px ${resumeFile ? "solid" : "dashed"} ${drag ? "var(--app-accent)" : resumeFile ? "var(--app-accent)" : errors.resume ? "#64748B" : "var(--app-border)"}`,
                 borderRadius: 14, padding: "22px 16px", textAlign: "center", cursor: "pointer",
                 background: drag || resumeFile ? "var(--app-bg)" : "var(--app-bg)",
                 transition: "all 0.2s", userSelect: "none",
@@ -417,7 +417,7 @@ export default function InterviewApplyForm() {
 
           {/* API Error */}
           {apiError && (
-            <div style={{ background: "#fee2e2", border: "1px solid #fecaca", borderRadius: 10, padding: "12px 16px", fontSize: 13, color: "#ef4444" }}>
+            <div style={{ background: "#E2E8F0", border: "1px solid #E2E8F0", borderRadius: 10, padding: "12px 16px", fontSize: 13, color: "#64748B" }}>
               {apiError}
             </div>
           )}
@@ -429,7 +429,7 @@ export default function InterviewApplyForm() {
             style={{
               width: "70%", margin: "0 auto", padding: "14px", borderRadius: 14, border: "none",
               background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))",
-              color: "#fff", fontSize: 15, fontWeight: 800,
+              color: "#FFFFFF", fontSize: 15, fontWeight: 800,
               fontFamily: "'Syne',sans-serif", letterSpacing: 0.3,
               cursor: loading ? "not-allowed" : "pointer",
               opacity: loading ? 0.7 : 1,
@@ -461,13 +461,13 @@ const css = `
 const sty = {
   page: {
     minHeight: "100vh",
-    background: "radial-gradient(ellipse at 20% 20%,rgba(var(--app-accent-rgb, 124, 58, 237),0.08) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(15, 23, 42,0.06) 0%,transparent 50%),var(--app-bg)",
+    background: "radial-gradient(ellipse at 20% 20%,rgba(var(--app-accent-rgb, 124, 58, 237),0.08) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(15, 23, 42, 0.06) 0%,transparent 50%),var(--app-bg)",
     display: "flex", alignItems: "center", justifyContent: "center",
     padding: "32px 16px", fontFamily: "'DM Sans',sans-serif",
   },
   card: {
     width: "100%", maxWidth: 540,
-    background: "#fff", borderRadius: 24,
+    background: "#FFFFFF", borderRadius: 24,
     border: "1px solid var(--app-border)",
     boxShadow: "0 24px 60px rgba(var(--app-accent-rgb, 124, 58, 237),0.10),0 4px 16px rgba(var(--app-accent-rgb, 124, 58, 237),0.06)",
   },
@@ -490,13 +490,13 @@ const sty = {
   input: (hasError) => ({
     width: "100%", padding: "11px 14px",
     background: "var(--app-bg)",
-    border: `1.5px solid ${hasError ? "#ef4444" : "var(--app-border)"}`,
+    border: `1.5px solid ${hasError ? "#64748B" : "var(--app-border)"}`,
     borderRadius: 10, fontSize: 13, color: "var(--app-text)",
     fontFamily: "'DM Sans',sans-serif",
     boxSizing: "border-box", transition: "border 0.2s,box-shadow 0.2s",
     display: "block",
   }),
-  err: { color: "#ef4444", fontSize: 11, marginTop: 5, fontWeight: 500, margin: "5px 0 0" },
+  err: { color: "#64748B", fontSize: 11, marginTop: 5, fontWeight: 500, margin: "5px 0 0" },
 };
 
 

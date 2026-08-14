@@ -91,9 +91,9 @@ export default function FinBank() {
 
   const colors = [
     { bg: "linear-gradient(135deg,var(--app-accent),#2563EB)", badge: ' var(--app-accent, var(--app-accent, #2563EB))' },
-    { bg: 'linear-gradient(135deg,#8B5CF6,#2563EB)', badge: '#8B5CF6' },
-    { bg: 'linear-gradient(135deg,#F59E0B,#D97706)', badge: '#F59E0B' },
-    { bg: 'linear-gradient(135deg,#10B981,#059669)', badge: '#10B981' }
+    { bg: 'linear-gradient(135deg,#2563EB,#2563EB)', badge: '#2563EB' },
+    { bg: 'linear-gradient(135deg,#64748B,#64748B)', badge: '#64748B' },
+    { bg: 'linear-gradient(135deg,#16A34A,#16A34A)', badge: '#16A34A' }
   ];
 
   return (
@@ -101,15 +101,15 @@ export default function FinBank() {
       <style>{`
 /* ── M Business Finance Design System ── */
 :root {
-  --primary: var(--app-accent, var(--app-accent, #2563EB)); --primary-dark:#2563EB; --primary-light:var(--teal-light, var(--teal-light, #EFF6FF)); --primary-mid:#B2EBF2;
-  --text-dark:#1A2332; --text-mid:#4A5568; --text-light:#718096;
-  --bg:#F0F4F8; --white:#FFFFFF; --border:#E2E8F0;
-  --green:#16A34A; --green-light:#D1FAE5; --green-dark:#065F46;
-  --orange:#F59E0B; --orange-light:#FEF3C7; --orange-dark:#92400E;
-  --red:#FF6B6B; --red-dark:#EF4444; --red-light:#FEE2E2;
-  --purple:#8B5CF6; --purple-light:#EFF6FF;
-  --blue:#3B82F6; --blue-light:#DBEAFE;
-  --radius:14px; --shadow:0 2px 12px rgba(37, 99, 235,.08); --shadow-lg:0 8px 32px rgba(37, 99, 235,.14);
+  --primary: var(--app-accent, var(--app-accent, #2563EB)); --primary-dark:#2563EB; --primary-light:var(--teal-light, var(--teal-light, #EFF6FF)); --primary-mid:#E2E8F0;
+  --text-dark:#1E293B; --text-mid:#64748B; --text-light:#64748B;
+  --bg:#EFF6FF; --white:#FFFFFF; --border:#E2E8F0;
+  --green:#16A34A; --green-light:#E2E8F0; --green-dark:#1E293B;
+  --orange:#64748B; --orange-light:#E2E8F0; --orange-dark:#1E293B;
+  --red:#64748B; --red-dark:#64748B; --red-light:#E2E8F0;
+  --purple:#2563EB; --purple-light:#EFF6FF;
+  --blue:#2563EB; --blue-light:#E2E8F0;
+  --radius:14px; --shadow:0 2px 12px rgba(37, 99, 235, .08); --shadow-lg:0 8px 32px rgba(37, 99, 235, .14);
 }
 * { box-sizing: border-box; }
 a { text-decoration: none; color: inherit; }
@@ -120,25 +120,25 @@ a { text-decoration: none; color: inherit; }
 .topbar-actions{display:flex;align-items:center;gap:10px;}
 .content{padding:26px;flex:1;}
 .btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:10px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .15s;}
-.btn-primary{background:var(--primary);color:#fff;}.btn-primary:hover{background:var(--primary-dark);}
+.btn-primary{background:var(--primary);color:#FFFFFF;}.btn-primary:hover{background:var(--primary-dark);}
 .btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text-mid);}.btn-outline:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-light);}
 .card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px 24px;}
 .kpi-grid{display:grid;gap:16px;margin-bottom:22px;}
 .kpi-grid-4{grid-template-columns:repeat(4,1fr);}
 .kpi{background:var(--white);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow);border-left:4px solid transparent;height:96px;box-sizing:border-box;overflow:hidden;}
 .kpi.profit{border-left-color:var(--primary);}
-.kpi.pending{border-left-color:var(--orange);}
-.kpi.expense{border-left-color:var(--red);}
+.kpi.pending{border-left-color:var(--app-muted);}
+.kpi.expense{border-left-color:var(--app-text);}
 .kpi.income{border-left-color:var(--green);}
 .kpi-label{font-size:10px;font-weight:800;color:var(--text-light);text-transform:uppercase;letter-spacing:.6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .kpi-value{font-size:19px;font-weight:900;color:var(--text-dark);line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .kpi-sub{font-size:10px;font-weight:600;display:flex;align-items:center;gap:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .kpi-sub.up{color:var(--green);}
 .kpi-sub.neutral{color:var(--text-light);}
-.kpi-sub.down{color:var(--red);}
+.kpi-sub.down{color:var(--app-text);}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
 .grid-main-side{display:grid;grid-template-columns:1fr 320px;gap:22px;}
-.bank-card{border-radius:16px;padding:22px 24px;color:#fff;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
+.bank-card{border-radius:16px;padding:22px 24px;color:#FFFFFF;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
 .bank-card::before{content:"";position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.1);}
 .bank-card::after{content:"";position:absolute;bottom:-40px;right:20px;width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,.07);}
 .bank-card:hover{transform:translateY(-3px);}
@@ -150,15 +150,15 @@ a { text-decoration: none; color: inherit; }
 .rec-row:last-child{border-bottom:none;}
 .rec-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .rec-icon.in{background:var(--green-light); color:var(--green);}
-.rec-icon.out{background:var(--red-light); color:var(--red-dark);}
+.rec-icon.out{background:var(--app-accent-light); color:var(--app-text);}
 .rec-match{background:var(--green-light);color:var(--green-dark);font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;margin-left:auto;}
-.rec-unmatched{background:var(--orange-light);color:var(--orange-dark);font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;margin-left:auto;}
+.rec-unmatched{background:var(--app-accent-light);color:var(--app-muted);font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;margin-left:auto;}
 .amt-in{color:var(--green);font-weight:800;}
-.amt-out{color:var(--red-dark);font-weight:800;}
+.amt-out{color:var(--app-text);font-weight:800;}
 .exp-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:10px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid;transition:all .15s;}
-.exp-pdf{background:var(--red-light);color:var(--red-dark);border-color:#FCA5A5;}
-.exp-excel{background:var(--green-light);color:var(--green-dark);border-color:#6EE7B7;}
-.exp-csv{background:var(--blue-light);color:#1E40AF;border-color:#93C5FD;}
+.exp-pdf{background:var(--app-accent-light);color:var(--app-text);border-color:#E2E8F0;}
+.exp-excel{background:var(--green-light);color:var(--green-dark);border-color:#64748B;}
+.exp-csv{background:var(--blue-light);color:#2563EB;border-color:#E2E8F0;}
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(3px);}
 .modal-bg.open{display:flex;}
 .modal{background:var(--white);border-radius:18px;padding:28px 30px;width:560px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.18);}
@@ -173,7 +173,7 @@ a { text-decoration: none; color: inherit; }
       `}</style>
       <div className="main">
         <div className="topbar">
-          <div className="breadcrumb"><i className="ti ti-wallet" style={{ fontSize: 22, color: '#1A2332' }}></i><span style={{ fontSize: 22, fontWeight: 900, color: '#1A2332' }}>Bank Accounts</span></div>
+          <div className="breadcrumb"><i className="ti ti-wallet" style={{ fontSize: 22, color: '#1E293B' }}></i><span style={{ fontSize: 22, fontWeight: 900, color: '#1E293B' }}>Bank Accounts</span></div>
           <div className="topbar-actions">
             <button className="btn btn-outline" onClick={openImport} style={{ borderColor: 'var(--primary)', color: 'var(--primary)' }}><i className="ti ti-upload"></i>Import Statement</button>
 
@@ -208,12 +208,12 @@ a { text-decoration: none; color: inherit; }
               <div><div className="kpi-label">Total Credits</div><div className="kpi-value">₹{totalCredits.toLocaleString('en-IN')}</div><div className="kpi-sub up">{income.length} transactions</div></div>
             </div>
             <div className="kpi pending" style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-              <div style={{ width: 40, height: 40, borderRadius: 10, background: 'var(--orange-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><i className="ti ti-arrow-up" style={{ color: 'var(--orange)', fontSize: 18 }}></i></div>
+              <div style={{ width: 40, height: 40, borderRadius: 10, background: 'var(--app-accent-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><i className="ti ti-arrow-up" style={{ color: 'var(--app-muted)', fontSize: 18 }}></i></div>
               <div><div className="kpi-label">Total Debits</div><div className="kpi-value">₹{totalDebits.toLocaleString('en-IN')}</div><div className="kpi-sub down">{expenses.length} transactions</div></div>
             </div>
             <div className="kpi expense" style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-              <div style={{ width: 40, height: 40, borderRadius: 10, background: totalCredits - totalDebits >= 0 ? 'var(--green-light)' : 'var(--red-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><i className={`ti ti-trending-${totalCredits >= totalDebits ? 'up' : 'down'}`} style={{ color: totalCredits - totalDebits >= 0 ? 'var(--green)' : 'var(--red-dark)', fontSize: 18 }}></i></div>
-              <div><div className="kpi-label">Net Flow</div><div className="kpi-value" style={{ color: totalCredits - totalDebits >= 0 ? 'var(--green)' : 'var(--red-dark)' }}>₹{Math.abs(totalCredits - totalDebits).toLocaleString('en-IN')}</div><div className={`kpi-sub ${totalCredits >= totalDebits ? 'up' : 'down'}`}>{totalCredits >= totalDebits ? 'Surplus' : 'Deficit'}</div></div>
+              <div style={{ width: 40, height: 40, borderRadius: 10, background: totalCredits - totalDebits >= 0 ? 'var(--green-light)' : 'var(--app-accent-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><i className={`ti ti-trending-${totalCredits >= totalDebits ? 'up' : 'down'}`} style={{ color: totalCredits - totalDebits >= 0 ? 'var(--green)' : 'var(--app-text)', fontSize: 18 }}></i></div>
+              <div><div className="kpi-label">Net Flow</div><div className="kpi-value" style={{ color: totalCredits - totalDebits >= 0 ? 'var(--green)' : 'var(--app-text)' }}>₹{Math.abs(totalCredits - totalDebits).toLocaleString('en-IN')}</div><div className={`kpi-sub ${totalCredits >= totalDebits ? 'up' : 'down'}`}>{totalCredits >= totalDebits ? 'Surplus' : 'Deficit'}</div></div>
             </div>
           </div>
 
@@ -233,7 +233,7 @@ a { text-decoration: none; color: inherit; }
                 </div>
                 <div style={{ display: 'flex', gap: '8px', marginBottom: '14px' }}>
                   <span style={{ background: 'var(--green-light)', color: 'var(--green-dark)', padding: '4px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: 700 }}><i className="ti ti-arrow-down"></i> {income.length} Credits</span>
-                  <span style={{ background: 'var(--red-light)', color: 'var(--red-dark)', padding: '4px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: 700 }}><i className="ti ti-arrow-up"></i> {expenses.length} Debits</span>
+                  <span style={{ background: 'var(--app-accent-light)', color: 'var(--app-text)', padding: '4px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: 700 }}><i className="ti ti-arrow-up"></i> {expenses.length} Debits</span>
                 </div>
                 {loadingTxns ? (
                   <div style={{ padding: 20, textAlign: 'center', color: 'var(--text-light)' }}>Loading transactions...</div>
@@ -316,7 +316,7 @@ a { text-decoration: none; color: inherit; }
             <label>Confirm Account Number *</label>
             <input type="text" value={newBank.confirmAccountNo} onChange={e => setNewBank({ ...newBank, confirmAccountNo: e.target.value })} placeholder="Re-enter account number" />
             {newBank.confirmAccountNo && newBank.accountNo !== newBank.confirmAccountNo && (
-              <div style={{ color: '#EF4444', fontSize: 12, marginTop: 4 }}>Does not match</div>
+              <div style={{ color: '#64748B', fontSize: 12, marginTop: 4 }}>Does not match</div>
             )}
           </div>
           <div className="form-2col">

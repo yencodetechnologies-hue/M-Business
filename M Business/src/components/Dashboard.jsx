@@ -93,13 +93,13 @@ const parseLimit = (limitStr) => {
   const m = s.match(/\d+/);
   return m ? parseInt(m[0]) : 10;
 };
-const sc = s => ({ Active: "#22C55E", Inactive: "#EF4444", "In Progress": "var(--app-accent)", Pending: "#F59E0B", Completed: "#22C55E", "On Hold": "var(--app-muted)", Sent: "var(--app-accent)", Approved: "#22C55E", Rejected: "#EF4444", Paid: "#22C55E", Overdue: "#EF4444", Client: "var(--app-accent)", Employee: "var(--app-muted)", Manager: "#f59e0b", pending: "#F59E0B", hired: "#22C55E", rejected: "#EF4444" }[s] || "var(--app-muted)");
+const sc = s => ({ Active: "#16A34A", Inactive: "#64748B", "In Progress": "var(--app-accent)", Pending: "#64748B", Completed: "#16A34A", "On Hold": "var(--app-muted)", Sent: "var(--app-accent)", Approved: "#16A34A", Rejected: "#64748B", Paid: "#16A34A", Overdue: "#64748B", Client: "var(--app-accent)", Employee: "var(--app-muted)", Manager: "#64748B", pending: "#64748B", hired: "#16A34A", rejected: "#64748B" }[s] || "var(--app-muted)");
 
 function Badge({ label }) { const c = sc(label); return <span style={{ background: `${c}18`, color: c, border: `1px solid ${c}33`, padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>{label}</span>; }
 
 function SC({ title, children, action }) {
   return (
-    <div style={{ background: "#fff", borderRadius: 16, padding: 22, boxShadow: "0 4px 24px rgba(var(--app-accent-rgb, 124, 58, 237),0.08)", border: "1px solid var(--app-border)" }}>
+    <div style={{ background: "#FFFFFF", borderRadius: 16, padding: 22, boxShadow: "0 4px 24px rgba(var(--app-accent-rgb, 124, 58, 237),0.08)", border: "1px solid var(--app-border)" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, flexWrap: "wrap", gap: 8 }}>
         <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: T.text }}>{title}</h3>
         {action}
@@ -121,7 +121,7 @@ function Search({ value, onChange, placeholder }) {
 function Mdl({ title, onClose, children, maxWidth = 820 }) {
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(var(--app-accent-rgb, 124, 58, 237), 0.55)", backdropFilter: "blur(8px)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}>
-      <div style={{ background: "#fff", borderRadius: 20, width: "100%", maxWidth, maxHeight: "90vh", overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 32px 80px rgba(var(--app-accent-rgb, 124, 58, 237),0.25)" }}>
+      <div style={{ background: "#FFFFFF", borderRadius: 20, width: "100%", maxWidth, maxHeight: "90vh", overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 32px 80px rgba(var(--app-accent-rgb, 124, 58, 237),0.25)" }}>
         <div style={{ padding: "16px 22px", borderBottom: "1px solid var(--app-border)", display: "flex", justifyContent: "space-between", alignItems: "center", background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))", flexShrink: 0 }}>
           <h2 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: T.text }}>{title}</h2>
           <button onClick={onClose} style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "var(--app-accent)", padding: "4px 8px" }}>Close</button>
@@ -153,8 +153,8 @@ function Fld({ label, value, onChange, options, type = "text", error, placeholde
     }
   }, [value, options, allowCustom]);
 
-  const s = { width: "100%", border: `1.5px solid ${error ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: disabled ? "var(--app-border)" : "var(--app-bg)", boxSizing: "border-box", outline: "none", fontFamily: "inherit", opacity: disabled ? 0.7 : 1 };
-  const sCustom = { flex: 1.2, border: `1.5px solid ${error ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: "#fff", boxSizing: "border-box", outline: "none", fontFamily: "inherit" };
+  const s = { width: "100%", border: `1.5px solid ${error ? "#64748B" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: disabled ? "var(--app-border)" : "var(--app-bg)", boxSizing: "border-box", outline: "none", fontFamily: "inherit", opacity: disabled ? 0.7 : 1 };
+  const sCustom = { flex: 1.2, border: `1.5px solid ${error ? "#64748B" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: "#FFFFFF", boxSizing: "border-box", outline: "none", fontFamily: "inherit" };
   const [showCropModal, setShowCropModal] = useState(false);
   const [cropImage, setCropImage] = useState(null);
   const [cropCallback, setCropCallback] = useState(null);
@@ -203,7 +203,7 @@ function Fld({ label, value, onChange, options, type = "text", error, placeholde
         if (isNumericField && val && !/^\d*$/.test(val)) return;
         onChange(val);
       }} style={s} placeholder={placeholder || ""} disabled={disabled} />}
-      {error && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {error}</div>}
+      {error && <div style={{ fontSize: 11, color: "#64748B", marginTop: 4 }}>Warning {error}</div>}
     </div>
   );
 }
@@ -228,7 +228,7 @@ function Pagination({ totalItems, itemsPerPage, currentPage, onPageChange, onIte
         <button
           disabled={currentPage === 1}
           onClick={() => onPageChange(currentPage - 1)}
-          style={{ padding: "7px 14px", borderRadius: 10, border: "1.5px solid var(--app-border)", background: currentPage === 1 ? "#f8fafc" : "#fff", color: currentPage === 1 ? "#cbd5e1" : "var(--app-accent)", fontSize: 13, fontWeight: 700, cursor: currentPage === 1 ? "not-allowed" : "pointer", transition: "all 0.2s" }}
+          style={{ padding: "7px 14px", borderRadius: 10, border: "1.5px solid var(--app-border)", background: currentPage === 1 ? "#F8FAFC" : "#FFFFFF", color: currentPage === 1 ? "#E2E8F0" : "var(--app-accent)", fontSize: 13, fontWeight: 700, cursor: currentPage === 1 ? "not-allowed" : "pointer", transition: "all 0.2s" }}
         >
           Previous
         </button>
@@ -236,24 +236,24 @@ function Pagination({ totalItems, itemsPerPage, currentPage, onPageChange, onIte
         {/* Simple page numbers */}
         {totalPages <= 7 ? (
           [...Array(totalPages)].map((_, i) => (
-            <button key={i + 1} onClick={() => onPageChange(i + 1)} style={{ width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 10, border: "1.5px solid", borderColor: currentPage === (i + 1) ? "var(--app-accent)" : "var(--app-border)", background: currentPage === (i + 1) ? "var(--app-accent)" : "#fff", color: currentPage === (i + 1) ? "#fff" : "var(--app-accent)", fontSize: 13, fontWeight: 700, cursor: "pointer", transition: "all 0.2s" }}>{i + 1}</button>
+            <button key={i + 1} onClick={() => onPageChange(i + 1)} style={{ width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 10, border: "1.5px solid", borderColor: currentPage === (i + 1) ? "var(--app-accent)" : "var(--app-border)", background: currentPage === (i + 1) ? "var(--app-accent)" : "#FFFFFF", color: currentPage === (i + 1) ? "#FFFFFF" : "var(--app-accent)", fontSize: 13, fontWeight: 700, cursor: "pointer", transition: "all 0.2s" }}>{i + 1}</button>
           ))
         ) : (
           <>
-            <button onClick={() => onPageChange(1)} style={{ width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 10, border: "1.5px solid", borderColor: currentPage === 1 ? "var(--app-accent)" : "var(--app-border)", background: currentPage === 1 ? "var(--app-accent)" : "#fff", color: currentPage === 1 ? "#fff" : "var(--app-accent)", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>1</button>
-            {currentPage > 3 && <span style={{ color: "#cbd5e1" }}>...</span>}
+            <button onClick={() => onPageChange(1)} style={{ width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 10, border: "1.5px solid", borderColor: currentPage === 1 ? "var(--app-accent)" : "var(--app-border)", background: currentPage === 1 ? "var(--app-accent)" : "#FFFFFF", color: currentPage === 1 ? "#FFFFFF" : "var(--app-accent)", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>1</button>
+            {currentPage > 3 && <span style={{ color: "#E2E8F0" }}>...</span>}
             {currentPage > 2 && currentPage < totalPages - 1 && (
-              <button onClick={() => onPageChange(currentPage)} style={{ width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 10, border: "1.5px solid var(--app-accent)", background: "var(--app-accent)", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>{currentPage}</button>
+              <button onClick={() => onPageChange(currentPage)} style={{ width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 10, border: "1.5px solid var(--app-accent)", background: "var(--app-accent)", color: "#FFFFFF", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>{currentPage}</button>
             )}
-            {currentPage < totalPages - 2 && <span style={{ color: "#cbd5e1" }}>...</span>}
-            <button onClick={() => onPageChange(totalPages)} style={{ width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 10, border: "1.5px solid", borderColor: currentPage === totalPages ? "var(--app-accent)" : "var(--app-border)", background: currentPage === totalPages ? "var(--app-accent)" : "#fff", color: currentPage === totalPages ? "#fff" : "var(--app-accent)", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>{totalPages}</button>
+            {currentPage < totalPages - 2 && <span style={{ color: "#E2E8F0" }}>...</span>}
+            <button onClick={() => onPageChange(totalPages)} style={{ width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 10, border: "1.5px solid", borderColor: currentPage === totalPages ? "var(--app-accent)" : "var(--app-border)", background: currentPage === totalPages ? "var(--app-accent)" : "#FFFFFF", color: currentPage === totalPages ? "#FFFFFF" : "var(--app-accent)", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>{totalPages}</button>
           </>
         )}
 
         <button
           disabled={currentPage === totalPages}
           onClick={() => onPageChange(currentPage + 1)}
-          style={{ padding: "7px 14px", borderRadius: 10, border: "1.5px solid var(--app-border)", background: currentPage === totalPages ? "#f8fafc" : "#fff", color: currentPage === totalPages ? "#cbd5e1" : "var(--app-accent)", fontSize: 13, fontWeight: 700, cursor: currentPage === totalPages ? "not-allowed" : "pointer", transition: "all 0.2s" }}
+          style={{ padding: "7px 14px", borderRadius: 10, border: "1.5px solid var(--app-border)", background: currentPage === totalPages ? "#F8FAFC" : "#FFFFFF", color: currentPage === totalPages ? "#E2E8F0" : "var(--app-accent)", fontSize: 13, fontWeight: 700, cursor: currentPage === totalPages ? "not-allowed" : "pointer", transition: "all 0.2s" }}
         >
           Next
         </button>
@@ -265,15 +265,15 @@ function Pagination({ totalItems, itemsPerPage, currentPage, onPageChange, onIte
 function ConfirmModal({ title, message, onConfirm, onCancel, confirmLabel = "Delete", danger = true }) {
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(var(--app-accent-rgb, 124, 58, 237), 0.6)", backdropFilter: "blur(8px)", zIndex: 2000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
-      <div style={{ background: "#fff", borderRadius: 18, width: "100%", maxWidth: 400, padding: "28px 28px 22px", boxShadow: "0 32px 80px rgba(var(--app-accent-rgb, 124, 58, 237),0.25)" }}>
-        <div style={{ width: 52, height: 52, borderRadius: "50%", background: danger ? "#fee2e2" : "#f0fdf4", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, margin: "0 auto 14px" }}>
+      <div style={{ background: "#FFFFFF", borderRadius: 18, width: "100%", maxWidth: 400, padding: "28px 28px 22px", boxShadow: "0 32px 80px rgba(var(--app-accent-rgb, 124, 58, 237),0.25)" }}>
+        <div style={{ width: 52, height: 52, borderRadius: "50%", background: danger ? "#E2E8F0" : "#F8FAFC", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, margin: "0 auto 14px" }}>
           {danger ? "Delete" : "Success"}
         </div>
         <h3 style={{ textAlign: "center", margin: "0 0 8px", fontSize: 16, fontWeight: 800, color: T.text }}>{title}</h3>
-        <p style={{ textAlign: "center", color: "#6b7280", fontSize: 13, margin: "0 0 22px" }}>{message}</p>
+        <p style={{ textAlign: "center", color: "#64748B", fontSize: 13, margin: "0 0 22px" }}>{message}</p>
         <div style={{ display: "flex", gap: 10 }}>
           <button onClick={onCancel} style={{ flex: 1, padding: "10px", background: "var(--app-bg)", border: "1px solid var(--app-border)", borderRadius: 10, fontSize: 13, fontWeight: 600, color: T.text, cursor: "pointer", fontFamily: "inherit" }}>Cancel</button>
-          <button onClick={onConfirm} style={{ flex: 1, padding: "10px", background: danger ? "linear-gradient(135deg,#EF4444,#dc2626)" : "linear-gradient(135deg,#22C55E,#16a34a)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>{confirmLabel}</button>
+          <button onClick={onConfirm} style={{ flex: 1, padding: "10px", background: danger ? "linear-gradient(135deg,#64748B,#64748B)" : "linear-gradient(135deg,#16A34A,#16A34A)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#FFFFFF", cursor: "pointer", fontFamily: "inherit" }}>{confirmLabel}</button>
         </div>
       </div>
     </div>
@@ -287,7 +287,7 @@ function ActionBtns({ onView, onEdit, onDelete }) {
     <div style={{ display: "flex", gap: 5, flexWrap: "nowrap" }}>
       {onView && <button onClick={onView} title="View" style={{ background: "rgba(var(--app-accent-rgb, 124, 58, 237), 0.1)", border: "1px solid rgba(var(--app-accent-rgb, 124, 58, 237), 0.3)", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: "var(--app-accent)", cursor: "pointer", fontWeight: 600, fontFamily: "inherit", whiteSpace: "nowrap" }}>View</button>}
       <button onClick={onEdit} title="Edit" style={{ background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.1)", border: "1px solid rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: "var(--app-accent)", cursor: "pointer", fontWeight: 600, fontFamily: "inherit", whiteSpace: "nowrap" }}>Edit</button>
-      <button onClick={onDelete} title="Delete" style={{ background: "#fee2e2", border: "1px solid #fecaca", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: "#ef4444", cursor: "pointer", fontWeight: 600, fontFamily: "inherit", whiteSpace: "nowrap" }}>Delete</button>
+      <button onClick={onDelete} title="Delete" style={{ background: "#E2E8F0", border: "1px solid #E2E8F0", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: "#64748B", cursor: "pointer", fontWeight: 600, fontFamily: "inherit", whiteSpace: "nowrap" }}>Delete</button>
     </div>
   );
 }
@@ -309,17 +309,17 @@ function ClientDropdown({ clients, value, onChange, error, onAddClient }) {
   const selected = clients.find(c => (c.clientName || c.name) === value);
   return (
     <div style={{ position: "relative", zIndex: open ? 1000 : 1 }}>
-      <div onClick={() => setOpen(!open)} style={{ width: "100%", border: `1.5px solid ${error ? "#EF4444" : open ? "var(--app-accent)" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 36px 10px 14px", fontSize: 13, color: value ? T.text : "var(--app-muted)", background: "var(--app-bg)", cursor: "pointer", userSelect: "none", boxSizing: "border-box", position: "relative", minHeight: 42 }}>
-        {value ? (<div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{value[0].toUpperCase()}</div><span>{value}</span>{selected?.companyName && <span style={{ fontSize: 11, color: "var(--app-muted)" }}>({selected.companyName})</span>}</div>) : "-- Select Client --"}
+      <div onClick={() => setOpen(!open)} style={{ width: "100%", border: `1.5px solid ${error ? "#64748B" : open ? "var(--app-accent)" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 36px 10px 14px", fontSize: 13, color: value ? T.text : "var(--app-muted)", background: "var(--app-bg)", cursor: "pointer", userSelect: "none", boxSizing: "border-box", position: "relative", minHeight: 42 }}>
+        {value ? (<div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{value[0].toUpperCase()}</div><span>{value}</span>{selected?.companyName && <span style={{ fontSize: 11, color: "var(--app-muted)" }}>({selected.companyName})</span>}</div>) : "-- Select Client --"}
         <span style={{ position: "absolute", right: 12, top: "50%", transform: `translateY(-50%) rotate(${open ? 180 : 0}deg)`, fontSize: 10, color: "var(--app-muted)", transition: "0.2s" }}>▼</span>
       </div>
       {open && (
-        <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "#fff", border: "1.5px solid var(--app-border)", borderRadius: 12, boxShadow: "0 8px 32px rgba(var(--app-accent-rgb, 124, 58, 237),0.15)", zIndex: 999, overflow: "hidden" }}>
+        <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "#FFFFFF", border: "1.5px solid var(--app-border)", borderRadius: 12, boxShadow: "0 8px 32px rgba(var(--app-accent-rgb, 124, 58, 237),0.15)", zIndex: 999, overflow: "hidden" }}>
           <div style={{ padding: "10px 10px 6px" }}><div style={{ position: "relative" }}><span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12 }}>Search</span><input autoFocus placeholder="Search client..." value={search} onChange={e => setSearch(e.target.value)} onClick={e => e.stopPropagation()} style={{ width: "100%", padding: "7px 10px 7px 30px", border: "1.5px solid var(--app-border)", borderRadius: 8, fontSize: 12, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} /></div></div>
-          {onAddClient && <div onClick={() => { setOpen(false); setSearch(""); onAddClient(); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: "linear-gradient(90deg,#eff6ff,var(--app-bg))", borderBottom: "2px solid var(--app-border)" }}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 17, fontWeight: 700, flexShrink: 0 }}>+</div><div><div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>Add New Client</div></div></div>}
+          {onAddClient && <div onClick={() => { setOpen(false); setSearch(""); onAddClient(); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: "linear-gradient(90deg,#EFF6FF,var(--app-bg))", borderBottom: "2px solid var(--app-border)" }}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 17, fontWeight: 700, flexShrink: 0 }}>+</div><div><div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>Add New Client</div></div></div>}
           <div style={{ maxHeight: 180, overflowY: "auto" }}>
             {filtered.length === 0 ? <div style={{ padding: 14, textAlign: "center", color: "var(--app-muted)", fontSize: 13 }}>No clients found</div>
-              : filtered.map((c, i) => { const name = c.clientName || c.name || ""; const company = c.companyName || c.company || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "#eff6ff" : "transparent", borderBottom: "1px solid var(--app-bg)" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "#eff6ff" : "transparent"}><div style={{ width: 28, height: 28, borderRadius: "50%", background: c.logoUrl ? "#fff" : "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0, overflow: "hidden", border: c.logoUrl ? "1px solid var(--app-border)" : "none" }}>{c.logoUrl ? <img src={c.logoUrl} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} /> : (name[0]?.toUpperCase() || "?")}</div><div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</div>{company && <div style={{ fontSize: 11, color: "var(--app-muted)" }}>{company}</div>}</div>{isSel && <span style={{ fontSize: 14, color: "var(--app-accent)" }}>Yes</span>}</div>); })}
+              : filtered.map((c, i) => { const name = c.clientName || c.name || ""; const company = c.companyName || c.company || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "#EFF6FF" : "transparent", borderBottom: "1px solid var(--app-bg)" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "#EFF6FF" : "transparent"}><div style={{ width: 28, height: 28, borderRadius: "50%", background: c.logoUrl ? "#FFFFFF" : "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 11, fontWeight: 700, flexShrink: 0, overflow: "hidden", border: c.logoUrl ? "1px solid var(--app-border)" : "none" }}>{c.logoUrl ? <img src={c.logoUrl} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} /> : (name[0]?.toUpperCase() || "?")}</div><div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</div>{company && <div style={{ fontSize: 11, color: "var(--app-muted)" }}>{company}</div>}</div>{isSel && <span style={{ fontSize: 14, color: "var(--app-accent)" }}>Yes</span>}</div>); })}
           </div>
         </div>
       )}
@@ -420,11 +420,11 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-      {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
+      {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#FFFFFF", border: "1.5px solid #16A34A", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#16A34A", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>
-        {[{ t: "Total Clients", v: clients.length, i: "Team", c: "var(--app-accent)" }, { t: "Active", v: clients.filter(c => c.status === "Active").length, i: "Success", c: "#22C55E" }, { t: "Inactive", v: clients.filter(c => c.status === "Inactive").length, i: "Stop", c: "#EF4444" }].map(({ t, v, i, c }) => (
-          <div key={t} style={{ background: "#fff", borderRadius: 14, padding: "18px 20px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", display: "flex", alignItems: "center", gap: 12 }}>
+        {[{ t: "Total Clients", v: clients.length, i: "Team", c: "var(--app-accent)" }, { t: "Active", v: clients.filter(c => c.status === "Active").length, i: "Success", c: "#16A34A" }, { t: "Inactive", v: clients.filter(c => c.status === "Inactive").length, i: "Stop", c: "#64748B" }].map(({ t, v, i, c }) => (
+          <div key={t} style={{ background: "#FFFFFF", borderRadius: 14, padding: "18px 20px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", display: "flex", alignItems: "center", gap: 12 }}>
             <div style={{ width: 40, height: 40, borderRadius: 11, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{i}</div>
             <div><div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5 }}>{t.toUpperCase()}</div><div style={{ fontSize: 24, fontWeight: 800, color: c }}>{v}</div></div>
           </div>
@@ -447,13 +447,13 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
                     <td style={{ padding: "12px 14px", color: "var(--app-muted)", fontSize: 11, fontFamily: "monospace" }}>{`CLT${String((currentPage - 1) * itemsPerPage + i + 1).padStart(3, "0")}`}</td>
                     <td style={{ padding: "12px 14px" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <div style={{ width: 28, height: 28, borderRadius: "50%", background: c.logoUrl ? "#fff" : "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0, overflow: "hidden", border: c.logoUrl ? "1px solid var(--app-border)" : "none" }}>{c.logoUrl ? <img src={c.logoUrl} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} /> : ((c.clientName || c.name || "?")[0].toUpperCase())}</div>
+                        <div style={{ width: 28, height: 28, borderRadius: "50%", background: c.logoUrl ? "#FFFFFF" : "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 11, fontWeight: 700, flexShrink: 0, overflow: "hidden", border: c.logoUrl ? "1px solid var(--app-border)" : "none" }}>{c.logoUrl ? <img src={c.logoUrl} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} /> : ((c.clientName || c.name || "?")[0].toUpperCase())}</div>
                         <span style={{ fontWeight: 700, color: T.text }}>{c.clientName || c.name || "—"}</span>
                       </div>
                     </td>
                     <td style={{ padding: "12px 14px", color: "var(--app-accent)" }}>{c.contactPersonName || "—"}</td>
-                    <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{c.email || "—"}</td>
-                    <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{c.phone || "—"}</td>
+                    <td style={{ padding: "12px 14px", color: "#64748B", fontSize: 12 }}>{c.email || "—"}</td>
+                    <td style={{ padding: "12px 14px", color: "#64748B", fontSize: 12 }}>{c.phone || "—"}</td>
                     <td style={{ padding: "12px 14px" }}><Badge label={c.status || "Active"} /></td>
                     <td style={{ padding: "12px 14px", color: "var(--app-muted)", fontSize: 12 }}>{c.createdAt ? new Date(c.createdAt).toLocaleDateString() : "—"}</td>
                     <td style={{ padding: "12px 14px" }}>
@@ -475,7 +475,7 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
       {viewClient && (
         <Mdl title="Client Profile" onClose={() => setViewClient(null)} maxWidth={500}>
           <div style={{ display: "flex", alignItems: "center", gap: 14, padding: 16, background: "linear-gradient(135deg,var(--app-bg),var(--app-bg))", borderRadius: 14, border: "1px solid var(--app-border)", marginBottom: 18 }}>
-            <div style={{ width: 52, height: 52, borderRadius: "50%", background: viewClient.logoUrl ? "#fff" : "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 20, fontWeight: 800, flexShrink: 0, overflow: "hidden", border: viewClient.logoUrl ? "1px solid var(--app-border)" : "none" }}>{viewClient.logoUrl ? <img src={viewClient.logoUrl} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} /> : ((viewClient.clientName || viewClient.name || "?")[0].toUpperCase())}</div>
+            <div style={{ width: 52, height: 52, borderRadius: "50%", background: viewClient.logoUrl ? "#FFFFFF" : "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 20, fontWeight: 800, flexShrink: 0, overflow: "hidden", border: viewClient.logoUrl ? "1px solid var(--app-border)" : "none" }}>{viewClient.logoUrl ? <img src={viewClient.logoUrl} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} /> : ((viewClient.clientName || viewClient.name || "?")[0].toUpperCase())}</div>
             <div>
               <div style={{ fontSize: 17, fontWeight: 800, color: T.text }}>{viewClient.clientName || viewClient.name}</div>
               <div style={{ fontSize: 13, color: "var(--app-accent)", marginTop: 2 }}>{viewClient.companyName || viewClient.company || "—"}</div>
@@ -523,11 +523,11 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
             {(() => {
               const clientProjects = projects.filter(p => (p.client || "").toLowerCase() === (viewClient.clientName || viewClient.name || "").toLowerCase());
               return clientProjects.length === 0 ? (
-                <div style={{ padding: "12px", background: "#f8fafc", borderRadius: 10, border: "1px solid #f1f5f9", textAlign: "center", color: "var(--app-muted)", fontSize: 12 }}>No projects found for this client</div>
+                <div style={{ padding: "12px", background: "#F8FAFC", borderRadius: 10, border: "1px solid #EFF6FF", textAlign: "center", color: "var(--app-muted)", fontSize: 12 }}>No projects found for this client</div>
               ) : (
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {clientProjects.slice(0, 3).map((p, idx) => (
-                    <div key={idx} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 12px", background: "#fff", borderRadius: 10, border: "1px solid var(--app-border)" }}>
+                    <div key={idx} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 12px", background: "#FFFFFF", borderRadius: 10, border: "1px solid var(--app-border)" }}>
                       <div>
                         <div style={{ fontSize: 13, fontWeight: 700, color: T.text }}>{p.name}</div>
                         <div style={{ fontSize: 11, color: "var(--app-muted)" }}>{p.end ? new Date(p.end).toLocaleDateString() : "No deadline"}</div>
@@ -546,10 +546,10 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
                 setViewClient(null);
                 if (onCreateProject) onCreateProject(c);
               }}
-              style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#16A34A,#2563EB)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}
+              style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#16A34A,#2563EB)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#FFFFFF", cursor: "pointer", fontFamily: "inherit" }}
             >+ Add Project</button>
-            <button onClick={() => { setViewClient(null); openEdit(viewClient); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Edit</button>
-            <button onClick={() => { setViewClient(null); setDeleteTarget(viewClient); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#EF4444,#dc2626)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Delete</button>
+            <button onClick={() => { setViewClient(null); openEdit(viewClient); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#FFFFFF", cursor: "pointer", fontFamily: "inherit" }}>Edit</button>
+            <button onClick={() => { setViewClient(null); setDeleteTarget(viewClient); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#64748B,#64748B)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#FFFFFF", cursor: "pointer", fontFamily: "inherit" }}>Delete</button>
           </div>
         </Mdl>
       )}
@@ -558,40 +558,40 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
       {editClient && (
         <Mdl title="Edit Client" onClose={() => setEditClient(null)}>
           {/* LOGO */}
-          <div style={{ marginBottom: 16, padding: '14px', background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA' }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 10 }}>Client Logo</div>
+          <div style={{ marginBottom: 16, padding: '14px', background: '#F8FAFC', borderRadius: 12, border: '1px solid #E2E8F0' }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 10 }}>Client Logo</div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
               <div style={{ position: 'relative', width: 72, height: 72 }}>
-                <div style={{ width: 72, height: 72, borderRadius: 14, background: '#fff', border: '2px dashed #E0E6EA', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                <div style={{ width: 72, height: 72, borderRadius: 14, background: '#FFFFFF', border: '2px dashed #E2E8F0', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
                   {editForm.logoUrl ? <img src={editForm.logoUrl} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} /> : <span style={{ fontSize: 30 }}>Company</span>}
                 </div>
-                <label style={{ position: 'absolute', bottom: 0, right: 0, background: accentColor, width: 24, height: 24, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: '2px solid #fff' }}>
+                <label style={{ position: 'absolute', bottom: 0, right: 0, background: accentColor, width: 24, height: 24, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: '2px solid #FFFFFF' }}>
                   <span style={{ fontSize: 12 }}></span>
                   <input type="file" accept="image/*" style={{ display: 'none' }} onChange={e => { const file = e.target.files[0]; if (file) { const r = new FileReader(); r.onloadend = () => setEditForm(p => ({ ...p, logoUrl: r.result })); r.readAsDataURL(file); } }} />
                 </label>
               </div>
-              <div style={{ fontSize: 12, color: '#94A3B0' }}>PNG, JPG · Max 2MB</div>
+              <div style={{ fontSize: 12, color: '#64748B' }}>PNG, JPG · Max 2MB</div>
             </div>
           </div>
 
           {/* CLIENT TYPE */}
           <div style={{ marginBottom: 14 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 8 }}>Client Type</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 8 }}>Client Type</div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
               {[{ val: 'b2b', icon: '🏢', label: 'B2B', sub: 'Company / Business' }, { val: 'b2c', icon: '👤', label: 'B2C', sub: 'Individual' }, { val: 'freelancer', icon: '💼', label: 'Freelancer', sub: 'Consultant / Solo' }].map(t => (
                 <div key={t.val} onClick={() => setEditForm(p => ({ ...p, clientType: t.val }))}
-                  style={{ border: `2px solid ${editForm.clientType === t.val ? accentColor : '#E0E6EA'}`, borderRadius: 10, padding: '10px 8px', textAlign: 'center', cursor: 'pointer', background: editForm.clientType === t.val ? accentLight : '#F4F6F8', position: 'relative' }}>
+                  style={{ border: `2px solid ${editForm.clientType === t.val ? accentColor : '#E2E8F0'}`, borderRadius: 10, padding: '10px 8px', textAlign: 'center', cursor: 'pointer', background: editForm.clientType === t.val ? accentLight : '#F8FAFC', position: 'relative' }}>
                   {editForm.clientType === t.val && <span style={{ position: 'absolute', top: 6, right: 6, width: 14, height: 14, borderRadius: '50%', background: accentColor, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}></span>}
                   <div style={{ fontSize: 20, marginBottom: 3 }}>{t.icon}</div>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: editForm.clientType === t.val ? '#007B8A' : '#1A2332' }}>{t.label}</div>
-                  <div style={{ fontSize: 10, color: '#94A3B0' }}>{t.sub}</div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: editForm.clientType === t.val ? '#16A34A' : '#1E293B' }}>{t.label}</div>
+                  <div style={{ fontSize: 10, color: '#64748B' }}>{t.sub}</div>
                 </div>
               ))}
             </div>
           </div>
 
           {/* BASIC INFO */}
-          <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 12 }}>
+          <div style={{ background: '#F8FAFC', borderRadius: 12, border: '1px solid #E2E8F0', padding: '14px 16px', marginBottom: 12 }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Company Basic Info</div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
               <Fld label="Client / Display Name *" value={editForm.clientName} onChange={v => { setEditForm(p => ({ ...p, clientName: v })); setEditErr(p => ({ ...p, clientName: '' })); }} error={editErr.clientName} />
@@ -605,7 +605,7 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
           </div>
 
           {/* PRIMARY CONTACT */}
-          <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 12 }}>
+          <div style={{ background: '#F8FAFC', borderRadius: 12, border: '1px solid #E2E8F0', padding: '14px 16px', marginBottom: 12 }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Document Primary Contact</div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
               <Fld label="Contact Person Name" value={editForm.contactPersonName} onChange={v => setEditForm(p => ({ ...p, contactPersonName: v }))} />
@@ -618,7 +618,7 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
           </div>
 
           {/* ADDRESS */}
-          <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 12 }}>
+          <div style={{ background: '#F8FAFC', borderRadius: 12, border: '1px solid #E2E8F0', padding: '14px 16px', marginBottom: 12 }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Location Address</div>
             <div style={{ marginBottom: 12 }}><Fld label="Street / Building Address" value={editForm.address} onChange={v => setEditForm(p => ({ ...p, address: v }))} /></div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
@@ -630,7 +630,7 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
           </div>
 
           {/* ONLINE PRESENCE */}
-          <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 12 }}>
+          <div style={{ background: '#F8FAFC', borderRadius: 12, border: '1px solid #E2E8F0', padding: '14px 16px', marginBottom: 12 }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Web Online Presence</div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
               <Fld label="Website URL" value={editForm.website} onChange={v => setEditForm(p => ({ ...p, website: v }))} />
@@ -639,7 +639,7 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
           </div>
 
           {/* BILLING & TERMS */}
-          <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 12 }}>
+          <div style={{ background: '#F8FAFC', borderRadius: 12, border: '1px solid #E2E8F0', padding: '14px 16px', marginBottom: 12 }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}> Billing & Terms</div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
               <Fld label="Billing Currency" value={editForm.billingCurrency} onChange={v => setEditForm(p => ({ ...p, billingCurrency: v }))} options={['INR — Indian Rupee', 'USD — US Dollar', 'GBP — British Pound', 'EUR — Euro', 'AED — UAE Dirham', 'SGD — Singapore Dollar', 'AUD — Australian Dollar']} />
@@ -650,7 +650,7 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
           </div>
 
           {/* PORTAL PASSWORD */}
-          <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 12 }}>
+          <div style={{ background: '#F8FAFC', borderRadius: 12, border: '1px solid #E2E8F0', padding: '14px 16px', marginBottom: 12 }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Secure Portal Access</div>
             <input type="password" value={editForm.password} onChange={e => setEditForm(p => ({ ...p, password: e.target.value }))}
               style={{ width: '100%', border: '1.5px solid var(--app-border)', borderRadius: 10, padding: '10px 14px', fontSize: 13, color: T.text, background: 'var(--app-bg)', boxSizing: 'border-box', outline: 'none' }}
@@ -658,16 +658,16 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
           </div>
 
           {/* INTERNAL NOTES */}
-          <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
+          <div style={{ background: '#F8FAFC', borderRadius: 12, border: '1px solid #E2E8F0', padding: '14px 16px', marginBottom: 14 }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Edit Internal Notes</div>
             <textarea value={editForm.notes} onChange={e => setEditForm(p => ({ ...p, notes: e.target.value }))}
-              style={{ width: '100%', border: '1.5px solid #E0E6EA', borderRadius: 10, padding: '10px 14px', fontSize: 13, color: T.text, background: '#fff', boxSizing: 'border-box', outline: 'none', minHeight: 70, resize: 'vertical', fontFamily: 'inherit' }}
+              style={{ width: '100%', border: '1.5px solid #E2E8F0', borderRadius: 10, padding: '10px 14px', fontSize: 13, color: T.text, background: '#FFFFFF', boxSizing: 'border-box', outline: 'none', minHeight: 70, resize: 'vertical', fontFamily: 'inherit' }}
               placeholder="Any internal context,  instructions..." />
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 4 }}>
             <button onClick={() => setEditClient(null)} style={{ background: 'var(--app-bg)', border: '1px solid var(--app-border)', color: T.text, borderRadius: 10, padding: '10px 16px', cursor: 'pointer', fontWeight: 600, fontSize: 13, fontFamily: 'inherit' }}>Cancel</button>
-            <button onClick={saveEdit} disabled={saving} style={{ background: 'linear-gradient(135deg,var(--app-accent),var(--app-muted))', border: 'none', borderRadius: 10, padding: '10px 20px', fontSize: 13, fontWeight: 700, color: '#fff', cursor: saving ? 'not-allowed' : 'pointer', fontFamily: 'inherit', opacity: saving ? 0.7 : 1 }}>{saving ? 'Saving…' : 'Save Changes '}</button>
+            <button onClick={saveEdit} disabled={saving} style={{ background: 'linear-gradient(135deg,var(--app-accent),var(--app-muted))', border: 'none', borderRadius: 10, padding: '10px 20px', fontSize: 13, fontWeight: 700, color: '#FFFFFF', cursor: saving ? 'not-allowed' : 'pointer', fontFamily: 'inherit', opacity: saving ? 0.7 : 1 }}>{saving ? 'Saving…' : 'Save Changes '}</button>
           </div>
         </Mdl>
       )}
@@ -764,11 +764,11 @@ function EmployeesPage({ employees, setEmployees }) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-      {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
+      {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#FFFFFF", border: "1.5px solid #16A34A", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#16A34A", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>
-        {[{ t: "Total", v: employees.length, i: "‍Job", c: "var(--app-accent)" }, { t: "Active", v: employees.filter(e => e.status === "Active").length, i: "Success", c: "#22C55E" }, { t: "Inactive", v: employees.filter(e => e.status === "Inactive").length, i: "Stop", c: "#EF4444" }].map(({ t, v, i, c }) => (
-          <div key={t} style={{ background: "#fff", borderRadius: 14, padding: "18px 20px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", display: "flex", alignItems: "center", gap: 12 }}>
+        {[{ t: "Total", v: employees.length, i: "‍Job", c: "var(--app-accent)" }, { t: "Active", v: employees.filter(e => e.status === "Active").length, i: "Success", c: "#16A34A" }, { t: "Inactive", v: employees.filter(e => e.status === "Inactive").length, i: "Stop", c: "#64748B" }].map(({ t, v, i, c }) => (
+          <div key={t} style={{ background: "#FFFFFF", borderRadius: 14, padding: "18px 20px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", display: "flex", alignItems: "center", gap: 12 }}>
             <div style={{ width: 40, height: 40, borderRadius: 11, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{i}</div>
             <div><div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5 }}>{t.toUpperCase()}</div><div style={{ fontSize: 24, fontWeight: 800, color: c }}>{v}</div></div>
           </div>
@@ -791,15 +791,15 @@ function EmployeesPage({ employees, setEmployees }) {
                     <td style={{ padding: "12px 14px", color: "var(--app-muted)", fontSize: 11, fontFamily: "monospace" }}>{`EMP${String((currentPage - 1) * itemsPerPage + i + 1).padStart(3, "0")}`}</td>
                     <td style={{ padding: "12px 14px" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{(e.name || "?")[0].toUpperCase()}</div>
+                        <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{(e.name || "?")[0].toUpperCase()}</div>
                         <span style={{ fontWeight: 700, color: T.text }}>{e.name || "—"}</span>
                       </div>
                     </td>
-                    <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{e.email || "—"}</td>
-                    <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{e.phone || "—"}</td>
+                    <td style={{ padding: "12px 14px", color: "#64748B", fontSize: 12 }}>{e.email || "—"}</td>
+                    <td style={{ padding: "12px 14px", color: "#64748B", fontSize: 12 }}>{e.phone || "—"}</td>
                     <td style={{ padding: "12px 14px", color: "var(--app-accent)", fontSize: 12, fontWeight: 600 }}>{e.role || "—"}</td>
-                    <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{e.department || "—"}</td>
-                    <td style={{ padding: "12px 14px", color: "#22C55E", fontSize: 12, fontWeight: 600 }}>{e.salary || "—"}</td>
+                    <td style={{ padding: "12px 14px", color: "#64748B", fontSize: 12 }}>{e.department || "—"}</td>
+                    <td style={{ padding: "12px 14px", color: "#16A34A", fontSize: 12, fontWeight: 600 }}>{e.salary || "—"}</td>
                     <td style={{ padding: "12px 14px" }}><Badge label={e.status || "Active"} /></td>
                     <td style={{ padding: "12px 14px" }}>
                       <ActionBtns
@@ -819,7 +819,7 @@ function EmployeesPage({ employees, setEmployees }) {
       {viewEmp && (
         <Mdl title="Employee Profile" onClose={() => setViewEmp(null)} maxWidth={500}>
           <div style={{ display: "flex", alignItems: "center", gap: 14, padding: 16, background: "linear-gradient(135deg,var(--app-bg),var(--app-bg))", borderRadius: 14, border: "1px solid var(--app-border)", marginBottom: 18 }}>
-            <div style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 20, fontWeight: 800, flexShrink: 0 }}>{(viewEmp.name || "?")[0].toUpperCase()}</div>
+            <div style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 20, fontWeight: 800, flexShrink: 0 }}>{(viewEmp.name || "?")[0].toUpperCase()}</div>
             <div>
               <div style={{ fontSize: 17, fontWeight: 800, color: T.text }}>{viewEmp.name}</div>
               <div style={{ fontSize: 13, color: "var(--app-accent)", marginTop: 2 }}>{viewEmp.role || "Employee"}</div>
@@ -843,19 +843,19 @@ function EmployeesPage({ employees, setEmployees }) {
                 const hasDoc = !!doc?.url;
                 const isImg = (url = "") => /\.(jpg|jpeg|png|gif|webp)$/i.test(url) || url.startsWith("data:image");
                 return (
-                  <div key={dt.key} style={{ border: `1.5px solid ${hasDoc ? dt.color + "35" : "#f1f5f9"}`, borderRadius: 12, overflow: "hidden", background: hasDoc ? `${dt.color}04` : "#f8fafc" }}>
+                  <div key={dt.key} style={{ border: `1.5px solid ${hasDoc ? dt.color + "35" : "#EFF6FF"}`, borderRadius: 12, overflow: "hidden", background: hasDoc ? `${dt.color}04` : "#F8FAFC" }}>
                     <div style={{ padding: "10px 12px", display: "flex", alignItems: "center", gap: 8 }}>
                       <span style={{ fontSize: 16 }}>{dt.icon}</span>
                       <div style={{ flex: 1, fontSize: 12, fontWeight: 700, color: "var(--app-sidebar)" }}>{dt.label}</div>
                       {hasDoc
                         ? <span style={{ background: `${dt.color}15`, border: `1px solid ${dt.color}30`, borderRadius: 20, padding: "2px 10px", fontSize: 10, fontWeight: 700, color: dt.color }}>Yes Uploaded</span>
-                        : <span style={{ background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 20, padding: "2px 10px", fontSize: 10, fontWeight: 700, color: "#ef4444" }}>Cancel Missing</span>}
+                        : <span style={{ background: "#F8FAFC", border: "1px solid #E2E8F0", borderRadius: 20, padding: "2px 10px", fontSize: 10, fontWeight: 700, color: "#64748B" }}>Cancel Missing</span>}
                     </div>
                     {hasDoc && (
                       <div style={{ padding: "0 12px 10px" }}>
                         {isImg(doc.url)
-                          ? <img src={doc.url} alt={dt.label} style={{ width: "100%", maxHeight: 120, objectFit: "contain", borderRadius: 8, border: "1px solid #f1f5f9", background: "#fff" }} />
-                          : <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", background: "#fff", borderRadius: 8, border: "1px solid #f1f5f9" }}>
+                          ? <img src={doc.url} alt={dt.label} style={{ width: "100%", maxHeight: 120, objectFit: "contain", borderRadius: 8, border: "1px solid #EFF6FF", background: "#FFFFFF" }} />
+                          : <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", background: "#FFFFFF", borderRadius: 8, border: "1px solid #EFF6FF" }}>
                             <span style={{ fontSize: 20 }}>Document</span>
                             <div style={{ fontSize: 11, fontWeight: 600, color: "var(--app-sidebar)" }}>{doc.fileName || `${dt.label}.pdf`}</div>
                           </div>}
@@ -864,7 +864,7 @@ function EmployeesPage({ employees, setEmployees }) {
                             style={{ flex: 1, padding: "6px 10px", background: `${dt.color}10`, border: `1px solid ${dt.color}30`, borderRadius: 7, fontSize: 11, fontWeight: 700, color: dt.color, cursor: "pointer", fontFamily: "inherit" }}>
                             View
                           </button>
-                          <a href={doc.url} download style={{ flex: 1, padding: "6px 10px", background: "#f1f5f9", border: "1px solid #e2e8f0", borderRadius: 7, fontSize: 11, fontWeight: 700, color: "#475569", textDecoration: "none", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <a href={doc.url} download style={{ flex: 1, padding: "6px 10px", background: "#EFF6FF", border: "1px solid #E2E8F0", borderRadius: 7, fontSize: 11, fontWeight: 700, color: "#64748B", textDecoration: "none", display: "flex", alignItems: "center", justifyContent: "center" }}>
                             Download
                           </a>
                         </div>
@@ -876,8 +876,8 @@ function EmployeesPage({ employees, setEmployees }) {
             </div>
           </div>
           <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
-            <button onClick={() => { setViewEmp(null); openEdit(viewEmp); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Edit</button>
-            <button onClick={() => { setViewEmp(null); setDeleteTarget(viewEmp); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#EF4444,#dc2626)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Delete</button>
+            <button onClick={() => { setViewEmp(null); openEdit(viewEmp); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#FFFFFF", cursor: "pointer", fontFamily: "inherit" }}>Edit</button>
+            <button onClick={() => { setViewEmp(null); setDeleteTarget(viewEmp); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#64748B,#64748B)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#FFFFFF", cursor: "pointer", fontFamily: "inherit" }}>Delete</button>
           </div>
         </Mdl>
       )}
@@ -899,19 +899,19 @@ function EmployeesPage({ employees, setEmployees }) {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }} className="modal-2col">
               <div style={{ marginBottom: 14 }}>
                 <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>PASSWORD</label>
-                <input type="password" value={editForm.password || ""} onChange={e => { setEditForm(p => ({ ...p, password: e.target.value })); setEditErr(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${editErr.password ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Leave blank to keep current password" />
-                {editErr.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>{editErr.password}</div>}
+                <input type="password" value={editForm.password || ""} onChange={e => { setEditForm(p => ({ ...p, password: e.target.value })); setEditErr(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${editErr.password ? "#64748B" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Leave blank to keep current password" />
+                {editErr.password && <div style={{ fontSize: 11, color: "#64748B", marginTop: 4 }}>{editErr.password}</div>}
               </div>
               <div style={{ marginBottom: 14 }}>
                 <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>CONFIRM PASSWORD</label>
-                <input type="password" value={editForm.confirmPassword || ""} onChange={e => { setEditForm(p => ({ ...p, confirmPassword: e.target.value })); setEditErr(p => ({ ...p, confirmPassword: "" })); }} style={{ width: "100%", border: `1.5px solid ${editErr.confirmPassword ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Re-enter new password" />
-                {editErr.confirmPassword && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>{editErr.confirmPassword}</div>}
+                <input type="password" value={editForm.confirmPassword || ""} onChange={e => { setEditForm(p => ({ ...p, confirmPassword: e.target.value })); setEditErr(p => ({ ...p, confirmPassword: "" })); }} style={{ width: "100%", border: `1.5px solid ${editErr.confirmPassword ? "#64748B" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Re-enter new password" />
+                {editErr.confirmPassword && <div style={{ fontSize: 11, color: "#64748B", marginTop: 4 }}>{editErr.confirmPassword}</div>}
               </div>
             </div>
           </div>
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 4 }}>
             <button onClick={() => setEditEmp(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>Cancel</button>
-            <button onClick={saveEdit} disabled={saving} style={{ background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: saving ? 0.7 : 1 }}>{saving ? "Saving…" : "Save Changes "}</button>
+            <button onClick={saveEdit} disabled={saving} style={{ background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#FFFFFF", cursor: saving ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: saving ? 0.7 : 1 }}>{saving ? "Saving…" : "Save Changes "}</button>
           </div>
         </Mdl>
       )}
@@ -977,11 +977,11 @@ function ManagersPage({ managers, setManagers }) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-      {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
+      {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#FFFFFF", border: "1.5px solid #16A34A", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#16A34A", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>
-        {[{ t: "Total Managers", v: managers.length, i: "‍Job", c: "#f59e0b" }, { t: "Active", v: managers.filter(m => m.status === "Active").length, i: "Success", c: "#22C55E" }, { t: "Inactive", v: managers.filter(m => m.status === "Inactive").length, i: "Stop", c: "#EF4444" }].map(({ t, v, i, c }) => (
-          <div key={t} style={{ background: "#fff", borderRadius: 14, padding: "18px 20px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", display: "flex", alignItems: "center", gap: 12 }}>
+        {[{ t: "Total Managers", v: managers.length, i: "‍Job", c: "#64748B" }, { t: "Active", v: managers.filter(m => m.status === "Active").length, i: "Success", c: "#16A34A" }, { t: "Inactive", v: managers.filter(m => m.status === "Inactive").length, i: "Stop", c: "#64748B" }].map(({ t, v, i, c }) => (
+          <div key={t} style={{ background: "#FFFFFF", borderRadius: 14, padding: "18px 20px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", display: "flex", alignItems: "center", gap: 12 }}>
             <div style={{ width: 40, height: 40, borderRadius: 11, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{i}</div>
             <div><div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5 }}>{t.toUpperCase()}</div><div style={{ fontSize: 24, fontWeight: 800, color: c }}>{v}</div></div>
           </div>
@@ -1004,14 +1004,14 @@ function ManagersPage({ managers, setManagers }) {
                     <td style={{ padding: "12px 14px", color: "var(--app-muted)", fontSize: 11, fontFamily: "monospace" }}>{`MGR${String((currentPage - 1) * itemsPerPage + i + 1).padStart(3, "0")}`}</td>
                     <td style={{ padding: "12px 14px" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#f59e0b,#fbbf24)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{(m.managerName || "?")[0].toUpperCase()}</div>
+                        <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#64748B,#64748B)", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{(m.managerName || "?")[0].toUpperCase()}</div>
                         <span style={{ fontWeight: 700, color: T.text }}>{m.managerName || "—"}</span>
                       </div>
                     </td>
-                    <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{m.email || "—"}</td>
-                    <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{m.phone || "—"}</td>
-                    <td style={{ padding: "12px 14px", color: "#f59e0b", fontSize: 12, fontWeight: 600 }}>{m.role || "Manager"}</td>
-                    <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{m.department || "—"}</td>
+                    <td style={{ padding: "12px 14px", color: "#64748B", fontSize: 12 }}>{m.email || "—"}</td>
+                    <td style={{ padding: "12px 14px", color: "#64748B", fontSize: 12 }}>{m.phone || "—"}</td>
+                    <td style={{ padding: "12px 14px", color: "#64748B", fontSize: 12, fontWeight: 600 }}>{m.role || "Manager"}</td>
+                    <td style={{ padding: "12px 14px", color: "#64748B", fontSize: 12 }}>{m.department || "—"}</td>
                     <td style={{ padding: "12px 14px" }}><Badge label={m.status || "Active"} /></td>
                     <td style={{ padding: "12px 14px", color: "var(--app-muted)", fontSize: 12 }}>{m.createdAt ? new Date(m.createdAt).toLocaleDateString() : "—"}</td>
                     <td style={{ padding: "12px 14px" }}>
@@ -1027,11 +1027,11 @@ function ManagersPage({ managers, setManagers }) {
 
       {viewMgr && (
         <Mdl title="Manager Profile" onClose={() => setViewMgr(null)} maxWidth={500}>
-          <div style={{ display: "flex", alignItems: "center", gap: 14, padding: 16, background: "linear-gradient(135deg,#fffbeb,#fef3c7)", borderRadius: 14, border: "1px solid #fde68a", marginBottom: 18 }}>
-            <div style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,#f59e0b,#fbbf24)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 20, fontWeight: 800, flexShrink: 0 }}>{(m => m[0].toUpperCase())(viewMgr.managerName || "M")}</div>
+          <div style={{ display: "flex", alignItems: "center", gap: 14, padding: 16, background: "linear-gradient(135deg,#F8FAFC,#E2E8F0)", borderRadius: 14, border: "1px solid #E2E8F0", marginBottom: 18 }}>
+            <div style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,#64748B,#64748B)", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 20, fontWeight: 800, flexShrink: 0 }}>{(m => m[0].toUpperCase())(viewMgr.managerName || "M")}</div>
             <div>
               <div style={{ fontSize: 17, fontWeight: 800, color: T.text }}>{viewMgr.managerName}</div>
-              <div style={{ fontSize: 13, color: "#f59e0b", marginTop: 2 }}>{viewMgr.role || "Manager"}</div>
+              <div style={{ fontSize: 13, color: "#64748B", marginTop: 2 }}>{viewMgr.role || "Manager"}</div>
             </div>
             <div style={{ marginLeft: "auto" }}><Badge label={viewMgr.status || "Active"} /></div>
           </div>
@@ -1042,8 +1042,8 @@ function ManagersPage({ managers, setManagers }) {
           <InfoRow icon="Date" label="Joined" value={viewMgr.createdAt ? new Date(viewMgr.createdAt).toLocaleDateString() : "—"} />
 
           <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
-            <button onClick={() => { setViewMgr(null); openEdit(viewMgr); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#f59e0b,#fbbf24)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Edit</button>
-            <button onClick={() => { setViewMgr(null); setDeleteTarget(viewMgr); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#EF4444,#dc2626)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Delete</button>
+            <button onClick={() => { setViewMgr(null); openEdit(viewMgr); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#64748B,#64748B)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#FFFFFF", cursor: "pointer", fontFamily: "inherit" }}>Edit</button>
+            <button onClick={() => { setViewMgr(null); setDeleteTarget(viewMgr); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#64748B,#64748B)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#FFFFFF", cursor: "pointer", fontFamily: "inherit" }}>Delete</button>
           </div>
         </Mdl>
       )}
@@ -1061,7 +1061,7 @@ function ManagersPage({ managers, setManagers }) {
           <Fld label="Address" value={editForm.address} onChange={v => setEditForm(p => ({ ...p, address: v }))} />
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 4 }}>
             <button onClick={() => setEditMgr(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>Cancel</button>
-            <button onClick={saveEdit} disabled={saving} style={{ background: "linear-gradient(135deg,#f59e0b,#fbbf24)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: saving ? 0.7 : 1 }}>{saving ? "Saving…" : "Save Changes "}</button>
+            <button onClick={saveEdit} disabled={saving} style={{ background: "linear-gradient(135deg,#64748B,#64748B)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#FFFFFF", cursor: saving ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: saving ? 0.7 : 1 }}>{saving ? "Saving…" : "Save Changes "}</button>
           </div>
         </Mdl>
       )}
@@ -1138,11 +1138,11 @@ function ProjectsPage({ projects, setProjects, clients, employees, config, onVie
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-      {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
+      {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#FFFFFF", border: "1.5px solid #16A34A", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#16A34A", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12 }}>
-        {[{ t: "Total", v: projects.length, i: "Folder", c: "var(--app-muted)" }, { t: "Active", v: projects.filter(p => p.status === "In Progress").length, i: "Action", c: "var(--app-accent)" }, { t: "Completed", v: projects.filter(p => p.status === "Completed").length, i: "Success", c: "#22C55E" }, { t: "Pending", v: projects.filter(p => p.status === "Pending").length, i: "Pending", c: "#F59E0B" }].map(({ t, v, i, c }) => (
-          <div key={t} style={{ background: "#fff", borderRadius: 14, padding: "18px 20px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", display: "flex", alignItems: "center", gap: 12 }}>
+        {[{ t: "Total", v: projects.length, i: "Folder", c: "var(--app-muted)" }, { t: "Active", v: projects.filter(p => p.status === "In Progress").length, i: "Action", c: "var(--app-accent)" }, { t: "Completed", v: projects.filter(p => p.status === "Completed").length, i: "Success", c: "#16A34A" }, { t: "Pending", v: projects.filter(p => p.status === "Pending").length, i: "Pending", c: "#64748B" }].map(({ t, v, i, c }) => (
+          <div key={t} style={{ background: "#FFFFFF", borderRadius: 14, padding: "18px 20px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", display: "flex", alignItems: "center", gap: 12 }}>
             <div style={{ width: 40, height: 40, borderRadius: 11, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{i}</div>
             <div><div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5 }}>{t.toUpperCase()}</div><div style={{ fontSize: 24, fontWeight: 800, color: c }}>{v}</div></div>
           </div>
@@ -1165,7 +1165,7 @@ function ProjectsPage({ projects, setProjects, clients, employees, config, onVie
                     <td style={{ padding: "12px 14px", color: "var(--app-muted)", fontSize: 11, fontFamily: "monospace" }}>{`PRJ${String((currentPage - 1) * itemsPerPage + i + 1).padStart(3, "0")}`}</td>
                     <td style={{ padding: "12px 14px", fontWeight: 700, color: T.text }}>{p.name}</td>
                     <td style={{ padding: "12px 14px", color: "var(--app-accent)" }}>{p.client || "—"}</td>
-                    <td style={{ padding: "12px 14px", color: "#22C55E", fontWeight: 600 }}>{p.currency || "₹"} {p.budget || "0"}</td>
+                    <td style={{ padding: "12px 14px", color: "#16A34A", fontWeight: 600 }}>{p.currency || "₹"} {p.budget || "0"}</td>
                     <td style={{ padding: "12px 14px" }}><Badge label={p.status || "Pending"} /></td>
                     <td style={{ padding: "12px 14px" }}>
                       {(() => {
@@ -1174,13 +1174,13 @@ function ProjectsPage({ projects, setProjects, clients, employees, config, onVie
                           ? <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                             {assignedEmployees.slice(0, 2).map((emp, idx) => (
                               <div key={idx} style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                                <div style={{ width: 20, height: 20, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 8, fontWeight: 700, flexShrink: 0 }}>{emp[0].toUpperCase()}</div>
+                                <div style={{ width: 20, height: 20, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 8, fontWeight: 700, flexShrink: 0 }}>{emp[0].toUpperCase()}</div>
                                 <span style={{ color: "var(--app-accent)", fontWeight: 600, fontSize: 11 }}>{emp}</span>
                               </div>
                             ))}
                             {assignedEmployees.length > 2 && <div style={{ fontSize: 10, color: "var(--app-muted)", fontStyle: "italic" }}>+{assignedEmployees.length - 2} more</div>}
                           </div>
-                          : <button onClick={() => { setAssignModal(p); setAssignTo(Array.isArray(p.assignedTo) ? p.assignedTo : (p.assignedTo ? [p.assignedTo] : [])); }} style={{ background: "rgba(var(--app-accent-rgb, 124, 58, 237), 0.1)", border: "1px solid rgba(37, 99, 235,0.25)", borderRadius: 7, padding: "4px 10px", fontSize: 11, color: "var(--app-accent)", fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Assign</button>
+                          : <button onClick={() => { setAssignModal(p); setAssignTo(Array.isArray(p.assignedTo) ? p.assignedTo : (p.assignedTo ? [p.assignedTo] : [])); }} style={{ background: "rgba(var(--app-accent-rgb, 124, 58, 237), 0.1)", border: "1px solid rgba(37, 99, 235, 0.25)", borderRadius: 7, padding: "4px 10px", fontSize: 11, color: "var(--app-accent)", fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Assign</button>
                       })()}
                     </td>
                     <td style={{ padding: "12px 14px" }}>
@@ -1211,8 +1211,8 @@ function ProjectsPage({ projects, setProjects, clients, employees, config, onVie
               return assignedEmployees.length > 0
                 ? <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                   {assignedEmployees.map((emp, idx) => (
-                    <div key={idx} style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", background: "#f8fafc", borderRadius: 8, border: "1px solid #e2e8f0" }}>
-                      <div style={{ width: 24, height: 24, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{emp[0].toUpperCase()}</div>
+                    <div key={idx} style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", background: "#F8FAFC", borderRadius: 8, border: "1px solid #E2E8F0" }}>
+                      <div style={{ width: 24, height: 24, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{emp[0].toUpperCase()}</div>
                       <span style={{ color: "var(--app-sidebar)", fontWeight: 600, fontSize: 12 }}>{emp}</span>
                     </div>
                   ))}
@@ -1226,9 +1226,9 @@ function ProjectsPage({ projects, setProjects, clients, employees, config, onVie
           <InfoRow icon="Team" label="Team" value={viewProj.team} />
           <InfoRow icon="Edit" label="Description" value={viewProj.description} />
           <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
-            <button onClick={() => { setViewProj(null); openEdit(viewProj); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Edit</button>
-            <button onClick={() => { setViewProj(null); setAssignModal(viewProj); setAssignTo(Array.isArray(viewProj.assignedTo) ? viewProj.assignedTo : (viewProj.assignedTo ? [viewProj.assignedTo] : [])); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,var(--app-accent),#8b5cf6)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Profile Assign</button>
-            <button onClick={() => { setViewProj(null); setDeleteTarget(viewProj); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#EF4444,#dc2626)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Delete</button>
+            <button onClick={() => { setViewProj(null); openEdit(viewProj); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#FFFFFF", cursor: "pointer", fontFamily: "inherit" }}>Edit</button>
+            <button onClick={() => { setViewProj(null); setAssignModal(viewProj); setAssignTo(Array.isArray(viewProj.assignedTo) ? viewProj.assignedTo : (viewProj.assignedTo ? [viewProj.assignedTo] : [])); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,var(--app-accent),#2563EB)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#FFFFFF", cursor: "pointer", fontFamily: "inherit" }}>Profile Assign</button>
+            <button onClick={() => { setViewProj(null); setDeleteTarget(viewProj); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#64748B,#64748B)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#FFFFFF", cursor: "pointer", fontFamily: "inherit" }}>Delete</button>
           </div>
         </Mdl>
       )}
@@ -1240,7 +1240,7 @@ function ProjectsPage({ projects, setProjects, clients, employees, config, onVie
             <div style={{ marginBottom: 14 }}>
               <label style={{ display: "block", fontSize: 11, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>COMPANY NAME *</label>
               <ClientDropdown clients={clients} value={editForm.client} onChange={v => { setEditForm(p => ({ ...p, client: v })); setEditErr(p => ({ ...p, client: "" })); }} error={editErr.client} />
-              {editErr.client && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {editErr.client}</div>}
+              {editErr.client && <div style={{ fontSize: 11, color: "#64748B", marginTop: 4 }}>Warning {editErr.client}</div>}
             </div>
             <Fld label="Purpose" value={editForm.purpose} onChange={v => setEditForm(p => ({ ...p, purpose: v }))} />
             <div style={{ marginBottom: 14 }}>
@@ -1288,7 +1288,7 @@ function ProjectsPage({ projects, setProjects, clients, employees, config, onVie
                     />
                     <label htmlFor={`edit-emp-${emp._id || emp.email}`} style={{ flex: 1, cursor: "pointer", fontSize: 13, color: "var(--app-sidebar)", display: "flex", alignItems: "center", gap: 8 }}>
                       <span>{emp.name}</span>
-                      {emp.department && <span style={{ fontSize: 11, color: "#a78bba", background: "#eff6ff", padding: "2px 6px", borderRadius: 4 }}>{emp.department}</span>}
+                      {emp.department && <span style={{ fontSize: 11, color: "#64748B", background: "#EFF6FF", padding: "2px 6px", borderRadius: 4 }}>{emp.department}</span>}
                     </label>
                   </div>
                 ))}
@@ -1298,12 +1298,12 @@ function ProjectsPage({ projects, setProjects, clients, employees, config, onVie
                 <label style={{ display: "block", fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 6 }}>SELECTED EMPLOYEES ({editForm.assignedTo.length})</label>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                   {editForm.assignedTo.map(name => (
-                    <div key={name} style={{ display: "flex", alignItems: "center", gap: 6, background: "#eff6ff", border: "1px solid #e2e8f0", borderRadius: 8, padding: "4px 10px" }}>
-                      <div style={{ width: 18, height: 18, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 8, fontWeight: 700 }}>{name ? name[0].toUpperCase() : "?"}</div>
+                    <div key={name} style={{ display: "flex", alignItems: "center", gap: 6, background: "#EFF6FF", border: "1px solid #E2E8F0", borderRadius: 8, padding: "4px 10px" }}>
+                      <div style={{ width: 18, height: 18, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 8, fontWeight: 700 }}>{name ? name[0].toUpperCase() : "?"}</div>
                       <span style={{ fontSize: 12, fontWeight: 600, color: "var(--app-accent)" }}>{name}</span>
                       <button
                         onClick={(e) => { e.stopPropagation(); setEditForm({ ...editForm, assignedTo: editForm.assignedTo.filter(n => n !== name) }); }}
-                        style={{ background: "none", border: "none", cursor: "pointer", color: "#ef4444", fontSize: 14, padding: "0 2px", fontWeight: 700 }}
+                        style={{ background: "none", border: "none", cursor: "pointer", color: "#64748B", fontSize: 14, padding: "0 2px", fontWeight: 700 }}
                       >
                         ✕
                       </button>
@@ -1316,7 +1316,7 @@ function ProjectsPage({ projects, setProjects, clients, employees, config, onVie
           <Fld label="Description" value={editForm.description} onChange={v => setEditForm(p => ({ ...p, description: v }))} />
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 4 }}>
             <button onClick={() => setEditProj(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>Cancel</button>
-            <button onClick={saveEdit} disabled={saving} style={{ background: "linear-gradient(135deg,var(--app-muted),var(--app-accent))", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: saving ? 0.7 : 1 }}>{saving ? "Saving…" : "Save Changes "}</button>
+            <button onClick={saveEdit} disabled={saving} style={{ background: "linear-gradient(135deg,var(--app-muted),var(--app-accent))", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#FFFFFF", cursor: saving ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: saving ? 0.7 : 1 }}>{saving ? "Saving…" : "Save Changes "}</button>
           </div>
         </Mdl>
       )}
@@ -1344,7 +1344,7 @@ function ProjectsPage({ projects, setProjects, clients, employees, config, onVie
                     />
                     <label htmlFor={`assign-emp-${emp._id || emp.email}`} style={{ flex: 1, cursor: "pointer", fontSize: 13, color: "var(--app-sidebar)", display: "flex", alignItems: "center", gap: 8 }}>
                       <span>{emp.name}</span>
-                      {emp.department && <span style={{ fontSize: 11, color: "#a78bba", background: "#eff6ff", padding: "2px 6px", borderRadius: 4 }}>{emp.department}</span>}
+                      {emp.department && <span style={{ fontSize: 11, color: "#64748B", background: "#EFF6FF", padding: "2px 6px", borderRadius: 4 }}>{emp.department}</span>}
                     </label>
                   </div>
                 ))}
@@ -1354,12 +1354,12 @@ function ProjectsPage({ projects, setProjects, clients, employees, config, onVie
                 <label style={{ display: "block", fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 6 }}>SELECTED EMPLOYEES ({assignTo.length})</label>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                   {assignTo.map(name => (
-                    <div key={name} style={{ display: "flex", alignItems: "center", gap: 6, background: "#eff6ff", border: "1px solid #e2e8f0", borderRadius: 8, padding: "4px 10px" }}>
-                      <div style={{ width: 18, height: 18, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 8, fontWeight: 700 }}>{name ? name[0].toUpperCase() : "?"}</div>
+                    <div key={name} style={{ display: "flex", alignItems: "center", gap: 6, background: "#EFF6FF", border: "1px solid #E2E8F0", borderRadius: 8, padding: "4px 10px" }}>
+                      <div style={{ width: 18, height: 18, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 8, fontWeight: 700 }}>{name ? name[0].toUpperCase() : "?"}</div>
                       <span style={{ fontSize: 12, fontWeight: 600, color: "var(--app-accent)" }}>{name}</span>
                       <button
                         onClick={(e) => { e.stopPropagation(); setAssignTo(assignTo.filter(n => n !== name)); }}
-                        style={{ background: "none", border: "none", cursor: "pointer", color: "#ef4444", fontSize: 14, padding: "0 2px", fontWeight: 700 }}
+                        style={{ background: "none", border: "none", cursor: "pointer", color: "#64748B", fontSize: 14, padding: "0 2px", fontWeight: 700 }}
                       >
                         ✕
                       </button>
@@ -1371,7 +1371,7 @@ function ProjectsPage({ projects, setProjects, clients, employees, config, onVie
           </div>
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
             <button onClick={() => setAssignModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>Cancel</button>
-            <button onClick={doAssign} style={{ background: "linear-gradient(135deg,var(--app-accent),#8b5cf6)", color: "#fff", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Save Assignment </button>
+            <button onClick={doAssign} style={{ background: "linear-gradient(135deg,var(--app-accent),#2563EB)", color: "#FFFFFF", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Save Assignment </button>
           </div>
         </Mdl>
       )}
@@ -1391,21 +1391,21 @@ function SearchDropdown({ label, items, displayKey, value, onChange, error, plac
   return (
     <div style={{ marginBottom: 14, position: "relative" }}>
       <label style={{ display: "block", fontSize: 11, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>{label.toUpperCase()}</label>
-      <div onClick={() => setOpen(!open)} style={{ width: "100%", border: `1.5px solid ${error ? "#EF4444" : open ? "var(--app-accent)" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 36px 10px 14px", fontSize: 13, color: value ? T.text : "var(--app-muted)", background: "var(--app-bg)", cursor: "pointer", position: "relative", userSelect: "none", minHeight: 42, boxSizing: "border-box" }}>
+      <div onClick={() => setOpen(!open)} style={{ width: "100%", border: `1.5px solid ${error ? "#64748B" : open ? "var(--app-accent)" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 36px 10px 14px", fontSize: 13, color: value ? T.text : "var(--app-muted)", background: "var(--app-bg)", cursor: "pointer", position: "relative", userSelect: "none", minHeight: 42, boxSizing: "border-box" }}>
         {value || placeholder || "-- Select --"}
         <span style={{ position: "absolute", right: 12, top: "50%", transform: `translateY(-50%) rotate(${open ? 180 : 0}deg)`, fontSize: 10, color: "var(--app-muted)", transition: "0.2s" }}>▼</span>
       </div>
       {open && (
-        <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "#fff", border: "1.5px solid var(--app-border)", borderRadius: 12, boxShadow: "0 8px 32px rgba(var(--app-accent-rgb, 124, 58, 237),0.15)", zIndex: 999, overflow: "hidden" }}>
+        <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "#FFFFFF", border: "1.5px solid var(--app-border)", borderRadius: 12, boxShadow: "0 8px 32px rgba(var(--app-accent-rgb, 124, 58, 237),0.15)", zIndex: 999, overflow: "hidden" }}>
           <div style={{ padding: "8px 10px" }}><input autoFocus placeholder="Search..." value={search} onChange={e => setSearch(e.target.value)} onClick={e => e.stopPropagation()} style={{ width: "100%", padding: "7px 10px", border: "1.5px solid var(--app-border)", borderRadius: 8, fontSize: 12, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} /></div>
           <div style={{ maxHeight: 180, overflowY: "auto" }}>
             {filtered.length === 0 ? <div style={{ padding: 14, textAlign: "center", color: "var(--app-muted)", fontSize: 13 }}>No results</div>
-              : filtered.map((item, i) => { const name = item[displayKey] || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "#eff6ff" : "transparent", borderBottom: "1px solid var(--app-bg)" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "#eff6ff" : "transparent"}><div style={{ width: 26, height: 26, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{name[0]?.toUpperCase() || "?"}</div><span style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</span>{isSel && <span style={{ marginLeft: "auto", color: "var(--app-accent)" }}>Yes</span>}</div>); })}
+              : filtered.map((item, i) => { const name = item[displayKey] || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "#EFF6FF" : "transparent", borderBottom: "1px solid var(--app-bg)" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "#EFF6FF" : "transparent"}><div style={{ width: 26, height: 26, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{name[0]?.toUpperCase() || "?"}</div><span style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</span>{isSel && <span style={{ marginLeft: "auto", color: "var(--app-accent)" }}>Yes</span>}</div>); })}
           </div>
         </div>
       )}
       {open && <div style={{ position: "fixed", inset: 0, zIndex: 998 }} onClick={() => { setOpen(false); setSearch(""); }} />}
-      {error && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {error}</div>}
+      {error && <div style={{ fontSize: 11, color: "#64748B", marginTop: 4 }}>Warning {error}</div>}
     </div>
   );
 }
@@ -1445,24 +1445,24 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
     t: s,
     v: trackList.filter(p => p.status === s).length,
     i: s === "Completed" ? "Success" : s === "In Progress" ? "Action" : s === "Pending" ? "" : "Folder",
-    c: s === "Completed" ? "#22C55E" : s === "In Progress" ? "var(--app-accent)" : s === "Pending" ? "#F59E0B" : "var(--app-accent)"
+    c: s === "Completed" ? "#16A34A" : s === "In Progress" ? "var(--app-accent)" : s === "Pending" ? "#64748B" : "var(--app-accent)"
   }));
   const openAdd = () => { setTsForm(EMPTY); setTsErr({}); setTsEditId(null); setTsModal("add"); };
   const openEdit = (p) => { setTsForm({ projectId: p.projectId || p.id || "", name: p.name || "", client: p.client || "", manager: p.manager || "", employee: p.employee || "", deadline: p.deadline || "", status: p.status || "In Progress", progress: p.progress || p.pct || 0, notes: p.notes || p.note || "" }); setTsErr({}); setTsEditId(p._id || p.id); setTsModal("edit"); };
   const saveTs = async () => { const errs = {}; if (!tsForm.name.trim()) errs.name = "Project name required"; if (!tsForm.client.trim()) errs.client = "Company name required"; if (!tsForm.deadline) errs.deadline = "Deadline required"; const pv = Number(tsForm.progress); if (isNaN(pv) || pv < 0 || pv > 100) errs.progress = "0–100 only"; if (Object.keys(errs).length) { setTsErr(errs); return; } try { setTsSaving(true); const payload = { ...tsForm, progress: Number(tsForm.progress) }; if (tsModal === "add") { if (!payload.projectId) { const maxId = Math.max(...trackList.map(p => { const match = (p.projectId || p.id || "").match(/PRJ(\d+)/); return match ? parseInt(match[1]) : 0; }), 0); payload.projectId = `PRJ${String(maxId + 1).padStart(3, "0")}`; } const res = await axios.post(BASE_URL + "/api/project-status", payload); setTrackList(prev => [res.data, ...prev]); } else { const res = await axios.put(`https://mbusiness.octosofttechnologies.in/api/project-status/${tsEditId}`, payload); setTrackList(prev => prev.map(p => (p._id || p.id) === tsEditId ? res.data : p)); } showToast(tsModal === "add" ? "Success Project added!" : "Success Project updated!"); setTsModal(null); } catch { if (tsModal === "add") { const local = { ...tsForm, _id: Date.now().toString(), projectId: tsForm.projectId || `PRJ${String(trackList.length + 1).padStart(3, "0")}`, progress: Number(tsForm.progress) }; setTrackList(prev => [local, ...prev]); } else { setTrackList(prev => prev.map(p => (p._id || p.id) === tsEditId ? { ...p, ...tsForm, progress: Number(tsForm.progress) } : p)); } showToast("Success Saved locally!"); setTsModal(null); } finally { setTsSaving(false); } };
   const deleteTs = async (id) => { if (!window.confirm("Delete?")) return; try { await axios.delete(`https://mbusiness.octosofttechnologies.in/api/project-status/${id}`); } catch { } setTrackList(prev => prev.filter(p => (p._id || p.id) !== id)); showToast("Delete Deleted!"); };
-  const B2 = (color) => ({ background: `linear-gradient(135deg,${color},${color}cc)`, color: "#fff", border: "none", borderRadius: 10, padding: "8px 16px", fontWeight: 700, fontSize: 13, cursor: "pointer", fontFamily: "inherit" });
+  const B2 = (color) => ({ background: `linear-gradient(135deg,${color},${color}cc)`, color: "#FFFFFF", border: "none", borderRadius: 10, padding: "8px 16px", fontWeight: 700, fontSize: 13, cursor: "pointer", fontFamily: "inherit" });
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-      {tsToast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{tsToast}</div>}
+      {tsToast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#FFFFFF", border: "1.5px solid #16A34A", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#16A34A", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{tsToast}</div>}
       <div className="dash-stats" style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 12 }}>
-        {tsStats.map(({ t, v, i, c }) => (<div key={t} style={{ background: "#fff", borderRadius: 14, padding: "18px 20px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", position: "relative", overflow: "hidden" }}><div style={{ width: 38, height: 38, borderRadius: 10, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, marginBottom: 8 }}>{i}</div><div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 2 }}>{t.toUpperCase()}</div><div style={{ fontSize: 24, fontWeight: 800, color: c }}>{v}</div></div>))}
+        {tsStats.map(({ t, v, i, c }) => (<div key={t} style={{ background: "#FFFFFF", borderRadius: 14, padding: "18px 20px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", position: "relative", overflow: "hidden" }}><div style={{ width: 38, height: 38, borderRadius: 10, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, marginBottom: 8 }}>{i}</div><div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 2 }}>{t.toUpperCase()}</div><div style={{ fontSize: 24, fontWeight: 800, color: c }}>{v}</div></div>))}
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
           <div style={{ position: "relative" }}><span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>Search</span><input placeholder="Search…" value={tsSearch} onChange={e => setTsSearch(e.target.value)} style={{ padding: "9px 14px 9px 34px", border: "1.5px solid var(--app-border)", borderRadius: 10, fontSize: 13, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", width: 240, color: T.text }} /></div>
-          <button onClick={() => setTsFilter("All")} style={{ padding: "7px 13px", borderRadius: 9, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", border: "1.5px solid", borderColor: tsFilter === "All" ? "var(--app-accent)" : "var(--app-border)", background: tsFilter === "All" ? "rgba(var(--app-accent-rgb, 124, 58, 237),0.1)" : "#fff", color: tsFilter === "All" ? "var(--app-accent)" : "var(--app-muted)" }}>All</button>
-          {customStatuses.map(f => (<button key={f} onClick={() => setTsFilter(f)} style={{ padding: "7px 13px", borderRadius: 9, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", border: "1.5px solid", borderColor: tsFilter === f ? "var(--app-accent)" : "var(--app-border)", background: tsFilter === f ? "rgba(var(--app-accent-rgb, 124, 58, 237),0.1)" : "#fff", color: tsFilter === f ? "var(--app-accent)" : "var(--app-muted)" }}>{f}</button>))}
+          <button onClick={() => setTsFilter("All")} style={{ padding: "7px 13px", borderRadius: 9, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", border: "1.5px solid", borderColor: tsFilter === "All" ? "var(--app-accent)" : "var(--app-border)", background: tsFilter === "All" ? "rgba(var(--app-accent-rgb, 124, 58, 237),0.1)" : "#FFFFFF", color: tsFilter === "All" ? "var(--app-accent)" : "var(--app-muted)" }}>All</button>
+          {customStatuses.map(f => (<button key={f} onClick={() => setTsFilter(f)} style={{ padding: "7px 13px", borderRadius: 9, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", border: "1.5px solid", borderColor: tsFilter === f ? "var(--app-accent)" : "var(--app-border)", background: tsFilter === f ? "rgba(var(--app-accent-rgb, 124, 58, 237),0.1)" : "#FFFFFF", color: tsFilter === f ? "var(--app-accent)" : "var(--app-muted)" }}>{f}</button>))}
         </div>
         <button onClick={openAdd} style={B2("var(--app-accent)")}>+ Add Project Status</button>
       </div>
@@ -1475,12 +1475,12 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
                 : paginated.map((p, i) => (<tr key={p._id || p.id || i} style={{ borderBottom: "1px solid var(--app-border)" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
                   <td style={{ padding: "11px 12px", fontFamily: "monospace", fontSize: 11, color: "var(--app-muted)" }}>{p.projectId || p.id || `PRJ${String((currentPage - 1) * itemsPerPage + i + 1).padStart(3, "0")}`}</td>
                   <td style={{ padding: "11px 12px", fontWeight: 700, color: T.text }}>{p.name}</td>
-                  <td style={{ padding: "11px 12px" }}><div style={{ display: "flex", alignItems: "center", gap: 6 }}><div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 9, fontWeight: 700, flexShrink: 0 }}>{(p.client || "?")[0].toUpperCase()}</div><span style={{ color: T.text, fontSize: 12 }}>{p.client || "—"}</span></div></td>
+                  <td style={{ padding: "11px 12px" }}><div style={{ display: "flex", alignItems: "center", gap: 6 }}><div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 9, fontWeight: 700, flexShrink: 0 }}>{(p.client || "?")[0].toUpperCase()}</div><span style={{ color: T.text, fontSize: 12 }}>{p.client || "—"}</span></div></td>
                   <td style={{ padding: "11px 12px", color: "var(--app-accent)", fontSize: 12 }}>{p.manager || "—"}</td>
                   <td style={{ padding: "11px 12px", color: "var(--app-accent)", fontSize: 12 }}>{p.employee || "—"}</td>
                   <td style={{ padding: "11px 12px", fontFamily: "monospace", fontSize: 12, color: "var(--app-muted)", whiteSpace: "nowrap" }}>{p.deadline || "—"}</td>
                   <td style={{ padding: "11px 12px" }}><Badge label={p.status} /></td>
-                  <td style={{ padding: "11px 12px", minWidth: 130 }}><div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ flex: 1, background: "var(--app-border)", borderRadius: 6, height: 7 }}><div style={{ width: `${p.progress || p.pct || 0}%`, background: p.progress === 100 || p.pct === 100 ? "linear-gradient(90deg,#22C55E,#4ade80)" : "linear-gradient(90deg,var(--app-accent),var(--app-muted))", borderRadius: 6, height: "100%" }} /></div><span style={{ fontSize: 12, fontWeight: 700, color: sc(p.status), width: 32, textAlign: "right" }}>{p.progress || p.pct || 0}%</span></div></td>
+                  <td style={{ padding: "11px 12px", minWidth: 130 }}><div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ flex: 1, background: "var(--app-border)", borderRadius: 6, height: 7 }}><div style={{ width: `${p.progress || p.pct || 0}%`, background: p.progress === 100 || p.pct === 100 ? "linear-gradient(90deg,#16A34A,#16A34A)" : "linear-gradient(90deg,var(--app-accent),var(--app-muted))", borderRadius: 6, height: "100%" }} /></div><span style={{ fontSize: 12, fontWeight: 700, color: sc(p.status), width: 32, textAlign: "right" }}>{p.progress || p.pct || 0}%</span></div></td>
                   <td style={{ padding: "11px 12px", maxWidth: 180 }}><span style={{ fontSize: 12, color: "var(--app-muted)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", display: "block" }} title={p.notes || p.note}>{(p.notes || p.note) ? `Edit ${p.notes || p.note}` : "—"}</span></td>
                   <td style={{ padding: "11px 12px" }}><ActionBtns onEdit={() => openEdit(p)} onDelete={() => deleteTs(p._id || p.id)} /></td>
                 </tr>))}
@@ -1493,7 +1493,7 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
         <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
           <Fld label="Project ID" value={tsForm.projectId || "Auto-generated"} onChange={v => setTsForm({ ...tsForm, projectId: v })} placeholder="Auto-generated (PRJ001)" disabled={tsModal === "add"} />
           <Fld label="Project Name *" value={tsForm.name} onChange={v => { setTsForm({ ...tsForm, name: v }); setTsErr(p => ({ ...p, name: "" })); }} error={tsErr.name} />
-          <div style={{ marginBottom: 14 }}><label style={{ display: "block", fontSize: 11, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>COMPANY NAME *</label><ClientDropdown clients={clientNames.length ? clients : []} value={tsForm.client} onChange={v => { setTsForm({ ...tsForm, client: v }); setTsErr(p => ({ ...p, client: "" })); }} error={tsErr.client} />{tsErr.client && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {tsErr.client}</div>}</div>
+          <div style={{ marginBottom: 14 }}><label style={{ display: "block", fontSize: 11, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>COMPANY NAME *</label><ClientDropdown clients={clientNames.length ? clients : []} value={tsForm.client} onChange={v => { setTsForm({ ...tsForm, client: v }); setTsErr(p => ({ ...p, client: "" })); }} error={tsErr.client} />{tsErr.client && <div style={{ fontSize: 11, color: "#64748B", marginTop: 4 }}>Warning {tsErr.client}</div>}</div>
           <SearchDropdown label="Manager" items={managerNames} displayKey="name" value={tsForm.manager} onChange={v => setTsForm({ ...tsForm, manager: v })} placeholder="-- Select Manager --" />
           <SearchDropdown label="Employee" items={employeeNames} displayKey="name" value={tsForm.employee} onChange={v => setTsForm({ ...tsForm, employee: v })} placeholder="-- Select Employee --" />
           <Fld label="Deadline *" value={tsForm.deadline} type="date" onChange={v => { setTsForm({ ...tsForm, deadline: v }); setTsErr(p => ({ ...p, deadline: "" })); }} error={tsErr.deadline} />
@@ -1508,7 +1508,7 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
             {tsForm.status === "custom" && (
               <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
                 <input placeholder="Enter new status..." value={newStatus} onChange={e => setNewStatus(e.target.value)} style={{ flex: 1, padding: "10px 14px", borderRadius: 10, border: "1.5px solid var(--app-border)", background: "var(--app-bg)", fontSize: 13, outline: "none" }} />
-                <button onClick={() => { if (newStatus.trim()) { setCustomStatuses(p => [...new Set([...p, newStatus.trim()])]); setTsForm({ ...tsForm, status: newStatus.trim() }); setNewStatus(""); } }} style={{ padding: "0 14px", background: "var(--app-accent)", color: "#fff", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Add</button>
+                <button onClick={() => { if (newStatus.trim()) { setCustomStatuses(p => [...new Set([...p, newStatus.trim()])]); setTsForm({ ...tsForm, status: newStatus.trim() }); setNewStatus(""); } }} style={{ padding: "0 14px", background: "var(--app-accent)", color: "#FFFFFF", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Add</button>
               </div>
             )}
           </div>
@@ -1583,27 +1583,27 @@ function InterviewPage({ companyId, companyName }) {
   const fmt = (iso) => iso ? new Date(iso).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—";
   const displayed = candidates.filter(c => { const okF = filter === "all" || (c.status || "pending").toLowerCase() === filter; const q = search.toLowerCase(); const okS = !q || (c.name || "").toLowerCase().includes(q) || (c.role || "").toLowerCase().includes(q) || (c.email || "").toLowerCase().includes(q) || (c.mobile || "").includes(q); return okF && okS; });
   const counts = { total: candidates.length, pending: candidates.filter(c => (c.status || "Pending").toLowerCase() === "pending").length, hired: candidates.filter(c => (c.status || "").toLowerCase() === "hired").length, rejected: candidates.filter(c => (c.status || "").toLowerCase() === "rejected").length };
-  const sColor = { pending: "#F59E0B", hired: "#22C55E", rejected: "#EF4444" };
+  const sColor = { pending: "#64748B", hired: "#16A34A", rejected: "#64748B" };
   const sC = (s = "pending") => sColor[s.toLowerCase()] || "var(--app-muted)";
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
-      <div style={{ background: "linear-gradient(135deg,var(--app-sidebar),#0f172a)", borderRadius: 16, padding: "20px 24px", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", boxShadow: "0 8px 24px rgba(15, 23, 42,0.25)" }}>
+      {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#FFFFFF", border: "1.5px solid #16A34A", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#16A34A", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
+      <div style={{ background: "linear-gradient(135deg,var(--app-sidebar),#0F172A)", borderRadius: 16, padding: "20px 24px", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", boxShadow: "0 8px 24px rgba(15, 23, 42, 0.25)" }}>
         <div style={{ width: 42, height: 42, borderRadius: 12, background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}></div>
         <div style={{ flex: 1, minWidth: 0 }}><div style={{ fontSize: 10, color: "rgba(255,255,255,0.5)", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>Candidate Application Link</div><div style={{ fontSize: 12, color: "var(--app-muted)", fontFamily: "monospace", wordBreak: "break-all" }}>{appLink}</div></div>
         <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
-          <button onClick={copyLink} style={{ background: linkCopied ? "rgba(34,197,94,0.2)" : "rgba(var(--app-accent-rgb, 124, 58, 237),0.25)", border: `1px solid ${linkCopied ? "rgba(34,197,94,0.5)" : "rgba(var(--app-accent-rgb, 124, 58, 237),0.5)"}`, borderRadius: 9, padding: "9px 16px", color: linkCopied ? "#4ade80" : "var(--app-muted)", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{linkCopied ? "Success Copied!" : "Document Copy Link"}</button>
-          <button onClick={() => window.open(appLink, "_blank")} style={{ background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", border: "none", borderRadius: 9, padding: "9px 16px", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>View Preview Form</button>
+          <button onClick={copyLink} style={{ background: linkCopied ? "rgba(22, 163, 74, 0.2)" : "rgba(var(--app-accent-rgb, 124, 58, 237),0.25)", border: `1px solid ${linkCopied ? "rgba(22, 163, 74, 0.5)" : "rgba(var(--app-accent-rgb, 124, 58, 237),0.5)"}`, borderRadius: 9, padding: "9px 16px", color: linkCopied ? "#16A34A" : "var(--app-muted)", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{linkCopied ? "Success Copied!" : "Document Copy Link"}</button>
+          <button onClick={() => window.open(appLink, "_blank")} style={{ background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", border: "none", borderRadius: 9, padding: "9px 16px", color: "#FFFFFF", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>View Preview Form</button>
         </div>
       </div>
       <div className="dash-stats" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12 }}>
-        {[{ t: "Total", v: counts.total, i: "Target", c: "var(--app-accent)" }, { t: "Pending", v: counts.pending, i: "Pending", c: "#F59E0B" }, { t: "Hired", v: counts.hired, i: "Success", c: "#22C55E" }, { t: "Rejected", v: counts.rejected, i: "Error", c: "#EF4444" }].map(({ t, v, i, c }) => (<div key={t} style={{ background: "#fff", borderRadius: 14, padding: "18px 16px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", position: "relative", overflow: "hidden" }}><div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg,${c},${c}88)` }} /><div style={{ width: 36, height: 36, borderRadius: 10, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, marginBottom: 8 }}>{i}</div><div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 2 }}>{t.toUpperCase()}</div><div style={{ fontSize: 26, fontWeight: 800, color: c }}>{v}</div></div>))}
+        {[{ t: "Total", v: counts.total, i: "Target", c: "var(--app-accent)" }, { t: "Pending", v: counts.pending, i: "Pending", c: "#64748B" }, { t: "Hired", v: counts.hired, i: "Success", c: "#16A34A" }, { t: "Rejected", v: counts.rejected, i: "Error", c: "#64748B" }].map(({ t, v, i, c }) => (<div key={t} style={{ background: "#FFFFFF", borderRadius: 14, padding: "18px 16px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", position: "relative", overflow: "hidden" }}><div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg,${c},${c}88)` }} /><div style={{ width: 36, height: 36, borderRadius: 10, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, marginBottom: 8 }}>{i}</div><div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 2 }}>{t.toUpperCase()}</div><div style={{ fontSize: 26, fontWeight: 800, color: c }}>{v}</div></div>))}
       </div>
-      <div style={{ background: "#fff", borderRadius: 16, padding: 22, boxShadow: "0 4px 24px rgba(var(--app-accent-rgb, 124, 58, 237),0.08)", border: "1px solid var(--app-border)" }}>
+      <div style={{ background: "#FFFFFF", borderRadius: 16, padding: 22, boxShadow: "0 4px 24px rgba(var(--app-accent-rgb, 124, 58, 237),0.08)", border: "1px solid var(--app-border)" }}>
         <h3 style={{ margin: "0 0 16px", fontSize: 15, fontWeight: 700, color: "var(--app-sidebar)" }}>All Candidates ({displayed.length})</h3>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16, flexWrap: "wrap" }}>
           <div style={{ position: "relative", flex: 1, minWidth: 200 }}><span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>Search</span><input placeholder="Search name, role, email, mobile..." value={search} onChange={e => setSearch(e.target.value)} style={{ width: "100%", padding: "9px 14px 9px 34px", border: "1.5px solid var(--app-border)", borderRadius: 10, fontSize: 13, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", color: "var(--app-sidebar)", boxSizing: "border-box" }} /></div>
-          {["all", "pending", "hired", "rejected"].map(f => (<button key={f} onClick={() => setFilter(f)} style={{ padding: "7px 14px", borderRadius: 20, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", border: "1.5px solid", borderColor: filter === f ? (f === "all" ? "var(--app-accent)" : sC(f)) : "var(--app-border)", background: filter === f ? `${f === "all" ? "var(--app-accent)" : sC(f)}15` : "#fff", color: filter === f ? (f === "all" ? "var(--app-accent)" : sC(f)) : "var(--app-muted)", transition: "all 0.15s" }}>{f === "all" ? "Target All" : f === "pending" ? "Pending Pending" : f === "hired" ? "Success Hired" : "Error Rejected"}</button>))}
+          {["all", "pending", "hired", "rejected"].map(f => (<button key={f} onClick={() => setFilter(f)} style={{ padding: "7px 14px", borderRadius: 20, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", border: "1.5px solid", borderColor: filter === f ? (f === "all" ? "var(--app-accent)" : sC(f)) : "var(--app-border)", background: filter === f ? `${f === "all" ? "var(--app-accent)" : sC(f)}15` : "#FFFFFF", color: filter === f ? (f === "all" ? "var(--app-accent)" : sC(f)) : "var(--app-muted)", transition: "all 0.15s" }}>{f === "all" ? "Target All" : f === "pending" ? "Pending Pending" : f === "hired" ? "Success Hired" : "Error Rejected"}</button>))}
         </div>
         {loading ? (<div style={{ textAlign: "center", padding: 50, color: "var(--app-muted)" }}>Loading candidates...</div>) : paginated.length === 0 ? (<div style={{ textAlign: "center", padding: "50px 20px", color: "var(--app-muted)" }}><div style={{ fontSize: 48, marginBottom: 12 }}></div><div style={{ fontSize: 15, fontWeight: 700, color: "var(--app-sidebar)", marginBottom: 6 }}>{candidates.length === 0 ? "No applications yet" : "No results found"}</div></div>) : (
           <div style={{ overflowX: "auto" }}>
@@ -1615,15 +1615,15 @@ function InterviewPage({ companyId, companyName }) {
                   const finalResumeUrl = resumeUrl; return (
                     <tr key={c._id || c.id || i} style={{ borderBottom: "1px solid var(--app-border)", transition: "background 0.15s" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
                       <td style={{ padding: "12px 12px", color: "var(--app-muted)", fontSize: 11, fontFamily: "monospace" }}>{String((currentPage - 1) * itemsPerPage + i + 1).padStart(3, "0")}</td>
-                      <td style={{ padding: "12px 12px" }}><div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{(c.name || "?")[0].toUpperCase()}</div><span style={{ fontWeight: 700, color: "var(--app-sidebar)" }}>{c.name || "—"}</span></div></td>
+                      <td style={{ padding: "12px 12px" }}><div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{(c.name || "?")[0].toUpperCase()}</div><span style={{ fontWeight: 700, color: "var(--app-sidebar)" }}>{c.name || "—"}</span></div></td>
                       <td style={{ padding: "12px 12px" }}><div style={{ fontSize: 12, color: "var(--app-accent)" }}>{c.email || "—"}</div><div style={{ fontSize: 11, color: "var(--app-muted)", marginTop: 2 }}>{c.mobile || ""}</div></td>
-                      <td style={{ padding: "12px 12px" }}>{(c.experience || "").toLowerCase() === "fresher" ? <span style={{ background: "rgba(34,197,94,0.12)", color: "#22C55E", border: "1px solid rgba(34,197,94,0.25)", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>Education Fresher</span> : <span style={{ background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.12)", color: "var(--app-accent)", border: "1px solid rgba(var(--app-accent-rgb, 124, 58, 237),0.25)", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>Job {c.years || "?"}yrs</span>}</td>
+                      <td style={{ padding: "12px 12px" }}>{(c.experience || "").toLowerCase() === "fresher" ? <span style={{ background: "rgba(22, 163, 74, 0.12)", color: "#16A34A", border: "1px solid rgba(22, 163, 74, 0.25)", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>Education Fresher</span> : <span style={{ background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.12)", color: "var(--app-accent)", border: "1px solid rgba(var(--app-accent-rgb, 124, 58, 237),0.25)", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>Job {c.years || "?"}yrs</span>}</td>
                       <td style={{ padding: "12px 12px", fontWeight: 600, color: "var(--app-sidebar)", fontSize: 12 }}>{c.role || "—"}</td>
-                      <td style={{ padding: "12px 12px", fontSize: 12, color: "var(--app-accent)" }}>{c.interviewerName || <span style={{ color: "#ddd" }}>—</span>}</td>
+                      <td style={{ padding: "12px 12px", fontSize: 12, color: "var(--app-accent)" }}>{c.interviewerName || <span style={{ color: "#E2E8F0" }}>—</span>}</td>
                       <td style={{ padding: "12px 12px", fontSize: 12, color: "var(--app-muted)", fontFamily: "monospace", whiteSpace: "nowrap" }}>{fmt(c.date || c.createdAt)}</td>
-                      <td style={{ padding: "12px 12px" }}><select value={status} onChange={e => updateStatus(idx, e.target.value)} style={{ background: status === "hired" ? "rgba(34,197,94,0.1)" : status === "rejected" ? "rgba(239,68,68,0.1)" : "rgba(245,158,11,0.1)", border: `1.5px solid ${sC(status)}44`, borderRadius: 8, padding: "5px 10px", color: sC(status), fontSize: 12, fontWeight: 700, cursor: "pointer", outline: "none", fontFamily: "inherit" }}><option value="pending">Pending Pending</option><option value="hired">Success Hired</option><option value="rejected">Error Rejected</option></select></td>
-                      <td style={{ padding: "12px 12px" }}>{finalResumeUrl ? <button onClick={() => setViewModal({ ...c, _resolvedResumeUrl: finalResumeUrl })} style={{ background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.1)", border: "1px solid rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "var(--app-accent)", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap" }}>Document View</button> : <span style={{ fontSize: 11, color: "#ddd" }}>—</span>}</td>
-                      <td style={{ padding: "12px 12px" }}><div style={{ display: "flex", gap: 5 }}><button onClick={() => setViewModal({ ...c, _resolvedResumeUrl: finalResumeUrl })} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: "var(--app-accent)", cursor: "pointer", fontWeight: 600, fontFamily: "inherit" }}>Profile</button><button onClick={() => deleteCandidate(idx)} style={{ background: "#fee2e2", border: "1px solid #fecaca", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: "#ef4444", cursor: "pointer", fontWeight: 600, fontFamily: "inherit" }}>Delete</button></div></td>
+                      <td style={{ padding: "12px 12px" }}><select value={status} onChange={e => updateStatus(idx, e.target.value)} style={{ background: status === "hired" ? "rgba(22, 163, 74, 0.1)" : status === "rejected" ? "rgba(100, 116, 139, 0.1)" : "rgba(100, 116, 139, 0.1)", border: `1.5px solid ${sC(status)}44`, borderRadius: 8, padding: "5px 10px", color: sC(status), fontSize: 12, fontWeight: 700, cursor: "pointer", outline: "none", fontFamily: "inherit" }}><option value="pending">Pending Pending</option><option value="hired">Success Hired</option><option value="rejected">Error Rejected</option></select></td>
+                      <td style={{ padding: "12px 12px" }}>{finalResumeUrl ? <button onClick={() => setViewModal({ ...c, _resolvedResumeUrl: finalResumeUrl })} style={{ background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.1)", border: "1px solid rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "var(--app-accent)", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap" }}>Document View</button> : <span style={{ fontSize: 11, color: "#E2E8F0" }}>—</span>}</td>
+                      <td style={{ padding: "12px 12px" }}><div style={{ display: "flex", gap: 5 }}><button onClick={() => setViewModal({ ...c, _resolvedResumeUrl: finalResumeUrl })} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: "var(--app-accent)", cursor: "pointer", fontWeight: 600, fontFamily: "inherit" }}>Profile</button><button onClick={() => deleteCandidate(idx)} style={{ background: "#E2E8F0", border: "1px solid #E2E8F0", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: "#64748B", cursor: "pointer", fontWeight: 600, fontFamily: "inherit" }}>Delete</button></div></td>
                     </tr>
                   );
                 })}
@@ -1635,14 +1635,14 @@ function InterviewPage({ companyId, companyName }) {
       </div>
       {viewModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(var(--app-accent-rgb, 124, 58, 237), 0.55)", backdropFilter: "blur(8px)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
-          <div style={{ background: "#fff", borderRadius: 20, width: "100%", maxWidth: 820, maxHeight: "90vh", overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 32px 80px rgba(var(--app-accent-rgb, 124, 58, 237),0.25)" }}>
+          <div style={{ background: "#FFFFFF", borderRadius: 20, width: "100%", maxWidth: 820, maxHeight: "90vh", overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 32px 80px rgba(var(--app-accent-rgb, 124, 58, 237),0.25)" }}>
             <div style={{ padding: "16px 22px", borderBottom: "1px solid var(--app-border)", display: "flex", justifyContent: "space-between", alignItems: "center", background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))", flexShrink: 0 }}>
               <h2 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: "var(--app-sidebar)" }}>Profile Candidate Profile</h2>
               <button onClick={() => setViewModal(null)} style={{ background: "none", border: "none", fontSize: 18, cursor: "pointer", color: "var(--app-accent)", padding: "4px 8px" }}>Close</button>
             </div>
             <div style={{ overflowY: "auto", padding: "20px 22px", flex: 1 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 14, padding: 16, background: "linear-gradient(135deg,var(--app-bg),var(--app-bg))", borderRadius: 14, border: "1px solid var(--app-border)", marginBottom: 18 }}>
-                <div style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 20, fontWeight: 800, flexShrink: 0 }}>
+                <div style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 20, fontWeight: 800, flexShrink: 0 }}>
                   {(viewModal.name || "?")[0].toUpperCase()}
                 </div>
                 <div style={{ flex: 1 }}>
@@ -1665,13 +1665,13 @@ function InterviewPage({ companyId, companyName }) {
                       onError={(e) => {
                         e.target.style.display = 'none';
                         const errorDiv = document.createElement('div');
-                        errorDiv.style.cssText = 'padding: 50px; text-align: center; color: #ef4444; font-size: 14px; background: #fef2f2; border: 1.5px solid #fecaca; border-radius: 12px; margin: 20px;';
-                        errorDiv.innerHTML = 'Document Resume file not found<br><span style="font-size: 12px; color: #991b1b;">The resume file may have been deleted or moved</span>';
+                        errorDiv.style.cssText = 'padding: 50px; text-align: center; color: #64748B; font-size: 14px; background: #F8FAFC; border: 1.5px solid #E2E8F0; border-radius: 12px; margin: 20px;';
+                        errorDiv.innerHTML = 'Document Resume file not found<br><span style="font-size: 12px; color: #1E293B;">The resume file may have been deleted or moved</span>';
                         e.target.parentNode.appendChild(errorDiv);
                       }}
                     />
-                    <div style={{ padding: "12px", background: "#fff", borderTop: "1px solid var(--app-border)", display: "flex", justifyContent: "center" }}>
-                      <a href={viewModal._resolvedResumeUrl} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "var(--app-accent)", color: "#fff", padding: "8px 16px", borderRadius: 8, textDecoration: "none", fontSize: 13, fontWeight: 600, fontFamily: "inherit" }}>
+                    <div style={{ padding: "12px", background: "#FFFFFF", borderTop: "1px solid var(--app-border)", display: "flex", justifyContent: "center" }}>
+                      <a href={viewModal._resolvedResumeUrl} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "var(--app-accent)", color: "#FFFFFF", padding: "8px 16px", borderRadius: 8, textDecoration: "none", fontSize: 13, fontWeight: 600, fontFamily: "inherit" }}>
                         Open in New Tab
                       </a>
                     </div>
@@ -1744,25 +1744,25 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
 
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", backdropFilter: "blur(10px)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }} onClick={onClose}>
-      <div style={{ background: "#fff", borderRadius: 22, width: "100%", maxWidth: 420, maxHeight: "90vh", boxShadow: "0 32px 80px rgba(0,0,0,0.2)", display: "flex", flexDirection: "column", overflow: "hidden" }} onClick={e => e.stopPropagation()}>
+      <div style={{ background: "#FFFFFF", borderRadius: 22, width: "100%", maxWidth: 420, maxHeight: "90vh", boxShadow: "0 32px 80px rgba(0,0,0,0.2)", display: "flex", flexDirection: "column", overflow: "hidden" }} onClick={e => e.stopPropagation()}>
         <div style={{ background: "var(--app-accent)", padding: "28px 28px 22px", textAlign: "center", flexShrink: 0, position: "relative" }}>
-          <button onClick={onClose} style={{ position: "absolute", top: 14, right: 14, background: "rgba(255,255,255,0.2)", border: "none", width: 30, height: 30, borderRadius: 8, color: "#fff", fontSize: 20, cursor: "pointer", lineHeight: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
+          <button onClick={onClose} style={{ position: "absolute", top: 14, right: 14, background: "rgba(255,255,255,0.2)", border: "none", width: 30, height: 30, borderRadius: 8, color: "#FFFFFF", fontSize: 20, cursor: "pointer", lineHeight: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
           <div style={{ width: 72, height: 72, borderRadius: 16, background: "rgba(255,255,255,0.22)", border: "3px solid rgba(255,255,255,0.45)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px", overflow: "hidden" }}>
-            {companyLogo ? <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <span style={{ fontSize: 24, fontWeight: 800, color: "#fff" }}>{initials}</span>}
+            {companyLogo ? <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <span style={{ fontSize: 24, fontWeight: 800, color: "#FFFFFF" }}>{initials}</span>}
           </div>
-          <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#fff" }}>{displayName}</h2>
+          <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#FFFFFF" }}>{displayName}</h2>
           <p style={{ margin: "4px 0 0", fontSize: 12, color: "rgba(255,255,255,0.65)" }}>{user?.email || "—"}</p>
-          <span style={{ display: "inline-block", marginTop: 8, background: "rgba(255,255,255,0.18)", border: "1px solid rgba(255,255,255,0.28)", borderRadius: 100, padding: "3px 12px", fontSize: 10, fontWeight: 700, color: "#fff", letterSpacing: 1, textTransform: "uppercase" }}>{user?.role || "user"}</span>
+          <span style={{ display: "inline-block", marginTop: 8, background: "rgba(255,255,255,0.18)", border: "1px solid rgba(255,255,255,0.28)", borderRadius: 100, padding: "3px 12px", fontSize: 10, fontWeight: 700, color: "#FFFFFF", letterSpacing: 1, textTransform: "uppercase" }}>{user?.role || "user"}</span>
         </div>
         <div style={{ padding: "18px 24px", overflowY: "auto", flex: 1 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", background: "#fef2f2", borderRadius: 9, border: "1px solid #fecaca", marginBottom: 12 }}>
-            <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(239,68,68,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>Company</div>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", background: "#F8FAFC", borderRadius: 9, border: "1px solid #E2E8F0", marginBottom: 12 }}>
+            <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(100, 116, 139, 0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>Company</div>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 10, color: "#ef4444", fontWeight: 700, letterSpacing: 0.5, textTransform: "uppercase" }}>Company Name</div>
+              <div style={{ fontSize: 10, color: "#64748B", fontWeight: 700, letterSpacing: 0.5, textTransform: "uppercase" }}>Company Name</div>
               {editCN ? (
                 <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
-                  <input value={newCN} onChange={e => setNewCN(e.target.value)} style={{ flex: 1, padding: "6px 10px", fontSize: 13, border: "1px solid #ddd", borderRadius: 6, outline: "none" }} autoFocus />
-                  <button onClick={saveCN} disabled={savingCN} style={{ padding: "4px 10px", background: "#22C55E", color: "#fff", border: "none", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>{savingCN ? "..." : "SAVE"}</button>
+                  <input value={newCN} onChange={e => setNewCN(e.target.value)} style={{ flex: 1, padding: "6px 10px", fontSize: 13, border: "1px solid #E2E8F0", borderRadius: 6, outline: "none" }} autoFocus />
+                  <button onClick={saveCN} disabled={savingCN} style={{ padding: "4px 10px", background: "#16A34A", color: "#FFFFFF", border: "none", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>{savingCN ? "..." : "SAVE"}</button>
                 </div>
               ) : (
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -1784,8 +1784,8 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
           <div style={{ display: "flex", gap: 10 }}>
             <button onClick={onClose} style={{ flex: 1, padding: "10px", background: "var(--app-bg)", border: "1px solid var(--app-border)", borderRadius: 9, fontSize: 13, fontWeight: 600, color: "var(--app-sidebar)", cursor: "pointer", fontFamily: "inherit" }}>✕
             </button>
-            <button onClick={() => logoRef.current.click()} style={{ flex: 1, padding: "10px", background: "var(--app-accent)", border: "none", borderRadius: 9, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}> Upload Logo</button>
-            <button onClick={onLogout} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#EF4444,#dc2626)", border: "none", borderRadius: 9, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}> Logout</button>
+            <button onClick={() => logoRef.current.click()} style={{ flex: 1, padding: "10px", background: "var(--app-accent)", border: "none", borderRadius: 9, fontSize: 13, fontWeight: 700, color: "#FFFFFF", cursor: "pointer", fontFamily: "inherit" }}> Upload Logo</button>
+            <button onClick={onLogout} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#64748B,#64748B)", border: "none", borderRadius: 9, fontSize: 13, fontWeight: 700, color: "#FFFFFF", cursor: "pointer", fontFamily: "inherit" }}> Logout</button>
           </div>
         </div>
         <input ref={logoRef} type="file" accept="image/*" style={{ display: "none" }}
@@ -1803,23 +1803,23 @@ function Sidebar({ active, setActive, onLogout, open, onClose, navItems, initial
   const items = navItems || NAV;
   return (
     <>
-      {open && <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(15,3,38,0.55)", backdropFilter: "blur(2px)", zIndex: 998, display: "block" }} className="mob-overlay" />}
+      {open && <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.55)", backdropFilter: "blur(2px)", zIndex: 998, display: "block" }} className="mob-overlay" />}
       <div
         className="sidebar app-sidebar-scroll"
         style={{
           width: 235,
-          background: "linear-gradient(165deg,#0f172a 0%,var(--app-sidebar) 45%,#0f172a 100%)",
-          color: "#fff", display: "flex", flexDirection: "column", height: "100vh",
+          background: "linear-gradient(165deg,#0F172A 0%,var(--app-sidebar) 45%,#0F172A 100%)",
+          color: "#FFFFFF", display: "flex", flexDirection: "column", height: "100vh",
           position: "fixed", top: 0, left: 0, zIndex: 999, flexShrink: 0, overflow: "hidden",
-          boxShadow: "6px 0 32px rgba(20,0,50,0.35)",
+          boxShadow: "6px 0 32px rgba(15, 23, 42, 0.35)",
           transform: open ? "translateX(0)" : "translateX(-100%)",
           transition: "transform 0.3s cubic-bezier(0.4,0,0.2,1)",
           borderRight: "1px solid rgba(255,255,255,0.06)"
         }}
       >
         {/* ambient glow accents */}
-        <div style={{ position: "absolute", top: -60, right: -60, width: 180, height: 180, borderRadius: "50%", background: "radial-gradient(circle,rgba(37, 99, 235,0.25),transparent 70%)", pointerEvents: "none", zIndex: 0 }} />
-        <div style={{ position: "absolute", bottom: -80, left: -60, width: 200, height: 200, borderRadius: "50%", background: "radial-gradient(circle,rgba(37, 99, 235,0.35),transparent 70%)", pointerEvents: "none", zIndex: 0 }} />
+        <div style={{ position: "absolute", top: -60, right: -60, width: 180, height: 180, borderRadius: "50%", background: "radial-gradient(circle,rgba(37, 99, 235, 0.25),transparent 70%)", pointerEvents: "none", zIndex: 0 }} />
+        <div style={{ position: "absolute", bottom: -80, left: -60, width: 200, height: 200, borderRadius: "50%", background: "radial-gradient(circle,rgba(37, 99, 235, 0.35),transparent 70%)", pointerEvents: "none", zIndex: 0 }} />
 
         <button onClick={onClose} className="sidebar-close" style={{ position: "absolute", top: 12, right: 12, zIndex: 2, width: 28, height: 28, borderRadius: 8, background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.8)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
           <X size={15} strokeWidth={2.5} />
@@ -1832,7 +1832,7 @@ function Sidebar({ active, setActive, onLogout, open, onClose, navItems, initial
               minWidth: 52,
               width: companyLogo ? "auto" : 52,
               maxWidth: "100%",
-              background: "linear-gradient(135deg,#ffffff,#f1f5f9)",
+              background: "linear-gradient(135deg,#FFFFFF,#EFF6FF)",
               borderRadius: 14,
               display: "flex",
               alignItems: "center",
@@ -1850,7 +1850,7 @@ function Sidebar({ active, setActive, onLogout, open, onClose, navItems, initial
               ) : (initials || "M")}
             </div>
             <div style={{ textAlign: "center" }}>
-              <div style={{ fontWeight: 800, fontSize: 14.5, color: "#fff", maxWidth: 190, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", letterSpacing: 0.3, fontFamily: T.fontSyne }}>{companyName || "Your Business"}</div>
+              <div style={{ fontWeight: 800, fontSize: 14.5, color: "#FFFFFF", maxWidth: 190, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", letterSpacing: 0.3, fontFamily: T.fontSyne }}>{companyName || "Your Business"}</div>
               <div style={{ fontSize: 8, color: "rgba(255,255,255,0.45)", letterSpacing: 2, marginTop: 3, fontWeight: 700 }}>MANAGEMENT SUITE</div>
             </div>
           </div>
@@ -1871,9 +1871,9 @@ function Sidebar({ active, setActive, onLogout, open, onClose, navItems, initial
                   position: "relative",
                   display: "flex", alignItems: "center", gap: 11, padding: "9px 12px", borderRadius: 11,
                   marginBottom: 4, cursor: "pointer", fontSize: 13, fontWeight: isActive ? 700 : 500,
-                  background: isActive ? "linear-gradient(135deg,rgba(37, 99, 235,0.22),rgba(255,255,255,0.08))" : "transparent",
-                  color: isActive ? "#fff" : "rgba(255,255,255,0.62)",
-                  boxShadow: isActive ? "0 4px 14px rgba(37, 99, 235,0.18), inset 0 0 0 1px rgba(255,255,255,0.1)" : "none",
+                  background: isActive ? "linear-gradient(135deg,rgba(37, 99, 235, 0.22),rgba(255,255,255,0.08))" : "transparent",
+                  color: isActive ? "#FFFFFF" : "rgba(255,255,255,0.62)",
+                  boxShadow: isActive ? "0 4px 14px rgba(37, 99, 235, 0.18), inset 0 0 0 1px rgba(255,255,255,0.1)" : "none",
                   transition: "background 0.18s ease, color 0.18s ease"
                 }}
               >
@@ -1895,7 +1895,7 @@ function Sidebar({ active, setActive, onLogout, open, onClose, navItems, initial
 
         <div style={{ padding: "12px 10px 16px", position: "relative", zIndex: 1, flexShrink: 0 }}>
           <div style={{ height: 1, margin: "0 6px 12px", background: "linear-gradient(90deg,transparent,rgba(255,255,255,0.14),transparent)" }} />
-          <button onClick={onLogout} className="sidebar-logout-btn" style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 9, padding: "10px 12px", background: "rgba(239,68,68,0.14)", border: "1px solid rgba(239,68,68,0.32)", borderRadius: 11, color: "#fca5a5", fontSize: 12.5, cursor: "pointer", fontWeight: 700, fontFamily: "inherit", transition: "background 0.18s ease, transform 0.18s ease" }}>
+          <button onClick={onLogout} className="sidebar-logout-btn" style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 9, padding: "10px 12px", background: "rgba(100, 116, 139, 0.14)", border: "1px solid rgba(100, 116, 139, 0.32)", borderRadius: 11, color: "#E2E8F0", fontSize: 12.5, cursor: "pointer", fontWeight: 700, fontFamily: "inherit", transition: "background 0.18s ease, transform 0.18s ease" }}>
             <LogOut size={15} strokeWidth={2.3} /> Logout
           </button>
         </div>
@@ -1927,27 +1927,27 @@ function MobileProjSlider({ projects, tasks, onViewProject }) {
       <div
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
-        style={{ background: "#fff", borderRadius: 20, border: "1px solid #e2e8f0", overflow: "hidden", boxShadow: "0 4px 16px rgba(15,10,41,0.06)" }}
+        style={{ background: "#FFFFFF", borderRadius: 20, border: "1px solid #E2E8F0", overflow: "hidden", boxShadow: "0 4px 16px rgba(15, 23, 42, 0.06)" }}
       >
         {pagedProjects.map((p, idx) => {
           const pTasks = (tasks || []).filter(t => (t.project === p.name || t.projectId === p._id || t.projectId === p.id));
           const doneTasks = pTasks.filter(t => t.status === "Done").length;
           const progress = pTasks.length > 0 ? Math.round((doneTasks / pTasks.length) * 100) : (p.progress || 0);
-          const ringColor = progress >= 80 ? "#16a34a" : progress >= 40 ? "#0f766e" : "#dc2626";
+          const ringColor = progress >= 80 ? "#16A34A" : progress >= 40 ? "#16A34A" : "#64748B";
           return (
             <div
               key={p._id || idx}
               onClick={() => onViewProject(p)}
-              style={{ display: "flex", alignItems: "center", gap: 14, padding: "13px 16px", borderBottom: idx === pagedProjects.length - 1 ? "none" : "1px solid #f1f5f9", cursor: "pointer" }}
+              style={{ display: "flex", alignItems: "center", gap: 14, padding: "13px 16px", borderBottom: idx === pagedProjects.length - 1 ? "none" : "1px solid #EFF6FF", cursor: "pointer" }}
             >
-              <span style={{ width: 9, height: 9, borderRadius: "50%", background: "#29b6e8", flexShrink: 0, display: "inline-block" }}></span>
+              <span style={{ width: 9, height: 9, borderRadius: "50%", background: "#2563EB", flexShrink: 0, display: "inline-block" }}></span>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 13.5, fontWeight: 700, color: "#0f172a", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.name}</div>
-                <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 1 }}>{p.status || "Active"} · {progress}%</div>
+                <div style={{ fontSize: 13.5, fontWeight: 700, color: "#0F172A", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.name}</div>
+                <div style={{ fontSize: 11, color: "#64748B", marginTop: 1 }}>{p.status || "Active"} · {progress}%</div>
               </div>
               <div style={{ position: "relative", width: 36, height: 36, flexShrink: 0 }}>
                 <svg width="36" height="36" viewBox="0 0 36 36">
-                  <circle cx="18" cy="18" r="14" fill="none" stroke="#f1f5f9" strokeWidth="4" />
+                  <circle cx="18" cy="18" r="14" fill="none" stroke="#EFF6FF" strokeWidth="4" />
                   <circle cx="18" cy="18" r="14" fill="none" stroke={ringColor} strokeWidth="4" strokeDasharray={`${(progress / 100) * 88} 88`} strokeLinecap="round" transform="rotate(-90 18 18)" />
                 </svg>
                 <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 8.5, fontWeight: 900, color: ringColor }}>{progress}%</div>
@@ -1956,7 +1956,7 @@ function MobileProjSlider({ projects, tasks, onViewProject }) {
           );
         })}
         {totalPages > 1 && (
-          <div style={{ textAlign: "center", padding: "10px 0", fontSize: 12, color: "#94a3b8", fontWeight: 700, borderTop: "1px solid #f1f5f9", background: "#fafcff" }}>
+          <div style={{ textAlign: "center", padding: "10px 0", fontSize: 12, color: "#64748B", fontWeight: 700, borderTop: "1px solid #EFF6FF", background: "#F8FAFC" }}>
             {page + 1} / {totalPages}
           </div>
         )}
@@ -1967,7 +1967,7 @@ function MobileProjSlider({ projects, tasks, onViewProject }) {
             <button
               key={i}
               onClick={() => setPage(i)}
-              style={{ width: i === page ? 22 : 8, height: 8, borderRadius: 4, border: "none", background: i === page ? "#0f766e" : "#cbd5e1", cursor: "pointer", transition: "all 0.2s", padding: 0 }}
+              style={{ width: i === page ? 22 : 8, height: 8, borderRadius: 4, border: "none", background: i === page ? "#16A34A" : "#E2E8F0", cursor: "pointer", transition: "all 0.2s", padding: 0 }}
             />
           ))}
         </div>
@@ -2310,7 +2310,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     const isVar = color && color.startsWith("var");
     return {
       background: isVar ? `var(--app-accent-gradient, linear-gradient(135deg, ${color}, ${color}))` : `linear-gradient(135deg, ${color}, ${color}cc)`,
-      color: "#fff",
+      color: "#FFFFFF",
       border: "none",
       borderRadius: 10,
       padding: "8px 16px",
@@ -2326,15 +2326,15 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const companyNameStr = user?.companyName || "Your Business";
 
   return (
-    <div style={{ display: "flex", height: "100vh", overflow: "hidden", background: "#f8fafc", fontFamily: T.fontDM }}>
+    <div style={{ display: "flex", height: "100vh", overflow: "hidden", background: "#F8FAFC", fontFamily: T.fontDM }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         *{box-sizing:border-box}
         ::-webkit-scrollbar{width:5px}
-        ::-webkit-scrollbar-thumb{background:#eff6ff;border-radius:3px}
+        ::-webkit-scrollbar-thumb{background:#EFF6FF;border-radius:3px}
         button,input,select,textarea{font-family:inherit}
-        .sidebar-nav-item:hover{background:rgba(255,255,255,0.09)!important;color:#fff!important;}
-        .sidebar-logout-btn:hover{background:rgba(239,68,68,0.24)!important;transform:translateY(-1px);}
+        .sidebar-nav-item:hover{background:rgba(255,255,255,0.09)!important;color:#FFFFFF!important;}
+        .sidebar-logout-btn:hover{background:rgba(100, 116, 139, 0.24)!important;transform:translateY(-1px);}
         .app-sidebar-scroll nav::-webkit-scrollbar{width:4px}
         .app-sidebar-scroll nav::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.18);border-radius:3px}
         .app-sidebar-scroll nav::-webkit-scrollbar-track{background:transparent}
@@ -2346,25 +2346,25 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       <Sidebar active={validActive} setActive={setActive} onLogout={handleLogout} open={sidebarOpen} onClose={() => setSidebarOpen(false)} navItems={navItems} initials={initials} companyName={companyNameStr} companyLogo={companyLogo} setSidebarInvoiceClick={setSidebarInvoiceClick} />
 
       <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column" }}>
-        <div className="mob-topbar" style={{ display: validActive === "dashboard" ? "none" : "flex", flexDirection: "column", background: "#0d0b26", padding: "16px 16px 14px", position: "sticky", top: 0, zIndex: 100, boxShadow: "0 2px 8px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)" }}>
+        <div className="mob-topbar" style={{ display: validActive === "dashboard" ? "none" : "flex", flexDirection: "column", background: "#0F172A", padding: "16px 16px 14px", position: "sticky", top: 0, zIndex: 100, boxShadow: "0 2px 8px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)" }}>
           {/* ROW 1 — Company Name (left) + Notification (right) */}
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-            <div style={{ fontSize: 16, fontWeight: 800, color: "#fff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+            <div style={{ fontSize: 16, fontWeight: 800, color: "#FFFFFF", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
               {companyNameStr}
             </div>
-            <div className="md-tap" style={{ width: 38, height: 38, borderRadius: 12, background: "rgba(255,255,255,0.07)", backdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0, color: "#fff" }}>
+            <div className="md-tap" style={{ width: 38, height: 38, borderRadius: 12, background: "rgba(255,255,255,0.07)", backdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0, color: "#FFFFFF" }}>
               <i className="ti ti-bell" style={{ fontSize: 17 }}></i>
             </div>
           </div>
 
           {/* ROW 2 — Logo (left) + Hamburger menu (right) */}
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <div onClick={() => setShowProfile(true)} style={{ width: 38, height: 38, borderRadius: 10, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0, cursor: "pointer" }}>
+            <div onClick={() => setShowProfile(true)} style={{ width: 38, height: 38, borderRadius: 10, background: "#FFFFFF", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0, cursor: "pointer" }}>
               {companyLogo
                 ? <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
                 : <span style={{ color: T.accent, fontWeight: 800, fontSize: 12 }}>{initials}</span>}
             </div>
-            <div className="md-tap" onClick={() => setSidebarOpen(true)} style={{ width: 42, height: 42, borderRadius: 14, background: "rgba(255,255,255,0.07)", backdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#fff" }}>
+            <div className="md-tap" onClick={() => setSidebarOpen(true)} style={{ width: 42, height: 42, borderRadius: 14, background: "rgba(255,255,255,0.07)", backdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#FFFFFF" }}>
               <i className="ti ti-menu-2" style={{ fontSize: 18 }}></i>
             </div>
           </div>
@@ -2380,15 +2380,15 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               {validActive === "clients" && <button onClick={() => { setActive("addClient"); }} style={B("var(--app-accent)")}>+ Add Client</button>}
               {validActive === "employees" && <button onClick={() => { setNeError({}); setModal("employee"); }} style={B("var(--app-accent)")}>+ Add Employee</button>}
            {validActive === "projects" && <button onClick={() => { setNpError({}); setActive("new-project"); }} style={B("var(--app-muted)")}>+ New Project</button>}
-              {validActive === "managers" && <button onClick={() => { setNmError({}); setShowMgrPass(false); setModal("manager"); }} style={B("#f59e0b")}>+ Add Manager</button>}
+              {validActive === "managers" && <button onClick={() => { setNmError({}); setShowMgrPass(false); setModal("manager"); }} style={B("#64748B")}>+ Add Manager</button>}
 
-              <div onClick={() => setShowProfile(true)} className="mob-topbar-hide" style={{ background: "#fff", border: "1.5px solid #e2e8f0", borderRadius: 12, padding: "6px 12px", display: "flex", alignItems: "center", gap: 10, cursor: "pointer", boxShadow: "0 2px 10px rgba(0,0,0,0.05)", flexShrink: 0 }}>
+              <div onClick={() => setShowProfile(true)} className="mob-topbar-hide" style={{ background: "#FFFFFF", border: "1.5px solid #E2E8F0", borderRadius: 12, padding: "6px 12px", display: "flex", alignItems: "center", gap: 10, cursor: "pointer", boxShadow: "0 2px 10px rgba(0,0,0,0.05)", flexShrink: 0 }}>
                 <div style={{
                   height: 32,
                   width: companyLogo ? "auto" : 32,
                   minWidth: 32,
-                  background: "#fff",
-                  border: "1px solid #e2e8f0",
+                  background: "#FFFFFF",
+                  border: "1px solid #E2E8F0",
                   borderRadius: 6,
                   display: "flex",
                   alignItems: "center",
@@ -2418,34 +2418,34 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       .md-glow{animation:mdPulseGlow 4s ease-in-out infinite}
       .md-tap:active{transform:scale(.96);}
       .md-tap{transition:transform .15s ease}
-      .mob-sticky-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 9999; background: #fff; display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border-bottom: 1px solid #f1f5f9; }
+      .mob-sticky-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 9999; background: #FFFFFF; display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border-bottom: 1px solid #EFF6FF; }
       .mob-scroll-header { transition: transform 0.3s ease, opacity 0.3s ease; }
     `}</style>
 
               {/* ── FIXED STICKY NAV — Logo + Hamburger (always visible) ── */}
               <div className="mob-sticky-nav">
-                <div style={{ width: 36, height: 36, borderRadius: 9, background: "#f1f5f9", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0 }}>
+                <div style={{ width: 36, height: 36, borderRadius: 9, background: "#EFF6FF", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0 }}>
                   {companyLogo
                     ? <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
-                    : <span style={{ color: "#0f766e", fontWeight: 800, fontSize: 11 }}>{initials}</span>}
+                    : <span style={{ color: "#16A34A", fontWeight: 800, fontSize: 11 }}>{initials}</span>}
                 </div>
-                <div className="md-tap" onClick={() => setSidebarOpen(true)} style={{ width: 36, height: 36, borderRadius: 9, background: "#f1f5f9", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#0f172a" }}>
+                <div className="md-tap" onClick={() => setSidebarOpen(true)} style={{ width: 36, height: 36, borderRadius: 9, background: "#EFF6FF", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#0F172A" }}>
                   <i className="ti ti-menu-2" style={{ fontSize: 18 }}></i>
                 </div>
               </div>
 
               {/* ── HERO — scrolls away (Company Name + Notification hide on scroll) ── */}
-              <div style={{ position: "relative", background: "radial-gradient(130% 100% at 20% -10%, #241a5e 0%, #140f38 40%, #08061a 100%)", borderRadius: "0 0 34px 34px", padding: "66px 18px 96px", color: "#fff", overflow: "hidden" }}>
+              <div style={{ position: "relative", background: "radial-gradient(130% 100% at 20% -10%, #1E293B 0%, #0F172A 40%, #0F172A 100%)", borderRadius: "0 0 34px 34px", padding: "66px 18px 96px", color: "#FFFFFF", overflow: "hidden" }}>
                 <div className="md-glow" style={{ position: "absolute", top: -70, right: -50, width: 220, height: 220, borderRadius: "50%", background: "radial-gradient(circle, var(--app-accent) 0%, transparent 70%)", filter: "blur(6px)" }} />
-                <div className="md-glow" style={{ position: "absolute", bottom: -90, left: -40, width: 200, height: 200, borderRadius: "50%", background: "radial-gradient(circle, #8b5cf6 0%, transparent 70%)", filter: "blur(10px)", animationDelay: "1.5s" }} />
+                <div className="md-glow" style={{ position: "absolute", bottom: -90, left: -40, width: 200, height: 200, borderRadius: "50%", background: "radial-gradient(circle, #2563EB 0%, transparent 70%)", filter: "blur(10px)", animationDelay: "1.5s" }} />
 
                 <div style={{ position: "relative", zIndex: 2 }}>
                   {/* ROW 1 — Company Name + Notification (scrolls away) */}
                   <div className="mob-scroll-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
-                    <div style={{ fontSize: 16, fontWeight: 800, color: "#fff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                    <div style={{ fontSize: 16, fontWeight: 800, color: "#FFFFFF", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                       {user?.companyName || "Ylines Ecommerce"}
                     </div>
-                    <div className="md-tap" style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(255,255,255,0.08)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0, color: "#fff" }}>
+                    <div className="md-tap" style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(255,255,255,0.08)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0, color: "#FFFFFF" }}>
                       <i className="ti ti-bell" style={{ fontSize: 16 }}></i>
                     </div>
                   </div>
@@ -2454,10 +2454,10 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     <i className="ti ti-sparkles" style={{ color: "var(--app-accent)" }}></i> Revenue this month
                   </div>
                   <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 4, flexWrap: "wrap" }}>
-                    <span style={{ fontSize: 38, fontWeight: 900, letterSpacing: -1, background: "linear-gradient(90deg,#fff,#c7d2fe)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                    <span style={{ fontSize: 38, fontWeight: 900, letterSpacing: -1, background: "linear-gradient(90deg,#FFFFFF,#E2E8F0)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
                       ₹{(totalRevenue || 0).toLocaleString("en-IN")}
                     </span>
-                    <span style={{ background: "rgba(74,222,128,0.15)", color: "#4ade80", fontSize: 11.5, fontWeight: 800, padding: "5px 10px", borderRadius: 20, display: "flex", alignItems: "center", gap: 4 }}>
+                    <span style={{ background: "rgba(22, 163, 74, 0.15)", color: "#16A34A", fontSize: 11.5, fontWeight: 800, padding: "5px 10px", borderRadius: 20, display: "flex", alignItems: "center", gap: 4 }}>
                       <i className="ti ti-trending-up"></i> Live
                     </span>
                   </div>
@@ -2480,33 +2480,33 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               {/* FLOATING STAT STRIP */}
               <div style={{ margin: "-72px 16px 0", position: "relative", zIndex: 5, display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10 }}>
                 {[
-                  { icon: "ti-users", label: "Clients", val: clients.length, grad: "linear-gradient(135deg,#2563eb,#2563eb)" },
+                  { icon: "ti-users", label: "Clients", val: clients.length, grad: "linear-gradient(135deg,#2563EB,#2563EB)" },
                   { icon: "ti-folder", label: "Projects", val: projects.length, grad: "linear-gradient(135deg,var(--app-accent),#2563EB)" },
-                  { icon: "ti-user-circle", label: "Team", val: employees.length, grad: "linear-gradient(135deg,#f59e0b,#fbbf24)" },
+                  { icon: "ti-user-circle", label: "Team", val: employees.length, grad: "linear-gradient(135deg,#64748B,#64748B)" },
                 ].map((s, i) => (
-                  <div key={i} className="md-card" style={{ animationDelay: `${i * 70}ms`, background: "#fff", borderRadius: 18, padding: "14px 8px", boxShadow: "0 10px 30px rgba(15,10,41,0.14)", textAlign: "center", border: "1px solid rgba(0,0,0,0.03)" }}>
-                    <div style={{ width: 34, height: 34, borderRadius: 11, background: s.grad, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 8px", color: "#fff", fontSize: 15, boxShadow: "0 6px 14px rgba(0,0,0,0.15)" }}>
+                  <div key={i} className="md-card" style={{ animationDelay: `${i * 70}ms`, background: "#FFFFFF", borderRadius: 18, padding: "14px 8px", boxShadow: "0 10px 30px rgba(15, 23, 42, 0.14)", textAlign: "center", border: "1px solid rgba(0,0,0,0.03)" }}>
+                    <div style={{ width: 34, height: 34, borderRadius: 11, background: s.grad, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 8px", color: "#FFFFFF", fontSize: 15, boxShadow: "0 6px 14px rgba(0,0,0,0.15)" }}>
                       <i className={`ti ${s.icon}`}></i>
                     </div>
-                    <div style={{ fontSize: 19, fontWeight: 900, color: "#0f0a29" }}>{s.val}</div>
-                    <div style={{ fontSize: 10, color: "#94a3b8", fontWeight: 700, marginTop: 1 }}>{s.label}</div>
+                    <div style={{ fontSize: 19, fontWeight: 900, color: "#0F172A" }}>{s.val}</div>
+                    <div style={{ fontSize: 10, color: "#64748B", fontWeight: 700, marginTop: 1 }}>{s.label}</div>
                   </div>
                 ))}
               </div>
 
               {/* TEAL ACTION SECTION */}
-              <div style={{ margin: "18px 16px 0", background: "linear-gradient(135deg,#0f766e,#14b8a6)", borderRadius: 22, padding: "18px 16px 16px", boxShadow: "0 10px 30px rgba(15,118,110,0.25)" }}>
+              <div style={{ margin: "18px 16px 0", background: "linear-gradient(135deg,#16A34A,#16A34A)", borderRadius: 22, padding: "18px 16px 16px", boxShadow: "0 10px 30px rgba(22, 163, 74, 0.25)" }}>
                 <div style={{ fontSize: 12, fontWeight: 800, color: "rgba(255,255,255,0.85)", marginBottom: 12, letterSpacing: 0.4 }}>QUICK ACTIONS</div>
                 <div style={{ display: "flex", gap: 10 }}>
                   <button
                     onClick={() => setActive("invoices")}
-                    style={{ flex: 1, background: "#fff", color: "#0f766e", border: "none", borderRadius: 12, padding: "12px", fontSize: 13, fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
+                    style={{ flex: 1, background: "#FFFFFF", color: "#16A34A", border: "none", borderRadius: 12, padding: "12px", fontSize: 13, fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
                   >
                     <i className="ti ti-file-invoice"></i> Create Invoice
                   </button>
                   <button
                     onClick={() => { setMobileTaskProject(""); setMobileTaskTitle(""); setMobileTaskDesc(""); setMobileTaskPriority("medium"); setMobileTaskDue(""); setMobileTaskStatus("Not Started"); setMobileTaskMilestone(""); setMobileTaskAssignTo([]); setMobileTaskError(""); setShowMobileAddTask(true); }}
-                    style={{ flex: 1, background: "rgba(255,255,255,0.15)", color: "#fff", border: "1.5px solid rgba(255,255,255,0.4)", borderRadius: 12, padding: "12px", fontSize: 13, fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
+                    style={{ flex: 1, background: "rgba(255,255,255,0.15)", color: "#FFFFFF", border: "1.5px solid rgba(255,255,255,0.4)", borderRadius: 12, padding: "12px", fontSize: 13, fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
                   >
                     <i className="ti ti-checklist"></i> Add Task
                   </button>
@@ -2516,12 +2516,12 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               {/* PROJECTS / INVOICE LIST SWITCHER */}
               <div style={{ padding: "18px 16px 110px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-                  <div style={{ fontSize: 16, fontWeight: 900, color: "#0f0a29", display: "flex", alignItems: "center", gap: 8 }}>
-                    <span style={{ width: 6, height: 18, borderRadius: 4, background: "#0f766e", display: "inline-block" }}></span>
+                  <div style={{ fontSize: 16, fontWeight: 900, color: "#0F172A", display: "flex", alignItems: "center", gap: 8 }}>
+                    <span style={{ width: 6, height: 18, borderRadius: 4, background: "#16A34A", display: "inline-block" }}></span>
                     {mobileShowInvoices ? "Invoice List" : "Active Projects"}
                   </div>
                   {!mobileShowInvoices && (
-                    <div className="md-tap" onClick={() => setActive("projects")} style={{ fontSize: 12.5, fontWeight: 800, color: "#0f766e", display: "flex", alignItems: "center", gap: 3, cursor: "pointer" }}>
+                    <div className="md-tap" onClick={() => setActive("projects")} style={{ fontSize: 12.5, fontWeight: 800, color: "#16A34A", display: "flex", alignItems: "center", gap: 3, cursor: "pointer" }}>
                       View All <i className="ti ti-chevron-right" style={{ fontSize: 13 }}></i>
                     </div>
                   )}
@@ -2554,28 +2554,28 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                                 const pTasks = (tasks || []).filter(t => (t.project === p.name || t.projectId === p._id || t.projectId === p.id));
                                 const doneTasks = pTasks.length > 0 ? pTasks.filter(t => t.status === "Done").length : 0;
                                 const progress = pTasks.length > 0 ? Math.round((doneTasks / pTasks.length) * 100) : (p.progress || 0);
-                                const ringColor = progress >= 80 ? "#16a34a" : progress >= 40 ? "#0f766e" : "#dc2626";
+                                const ringColor = progress >= 80 ? "#16A34A" : progress >= 40 ? "#16A34A" : "#64748B";
                                 return (
                                   <div
                                     key={p._id || p.id || idx}
                                     className="md-card"
-                                    style={{ flex: "0 0 82%", scrollSnapAlign: "start", background: "#fff", borderRadius: 20, padding: "16px", boxShadow: "0 4px 16px rgba(15,10,41,0.06)", border: "1px solid rgba(0,0,0,0.04)", cursor: "pointer" }}
+                                    style={{ flex: "0 0 82%", scrollSnapAlign: "start", background: "#FFFFFF", borderRadius: 20, padding: "16px", boxShadow: "0 4px 16px rgba(15, 23, 42, 0.06)", border: "1px solid rgba(0,0,0,0.04)", cursor: "pointer" }}
                                     onClick={() => { setViewProject(null); setTimeout(() => setViewProject(p), 0); }}
                                   >
                                     <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                                       <div style={{ position: "relative", width: 50, height: 50, flexShrink: 0 }}>
                                         <svg width="50" height="50" viewBox="0 0 50 50">
-                                          <circle cx="25" cy="25" r="21" fill="none" stroke="#f1f5f9" strokeWidth="5" />
+                                          <circle cx="25" cy="25" r="21" fill="none" stroke="#EFF6FF" strokeWidth="5" />
                                           <circle cx="25" cy="25" r="21" fill="none" stroke={ringColor} strokeWidth="5" strokeDasharray={`${(progress / 100) * 132} 132`} strokeLinecap="round" transform="rotate(-90 25 25)" />
                                         </svg>
                                         <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: ringColor }}>{progress}%</div>
                                       </div>
                                       <div style={{ flex: 1, minWidth: 0 }}>
-                                        <div style={{ fontSize: 14.5, fontWeight: 800, color: "#0f0a29", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.name}</div>
-                                        <div style={{ fontSize: 11.5, color: "#94a3b8", marginTop: 2, display: "flex", alignItems: "center", gap: 4 }}>
+                                        <div style={{ fontSize: 14.5, fontWeight: 800, color: "#0F172A", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.name}</div>
+                                        <div style={{ fontSize: 11.5, color: "#64748B", marginTop: 2, display: "flex", alignItems: "center", gap: 4 }}>
                                           <i className="ti ti-building" style={{ fontSize: 12 }}></i>{p.client || "Internal"}
                                         </div>
-                                        <div style={{ height: 6, background: "#f1f5f9", borderRadius: 3, marginTop: 9, overflow: "hidden" }}>
+                                        <div style={{ height: 6, background: "#EFF6FF", borderRadius: 3, marginTop: 9, overflow: "hidden" }}>
                                           <div style={{ width: `${progress}%`, height: "100%", background: `linear-gradient(90deg, ${ringColor}, ${ringColor}cc)`, borderRadius: 3 }}></div>
                                         </div>
                                       </div>
@@ -2584,7 +2584,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                                 );
                               })}
                               {projects.length === 0 && (
-                                <div style={{ textAlign: "center", padding: "30px 0", color: "#94a3b8", fontSize: 13, width: "100%" }}>No projects yet</div>
+                                <div style={{ textAlign: "center", padding: "30px 0", color: "#64748B", fontSize: 13, width: "100%" }}>No projects yet</div>
                               )}
                             </div>
                           )}
@@ -2604,7 +2604,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     {projects.length > 3 && (
                       <button
                         onClick={() => setMobileShowAllProjects(v => !v)}
-                        style={{ width: "100%", marginTop: 12, background: "#f0fdfa", border: "1px solid #99f6e4", color: "#0f766e", borderRadius: 12, padding: "10px", fontSize: 12.5, fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
+                        style={{ width: "100%", marginTop: 12, background: "#EFF6FF", border: "1px solid #E2E8F0", color: "#16A34A", borderRadius: 12, padding: "10px", fontSize: 12.5, fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
                       >
                         <i className={`ti ti-chevron-${mobileShowAllProjects ? "up" : "down"}`}></i>
                         {mobileShowAllProjects ? "▲ See less" : `▼ See All (${projects.length})`}
@@ -2614,21 +2614,21 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 ) : (
                   <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                     {["Unpaid", "Overdue", "Part Paid", "Paid"].map((status, i) => {
-                      const statusColor = { Unpaid: "#f59e0b", Overdue: "#dc2626", "Part Paid": "#0284c7", Paid: "#16a34a" }[status];
+                      const statusColor = { Unpaid: "#64748B", Overdue: "#64748B", "Part Paid": "#2563EB", Paid: "#16A34A" }[status];
                       const list = INVOICES.filter(inv => (inv.status || "").toLowerCase() === status.toLowerCase() || (status === "Unpaid" && inv.status === "Pending"));
                       return (
-                        <div key={status} className="md-card" style={{ animationDelay: `${i * 60}ms`, background: "#fff", borderRadius: 16, padding: "14px 16px", boxShadow: "0 4px 16px rgba(15,10,41,0.06)", border: "1px solid rgba(0,0,0,0.04)" }}>
+                        <div key={status} className="md-card" style={{ animationDelay: `${i * 60}ms`, background: "#FFFFFF", borderRadius: 16, padding: "14px 16px", boxShadow: "0 4px 16px rgba(15, 23, 42, 0.06)", border: "1px solid rgba(0,0,0,0.04)" }}>
                           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: list.length ? 8 : 0 }}>
                             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                               <span style={{ width: 8, height: 8, borderRadius: "50%", background: statusColor, display: "inline-block" }}></span>
-                              <span style={{ fontSize: 13, fontWeight: 800, color: "#0f0a29" }}>{status}</span>
+                              <span style={{ fontSize: 13, fontWeight: 800, color: "#0F172A" }}>{status}</span>
                             </div>
                             <span style={{ fontSize: 11, fontWeight: 700, color: statusColor, background: `${statusColor}15`, padding: "3px 10px", borderRadius: 20 }}>{list.length}</span>
                           </div>
                           {list.map((inv, idx) => (
-                            <div key={idx} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderTop: idx > 0 ? "1px solid #f1f5f9" : "none" }}>
-                              <span style={{ fontSize: 12, color: "#475569" }}>{inv.client}</span>
-                              <span style={{ fontSize: 12, fontWeight: 700, color: "#0f0a29" }}>{inv.total}</span>
+                            <div key={idx} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderTop: idx > 0 ? "1px solid #EFF6FF" : "none" }}>
+                              <span style={{ fontSize: 12, color: "#64748B" }}>{inv.client}</span>
+                              <span style={{ fontSize: 12, fontWeight: 700, color: "#0F172A" }}>{inv.total}</span>
                             </div>
                           ))}
                         </div>
@@ -2636,7 +2636,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     })}
                     <button
                       onClick={() => setMobileShowInvoices(false)}
-                      style={{ marginTop: 4, background: "none", border: "none", color: "#0f766e", fontSize: 12.5, fontWeight: 800, cursor: "pointer", padding: "8px" }}
+                      style={{ marginTop: 4, background: "none", border: "none", color: "#16A34A", fontSize: 12.5, fontWeight: 800, cursor: "pointer", padding: "8px" }}
                     >
                       ← Back to Projects
                     </button>
@@ -2648,18 +2648,18 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               {/* ── Mobile Add Task Modal ──────────────────────────────── */}
               {showMobileAddTask && (
                 <div style={{ position: "fixed", inset: 0, zIndex: 99999, background: "rgba(0,0,0,0.55)", display: "flex", alignItems: "center", justifyContent: "center", padding: "0 12px" }}>
-                  <div style={{ background: "#fff", borderRadius: 20, width: "100%", maxWidth: 460, padding: 24, boxShadow: "0 20px 60px rgba(0,0,0,0.25)", boxSizing: "border-box", maxHeight: "92vh", overflowY: "auto" }}>
-                    <h3 style={{ margin: "0 0 18px", fontSize: 18, fontWeight: 800, color: "#0f172a" }}>Add New Task</h3>
+                  <div style={{ background: "#FFFFFF", borderRadius: 20, width: "100%", maxWidth: 460, padding: 24, boxShadow: "0 20px 60px rgba(0,0,0,0.25)", boxSizing: "border-box", maxHeight: "92vh", overflowY: "auto" }}>
+                    <h3 style={{ margin: "0 0 18px", fontSize: 18, fontWeight: 800, color: "#0F172A" }}>Add New Task</h3>
                     <form onSubmit={handleMobileAddTask}>
 
                       {/* Project selector — extra field for Dashboard context */}
                       <div style={{ marginBottom: 12 }}>
-                        <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", marginBottom: 4 }}>Project *</label>
+                        <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748B", marginBottom: 4 }}>Project *</label>
                         <select
                           required
                           value={mobileTaskProject}
                           onChange={e => { setMobileTaskProject(e.target.value); setMobileTaskMilestone(""); }}
-                          style={{ width: "100%", padding: "10px", borderRadius: 8, border: "1.5px solid #e2e8f0", outline: "none", boxSizing: "border-box", fontSize: 13, color: "#0f172a", background: "#fff" }}
+                          style={{ width: "100%", padding: "10px", borderRadius: 8, border: "1.5px solid #E2E8F0", outline: "none", boxSizing: "border-box", fontSize: 13, color: "#0F172A", background: "#FFFFFF" }}
                         >
                           <option value="">-- Select Project --</option>
                           {projects.map((p, i) => <option key={p._id || i} value={p._id}>{p.name}</option>)}
@@ -2668,49 +2668,49 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                       {/* Task Name */}
                       <div style={{ marginBottom: 12 }}>
-                        <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", marginBottom: 4 }}>Task Name *</label>
+                        <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748B", marginBottom: 4 }}>Task Name *</label>
                         <input
                           type="text"
                           value={mobileTaskTitle}
                           onChange={e => setMobileTaskTitle(e.target.value)}
                           placeholder="Enter task title"
                           required
-                          style={{ width: "100%", padding: "10px", borderRadius: 8, border: "1.5px solid #e2e8f0", outline: "none", boxSizing: "border-box", fontSize: 13 }}
+                          style={{ width: "100%", padding: "10px", borderRadius: 8, border: "1.5px solid #E2E8F0", outline: "none", boxSizing: "border-box", fontSize: 13 }}
                         />
                       </div>
 
                       {/* Description */}
                       <div style={{ marginBottom: 12 }}>
-                        <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", marginBottom: 4 }}>Description</label>
+                        <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748B", marginBottom: 4 }}>Description</label>
                         <textarea
                           value={mobileTaskDesc}
                           onChange={e => setMobileTaskDesc(e.target.value)}
                           placeholder="Enter details..."
-                          style={{ width: "100%", padding: "10px", borderRadius: 8, border: "1.5px solid #e2e8f0", outline: "none", resize: "vertical", minHeight: 64, boxSizing: "border-box", fontSize: 13 }}
+                          style={{ width: "100%", padding: "10px", borderRadius: 8, border: "1.5px solid #E2E8F0", outline: "none", resize: "vertical", minHeight: 64, boxSizing: "border-box", fontSize: 13 }}
                         />
                       </div>
 
                       {/* Priority + Due Date */}
                       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
                         <div>
-                          <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", marginBottom: 4 }}>Priority</label>
-                          <select value={mobileTaskPriority} onChange={e => setMobileTaskPriority(e.target.value)} style={{ width: "100%", padding: "10px", borderRadius: 8, border: "1.5px solid #e2e8f0", outline: "none", boxSizing: "border-box", fontSize: 13 }}>
+                          <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748B", marginBottom: 4 }}>Priority</label>
+                          <select value={mobileTaskPriority} onChange={e => setMobileTaskPriority(e.target.value)} style={{ width: "100%", padding: "10px", borderRadius: 8, border: "1.5px solid #E2E8F0", outline: "none", boxSizing: "border-box", fontSize: 13 }}>
                             <option value="low">Low</option>
                             <option value="medium">Medium</option>
                             <option value="high">High</option>
                           </select>
                         </div>
                         <div>
-                          <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", marginBottom: 4 }}>Due Date</label>
-                          <input type="date" value={mobileTaskDue} onChange={e => setMobileTaskDue(e.target.value)} style={{ width: "100%", padding: "9px", borderRadius: 8, border: "1.5px solid #e2e8f0", outline: "none", boxSizing: "border-box", background: "#fff", fontFamily: "inherit", fontSize: 13, cursor: "pointer" }} />
+                          <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748B", marginBottom: 4 }}>Due Date</label>
+                          <input type="date" value={mobileTaskDue} onChange={e => setMobileTaskDue(e.target.value)} style={{ width: "100%", padding: "9px", borderRadius: 8, border: "1.5px solid #E2E8F0", outline: "none", boxSizing: "border-box", background: "#FFFFFF", fontFamily: "inherit", fontSize: 13, cursor: "pointer" }} />
                         </div>
                       </div>
 
                       {/* Status + Milestone */}
                       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
                         <div>
-                          <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", marginBottom: 4 }}>Status</label>
-                          <select value={mobileTaskStatus} onChange={e => setMobileTaskStatus(e.target.value)} style={{ width: "100%", padding: "10px", borderRadius: 8, border: "1.5px solid #e2e8f0", outline: "none", boxSizing: "border-box", fontSize: 13 }}>
+                          <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748B", marginBottom: 4 }}>Status</label>
+                          <select value={mobileTaskStatus} onChange={e => setMobileTaskStatus(e.target.value)} style={{ width: "100%", padding: "10px", borderRadius: 8, border: "1.5px solid #E2E8F0", outline: "none", boxSizing: "border-box", fontSize: 13 }}>
                             <option value="Not Started">Not Started</option>
                             <option value="In Progress">In Progress</option>
                             <option value="Completed">Completed</option>
@@ -2718,12 +2718,12 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                           </select>
                         </div>
                         <div>
-                          <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", marginBottom: 4 }}>Link to Milestone *</label>
+                          <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748B", marginBottom: 4 }}>Link to Milestone *</label>
                           <select
                             required
                             value={mobileTaskMilestone}
                             onChange={e => setMobileTaskMilestone(e.target.value)}
-                            style={{ width: "100%", padding: "10px", borderRadius: 8, border: "1.5px solid #e2e8f0", outline: "none", boxSizing: "border-box", fontSize: 13 }}
+                            style={{ width: "100%", padding: "10px", borderRadius: 8, border: "1.5px solid #E2E8F0", outline: "none", boxSizing: "border-box", fontSize: 13 }}
                           >
                             <option value="">-- Select Milestone --</option>
                             {(() => {
@@ -2736,8 +2736,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                       {/* Team Members */}
                       <div style={{ marginBottom: 16 }}>
-                        <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", marginBottom: 4 }}>Select Team Members</label>
-                        <div style={{ width: "100%", maxHeight: 150, overflowY: "auto", padding: "8px", borderRadius: 8, border: "1.5px solid #e2e8f0", boxSizing: "border-box", background: "#fff" }}>
+                        <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748B", marginBottom: 4 }}>Select Team Members</label>
+                        <div style={{ width: "100%", maxHeight: 150, overflowY: "auto", padding: "8px", borderRadius: 8, border: "1.5px solid #E2E8F0", boxSizing: "border-box", background: "#FFFFFF" }}>
                           {(() => {
                             const selProj = projects.find(p => p._id === mobileTaskProject || p.name === mobileTaskProject);
                             const assigned = selProj?.assignedTo || selProj?.team || [];
@@ -2745,13 +2745,13 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                               const n = emp.name || emp.employeeName || "";
                               return assigned.length === 0 || assigned.includes(n);
                             });
-                            if (filtered.length === 0) return <div style={{ fontSize: 12, color: "#94a3b8", padding: "4px" }}>No employees assigned to this project.</div>;
+                            if (filtered.length === 0) return <div style={{ fontSize: 12, color: "#64748B", padding: "4px" }}>No employees assigned to this project.</div>;
                             return filtered.map(emp => {
                               const name = emp.name || emp.employeeName || "";
                               if (!name) return null;
                               const checked = mobileTaskAssignTo.includes(name);
                               return (
-                                <label key={emp._id} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 4px", fontSize: 13, color: "#0f172a", cursor: "pointer" }}>
+                                <label key={emp._id} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 4px", fontSize: 13, color: "#0F172A", cursor: "pointer" }}>
                                   <input
                                     type="checkbox"
                                     checked={checked}
@@ -2768,7 +2768,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                       {/* Error message */}
                       {mobileTaskError && (
-                        <div style={{ fontSize: 12, color: "#ef4444", marginBottom: 12, padding: "8px 12px", background: "#fef2f2", borderRadius: 8, border: "1px solid #fecaca" }}>
+                        <div style={{ fontSize: 12, color: "#64748B", marginBottom: 12, padding: "8px 12px", background: "#F8FAFC", borderRadius: 8, border: "1px solid #E2E8F0" }}>
                           {mobileTaskError}
                         </div>
                       )}
@@ -2778,14 +2778,14 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                         <button
                           type="button"
                           onClick={() => setShowMobileAddTask(false)}
-                          style={{ padding: "10px 20px", borderRadius: 10, border: "1.5px solid #e2e8f0", background: "#fff", color: "#64748b", fontWeight: 700, fontSize: 13, cursor: "pointer" }}
+                          style={{ padding: "10px 20px", borderRadius: 10, border: "1.5px solid #E2E8F0", background: "#FFFFFF", color: "#64748B", fontWeight: 700, fontSize: 13, cursor: "pointer" }}
                         >
                           Cancel
                         </button>
                         <button
                           type="submit"
                           disabled={mobileTaskAdding}
-                          style={{ padding: "10px 24px", borderRadius: 10, border: "none", background: "linear-gradient(135deg,#0f766e,#14b8a6)", color: "#fff", fontWeight: 800, fontSize: 13, cursor: mobileTaskAdding ? "not-allowed" : "pointer", opacity: mobileTaskAdding ? 0.7 : 1 }}
+                          style={{ padding: "10px 24px", borderRadius: 10, border: "none", background: "linear-gradient(135deg,#16A34A,#16A34A)", color: "#FFFFFF", fontWeight: 800, fontSize: 13, cursor: mobileTaskAdding ? "not-allowed" : "pointer", opacity: mobileTaskAdding ? 0.7 : 1 }}
                         >
                           {mobileTaskAdding ? "Adding..." : "Add Task"}
                         </button>
@@ -2797,8 +2797,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             </div>
             <div className="desktop-dashboard-view">
               <div className="dash-stats" style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 12, marginBottom: 18 }}>
-                {[{ t: "Total Clients", v: clients.length, i: "Team", c: "var(--app-accent)" }, { t: "Employees", v: employees.length, i: "‍Job", c: "var(--app-accent)" }, { t: "Managers", v: managers.length, i: "‍Job", c: "#f59e0b" }, { t: "Projects", v: projects.length, i: "Folder", c: "var(--app-muted)" }, { t: "Invoices", v: INVOICES.length, i: "", c: "#22C55E" }].map(({ t, v, i, c }) => (
-                  <div key={t} style={{ background: "#fff", borderRadius: 14, padding: "16px 14px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", position: "relative", overflow: "hidden" }}>
+                {[{ t: "Total Clients", v: clients.length, i: "Team", c: "var(--app-accent)" }, { t: "Employees", v: employees.length, i: "‍Job", c: "var(--app-accent)" }, { t: "Managers", v: managers.length, i: "‍Job", c: "#64748B" }, { t: "Projects", v: projects.length, i: "Folder", c: "var(--app-muted)" }, { t: "Invoices", v: INVOICES.length, i: "", c: "#16A34A" }].map(({ t, v, i, c }) => (
+                  <div key={t} style={{ background: "#FFFFFF", borderRadius: 14, padding: "16px 14px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", position: "relative", overflow: "hidden" }}>
                     <div style={{ position: "absolute", top: -12, right: -12, width: 60, height: 60, borderRadius: "50%", background: `radial-gradient(circle,${c}22,transparent)` }} />
                     <div style={{ width: 38, height: 38, borderRadius: 10, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, marginBottom: 8 }}>{i}</div>
                     <div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 2 }}>{t.toUpperCase()}</div>
@@ -2823,7 +2823,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                             <tr key={i} style={{ borderBottom: "1px solid var(--app-bg)", cursor: "pointer" }} onClick={() => { if (typeof setSelectedProjectForTasks === "function") setSelectedProjectForTasks(p); setActive("tasks"); }}>
                               <td style={{ padding: "9px 10px", fontWeight: 600, color: T.text }}>
                                 <div style={{ fontSize: 13 }}>{p.name}</div>
-                                <div style={{ fontSize: 11, color: "#22C55E" }}>{p.currency || "₹"} {p.budget || "0"}</div>
+                                <div style={{ fontSize: 11, color: "#16A34A" }}>{p.currency || "₹"} {p.budget || "0"}</div>
                                 <div style={{ marginTop: 4, fontSize: 10, fontWeight: 700, color: "var(--app-accent)", display: "flex", alignItems: "center", gap: 4 }}>
                                   Document {pTasks.length > 0 ? `${doneTasks}/${pTasks.length} Tasks` : "No Tasks"}
                                 </div>
@@ -2835,10 +2835,10 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                                   const text = `Folder *Project Details*\n\nProject: ${p.name}\nCompany: ${p.client}\nStatus: ${p.status}\nDeadline: ${p.end ? new Date(p.end).toLocaleDateString() : "—"}\nBudget: ${p.currency || "₹"} ${p.budget || "0"}`;
                                   const wpUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
                                   window.open(wpUrl, "_blank");
-                                }} style={{ background: "#25D366", color: "#fff", border: "none", borderRadius: 6, padding: "4px 8px", fontSize: 10, fontWeight: 700, cursor: "pointer" }}>Share</button>
+                                }} style={{ background: "#16A34A", color: "#FFFFFF", border: "none", borderRadius: 6, padding: "4px 8px", fontSize: 10, fontWeight: 700, cursor: "pointer" }}>Share</button>
                               </td>
                               <td style={{ padding: "9px 10px" }}>
-                                <button onClick={() => { setViewProject(null); setTimeout(() => setViewProject(p), 0); }} style={{ background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", border: "none", borderRadius: 6, padding: "5px 12px", fontSize: 11, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>View</button>
+                                <button onClick={() => { setViewProject(null); setTimeout(() => setViewProject(p), 0); }} style={{ background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", border: "none", borderRadius: 6, padding: "5px 12px", fontSize: 11, fontWeight: 700, color: "#FFFFFF", cursor: "pointer", fontFamily: "inherit" }}>View</button>
                               </td>
                             </tr>
                           );
@@ -2847,10 +2847,10 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     </table>
                   </div>
                 </SC>
-                <SC title="Recent Activity">{[{ icon: "Profile", text: "New client added", time: "2m ago", c: "var(--app-accent)" }, { icon: "‍Job", text: "Employee joined", time: "30m ago", c: "var(--app-accent)" }, { icon: "", text: "Invoice created", time: "1h ago", c: "#22C55E" }, { icon: "Folder", text: "Project updated", time: "3h ago", c: "var(--app-muted)" }, { icon: "Success", text: "ERP completed", time: "2d ago", c: "#F59E0B" }].map((a, i) => (<div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "7px 0", borderBottom: i < 4 ? "1px solid var(--app-bg)" : "none" }}><div style={{ width: 28, height: 28, borderRadius: 8, background: `${a.c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0 }}>{a.icon}</div><div style={{ flex: 1, minWidth: 0 }}><div style={{ fontSize: 12, fontWeight: 600, color: T.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{a.text}</div><div style={{ fontSize: 11, color: "var(--app-muted)" }}>{a.time}</div></div></div>))}</SC>
+                <SC title="Recent Activity">{[{ icon: "Profile", text: "New client added", time: "2m ago", c: "var(--app-accent)" }, { icon: "‍Job", text: "Employee joined", time: "30m ago", c: "var(--app-accent)" }, { icon: "", text: "Invoice created", time: "1h ago", c: "#16A34A" }, { icon: "Folder", text: "Project updated", time: "3h ago", c: "var(--app-muted)" }, { icon: "Success", text: "ERP completed", time: "2d ago", c: "#64748B" }].map((a, i) => (<div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "7px 0", borderBottom: i < 4 ? "1px solid var(--app-bg)" : "none" }}><div style={{ width: 28, height: 28, borderRadius: 8, background: `${a.c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0 }}>{a.icon}</div><div style={{ flex: 1, minWidth: 0 }}><div style={{ fontSize: 12, fontWeight: 600, color: T.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{a.text}</div><div style={{ fontSize: 11, color: "var(--app-muted)" }}>{a.time}</div></div></div>))}</SC>
               </div>
               <div className="dash-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-                <SC title="Project Progress">{TRACKING_SEED.map(t => (<div key={t.id} style={{ marginBottom: 12 }}><div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}><span style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{t.name}</span><span style={{ fontSize: 12, fontWeight: 700, color: sc(t.status) }}>{t.pct}%</span></div><div style={{ background: "var(--app-border)", borderRadius: 6, height: 6 }}><div style={{ width: `${t.pct}%`, background: t.pct === 100 ? "linear-gradient(90deg,#22C55E,#4ade80)" : "linear-gradient(90deg,var(--app-accent),var(--app-muted))", borderRadius: 6, height: "100%" }} /></div><div style={{ fontSize: 11, color: "var(--app-muted)", marginTop: 2 }}>{t.client}</div></div>))}</SC>
+                <SC title="Project Progress">{TRACKING_SEED.map(t => (<div key={t.id} style={{ marginBottom: 12 }}><div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}><span style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{t.name}</span><span style={{ fontSize: 12, fontWeight: 700, color: sc(t.status) }}>{t.pct}%</span></div><div style={{ background: "var(--app-border)", borderRadius: 6, height: 6 }}><div style={{ width: `${t.pct}%`, background: t.pct === 100 ? "linear-gradient(90deg,#16A34A,#16A34A)" : "linear-gradient(90deg,var(--app-accent),var(--app-muted))", borderRadius: 6, height: "100%" }} /></div><div style={{ fontSize: 11, color: "var(--app-muted)", marginTop: 2 }}>{t.client}</div></div>))}</SC>
                 <SC title="Invoice Status">{INVOICES.map(inv => (<div key={inv.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: "1px solid var(--app-bg)" }}><div><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{inv.id} · {inv.client}</div><div style={{ fontSize: 11, color: "var(--app-muted)" }}>Due: {inv.due}</div></div><div style={{ textAlign: "right" }}><div style={{ fontSize: 13, fontWeight: 700, color: T.text, marginBottom: 3 }}>{inv.total}</div><Badge label={inv.status} /></div></div>))}</SC>
               </div>
             </div>
@@ -2916,7 +2916,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           }} user={user} themeColor={getComputedStyle(document.documentElement).getPropertyValue('--app-accent').trim() || accentColor} />}
         </div>
         {/* GLOBAL MOBILE BOTTOM NAV — visible on every page, not just dashboard */}
-        <div className="app-bottom-nav" style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "rgba(15,10,41,0.94)", backdropFilter: "blur(16px)", borderRadius: "20px 20px 0 0", display: "none", justifyContent: "space-around", alignItems: "center", padding: "10px 6px calc(10px + env(safe-area-inset-bottom, 0px))", zIndex: 99999, boxShadow: "0 -4px 24px rgba(15,10,41,0.35)" }}>
+        <div className="app-bottom-nav" style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "rgba(15, 23, 42, 0.94)", backdropFilter: "blur(16px)", borderRadius: "20px 20px 0 0", display: "none", justifyContent: "space-around", alignItems: "center", padding: "10px 6px calc(10px + env(safe-area-inset-bottom, 0px))", zIndex: 99999, boxShadow: "0 -4px 24px rgba(15, 23, 42, 0.35)" }}>
           {[
             { icon: "ti-home", label: "Home", key: "dashboard" },
             { icon: "ti-folder", label: "Projects", key: "projects" },
@@ -2924,7 +2924,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             { icon: "ti-users", label: "Clients", key: "clients" },
             { icon: "ti-dots", label: "More", key: "settings" },
           ].map((n, i) => n.key === "add" ? (
-            <div key={i} className="md-tap" onClick={() => setActive("projects")} style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),#2563EB)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 24, marginTop: -30, boxShadow: "0 10px 24px rgba(37, 99, 235,0.5)", border: "3px solid #08061a", cursor: "pointer" }}>+</div>
+            <div key={i} className="md-tap" onClick={() => setActive("projects")} style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),#2563EB)", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 24, marginTop: -30, boxShadow: "0 10px 24px rgba(37, 99, 235, 0.5)", border: "3px solid #0F172A", cursor: "pointer" }}>+</div>
           ) : (
             <div key={i} className="md-tap" onClick={() => setActive(n.key)} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, color: active === n.key ? "var(--app-accent)" : "rgba(255,255,255,0.5)", padding: "4px 10px", cursor: "pointer" }}>
               <i className={`ti ${n.icon}`} style={{ fontSize: 19 }}></i>
@@ -2940,20 +2940,20 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       {modal === "client" && <Mdl title={clientSuccessData ? "Success Client Added Successfully" : "Add New Client"} onClose={() => { setModal(null); setClientSuccessData(null); }}>
         {clientSuccessData ? (
           <div style={{ textAlign: "center", padding: "20px 10px" }}>
-            <div style={{ width: 64, height: 64, background: "#dcfce7", color: "#16a34a", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 32, margin: "0 auto 18px" }}>Yes</div>
+            <div style={{ width: 64, height: 64, background: "#E2E8F0", color: "#16A34A", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 32, margin: "0 auto 18px" }}>Yes</div>
             <h3 style={{ fontSize: 18, color: T.text, marginBottom: 12 }}>New Client Registered!</h3>
-            <p style={{ fontSize: 13, color: "#6b7280", marginBottom: 24, lineHeight: 1.5 }}>
+            <p style={{ fontSize: 13, color: "#64748B", marginBottom: 24, lineHeight: 1.5 }}>
               The client account for <strong>{clientSuccessData.name}</strong> has been created.
               Please share these credentials with the client.
             </p>
 
-            <div style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 12, padding: 16, marginBottom: 24, textAlign: "left" }}>
+            <div style={{ background: "#F8FAFC", border: "1px solid #E2E8F0", borderRadius: 12, padding: 16, marginBottom: 24, textAlign: "left" }}>
               <div style={{ marginBottom: 12 }}>
-                <div style={{ fontSize: 10, color: "#94a3b8", fontWeight: 700, textTransform: "uppercase", marginBottom: 4 }}>EMAIL / USERNAME</div>
+                <div style={{ fontSize: 10, color: "#64748B", fontWeight: 700, textTransform: "uppercase", marginBottom: 4 }}>EMAIL / USERNAME</div>
                 <div style={{ fontSize: 14, fontWeight: 600, color: T.text }}>{clientSuccessData.email}</div>
               </div>
               <div>
-                <div style={{ fontSize: 10, color: "#94a3b8", fontWeight: 700, textTransform: "uppercase", marginBottom: 4 }}>PASSWORD</div>
+                <div style={{ fontSize: 10, color: "#64748B", fontWeight: 700, textTransform: "uppercase", marginBottom: 4 }}>PASSWORD</div>
                 <div style={{ fontSize: 14, fontWeight: 600, color: "var(--app-accent)", fontFamily: "monospace" }}>{clientSuccessData.password}</div>
               </div>
             </div>
@@ -2965,7 +2965,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   navigator.clipboard.writeText(text);
                   toast.success("Document Credentials copied to clipboard!");
                 }}
-                style={{ width: "100%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", color: "#fff", border: "none", borderRadius: 10, padding: "12px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}
+                style={{ width: "100%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", color: "#FFFFFF", border: "none", borderRadius: 10, padding: "12px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}
               >
                 Document Copy Credentials
               </button>
@@ -2976,14 +2976,14 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   const wpUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
                   window.open(wpUrl, "_blank");
                 }}
-                style={{ width: "100%", background: "#25D366", color: "#fff", border: "none", borderRadius: 10, padding: "12px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}
+                style={{ width: "100%", background: "#16A34A", color: "#FFFFFF", border: "none", borderRadius: 10, padding: "12px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}
               >
                 <span style={{ fontSize: 18 }}>Comment</span> Share on WhatsApp
               </button>
 
               <button
                 onClick={() => { setModal(null); setClientSuccessData(null); }}
-                style={{ width: "100%", background: "#fff", border: "1.5px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "12px", fontWeight: 700, cursor: "pointer" }}
+                style={{ width: "100%", background: "#FFFFFF", border: "1.5px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "12px", fontWeight: 700, cursor: "pointer" }}
               >
                 ✕
               </button>
@@ -2992,40 +2992,40 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         ) : (
           <>
             {/* ── LOGO ── */}
-            <div style={{ marginBottom: 18, padding: '16px', background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA' }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 10 }}>Client Logo</div>
+            <div style={{ marginBottom: 18, padding: '16px', background: '#F8FAFC', borderRadius: 12, border: '1px solid #E2E8F0' }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 10 }}>Client Logo</div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                 <div style={{ position: 'relative', width: 72, height: 72 }}>
-                  <div style={{ width: 72, height: 72, borderRadius: 14, background: '#fff', border: '2px dashed #E0E6EA', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                  <div style={{ width: 72, height: 72, borderRadius: 14, background: '#FFFFFF', border: '2px dashed #E2E8F0', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
                     {nc.logoUrl ? <img src={nc.logoUrl} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} /> : <span style={{ fontSize: 30 }}>Company</span>}
                   </div>
-                  <label style={{ position: 'absolute', bottom: 0, right: 0, background: accentColor, width: 24, height: 24, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: '2px solid #fff' }}>
+                  <label style={{ position: 'absolute', bottom: 0, right: 0, background: accentColor, width: 24, height: 24, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: '2px solid #FFFFFF' }}>
                     <span style={{ fontSize: 12 }}></span>
                     <input type="file" accept="image/*" style={{ display: 'none' }} onChange={e => { const file = e.target.files[0]; if (file) { const r = new FileReader(); r.onloadend = () => setNc(p => ({ ...p, logoUrl: r.result })); r.readAsDataURL(file); } }} />
                   </label>
                 </div>
-                <div style={{ fontSize: 12, color: '#94A3B0' }}>PNG, JPG · Max 2MB<br />Recommended 200✕200px</div>
+                <div style={{ fontSize: 12, color: '#64748B' }}>PNG, JPG · Max 2MB<br />Recommended 200✕200px</div>
               </div>
             </div>
 
             {/* ── CLIENT TYPE ── */}
             <div style={{ marginBottom: 16 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 8 }}>Client Type <span style={{ color: '#EF5350' }}>*</span></div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 8 }}>Client Type <span style={{ color: '#64748B' }}>*</span></div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
                 {[{ val: 'b2b', icon: '🏢', label: 'B2B', sub: 'Company / Business' }, { val: 'b2c', icon: '👤', label: 'B2C', sub: 'Individual person' }, { val: 'freelancer', icon: '💼', label: 'Freelancer', sub: 'Consultant / Solo' }].map(t => (
                   <div key={t.val} onClick={() => setNc(p => ({ ...p, clientType: t.val }))}
-                    style={{ border: `2px solid ${nc.clientType === t.val ? ' var(--app-accent, var(--app-accent, #2563EB))' : '#E0E6EA'}`, borderRadius: 10, padding: '12px 8px', textAlign: 'center', cursor: 'pointer', background: nc.clientType === t.val ? 'var(--teal-light, var(--teal-light, #EFF6FF))' : '#F4F6F8', transition: 'all .15s', position: 'relative' }}>
+                    style={{ border: `2px solid ${nc.clientType === t.val ? ' var(--app-accent, var(--app-accent, #2563EB))' : '#E2E8F0'}`, borderRadius: 10, padding: '12px 8px', textAlign: 'center', cursor: 'pointer', background: nc.clientType === t.val ? 'var(--teal-light, var(--teal-light, #EFF6FF))' : '#F8FAFC', transition: 'all .15s', position: 'relative' }}>
                     {nc.clientType === t.val && <span style={{ position: 'absolute', top: 6, right: 6, width: 14, height: 14, borderRadius: '50%', background: accentColor, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}></span>}
                     <div style={{ fontSize: 22, marginBottom: 4 }}>{t.icon}</div>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: nc.clientType === t.val ? '#007B8A' : '#1A2332' }}>{t.label}</div>
-                    <div style={{ fontSize: 10, color: '#94A3B0', marginTop: 2 }}>{t.sub}</div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: nc.clientType === t.val ? '#16A34A' : '#1E293B' }}>{t.label}</div>
+                    <div style={{ fontSize: 10, color: '#64748B', marginTop: 2 }}>{t.sub}</div>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* ── BASIC INFO ── */}
-            <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
+            <div style={{ background: '#F8FAFC', borderRadius: 12, border: '1px solid #E2E8F0', padding: '14px 16px', marginBottom: 14 }}>
               <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Company Basic Info</div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
                 <Fld label="Client / Display Name *" value={nc.name} onChange={v => { setNc({ ...nc, name: v }); setNcError(p => ({ ...p, name: '' })); }} error={ncError.name} />
@@ -3039,7 +3039,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             </div>
 
             {/* ── PRIMARY CONTACT ── */}
-            <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
+            <div style={{ background: '#F8FAFC', borderRadius: 12, border: '1px solid #E2E8F0', padding: '14px 16px', marginBottom: 14 }}>
               <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Document Primary Contact</div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
                 <Fld label="Contact Person Name" value={nc.contactPersonName} onChange={v => setNc({ ...nc, contactPersonName: v })} />
@@ -3052,7 +3052,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             </div>
 
             {/* ── ADDRESS ── */}
-            <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
+            <div style={{ background: '#F8FAFC', borderRadius: 12, border: '1px solid #E2E8F0', padding: '14px 16px', marginBottom: 14 }}>
               <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Location Address</div>
               <div style={{ marginBottom: 12 }}><Fld label="Street / Building Address" value={nc.address} onChange={v => setNc({ ...nc, address: v })} /></div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
@@ -3064,7 +3064,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             </div>
 
             {/* ── ONLINE PRESENCE ── */}
-            <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
+            <div style={{ background: '#F8FAFC', borderRadius: 12, border: '1px solid #E2E8F0', padding: '14px 16px', marginBottom: 14 }}>
               <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Web Online Presence</div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
                 <Fld label="Website URL" value={nc.website} onChange={v => setNc({ ...nc, website: v })} />
@@ -3073,7 +3073,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             </div>
 
             {/* ── BILLING & TERMS ── */}
-            <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
+            <div style={{ background: '#F8FAFC', borderRadius: 12, border: '1px solid #E2E8F0', padding: '14px 16px', marginBottom: 14 }}>
               <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}> Billing & Terms</div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
                 <Fld label="Billing Currency" value={nc.billingCurrency} onChange={v => { setNc({ ...nc, billingCurrency: v }); saveCustomCurrency(v); }} options={['INR — Indian Rupee', 'USD — US Dollar', 'GBP — British Pound', 'EUR — Euro', 'AED — UAE Dirham', 'SGD — Singapore Dollar', 'AUD — Australian Dollar', ...customCurrencies]} allowCustom={true} />
@@ -3084,22 +3084,22 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             </div>
 
             {/* ── PORTAL ACCESS ── */}
-            <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
+            <div style={{ background: '#F8FAFC', borderRadius: 12, border: '1px solid #E2E8F0', padding: '14px 16px', marginBottom: 14 }}>
               <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Secure Portal Access</div>
               <div style={{ position: 'relative', marginBottom: 4 }}>
                 <input type={showClientPass ? 'text' : 'password'} value={nc.password} onChange={e => setNc({ ...nc, password: e.target.value })}
-                  style={{ width: '100%', border: `1.5px solid ${ncError.password ? '#EF4444' : 'var(--app-border)'}`, borderRadius: 10, padding: '10px 46px 10px 14px', fontSize: 13, color: T.text, background: 'var(--app-bg)', boxSizing: 'border-box', outline: 'none' }}
+                  style={{ width: '100%', border: `1.5px solid ${ncError.password ? '#64748B' : 'var(--app-border)'}`, borderRadius: 10, padding: '10px 46px 10px 14px', fontSize: 13, color: T.text, background: 'var(--app-bg)', boxSizing: 'border-box', outline: 'none' }}
                   placeholder="Set client portal password *" />
                 <button type="button" onClick={() => setShowClientPass(!showClientPass)} style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--app-muted)', fontSize: 11, fontWeight: 700, fontFamily: 'inherit' }}>{showClientPass ? 'HIDE' : 'SHOW'}</button>
               </div>
-              {ncError.password && <div style={{ fontSize: 11, color: '#EF4444', marginTop: 4 }}>Warning {ncError.password}</div>}
+              {ncError.password && <div style={{ fontSize: 11, color: '#64748B', marginTop: 4 }}>Warning {ncError.password}</div>}
             </div>
 
             {/* ── INTERNAL NOTES ── */}
-            <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
+            <div style={{ background: '#F8FAFC', borderRadius: 12, border: '1px solid #E2E8F0', padding: '14px 16px', marginBottom: 14 }}>
               <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Edit Internal Notes</div>
               <textarea value={nc.notes} onChange={e => setNc({ ...nc, notes: e.target.value })}
-                style={{ width: '100%', border: '1.5px solid #E0E6EA', borderRadius: 10, padding: '10px 14px', fontSize: 13, color: T.text, background: '#fff', boxSizing: 'border-box', outline: 'none', minHeight: 70, resize: 'vertical', fontFamily: 'inherit' }}
+                style={{ width: '100%', border: '1.5px solid #E2E8F0', borderRadius: 10, padding: '10px 14px', fontSize: 13, color: T.text, background: '#FFFFFF', boxSizing: 'border-box', outline: 'none', minHeight: 70, resize: 'vertical', fontFamily: 'inherit' }}
                 placeholder="Any internal context,  instructions, or notes..." />
             </div>
 
@@ -3124,10 +3124,10 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         </div>
         <div style={{ marginBottom: 14, marginTop: 4 }} data-field="password">
           <div style={{ position: "relative" }}>
-            <input id="emp-fld-password" type={showEmpPass ? "text" : "password"} value={ne.password} onChange={e => { setNe({ ...ne, password: e.target.value }); setNeError(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${neError.password ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Set employee login password" />
+            <input id="emp-fld-password" type={showEmpPass ? "text" : "password"} value={ne.password} onChange={e => { setNe({ ...ne, password: e.target.value }); setNeError(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${neError.password ? "#64748B" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Set employee login password" />
             <button type="button" onClick={() => setShowEmpPass(!showEmpPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showEmpPass ? "HIDE" : "SHOW"}</button>
           </div>
-          {neError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {neError.password}</div>}
+          {neError.password && <div style={{ fontSize: 11, color: "#64748B", marginTop: 4 }}>Warning {neError.password}</div>}
         </div>
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
           <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
@@ -3143,9 +3143,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             <label style={{ display: "block", fontSize: 11, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>COMPANY NAME *</label>
             {prefillClientName ? (
               <div style={{ border: "1.5px solid var(--app-accent)", borderRadius: 10, padding: "10px 14px", fontSize: 13, background: "var(--app-bg)", display: "flex", alignItems: "center", gap: 8, minHeight: 42 }}>
-                <div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700 }}>{prefillClientName[0].toUpperCase()}</div>
+                <div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 10, fontWeight: 700 }}>{prefillClientName[0].toUpperCase()}</div>
                 <span style={{ fontWeight: 600, color: "var(--app-accent)" }}>{prefillClientName}</span>
-                <span style={{ marginLeft: "auto", fontSize: 10, background: "#eff6ff", color: "var(--app-accent)", borderRadius: 6, padding: "2px 8px", fontWeight: 700 }}>Auto-selected</span>
+                <span style={{ marginLeft: "auto", fontSize: 10, background: "#EFF6FF", color: "var(--app-accent)", borderRadius: 6, padding: "2px 8px", fontWeight: 700 }}>Auto-selected</span>
               </div>
             ) : (
               <ClientDropdown
@@ -3169,7 +3169,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 error={npError.client}
               />
             )}
-            {npError.client && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {npError.client}</div>}
+            {npError.client && <div style={{ fontSize: 11, color: "#64748B", marginTop: 4 }}>Warning {npError.client}</div>}
           </div>
           <Fld label="Purpose" value={np.purpose} onChange={v => setNp({ ...np, purpose: v })} />
           <Fld label="Company Name" value={np.companyName} onChange={v => setNp({ ...np, companyName: v })} />
@@ -3222,7 +3222,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   />
                   <label htmlFor={`emp-${e._id || e.email}`} style={{ flex: 1, cursor: "pointer", fontSize: 13, color: "var(--app-sidebar)", display: "flex", alignItems: "center", gap: 8 }}>
                     <span>{e.name}</span>
-                    {e.department && <span style={{ fontSize: 11, color: "#a78bba", background: "#eff6ff", padding: "2px 6px", borderRadius: 4 }}>{e.department}</span>}
+                    {e.department && <span style={{ fontSize: 11, color: "#64748B", background: "#EFF6FF", padding: "2px 6px", borderRadius: 4 }}>{e.department}</span>}
                   </label>
                 </div>
               ))}
@@ -3232,12 +3232,12 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               <label style={{ display: "block", fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 6 }}>SELECTED EMPLOYEES ({np.assignedTo.length})</label>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                 {np.assignedTo.map(name => (
-                  <div key={name} style={{ display: "flex", alignItems: "center", gap: 6, background: "#eff6ff", border: "1px solid #e2e8f0", borderRadius: 8, padding: "4px 10px" }}>
-                    <div style={{ width: 18, height: 18, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 8, fontWeight: 700 }}>{name ? name[0].toUpperCase() : "?"}</div>
+                  <div key={name} style={{ display: "flex", alignItems: "center", gap: 6, background: "#EFF6FF", border: "1px solid #E2E8F0", borderRadius: 8, padding: "4px 10px" }}>
+                    <div style={{ width: 18, height: 18, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 8, fontWeight: 700 }}>{name ? name[0].toUpperCase() : "?"}</div>
                     <span style={{ fontSize: 12, fontWeight: 600, color: "var(--app-accent)" }}>{name}</span>
                     <button
                       onClick={(e) => { e.stopPropagation(); setNp(prev => ({ ...prev, assignedTo: prev.assignedTo.filter(n => n !== name) })); }}
-                      style={{ background: "none", border: "none", cursor: "pointer", color: "#ef4444", fontSize: 14, padding: "0 2px", fontWeight: 700 }}
+                      style={{ background: "none", border: "none", cursor: "pointer", color: "#64748B", fontSize: 14, padding: "0 2px", fontWeight: 700 }}
                     >
                       ✕
                     </button>
@@ -3268,20 +3268,20 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         <div style={{ marginBottom: 14 }}>
           <label style={{ display: "block", fontSize: 11, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>PASSWORD *</label>
           <div style={{ position: "relative" }}>
-            <input type={showMgrPass ? "text" : "password"} value={nm.password} onChange={e => { setNm({ ...nm, password: e.target.value }); setNmError(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${nmError.password ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Set manager password" />
+            <input type={showMgrPass ? "text" : "password"} value={nm.password} onChange={e => { setNm({ ...nm, password: e.target.value }); setNmError(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${nmError.password ? "#64748B" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Set manager password" />
             <button type="button" onClick={() => setShowMgrPass(!showMgrPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showMgrPass ? "HIDE" : "SHOW"}</button>
           </div>
-          {nmError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {nmError.password}</div>}
+          {nmError.password && <div style={{ fontSize: 11, color: "#64748B", marginTop: 4 }}>Warning {nmError.password}</div>}
         </div>
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
           <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-          <button onClick={addManager} disabled={mgrSaveLoading} style={{ ...B("#f59e0b"), opacity: mgrSaveLoading ? 0.7 : 1 }}>{mgrSaveLoading ? "Saving..." : "Save Manager "}</button>
+          <button onClick={addManager} disabled={mgrSaveLoading} style={{ ...B("#64748B"), opacity: mgrSaveLoading ? 0.7 : 1 }}>{mgrSaveLoading ? "Saving..." : "Save Manager "}</button>
         </div>
       </Mdl>}
 
       {viewProject && (
-        <div style={{ position: "fixed", inset: 0, background: "#f8fafc", zIndex: 2000, overflowY: "auto", padding: 20 }}>
-          <button onClick={() => setViewProject(null)} style={{ marginBottom: 12, background: "#fff", border: "1px solid var(--app-border)", borderRadius: 10, padding: "8px 16px", cursor: "pointer", fontWeight: 700 }}>← Back</button>
+        <div style={{ position: "fixed", inset: 0, background: "#F8FAFC", zIndex: 2000, overflowY: "auto", padding: 20 }}>
+          <button onClick={() => setViewProject(null)} style={{ marginBottom: 12, background: "#FFFFFF", border: "1px solid var(--app-border)", borderRadius: 10, padding: "8px 16px", cursor: "pointer", fontWeight: 700 }}>← Back</button>
           <ModernProjectDetails
             key={viewProject?._id}
             project={viewProject}
@@ -3314,8 +3314,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               return assignedEmployees.length > 0
                 ? <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                   {assignedEmployees.map((emp, idx) => (
-                    <div key={idx} style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", background: "#f8fafc", borderRadius: 8, border: "1px solid #e2e8f0" }}>
-                      <div style={{ width: 24, height: 24, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{emp[0].toUpperCase()}</div>
+                    <div key={idx} style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", background: "#F8FAFC", borderRadius: 8, border: "1px solid #E2E8F0" }}>
+                      <div style={{ width: 24, height: 24, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{emp[0].toUpperCase()}</div>
                       <span style={{ color: "var(--app-sidebar)", fontWeight: 600, fontSize: 12 }}>{emp}</span>
                     </div>
                   ))}
@@ -3329,7 +3329,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           <InfoRow icon="Team" label="Team" value={viewProject.team} />
           <InfoRow icon="Edit" label="Description" value={viewProject.description} />
           <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
-            <button onClick={() => setViewProject(null)} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Close</button>
+            <button onClick={() => setViewProject(null)} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#FFFFFF", cursor: "pointer", fontFamily: "inherit" }}>Close</button>
           </div>
         </Mdl>
       )}

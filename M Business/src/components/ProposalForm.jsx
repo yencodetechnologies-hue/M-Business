@@ -22,7 +22,7 @@ function ProposalFormInner({ onBack, onSave, initialData, clients, onAddClient, 
           selEl.value = newlyAddedClientName;
           selEl.style.transition = 'box-shadow .3s, border-color .3s';
           selEl.style.borderColor = '#2563EB';
-          selEl.style.boxShadow = '0 0 0 3px rgba(37, 99, 235,.25)';
+          selEl.style.boxShadow = '0 0 0 3px rgba(37, 99, 235, .25)';
           setTimeout(() => { selEl.style.boxShadow = 'none'; }, 2000);
         }
       }
@@ -62,7 +62,7 @@ function ProposalFormInner({ onBack, onSave, initialData, clients, onAddClient, 
         const box = document.getElementById('ourSigBox');
         const name = document.getElementById('pv-from')?.innerText || 'Signed';
         if (box) {
-          box.innerHTML = type === 'image' ? `<img src="${value}" style="max-height:50px;max-width:100%;object-fit:contain;"/><div style="font-size:10px;color:var(--teal);font-weight:700;margin-top:2px;">${name} — Signed</div>` : `<span style="font-family:'Dancing Script',cursive;font-size:22px;color:#1e293b;font-weight:bold;">${value}</span><div style="font-size:10px;color:var(--teal);font-weight:700;margin-top:2px;">${name} — Signed</div>`;
+          box.innerHTML = type === 'image' ? `<img src="${value}" style="max-height:50px;max-width:100%;object-fit:contain;"/><div style="font-size:10px;color:var(--teal);font-weight:700;margin-top:2px;">${name} — Signed</div>` : `<span style="font-family:'Dancing Script',cursive;font-size:22px;color:#1E293B;font-weight:bold;">${value}</span><div style="font-size:10px;color:var(--teal);font-weight:700;margin-top:2px;">${name} — Signed</div>`;
           box.style.borderColor = 'var(--teal)'; box.style.background = 'var(--teal-lighter)';
         }
         const pvSig = document.getElementById('pv-sig1');
@@ -74,7 +74,7 @@ function ProposalFormInner({ onBack, onSave, initialData, clients, onAddClient, 
         const rect = cv.getBoundingClientRect();
         cv.width = rect.width || 420; cv.height = 160;
         const ctx = cv.getContext('2d');
-        ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 3.5; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+        ctx.strokeStyle = '#1E293B'; ctx.lineWidth = 3.5; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
         let drawing = false, pts = [];
         function pos(e) { const r = cv.getBoundingClientRect(), cx = e.touches ? e.touches[0].clientX : e.clientX, cy = e.touches ? e.touches[0].clientY : e.clientY; return { x: (cx - r.left) * (cv.width / r.width), y: (cy - r.top) * (cv.height / r.height) }; }
         cv.onmousedown = (e) => { pts = [pos(e)]; drawing = true; };
@@ -114,7 +114,7 @@ function ProposalFormInner({ onBack, onSave, initialData, clients, onAddClient, 
         sel.value = newlyAddedClientName;
         sel.style.transition = 'box-shadow .3s, border-color .3s';
         sel.style.borderColor = '#2563EB';
-        sel.style.boxShadow = '0 0 0 3px rgba(37, 99, 235,.25)';
+        sel.style.boxShadow = '0 0 0 3px rgba(37, 99, 235, .25)';
         setTimeout(() => {
           sel.style.boxShadow = 'none';
         }, 2000);
@@ -214,11 +214,11 @@ function ProposalFormInner({ onBack, onSave, initialData, clients, onAddClient, 
           liveZone.style.backgroundPosition = 'center';
           liveZone.style.borderColor = 'var(--teal)';
           liveZone.style.borderStyle = 'solid';
-          liveZone.innerHTML = `<div style="background:rgba(0,0,0,0.55);color:#fff;font-weight:700;font-size:12px;padding:6px 12px;border-radius:8px">Cover image uploaded — Click to change</div>`;
+          liveZone.innerHTML = `<div style="background:rgba(0,0,0,0.55);color:#FFFFFF;font-weight:700;font-size:12px;padding:6px 12px;border-radius:8px">Cover image uploaded — Click to change</div>`;
           liveZone.dataset.coverImage = dataUrl;
           const pCover = document.querySelector('.p-cover');
           if (pCover) {
-            pCover.style.backgroundImage = `linear-gradient(135deg, rgba(0,62,78,.75), rgba(0,150,180,.7)), url(${dataUrl})`;
+            pCover.style.backgroundImage = `linear-gradient(135deg, rgba(30, 41, 59, .75), rgba(37, 99, 235, .7)), url(${dataUrl})`;
             pCover.style.backgroundSize = 'cover';
             pCover.style.backgroundPosition = 'center';
           }
@@ -284,11 +284,11 @@ function ProposalFormInner({ onBack, onSave, initialData, clients, onAddClient, 
           if (!errEl) {
             errEl = document.createElement('div');
             errEl.id = 'toCompError';
-            errEl.style.cssText = 'color:var(--red);font-size:10px;font-weight:700;margin-top:4px';
+            errEl.style.cssText = 'color:var(--app-text);font-size:10px;font-weight:700;margin-top:4px';
             errEl.textContent = 'Required — please select a client before signing';
             clientSel.parentElement.appendChild(errEl);
           }
-          clientSel.style.borderColor = 'var(--red)';
+          clientSel.style.borderColor = 'var(--app-text)';
           clientSel.scrollIntoView({ behavior: 'smooth', block: 'center' });
           setTimeout(() => { clientSel.focus(); if (typeof clientSel.showPicker === 'function') { try { clientSel.showPicker(); } catch (e) { } } }, 300);
           return;
@@ -360,16 +360,16 @@ function ProposalFormInner({ onBack, onSave, initialData, clients, onAddClient, 
       <style>{`
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
-  --teal: var(--app-accent, var(--app-accent, #2563EB));--teal2:var(--app-accent2, #2563EB);--teal3:#26D0CE;--teal4:#006E7F;
+  --teal: var(--app-accent, var(--app-accent, #2563EB));--teal2:var(--app-accent2, #2563EB);--teal3:#2563EB;--teal4:#16A34A;
   --teal-light:var(--teal-light, var(--teal-light, #EFF6FF));--teal-lighter:var(--teal-lighter, #EFF6FF);
-  --bg:#F8FAFC;--surface:#FFFFFF;--surface2:#F8FAFB;--border:#E2E8F0;--border2:#E2E8F0;
+  --bg:#F8FAFC;--surface:#FFFFFF;--surface2:#F8FAFC;--border:#E2E8F0;--border2:#E2E8F0;
   --text:#1E293B;--text2:#64748B;--text3:#64748B;
-  --green:#16A34A;--green-bg:#E8FAF3;
-  --amber:#F5A623;--amber-bg:#FEF5E6;
-  --red:#F05C5C;--red-bg:#FEF2F2;
-  --purple:#7C5CFC;--purple-bg:#EEE9FF;
-  --blue:#2563EB;--blue-bg:#EFF4FF;
-  --sidebar-grad:linear-gradient(180deg,#26D0CE 0%, var(--app-accent, var(--app-accent, #2563EB)) 35%,var(--app-accent2, #2563EB) 65%,#006E7F 100%);
+  --green:#16A34A;--green-bg:#EFF6FF;
+  --amber:#64748B;--amber-bg:#F8FAFC;
+  --red:#64748B;--red-bg:#F8FAFC;
+  --purple:#2563EB;--purple-bg:#EFF6FF;
+  --blue:#2563EB;--blue-bg:#EFF6FF;
+  --sidebar-grad:linear-gradient(180deg,#2563EB 0%, var(--app-accent, var(--app-accent, #2563EB)) 35%,var(--app-accent2, #2563EB) 65%,#16A34A 100%);
   --font:'Nunito',sans-serif;--radius:14px;
 }
 html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(--text)}
@@ -407,10 +407,10 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
 .topbar-actions{display:flex;align-items:center;gap:7px;flex-shrink:0}
 .btn-o{display:flex;align-items:center;gap:5px;padding:7px 12px;background:var(--surface);border:1.5px solid var(--border);border-radius:9px;font-size:12px;font-weight:700;color:var(--text2);cursor:pointer;font-family:var(--font);transition:all .15s;white-space:nowrap}
 .btn-o:hover{border-color:var(--teal);color:var(--teal)}
-.btn-t{display:flex;align-items:center;gap:6px;padding:7px 14px;background:var(--teal);color:#fff;border:none;border-radius:9px;font-size:12px;font-weight:700;font-family:var(--font);cursor:pointer;transition:all .15s;box-shadow:0 3px 10px rgba(37, 99, 235,.25);white-space:nowrap}
+.btn-t{display:flex;align-items:center;gap:6px;padding:7px 14px;background:var(--teal);color:#FFFFFF;border:none;border-radius:9px;font-size:12px;font-weight:700;font-family:var(--font);cursor:pointer;transition:all .15s;box-shadow:0 3px 10px rgba(37, 99, 235, .25);white-space:nowrap}
 .btn-t:hover{background:var(--teal2)}
-.btn-g{background:var(--green);box-shadow:0 3px 10px rgba(38,194,129,.2)}
-.btn-g:hover{background:#1da86e}
+.btn-g{background:var(--green);box-shadow:0 3px 10px rgba(22, 163, 74, .2)}
+.btn-g:hover{background:#16A34A}
 
 /* ── TWO-PANEL LAYOUT ── */
 .two-panel{display:grid;grid-template-columns:1fr 1fr;gap:0;flex:1;overflow:hidden;height:calc(100vh - 56px)}
@@ -440,7 +440,7 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
 .card-header{display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid var(--border)}
 .card-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
 .card-title{font-size:13px;font-weight:800;color:var(--text)}
-.opt-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;background:var(--amber-bg);color:var(--amber);margin-left:4px}
+.opt-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;background:var(--app-accent-light);color:var(--app-muted);margin-left:4px}
 .card-actions{margin-left:auto;display:flex;align-items:center;gap:6px}
 .card-body{padding:16px}
 
@@ -452,13 +452,13 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
 .fl{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;display:flex;align-items:center;justify-content:space-between}
 .fl-hint{font-size:9px;color:var(--text3);text-transform:none;letter-spacing:0;font-weight:600}
 .fi{width:100%;padding:9px 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;font-size:13px;color:var(--text);font-family:var(--font);outline:none;transition:all .15s}
-.fi:focus{border-color:var(--teal);background:var(--surface);box-shadow:0 0 0 3px rgba(37, 99, 235,.08)}
+.fi:focus{border-color:var(--teal);background:var(--surface);box-shadow:0 0 0 3px rgba(37, 99, 235, .08)}
 .fi::placeholder{color:var(--text3)}
 .fi:read-only{background:var(--surface2);color:var(--text3)}
 .fs{width:100%;padding:9px 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;font-size:13px;color:var(--text);font-family:var(--font);outline:none;cursor:pointer;appearance:none;-webkit-appearance:none;transition:all .15s;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23A0B8BE' stroke-width='2'%3E%3Cpolyline points='6,9 12,15 18,9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center}
-.fs:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(37, 99, 235,.08)}
+.fs:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(37, 99, 235, .08)}
 .ta{width:100%;padding:9px 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;font-size:13px;color:var(--text);font-family:var(--font);outline:none;resize:vertical;min-height:80px;line-height:1.6;transition:all .15s}
-.ta:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(37, 99, 235,.08)}
+.ta:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(37, 99, 235, .08)}
 .ta::placeholder{color:var(--text3)}
 
 /* ── STATUS CHIPS ── */
@@ -466,11 +466,11 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
 .sc{padding:6px 12px;border:1.5px solid var(--border);border-radius:20px;cursor:pointer;font-size:11px;font-weight:700;color:var(--text2);font-family:var(--font);transition:all .15s;background:none}
 .sc:hover{border-color:var(--teal);color:var(--teal)}
 .sc.active-sc{border-color:var(--teal);background:var(--teal-lighter);color:var(--teal)}
-.sc.won{border-color:var(--green);background:var(--green-bg);color:var(--green)}
-.sc.lost{border-color:var(--red);background:var(--red-bg);color:var(--red)}
+.sc.won{border-color:var(--green);background:var(--app-accent-light);color:var(--green)}
+.sc.lost{border-color:var(--app-text);background:var(--app-accent-light);color:var(--app-text)}
 .sc.sent{border-color:var(--blue);background:var(--blue-bg);color:var(--blue)}
-.sc.neg{border-color:var(--amber);background:var(--amber-bg);color:var(--amber)}
-.sc.exp{border-color:var(--purple);background:var(--purple-bg);color:var(--purple)}
+.sc.neg{border-color:var(--app-muted);background:var(--app-accent-light);color:var(--app-muted)}
+.sc.exp{border-color:var(--app-accent);background:var(--app-accent-light);color:var(--app-accent)}
 
 /* ── COVER UPLOAD ── */
 .cover-zone{border:2px dashed var(--border2);border-radius:10px;padding:20px;text-align:center;cursor:pointer;transition:all .15s;background:var(--bg);margin-bottom:12px}
@@ -482,14 +482,14 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
 /* ── TEAM ── */
 .team-card{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;margin-bottom:8px;transition:all .15s}
 .team-card:hover{border-color:var(--teal)}
-.tc-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0}
+.tc-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#FFFFFF;flex-shrink:0}
 .tc-name{font-size:12px;font-weight:800;color:var(--text)}
 .tc-role{font-size:10px;color:var(--text3);margin-top:1px}
 .tc-exp{font-size:10px;color:var(--text2);margin-top:2px}
 .tc-skills{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
 .tc-skill{padding:2px 7px;background:var(--teal-light);border-radius:20px;font-size:9px;font-weight:700;color:var(--teal)}
 .tc-del{margin-left:auto;font-size:16px;color:var(--text3);cursor:pointer;transition:color .15s;flex-shrink:0}
-.tc-del:hover{color:var(--red)}
+.tc-del:hover{color:var(--app-text)}
 .add-btn{display:flex;align-items:center;gap:6px;padding:7px 13px;background:var(--teal-lighter);border:1.5px dashed var(--teal);border-radius:9px;font-size:11px;font-weight:700;color:var(--teal);cursor:pointer;font-family:var(--font);width:100%;justify-content:center;transition:all .15s;margin-top:6px}
 .add-btn:hover{background:var(--teal-light)}
 
@@ -497,7 +497,7 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
 .ms-item{display:flex;gap:10px;margin-bottom:0}
 .ms-left{display:flex;flex-direction:column;align-items:center;flex-shrink:0}
 .ms-dot{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--teal);background:var(--teal-lighter);border:2px solid var(--teal);flex-shrink:0;cursor:pointer;transition:all .15s}
-.ms-dot.done{background:var(--teal);color:#fff}
+.ms-dot.done{background:var(--teal);color:#FFFFFF}
 .ms-line{width:2px;background:var(--border);flex:1;margin:4px 0;min-height:14px}
 .ms-item:last-child .ms-line{display:none}
 .ms-body{flex:1;padding-bottom:14px}
@@ -510,7 +510,7 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
 .ms-desc:focus{border-color:var(--teal)}
 .ms-desc::placeholder{color:var(--text3)}
 .icon-del{width:24px;height:24px;border-radius:6px;border:1px solid var(--border);background:none;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;color:var(--text3);transition:all .15s;flex-shrink:0}
-.icon-del:hover{border-color:var(--red);color:var(--red);background:var(--red-bg)}
+.icon-del:hover{border-color:var(--app-text);color:var(--app-text);background:var(--app-accent-light)}
 
 /* ── DELIVERABLES / VALUE ITEMS ── */
 .dv-item{display:flex;align-items:center;gap:8px;padding:9px 11px;background:var(--surface2);border:1.5px solid var(--border);border-radius:9px;margin-bottom:7px;transition:all .15s}
@@ -519,18 +519,18 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
 .dv-input{flex:1;padding:6px 9px;background:var(--surface);border:1.5px solid var(--border);border-radius:8px;font-size:12px;color:var(--text);font-family:var(--font);outline:none;transition:all .15s}
 .dv-input:focus{border-color:var(--teal)}
 .dv-del{font-size:15px;color:var(--text3);cursor:pointer;transition:color .15s;flex-shrink:0}
-.dv-del:hover{color:var(--red)}
+.dv-del:hover{color:var(--app-text)}
 
 /* ── PRICING ── */
 .pricing-row{display:grid;grid-template-columns:1fr 90px 26px;gap:7px;margin-bottom:6px;align-items:center}
 .pr-inp{padding:8px 10px;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;font-size:12px;color:var(--text);font-family:var(--font);outline:none;transition:all .15s;width:100%}
 .pr-inp:focus{border-color:var(--teal)}
 .pr-del{width:24px;height:24px;border-radius:6px;border:1px solid var(--border);background:none;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;color:var(--text3);transition:all .15s}
-.pr-del:hover{border-color:var(--red);color:var(--red);background:var(--red-bg)}
+.pr-del:hover{border-color:var(--app-text);color:var(--app-text);background:var(--app-accent-light)}
 .total-box{padding:12px;background:var(--teal-lighter);border-radius:10px;border:1.5px solid var(--teal-light);margin-top:12px}
 .total-row{display:flex;justify-content:space-between;padding:4px 0;font-size:12px;border-bottom:1px solid var(--teal-light)}
 .total-row:last-child{border-bottom:none}
-.grand-box{display:flex;justify-content:space-between;padding:9px 12px;background:linear-gradient(135deg,var(--teal),var(--teal4));border-radius:9px;margin-top:8px}
+.grand-box{display:flex;justify-content:space-between;padding:9px 12px;background:linear-gradient(135deg,var(--teal),var(--app-primary));border-radius:9px;margin-top:8px}
 
 /* ── RISK ── */
 .risk-row-g{display:grid;grid-template-columns:1fr 80px 80px 24px;gap:6px;margin-bottom:6px;align-items:center}
@@ -553,16 +553,16 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
 
 /* PROPOSAL DOC */
 .prop-doc{font-family:var(--font);font-size:12px;color:#1E293B}
-.p-cover{background:linear-gradient(135deg,#003E4E 0%,#005F73 35%,#0096B4 70%,#26D0CE 100%);padding:26px 22px;position:relative;overflow:hidden;flex-shrink:0}
+.p-cover{background:linear-gradient(135deg,#1E293B 0%,#16A34A 35%,#2563EB 70%,#2563EB 100%);padding:26px 22px;position:relative;overflow:hidden;flex-shrink:0}
 .p-cover::after{content:'';position:absolute;right:-50px;top:-50px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.06)}
 .p-cover::before{content:'';position:absolute;left:-20px;bottom:-60px;width:140px;height:140px;border-radius:50%;background:rgba(0,0,0,.1)}
-.p-logo{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#fff;margin-bottom:14px;position:relative;z-index:1}
+.p-logo{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#FFFFFF;margin-bottom:14px;position:relative;z-index:1}
 .p-label{font-size:9px;font-weight:700;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;position:relative;z-index:1}
-.p-title{font-size:17px;font-weight:900;color:#fff;letter-spacing:-.3px;line-height:1.25;margin-bottom:5px;position:relative;z-index:1}
+.p-title{font-size:17px;font-weight:900;color:#FFFFFF;letter-spacing:-.3px;line-height:1.25;margin-bottom:5px;position:relative;z-index:1}
 .p-subtitle{font-size:11px;color:rgba(255,255,255,.7);margin-bottom:14px;position:relative;z-index:1}
 .p-meta{display:flex;gap:12px;flex-wrap:wrap;position:relative;z-index:1}
 .p-meta-i{display:flex;align-items:center;gap:4px;font-size:10px;color:rgba(255,255,255,.7);font-weight:600}
-.p-badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.2);margin-top:9px;position:relative;z-index:1}
+.p-badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;background:rgba(255,255,255,.15);color:#FFFFFF;border:1px solid rgba(255,255,255,.2);margin-top:9px;position:relative;z-index:1}
 .ps{padding:14px 18px;border-bottom:1px solid var(--border)}
 .ps:last-child{border-bottom:none}
 .ps-lbl{font-size:9px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;display:flex;align-items:center;gap:5px}
@@ -573,11 +573,11 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
 .pb-name{font-size:11px;font-weight:800;color:var(--text)}
 .pb-detail{font-size:9px;color:var(--text3);line-height:1.7;margin-top:1px}
 .exec-block{margin-bottom:8px;padding:9px 11px;border-radius:8px;border-left:3px solid var(--border2)}
-.exec-block.problem{border-left-color:var(--red);background:var(--red-bg)}
+.exec-block.problem{border-left-color:var(--app-text);background:var(--app-accent-light)}
 .exec-block.solution{border-left-color:var(--teal);background:var(--teal-lighter)}
-.exec-block.whyus{border-left-color:var(--green);background:var(--green-bg)}
+.exec-block.whyus{border-left-color:var(--green);background:var(--app-accent-light)}
 .eb-lbl{font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
-.exec-block.problem .eb-lbl{color:var(--red)}
+.exec-block.problem .eb-lbl{color:var(--app-text)}
 .exec-block.solution .eb-lbl{color:var(--teal)}
 .exec-block.whyus .eb-lbl{color:var(--green)}
 .eb-text{font-size:10px;color:var(--text2);line-height:1.6}
@@ -587,7 +587,7 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
 .tl-p{display:flex;flex-direction:column;gap:0}
 .tl-pi{display:flex;gap:8px;padding-bottom:8px}
 .tl-pi:last-child{padding-bottom:0}
-.tl-dot{width:20px;height:20px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:#fff;flex-shrink:0}
+.tl-dot{width:20px;height:20px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:#FFFFFF;flex-shrink:0}
 .tl-line-p{width:2px;background:var(--teal-light);flex:1;margin:2px 0;min-height:10px}
 .tl-pi:last-child .tl-line-p{display:none}
 .tl-pi-title{font-size:10px;font-weight:700;color:var(--text)}
@@ -595,23 +595,23 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
 .tl-pi-desc{font-size:9px;color:var(--text3);margin-top:1px;line-height:1.5}
 .team-p{display:flex;flex-wrap:wrap;gap:7px}
 .tp-card{padding:7px 9px;background:var(--surface2);border-radius:8px;border:1px solid var(--border)}
-.tp-av-p{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:#fff;flex-shrink:0}
+.tp-av-p{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:#FFFFFF;flex-shrink:0}
 .tp-name-p{font-size:10px;font-weight:700;color:var(--text)}
 .tp-role-p{font-size:9px;color:var(--text3)}
 .pricing-tbl{width:100%;border-collapse:collapse}
-.pricing-tbl thead tr{background:linear-gradient(135deg,var(--teal),var(--teal4))}
-.pricing-tbl thead th{padding:6px 8px;font-size:9px;font-weight:700;color:#fff;text-align:left}
+.pricing-tbl thead tr{background:linear-gradient(135deg,var(--teal),var(--app-primary))}
+.pricing-tbl thead th{padding:6px 8px;font-size:9px;font-weight:700;color:#FFFFFF;text-align:left}
 .pricing-tbl thead th:last-child{text-align:right}
 .pricing-tbl tbody tr{border-bottom:1px solid var(--border)}
 .pricing-tbl tbody tr:nth-child(even){background:var(--surface2)}
 .pricing-tbl tbody td{padding:5px 8px;font-size:10px;color:var(--text)}
 .pricing-tbl tbody td:last-child{text-align:right;font-weight:700}
-.pricing-grand{display:flex;justify-content:space-between;padding:6px 8px;background:linear-gradient(135deg,var(--teal),var(--teal4));border-radius:6px;margin-top:5px}
-.pricing-grand span:first-child{font-size:10px;font-weight:800;color:#fff}
-.pricing-grand span:last-child{font-size:12px;font-weight:900;color:#fff}
+.pricing-grand{display:flex;justify-content:space-between;padding:6px 8px;background:linear-gradient(135deg,var(--teal),var(--app-primary));border-radius:6px;margin-top:5px}
+.pricing-grand span:first-child{font-size:10px;font-weight:800;color:#FFFFFF}
+.pricing-grand span:last-child{font-size:12px;font-weight:900;color:#FFFFFF}
 .val-p{display:flex;flex-direction:column;gap:4px}
 .val-pi{display:flex;align-items:flex-start;gap:6px;font-size:10px;color:var(--text2)}
-.val-pi::before{content:'';color:var(--amber);font-weight:800;font-size:11px;flex-shrink:0}
+.val-pi::before{content:'';color:var(--app-muted);font-weight:800;font-size:11px;flex-shrink:0}
 .cs-p{padding:8px 10px;background:var(--surface2);border-radius:8px;border-left:3px solid var(--teal);margin-bottom:7px}
 .cs-p:last-child{margin-bottom:0}
 .cs-p-title{font-size:10px;font-weight:800;color:var(--text);margin-bottom:3px}
@@ -623,9 +623,9 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
 .risk-p{display:flex;flex-direction:column;gap:4px}
 .risk-pi{display:flex;align-items:flex-start;gap:7px;padding:5px 8px;border-radius:7px;background:var(--surface2);border:1px solid var(--border)}
 .risk-badge-p{font-size:8px;font-weight:800;padding:1px 6px;border-radius:20px;flex-shrink:0}
-.risk-badge-p.h{background:var(--red-bg);color:var(--red)}
-.risk-badge-p.m{background:var(--amber-bg);color:var(--amber)}
-.risk-badge-p.l{background:var(--green-bg);color:var(--green)}
+.risk-badge-p.h{background:var(--app-accent-light);color:var(--app-text)}
+.risk-badge-p.m{background:var(--app-accent-light);color:var(--app-muted)}
+.risk-badge-p.l{background:var(--app-accent-light);color:var(--green)}
 .risk-pi-text{font-size:9px;color:var(--text2);flex:1}
 .risk-pi-mit{font-size:9px;color:var(--text3);font-style:italic}
 .sop{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -701,7 +701,7 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
       <div class="card-header">
         <div class="card-icon" style="background:var(--teal-light);color:var(--teal)"><i class="ti ti-file-description"></i></div>
         <div class="card-title">Proposal Basics</div>
-        <span style="margin-left:auto;font-size:10px;font-weight:700;background:var(--amber-bg);color:var(--amber);padding:3px 9px;border-radius:20px">#PRO-2026-0015</span>
+        <span style="margin-left:auto;font-size:10px;font-weight:700;background:var(--app-accent-light);color:var(--app-muted);padding:3px 9px;border-radius:20px">#PRO-2026-0015</span>
       </div>
       <div class="card-body">
         <div class="cover-zone" id="coverZone">
@@ -732,7 +732,7 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
     </div>
 
     <div class="card" id="sec-parties">
-      <div class="card-header"><div class="card-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ti ti-building"></i></div><div class="card-title">Parties — From & Prepared For</div></div>
+      <div class="card-header"><div class="card-icon" style="background:var(--app-accent-light);color:var(--app-muted)"><i class="ti ti-building"></i></div><div class="card-title">Parties — From & Prepared For</div></div>
       <div class="card-body">
         <div style="font-size:10px;font-weight:800;color:var(--teal);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px">Our Details</div>
         <div class="form-row">
@@ -745,7 +745,7 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
         </div>
         <div class="fg"><label class="fl">Address</label><input class="fi" type="text" id="fromAddr" value="Chennai, Tamil Nadu, India" oninput="up()"></div>
         <div style="height:1px;background:var(--border);margin:14px 0"></div>
-        <div style="font-size:10px;font-weight:800;color:var(--amber);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px">Client Details</div>
+        <div style="font-size:10px;font-weight:800;color:var(--app-muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px">Client Details</div>
         <div class="form-row">
           <div class="fg"><label class="fl">Client / Company</label><select class="fi" id="toComp" onchange="clientSelected(this)"><option value="">-- Select Client --</option></select></div>
           <div class="fg"><label class="fl">Contact Person</label><input class="fi" type="text" id="toPerson" placeholder="Contact name" oninput="up()"></div>
@@ -768,14 +768,14 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
     </div>
 
     <div class="card" id="sec-deliverables">
-      <div class="card-header"><div class="card-icon" style="background:var(--purple-bg);color:var(--purple)"><i class="ti ti-checklist"></i></div><div class="card-title">Scope & Deliverables</div><div class="card-actions"><button onclick="addDel()" class="add-btn" style="width:auto;margin:0;padding:4px 9px;font-size:10px"><i class="ti ti-plus" style="font-size:11px"></i>Add</button></div></div>
+      <div class="card-header"><div class="card-icon" style="background:var(--app-accent-light);color:var(--app-accent)"><i class="ti ti-checklist"></i></div><div class="card-title">Scope & Deliverables</div><div class="card-actions"><button onclick="addDel()" class="add-btn" style="width:auto;margin:0;padding:4px 9px;font-size:10px"><i class="ti ti-plus" style="font-size:11px"></i>Add</button></div></div>
       <div class="card-body">
         <div id="delList">
           <div class="dv-item"><div class="dv-icon" style="background:var(--teal-light);color:var(--teal)"><i class="ti ti-world"></i></div><input type="text" class="dv-input" value="Fully responsive website (8 pages)" oninput="up()"><i class="ti ti-x dv-del" onclick="this.parentElement.remove();up()"></i></div>
-          <div class="dv-item"><div class="dv-icon" style="background:var(--purple-bg);color:var(--purple)"><i class="ti ti-palette"></i></div><input type="text" class="dv-input" value="Custom UI/UX design + brand guide" oninput="up()"><i class="ti ti-x dv-del" onclick="this.parentElement.remove();up()"></i></div>
+          <div class="dv-item"><div class="dv-icon" style="background:var(--app-accent-light);color:var(--app-accent)"><i class="ti ti-palette"></i></div><input type="text" class="dv-input" value="Custom UI/UX design + brand guide" oninput="up()"><i class="ti ti-x dv-del" onclick="this.parentElement.remove();up()"></i></div>
           <div class="dv-item"><div class="dv-icon" style="background:var(--blue-bg);color:var(--blue)"><i class="ti ti-settings"></i></div><input type="text" class="dv-input" value="CMS for easy content management" oninput="up()"><i class="ti ti-x dv-del" onclick="this.parentElement.remove();up()"></i></div>
-          <div class="dv-item"><div class="dv-icon" style="background:var(--green-bg);color:var(--green)"><i class="ti ti-chart-bar"></i></div><input type="text" class="dv-input" value="SEO optimisation + Google Analytics" oninput="up()"><i class="ti ti-x dv-del" onclick="this.parentElement.remove();up()"></i></div>
-          <div class="dv-item"><div class="dv-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ti ti-headset"></i></div><input type="text" class="dv-input" value="3-month post-launch support" oninput="up()"><i class="ti ti-x dv-del" onclick="this.parentElement.remove();up()"></i></div>
+          <div class="dv-item"><div class="dv-icon" style="background:var(--app-accent-light);color:var(--green)"><i class="ti ti-chart-bar"></i></div><input type="text" class="dv-input" value="SEO optimisation + Google Analytics" oninput="up()"><i class="ti ti-x dv-del" onclick="this.parentElement.remove();up()"></i></div>
+          <div class="dv-item"><div class="dv-icon" style="background:var(--app-accent-light);color:var(--app-muted)"><i class="ti ti-headset"></i></div><input type="text" class="dv-input" value="3-month post-launch support" oninput="up()"><i class="ti ti-x dv-del" onclick="this.parentElement.remove();up()"></i></div>
         </div>
         <button class="add-btn" onclick="addDel()"><i class="ti ti-plus" style="font-size:13px"></i>Add Deliverable</button>
       </div>
@@ -805,37 +805,37 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
     </div>
 
     <div class="card optional-card active-card" id="sec-team">
-      <div class="card-header"><div class="card-icon" style="background:var(--green-bg);color:var(--green)"><i class="ti ti-users"></i></div><div class="card-title">Our Team <span class="opt-badge">Optional</span></div><div class="card-actions"><button onclick="addTeamMember()" class="add-btn" style="width:auto;margin:0;padding:4px 9px;font-size:10px"><i class="ti ti-user-plus" style="font-size:11px"></i>Add</button></div></div>
+      <div class="card-header"><div class="card-icon" style="background:var(--app-accent-light);color:var(--green)"><i class="ti ti-users"></i></div><div class="card-title">Our Team <span class="opt-badge">Optional</span></div><div class="card-actions"><button onclick="addTeamMember()" class="add-btn" style="width:auto;margin:0;padding:4px 9px;font-size:10px"><i class="ti ti-user-plus" style="font-size:11px"></i>Add</button></div></div>
       <div class="card-body">
         <div id="teamList">
-          <div class="team-card"><div class="tc-av" style="background:linear-gradient(135deg,var(--teal),var(--teal4))">P</div><div style="flex:1;min-width:0"><div class="tc-name">Your Name</div><div class="tc-role">Lead Developer & Project Manager</div><div class="tc-exp">8+ years · Web & Mobile</div><div class="tc-skills"><span class="tc-skill">React.js</span><span class="tc-skill">Node.js</span></div></div><i class="ti ti-x tc-del" onclick="this.closest('.team-card').remove();updateTeamPreview()"></i></div>
-          <div class="team-card"><div class="tc-av" style="background:linear-gradient(135deg,var(--purple),#4E35B0)">AN</div><div style="flex:1;min-width:0"><div class="tc-name">Anitha N</div><div class="tc-role">Senior UI/UX Designer</div><div class="tc-exp">5+ years · SaaS & Corporate</div><div class="tc-skills"><span class="tc-skill">Figma</span><span class="tc-skill">Prototyping</span></div></div><i class="ti ti-x tc-del" onclick="this.closest('.team-card').remove();updateTeamPreview()"></i></div>
+          <div class="team-card"><div class="tc-av" style="background:linear-gradient(135deg,var(--teal),var(--app-primary))">P</div><div style="flex:1;min-width:0"><div class="tc-name">Your Name</div><div class="tc-role">Lead Developer & Project Manager</div><div class="tc-exp">8+ years · Web & Mobile</div><div class="tc-skills"><span class="tc-skill">React.js</span><span class="tc-skill">Node.js</span></div></div><i class="ti ti-x tc-del" onclick="this.closest('.team-card').remove();updateTeamPreview()"></i></div>
+          <div class="team-card"><div class="tc-av" style="background:linear-gradient(135deg,var(--app-accent),#64748B)">AN</div><div style="flex:1;min-width:0"><div class="tc-name">Anitha N</div><div class="tc-role">Senior UI/UX Designer</div><div class="tc-exp">5+ years · SaaS & Corporate</div><div class="tc-skills"><span class="tc-skill">Figma</span><span class="tc-skill">Prototyping</span></div></div><i class="ti ti-x tc-del" onclick="this.closest('.team-card').remove();updateTeamPreview()"></i></div>
         </div>
       </div>
     </div>
 
     <div class="card optional-card active-card" id="sec-value">
-      <div class="card-header"><div class="card-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ti ti-trending-up"></i></div><div class="card-title">Value Proposition & ROI <span class="opt-badge">Optional</span></div><div class="card-actions"><button onclick="addValue()" class="add-btn" style="width:auto;margin:0;padding:4px 9px;font-size:10px"><i class="ti ti-plus" style="font-size:11px"></i>Add</button></div></div>
+      <div class="card-header"><div class="card-icon" style="background:var(--app-accent-light);color:var(--app-muted)"><i class="ti ti-trending-up"></i></div><div class="card-title">Value Proposition & ROI <span class="opt-badge">Optional</span></div><div class="card-actions"><button onclick="addValue()" class="add-btn" style="width:auto;margin:0;padding:4px 9px;font-size:10px"><i class="ti ti-plus" style="font-size:11px"></i>Add</button></div></div>
       <div class="card-body">
         <div id="valueList">
-          <div class="dv-item"><div class="dv-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ti ti-trending-up"></i></div><input type="text" class="dv-input" value="300% increase in organic traffic within 6 months" oninput="up()"><i class="ti ti-x dv-del" onclick="this.parentElement.remove();up()"></i></div>
-          <div class="dv-item"><div class="dv-icon" style="background:var(--green-bg);color:var(--green)"><i class="ti ti-users"></i></div><input type="text" class="dv-input" value="2x lead generation with improved UX & CTAs" oninput="up()"><i class="ti ti-x dv-del" onclick="this.parentElement.remove();up()"></i></div>
+          <div class="dv-item"><div class="dv-icon" style="background:var(--app-accent-light);color:var(--app-muted)"><i class="ti ti-trending-up"></i></div><input type="text" class="dv-input" value="300% increase in organic traffic within 6 months" oninput="up()"><i class="ti ti-x dv-del" onclick="this.parentElement.remove();up()"></i></div>
+          <div class="dv-item"><div class="dv-icon" style="background:var(--app-accent-light);color:var(--green)"><i class="ti ti-users"></i></div><input type="text" class="dv-input" value="2x lead generation with improved UX & CTAs" oninput="up()"><i class="ti ti-x dv-del" onclick="this.parentElement.remove();up()"></i></div>
         </div>
       </div>
     </div>
 
     <div class="card optional-card" id="sec-casestudies" style="display:none">
-      <div class="card-header"><div class="card-icon" style="background:var(--green-bg);color:var(--green)"><i class="ti ti-trophy"></i></div><div class="card-title">Past Work & Case Studies <span class="opt-badge">Optional</span></div><div class="card-actions"><button onclick="addCaseStudy()" class="add-btn" style="width:auto;margin:0;padding:4px 9px;font-size:10px"><i class="ti ti-plus" style="font-size:11px"></i>Add</button></div></div>
+      <div class="card-header"><div class="card-icon" style="background:var(--app-accent-light);color:var(--green)"><i class="ti ti-trophy"></i></div><div class="card-title">Past Work & Case Studies <span class="opt-badge">Optional</span></div><div class="card-actions"><button onclick="addCaseStudy()" class="add-btn" style="width:auto;margin:0;padding:4px 9px;font-size:10px"><i class="ti ti-plus" style="font-size:11px"></i>Add</button></div></div>
       <div class="card-body"><div id="csList"></div></div>
     </div>
 
     <div class="card optional-card" id="sec-testimonials" style="display:none">
-      <div class="card-header"><div class="card-icon" style="background:var(--purple-bg);color:var(--purple)"><i class="ti ti-quote"></i></div><div class="card-title">Client Testimonials <span class="opt-badge">Optional</span></div><div class="card-actions"><button onclick="addTestimonial()" class="add-btn" style="width:auto;margin:0;padding:4px 9px;font-size:10px"><i class="ti ti-plus" style="font-size:11px"></i>Add</button></div></div>
+      <div class="card-header"><div class="card-icon" style="background:var(--app-accent-light);color:var(--app-accent)"><i class="ti ti-quote"></i></div><div class="card-title">Client Testimonials <span class="opt-badge">Optional</span></div><div class="card-actions"><button onclick="addTestimonial()" class="add-btn" style="width:auto;margin:0;padding:4px 9px;font-size:10px"><i class="ti ti-plus" style="font-size:11px"></i>Add</button></div></div>
       <div class="card-body"><div id="tmList"></div></div>
     </div>
 
     <div class="card optional-card active-card" id="sec-risks">
-      <div class="card-header"><div class="card-icon" style="background:var(--red-bg);color:var(--red)"><i class="ti ti-shield-exclamation"></i></div><div class="card-title">Risks & Mitigation <span class="opt-badge">Optional</span></div><div class="card-actions"><button onclick="addRisk()" class="add-btn" style="width:auto;margin:0;padding:4px 9px;font-size:10px"><i class="ti ti-plus" style="font-size:11px"></i>Add</button></div></div>
+      <div class="card-header"><div class="card-icon" style="background:var(--app-accent-light);color:var(--app-text)"><i class="ti ti-shield-exclamation"></i></div><div class="card-title">Risks & Mitigation <span class="opt-badge">Optional</span></div><div class="card-actions"><button onclick="addRisk()" class="add-btn" style="width:auto;margin:0;padding:4px 9px;font-size:10px"><i class="ti ti-plus" style="font-size:11px"></i>Add</button></div></div>
       <div class="card-body">
         <div class="risk-row-g hdr" style="margin-bottom:6px"><div>Risk</div><div>Level</div><div>Mitigation</div><div></div></div>
         <div id="riskList">
@@ -851,12 +851,12 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
     </div>
 
     <div class="card optional-card" id="sec-whyus" style="display:none">
-      <div class="card-header"><div class="card-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ti ti-medal"></i></div><div class="card-title">Why Choose Us? <span class="opt-badge">Optional</span></div></div>
-      <div class="card-body"><div id="whyList"><div class="dv-item"><div class="dv-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ti ti-star"></i></div><input type="text" class="dv-input" value="8+ years delivering enterprise-grade products"><i class="ti ti-x dv-del" onclick="this.parentElement.remove()"></i></div></div><button class="add-btn" onclick="addWhyUs()"><i class="ti ti-plus" style="font-size:13px"></i>Add Point</button></div>
+      <div class="card-header"><div class="card-icon" style="background:var(--app-accent-light);color:var(--app-muted)"><i class="ti ti-medal"></i></div><div class="card-title">Why Choose Us? <span class="opt-badge">Optional</span></div></div>
+      <div class="card-body"><div id="whyList"><div class="dv-item"><div class="dv-icon" style="background:var(--app-accent-light);color:var(--app-muted)"><i class="ti ti-star"></i></div><input type="text" class="dv-input" value="8+ years delivering enterprise-grade products"><i class="ti ti-x dv-del" onclick="this.parentElement.remove()"></i></div></div><button class="add-btn" onclick="addWhyUs()"><i class="ti ti-plus" style="font-size:13px"></i>Add Point</button></div>
     </div>
 
     <div class="card" id="sec-pricing">
-      <div class="card-header"><div class="card-icon" style="background:var(--green-bg);color:var(--green)"><i class="ti ti-currency-rupee"></i></div><div class="card-title">Investment & Pricing</div></div>
+      <div class="card-header"><div class="card-icon" style="background:var(--app-accent-light);color:var(--green)"><i class="ti ti-currency-rupee"></i></div><div class="card-title">Investment & Pricing</div></div>
       <div class="card-body">
         <div class="risk-row-g hdr" style="margin-bottom:6px;grid-template-columns:1fr 90px 24px"><div>Service / Item</div><div>Amount (₹)</div><div></div></div>
         <div id="pricingList">
@@ -874,9 +874,9 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
             <div class="fg"><label class="fl" style="font-size:10px">Discount %</label><input class="fi" type="number" id="disc" value="0" oninput="calcTotal()" style="padding:7px 10px;font-size:12px"></div>
           </div>
           <div class="total-row"><span style="color:var(--text2);font-weight:600">Subtotal</span><span id="subtotal" style="font-weight:700;color:var(--text)">₹95,000</span></div>
-          <div class="total-row"><span style="color:var(--amber);font-weight:600">GST (18%)</span><span id="taxAmt" style="font-weight:700;color:var(--amber)">₹17,100</span></div>
+          <div class="total-row"><span style="color:var(--app-muted);font-weight:600">GST (18%)</span><span id="taxAmt" style="font-weight:700;color:var(--app-muted)">₹17,100</span></div>
           <div class="total-row" id="discRow" style="display:none"><span style="color:var(--green);font-weight:600">Discount</span><span id="discAmt" style="font-weight:700;color:var(--green)">-₹0</span></div>
-          <div class="grand-box" style="margin-top:8px"><span style="font-size:13px;font-weight:800;color:#fff">Total Investment</span><span id="grandTotal" style="font-size:16px;font-weight:900;color:#fff">₹1,12,100</span></div>
+          <div class="grand-box" style="margin-top:8px"><span style="font-size:13px;font-weight:800;color:#FFFFFF">Total Investment</span><span id="grandTotal" style="font-size:16px;font-weight:900;color:#FFFFFF">₹1,12,100</span></div>
         </div>
         <div class="form-row" style="margin-top:12px">
           <div class="fg"><label class="fl">Payment Schedule</label><select class="fs" id="paySchedule" onchange="up()"><option>50% advance, 50% on delivery</option><option>33% start / 33% midpoint / 33% end</option><option>25% advance, 75% on delivery</option><option>100% advance</option><option>Monthly retainer</option></select></div>
@@ -886,7 +886,7 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
     </div>
 
     <div class="card" id="sec-signoff">
-      <div class="card-header"><div class="card-icon" style="background:var(--purple-bg);color:var(--purple)"><i class="ti ti-writing"></i></div><div class="card-title">Closing, Terms & Sign-off</div></div>
+      <div class="card-header"><div class="card-icon" style="background:var(--app-accent-light);color:var(--app-accent)"><i class="ti ti-writing"></i></div><div class="card-title">Closing, Terms & Sign-off</div></div>
       <div class="card-body">
         <div class="fg"><label class="fl">Closing Statement</label><textarea class="ta" id="closing" oninput="up()">We are excited about the opportunity to work with you on this project.</textarea></div>
         <div class="fg"><label class="fl">Terms & Conditions</label><textarea class="ta" id="terms" style="min-height:90px">1. 50% advance payment required before project commencement.
@@ -896,11 +896,11 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
 5. This proposal is valid for 30 days from the date of issue.</textarea></div>
     
         <div id="sigModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9999;align-items:center;justify-content:center;">
-          <div style="background:#fff;border-radius:16px;padding:24px;width:480px;max-width:95vw;box-shadow:0 8px 40px rgba(0,0,0,0.18);">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;"><div style="font-size:13px;font-weight:800;color:#0f172a">AUTHORISED SIGNATURE</div><button id="sigModalClose" style="background:none;border:none;font-size:20px;cursor:pointer;color:#64748B;">✕</button></div>
-            <div style="display:flex;border-bottom:2px solid #e5e7eb;margin-bottom:14px;"><button id="sigTab-draw" style="padding:6px 14px 8px;border:none;background:none;font-size:12px;font-weight:800;color:var(--teal);border-bottom:2px solid var(--teal);cursor:pointer;margin-bottom:-2px;">Draw</button><button id="sigTab-type" style="padding:6px 14px 8px;border:none;background:none;font-size:12px;font-weight:800;color:#64748B;border-bottom:2px solid transparent;cursor:pointer;margin-bottom:-2px;">Type</button><button id="sigTab-upload" style="padding:6px 14px 8px;border:none;background:none;font-size:12px;font-weight:800;color:#64748B;border-bottom:2px solid transparent;cursor:pointer;margin-bottom:-2px;">Upload</button></div>
-            <div id="sigContent-draw"><div style="background:#F8FAFC;border:1.5px solid #E2E8F0;border-radius:10px;padding:10px;"><canvas id="sigCanvas" width="420" height="160" style="border:1.5px dashed #E2E8F0;border-radius:8px;background:#fff;cursor:crosshair;width:100%;height:160px;display:block;touch-action:none;"></canvas></div><div style="display:flex;gap:10px;margin-top:10px;"><button id="sigClearBtn" style="padding:6px 14px;font-size:11px;background:#fff;border:1.5px solid #e5e7eb;border-radius:6px;cursor:pointer;font-weight:700;color:#374151;">Clear</button><button id="sigApplyDrawBtn" style="padding:6px 14px;font-size:11px;background:var(--teal);color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:800;">Apply Signature</button></div></div>
-            <div id="sigContent-type" style="display:none;"><div style="display:flex;gap:8px;align-items:center;"><input id="typedSigInput" type="text" placeholder="Type your name..." style="flex:1;padding:10px 14px;border:1.5px solid #e5e7eb;border-radius:10px;font-size:18px;font-family:'Dancing Script',cursive;font-weight:bold;color:#1e293b;outline:none;" /><button id="sigApplyTypeBtn" style="padding:10px 14px;background:var(--teal);border:none;border-radius:10px;color:#fff;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap;">Apply</button></div><div id="typedSigPreview" style="margin-top:10px;font-size:11px;color:#64748b;display:none;">Preview: <span id="typedSigPreviewText" style="font-family:'Dancing Script',cursive;font-size:22px;color:#1e293b;font-weight:bold;"></span></div></div>
+          <div style="background:#FFFFFF;border-radius:16px;padding:24px;width:480px;max-width:95vw;box-shadow:0 8px 40px rgba(0,0,0,0.18);">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;"><div style="font-size:13px;font-weight:800;color:#0F172A">AUTHORISED SIGNATURE</div><button id="sigModalClose" style="background:none;border:none;font-size:20px;cursor:pointer;color:#64748B;">✕</button></div>
+            <div style="display:flex;border-bottom:2px solid #E2E8F0;margin-bottom:14px;"><button id="sigTab-draw" style="padding:6px 14px 8px;border:none;background:none;font-size:12px;font-weight:800;color:var(--teal);border-bottom:2px solid var(--teal);cursor:pointer;margin-bottom:-2px;">Draw</button><button id="sigTab-type" style="padding:6px 14px 8px;border:none;background:none;font-size:12px;font-weight:800;color:#64748B;border-bottom:2px solid transparent;cursor:pointer;margin-bottom:-2px;">Type</button><button id="sigTab-upload" style="padding:6px 14px 8px;border:none;background:none;font-size:12px;font-weight:800;color:#64748B;border-bottom:2px solid transparent;cursor:pointer;margin-bottom:-2px;">Upload</button></div>
+            <div id="sigContent-draw"><div style="background:#F8FAFC;border:1.5px solid #E2E8F0;border-radius:10px;padding:10px;"><canvas id="sigCanvas" width="420" height="160" style="border:1.5px dashed #E2E8F0;border-radius:8px;background:#FFFFFF;cursor:crosshair;width:100%;height:160px;display:block;touch-action:none;"></canvas></div><div style="display:flex;gap:10px;margin-top:10px;"><button id="sigClearBtn" style="padding:6px 14px;font-size:11px;background:#FFFFFF;border:1.5px solid #E2E8F0;border-radius:6px;cursor:pointer;font-weight:700;color:#1E293B;">Clear</button><button id="sigApplyDrawBtn" style="padding:6px 14px;font-size:11px;background:var(--teal);color:#FFFFFF;border:none;border-radius:6px;cursor:pointer;font-weight:800;">Apply Signature</button></div></div>
+            <div id="sigContent-type" style="display:none;"><div style="display:flex;gap:8px;align-items:center;"><input id="typedSigInput" type="text" placeholder="Type your name..." style="flex:1;padding:10px 14px;border:1.5px solid #E2E8F0;border-radius:10px;font-size:18px;font-family:'Dancing Script',cursive;font-weight:bold;color:#1E293B;outline:none;" /><button id="sigApplyTypeBtn" style="padding:10px 14px;background:var(--teal);border:none;border-radius:10px;color:#FFFFFF;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap;">Apply</button></div><div id="typedSigPreview" style="margin-top:10px;font-size:11px;color:#64748B;display:none;">Preview: <span id="typedSigPreviewText" style="font-family:'Dancing Script',cursive;font-size:22px;color:#1E293B;font-weight:bold;"></span></div></div>
             <div id="sigContent-upload" style="display:none;"><div style="background:#F8FAFC;border:1.5px dashed #E2E8F0;border-radius:10px;padding:24px;text-align:center;cursor:pointer;position:relative;"><input id="sigUploadInput" type="file" accept="image/*" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;" /><i class="ti ti-upload" style="font-size:24px;color:#64748B;"></i><div style="font-size:12px;font-weight:700;color:#64748B;margin-top:4px;">Click to upload signature image</div></div></div>
           </div>
         </div>

@@ -1404,12 +1404,6 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
 
 
-  const activeSection = filtered.filter(c => (c.status || "Active").toLowerCase() === "active");
-
-  const otherSection = filtered.filter(c => (c.status || "Active").toLowerCase() !== "active");
-
-
-
   const clientProjectCount = (c) => projects.filter(p => {
     const cName = (c.clientName || c.name || "").toLowerCase();
     return (p.client || "").toLowerCase() === cName || p.clientId === c._id;
@@ -2273,12 +2267,6 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
     <div className="clients-page-root" style={{ display: "flex", flexDirection: "column", minHeight: "100%", height: "auto", overflowY: "auto", overflowX: "hidden", background: "linear-gradient(135deg,var(--app-bg) 0%,var(--app-bg) 100%)", padding: "24px 28px" }}>
       <style>{`.cl-card:hover{transform:translateY(-3px);box-shadow:0 14px 32px rgba(15,23,42,.1)!important;border-color:#2563EB!important}.cl-card:focus-visible{outline:3px solid rgba(37,99,235,.35);outline-offset:2px}@media (max-width:768px){.clients-page-root{padding:16px 14px!important}.cl-toolbar{flex-direction:column!important;align-items:stretch!important}.cl-stat-grid{grid-template-columns:1fr!important}}`}</style>
       {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#FFFFFF", border: "1.5px solid #16A34A", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#16A34A", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
-
-      {onBack && (
-        <div onClick={onBack} style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "#2563EB", fontWeight: 800, fontSize: 14, cursor: "pointer", marginBottom: 14 }}>
-          <i className="ti ti-chevron-left"></i> Back
-        </div>
-      )}
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 20, flexWrap: "wrap", gap: 14 }}>
         <div>

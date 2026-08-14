@@ -1193,7 +1193,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
   const pending = Math.max(0, budgetAmt - received - autoAdvanceTotal);
   // Always calculate spent from expenses array (source of truth)
-  const spent = (currProject.expenses || []).reduce((sum, exp) => sum + parseAmt(exp.amount), 0);
+  const expenseTotal = (currProject.expenses || []).reduce((sum, exp) => sum + parseAmt(exp.amount), 0);
+  const commissionTotal = (currProject.commissions || []).reduce((sum, c) => sum + commissionAmount(c, budgetAmt), 0);
+  const spent = expenseTotal + commissionTotal;
   const remaining = budgetAmt > 0 ? (budgetAmt - spent) : 0;
   const budgetUsedPct = budgetAmt > 0 ? Math.min(Math.round((spent / budgetAmt) * 100), 100) : 0;
   const budgetExceeded = budgetAmt > 0 && spent > budgetAmt;
@@ -4508,7 +4510,15 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               <span className="mpd-val mpd-r" style={{ wordBreak: 'break-word', maxWidth: '100%', textAlign: 'right' }}>{currency}{pending.toLocaleString()}</span>
             </div>
             <div className="mpd-brow">
-              <span className="mpd-lbl">Spent (Expenses)</span>
+              <span className="mpd-lbl">Expenses</span>
+              <span className="mpd-val">{currency}{expenseTotal.toLocaleString()}</span>
+            </div>
+            <div className="mpd-brow">
+              <span className="mpd-lbl">Commission</span>
+              <span className="mpd-val">{currency}{commissionTotal.toLocaleString()}</span>
+            </div>
+            <div className="mpd-brow">
+              <span className="mpd-lbl">Spent (Expenses + Commission)</span>
               <span className="mpd-val" style={{ color: budgetExceeded ? '#64748B' : undefined, fontWeight: budgetExceeded ? 800 : 700 }}>{currency}{spent.toLocaleString()}</span>
             </div>
             <div className="mpd-brow">

@@ -15,15 +15,15 @@ const headerStyle = {
   display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20
 };
 const titleStyle = { margin: 0, fontSize: 18, color: '#1A2332', display: 'flex', alignItems: 'center', gap: 8 };
-const closeBtnStyle = { background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: '#7B8FA1' };
+const closeBtnStyle = { background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: '#64748B' };
 
-const labelStyle = { display: 'block', fontSize: 10, fontWeight: 800, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.5px', marginBottom: 6 };
-const inputStyle = { width: '100%', padding: '10px 12px', borderRadius: 8, border: '1.5px solid #E8EDF2', outline: 'none', fontSize: 13, boxSizing: 'border-box' };
+const labelStyle = { display: 'block', fontSize: 10, fontWeight: 800, color: '#64748B', textTransform: 'uppercase', letterSpacing: '.5px', marginBottom: 6 };
+const inputStyle = { width: '100%', padding: '10px 12px', borderRadius: 8, border: '1.5px solid #E2E8F0', outline: 'none', fontSize: 13, boxSizing: 'border-box' };
 const rowStyle = { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 };
 const btnRowStyle = { display: 'flex', justifyContent: 'center', gap: 12, marginTop: 24 };
 
-const submitBtnStyle = { padding: '10px 24px', background: ' var(--app-accent, var(--app-accent, #00BCD4))', color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: 'pointer' };
-const cancelBtnStyle = { padding: '10px 24px', background: '#fff', color: '#4A5568', border: '1.5px solid #E8EDF2', borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: 'pointer' };
+const submitBtnStyle = { padding: '10px 24px', background: ' var(--app-accent, var(--app-accent, #2563EB))', color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: 'pointer' };
+const cancelBtnStyle = { padding: '10px 24px', background: '#fff', color: '#4A5568', border: '1.5px solid #E2E8F0', borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: 'pointer' };
 
 export default function ProjectPaymentModals({
   project,
@@ -283,7 +283,7 @@ export default function ProjectPaymentModals({
         <div style={modalStyle}>
           <div style={headerStyle}>
             <h3 style={titleStyle}>
-              <div style={{ background: 'var(--teal-light, var(--teal-light, #E0F7FA))', color: ' var(--app-accent, var(--app-accent, #00BCD4))', padding: 8, borderRadius: 8 }}><i className="ti ti-file-invoice"></i></div>
+              <div style={{ background: 'var(--teal-light, var(--teal-light, #EFF6FF))', color: ' var(--app-accent, var(--app-accent, #2563EB))', padding: 8, borderRadius: 8 }}><i className="ti ti-file-invoice"></i></div>
               {editData ? `Edit Invoice — ${editData.invoiceNo || ''}` : 'New Invoice'}
             </h3>
             <button style={closeBtnStyle} onClick={closeModals}>✕</button>
@@ -722,7 +722,7 @@ export default function ProjectPaymentModals({
         <div style={modalStyle}>
           <div style={headerStyle}>
             <h3 style={titleStyle}>
-              <div style={{ background: '#EDE9FE', color: '#8B5CF6', padding: 8, borderRadius: 8 }}><i className="ti ti-pig-money"></i></div>
+              <div style={{ background: '#EFF6FF', color: '#8B5CF6', padding: 8, borderRadius: 8 }}><i className="ti ti-pig-money"></i></div>
               Add Advance Payment
             </h3>
             <button style={closeBtnStyle} onClick={closeModals}>✕</button>

@@ -92,7 +92,7 @@ export default function ReceiptViewer() {
       `}</style>
 
       <div className="no-print" style={{ display: "flex", gap: 12, justifyContent: "center", marginBottom: 30 }}>
-        <button onClick={() => window.print()} style={{ padding: "12px 28px", background: "linear-gradient(135deg,#6366f1,#4f46e5)", border: "none", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#fff", fontFamily: "inherit", boxShadow: "0 4px 12px rgba(99,102,241,0.3)" }}>Print Receipt</button>
+        <button onClick={() => window.print()} style={{ padding: "12px 28px", background: "linear-gradient(135deg,#6366f1,#4f46e5)", border: "none", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#fff", fontFamily: "inherit", boxShadow: "0 4px 12px rgba(37, 99, 235,0.3)" }}>Print Receipt</button>
       </div>
 
       <div className="receipt-paper" style={{ maxWidth: 500, margin: "0 auto", background: "#fff", borderRadius: 24, boxShadow: "0 20px 50px rgba(0,0,0,0.05)", overflow: "hidden", border: "1px solid #e2e8f0" }}>

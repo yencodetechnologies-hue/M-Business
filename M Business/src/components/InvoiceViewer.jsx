@@ -198,11 +198,11 @@ export default function InvoiceViewer() {
         };
       case "Classic":
         return {
-          primaryColor: " var(--app-accent, var(--app-accent, #00BCD4))",
-          primaryBg: "var(--teal-light, #E0F7FA)",
-          logoColor: "var(--app-accent, var(--app-accent, #00BCD4))",
-          borderStyle: "1px solid #E0EEF0",
-          headerUnderline: "3px solid  var(--app-accent, var(--app-accent, #00BCD4))",
+          primaryColor: " var(--app-accent, var(--app-accent, #2563EB))",
+          primaryBg: "var(--teal-light, #EFF6FF)",
+          logoColor: "var(--app-accent, var(--app-accent, #2563EB))",
+          borderStyle: "1px solid #E2E8F0",
+          headerUnderline: "3px solid  var(--app-accent, var(--app-accent, #2563EB))",
           fontFamily: "'Nunito', sans-serif"
         };
       case "Modern":
@@ -210,7 +210,7 @@ export default function InvoiceViewer() {
         return {
           primaryColor: "#7C5CFC",
           primaryBg: "#EEE9FF",
-          logoColor: "linear-gradient(135deg, #7C5CFC, #4C1D95)",
+          logoColor: "linear-gradient(135deg, #7C5CFC, #0F172A)",
           borderStyle: "1px solid #E5E7EB",
           headerUnderline: "3px solid #7C5CFC",
           fontFamily: "'Plus Jakarta Sans', sans-serif"
@@ -240,7 +240,7 @@ export default function InvoiceViewer() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Dancing+Script:wght@700&display=swap');
         * { box-sizing: border-box; }
-        .inv-paper { max-width: 794px; margin: 0 auto; background: #fff; border-radius: 18px; box-shadow: 0 24px 80px rgba(99,102,241,0.15); overflow: hidden; display: flex; flex-direction: column; min-height: 1122px; }
+        .inv-paper { max-width: 794px; margin: 0 auto; background: #fff; border-radius: 18px; box-shadow: 0 24px 80px rgba(37, 99, 235,0.15); overflow: hidden; display: flex; flex-direction: column; min-height: 1122px; }
         @media print {
           @page { size: A4 portrait; margin: 12mm 14mm; }
           html, body { margin: 0 !important; padding: 0 !important; background: white !important; }
@@ -323,7 +323,7 @@ export default function InvoiceViewer() {
               <div className="inv-table-wrap" style={{ padding: isFirstPage ? "22px 32px" : "80px 32px 22px", overflowX: "auto", flexShrink: 0 }}>
                 <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 360 }}>
                   <thead>
-                    <tr style={{ background: currentT.primaryColor || "#1A2E35" }}>
+                    <tr style={{ background: currentT.primaryColor || "#1E293B" }}>
                       {["#", "Description", "Qty", "Unit Rate", "Amount"].map((h, i) => (
                         <th key={i} style={{ padding: "9px 11px", fontSize: 9, fontWeight: 700, color: "#fff", letterSpacing: 1.5, borderBottom: "2px solid var(--app-border)", textAlign: ["Amount", "Unit Rate", "Qty"].includes(h) ? "right" : "left" }}>{h.toUpperCase()}</th>
                       ))}
@@ -420,7 +420,7 @@ export default function InvoiceViewer() {
                       )}
                     </div>
                     <div style={{ width: "100%", height: 1, background: currentT.borderStyle || "#e2e8f0", marginBottom: 4 }}></div>
-                    <div style={{ fontSize: 9, fontWeight: 700, color: "#1e1b4b", textAlign: "center" }}>{inv.companyName}</div>
+                    <div style={{ fontSize: 9, fontWeight: 700, color: "#1e293b", textAlign: "center" }}>{inv.companyName}</div>
                     <div style={{ fontSize: 8, color: "#64748b", textAlign: "center", marginTop: 2 }}>Authorized Signatory</div>
                   </div>
                 </div>

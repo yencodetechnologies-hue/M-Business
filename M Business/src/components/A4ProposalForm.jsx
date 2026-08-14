@@ -178,11 +178,11 @@ function ClientDropdown({ clients, value, onChange, error }) {
                       gap: 10,
                       padding: "10px 14px",
                       cursor: "pointer",
-                      background: isSel ? "#f3e8ff" : "transparent",
+                      background: isSel ? "#eff6ff" : "transparent",
                       borderBottom: "1px solid var(--app-bg)"
                     }}
                     onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"}
-                    onMouseLeave={e => e.currentTarget.style.background = isSel ? "#f3e8ff" : "transparent"}
+                    onMouseLeave={e => e.currentTarget.style.background = isSel ? "#eff6ff" : "transparent"}
                   >
                     <div style={{
                       width: 28,

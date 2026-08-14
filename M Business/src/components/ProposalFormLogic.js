@@ -509,7 +509,7 @@ export function openSignatureModal() {
       ['draw', 'type', 'upload'].forEach(t => {
         const b = document.getElementById('sigTab-' + t);
         const c = document.getElementById('sigContent-' + t);
-        if (b) { b.style.color = t === tab ? 'var(--teal)' : '#607D86'; b.style.borderBottom = t === tab ? '2px solid var(--teal)' : '2px solid transparent'; }
+        if (b) { b.style.color = t === tab ? 'var(--teal)' : '#64748B'; b.style.borderBottom = t === tab ? '2px solid var(--teal)' : '2px solid transparent'; }
         if (c) c.style.display = t === tab ? 'block' : 'none';
       });
     };
@@ -563,7 +563,7 @@ export function openSignatureModal() {
     canvas.width = rect.width || 420;
     canvas.height = 160;
     const ctx = canvas.getContext('2d');
-    ctx.strokeStyle = '#1a2e35'; ctx.lineWidth = 3.5; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 3.5; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
     let isDrawing = false; let points = [];
     function getPos(e) {
       const r = canvas.getBoundingClientRect();
@@ -605,7 +605,7 @@ function _applySignatureToBox(value, type) {
     if (type === 'image') {
       box.innerHTML = `<img src="${value}" style="max-height:50px;max-width:100%;object-fit:contain;" /><div style="font-size:10px;color:var(--teal);font-weight:700;margin-top:2px;">${name} — Signed</div>`;
     } else {
-      box.innerHTML = `<span style="font-family:'Dancing Script',cursive;font-size:22px;color:#1a2e35;font-weight:bold;">${value}</span><div style="font-size:10px;color:var(--teal);font-weight:700;margin-top:2px;">${name} — Signed</div>`;
+      box.innerHTML = `<span style="font-family:'Dancing Script',cursive;font-size:22px;color:#1e293b;font-weight:bold;">${value}</span><div style="font-size:10px;color:var(--teal);font-weight:700;margin-top:2px;">${name} — Signed</div>`;
     }
     box.style.borderColor = 'var(--teal)';
     box.style.background = 'var(--teal-lighter)';

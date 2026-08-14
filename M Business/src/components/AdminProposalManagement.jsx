@@ -14,7 +14,7 @@ const THEMES = [
   { name: "Rose", p: "#e11d48", g: "linear-gradient(135deg,#9f1239,#f43f5e)", l: "#ffe4e6", t: "#881337" },
   { name: "Amber", p: "#d97706", g: "linear-gradient(135deg,#92400e,#fbbf24)", l: "#fef3c7", t: "#78350f" },
   { name: "Slate", p: "#334155", g: "linear-gradient(135deg,#0f172a,#475569)", l: "#f1f5f9", t: "#0f172a" },
-  { name: "Teal", p: "#0d9488", g: "linear-gradient(135deg,#134e4a,#2dd4bf)", l: "#ccfbf1", t: "#134e4a" },
+  { name: "Teal", p: "#2563eb", g: "linear-gradient(135deg,#134e4a,#2dd4bf)", l: "#ccfbf1", t: "#134e4a" },
   { name: "Fuchsia", p: "var(--app-accent)", g: "linear-gradient(135deg,#701a75,#e879f9)", l: "var(--app-border)", t: "#4a044e" },
 ];
 
@@ -168,7 +168,7 @@ const viewProposal = (proposal) => {
         content = `<div style="font-size:${fs}px; font-weight:${fw}; color:${el.color || '#000'}; white-space:pre-wrap; width:${el.width || el.w}px;">${val}</div>`;
       } else if (el.type === "shape") {
         const br = el.borderRadius !== undefined ? (typeof el.borderRadius === 'number' ? el.borderRadius + 'px' : el.borderRadius) : (el.shape === 'circle' ? '50%' : '4px');
-        content = `<div style="width:${el.width || el.w || 60}px; height:${el.height || el.h || 60}px; background:${el.color || ' var(--app-accent, var(--app-accent, #00BCD4))'}; border-radius:${br};"></div>`;
+        content = `<div style="width:${el.width || el.w || 60}px; height:${el.height || el.h || 60}px; background:${el.color || ' var(--app-accent, var(--app-accent, #2563EB))'}; border-radius:${br};"></div>`;
       } else if (el.type === "image") {
         content = `<img src="${el.src}" style="width:${el.width || el.w || 200}px; height:${el.height || el.h || 'auto'}; object-fit:contain; pointer-events:none;" />`;
       } else if (el.type === "icon") {
@@ -264,7 +264,7 @@ const viewProposal = (proposal) => {
           .slide-page { background: #fff; box-shadow: 0 4px 24px rgba(0,0,0,0.10); border-radius: 12px; overflow: hidden; }
           .top-bar { position: sticky; top: 0; z-index: 100; background: #1e293b; color: #fff; padding: 14px 28px; display: flex; align-items: center; justify-content: space-between; }
           .top-bar h2 { font-size: 16px; font-weight: 700; margin: 0; }
-          .print-btn { background:  var(--app-accent, var(--app-accent, #00BCD4)); color: #fff; border: none; border-radius: 8px; padding: 8px 20px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; }
+          .print-btn { background:  var(--app-accent, var(--app-accent, #2563EB)); color: #fff; border: none; border-radius: 8px; padding: 8px 20px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; }
           @media print { .top-bar { display: none; } body { background: white; } .slide-page { box-shadow: none; border-radius: 0; } @page { size: A4; margin: 0; } }
         </style>
       </head>
@@ -431,11 +431,11 @@ function CompanyDropdown({ clients, value, onChange, error }) {
                       gap: 10,
                       padding: "10px 14px",
                       cursor: "pointer",
-                      background: isSel ? "#f3e8ff" : "transparent",
+                      background: isSel ? "#eff6ff" : "transparent",
                       borderBottom: "1px solid var(--app-bg)"
                     }}
                     onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"}
-                    onMouseLeave={e => e.currentTarget.style.background = isSel ? "#f3e8ff" : "transparent"}
+                    onMouseLeave={e => e.currentTarget.style.background = isSel ? "#eff6ff" : "transparent"}
                   >
                     <div style={{
                       width: 28,
@@ -596,11 +596,11 @@ function EmployeeDropdown({ employees, value, onChange, error }) {
                       gap: 10,
                       padding: "10px 14px",
                       cursor: "pointer",
-                      background: isSel ? "#f3e8ff" : "transparent",
+                      background: isSel ? "#eff6ff" : "transparent",
                       borderBottom: "1px solid var(--app-bg)"
                     }}
                     onMouseEnter={ev => ev.currentTarget.style.background = "var(--app-bg)"}
-                    onMouseLeave={ev => ev.currentTarget.style.background = isSel ? "#f3e8ff" : "transparent"}
+                    onMouseLeave={ev => ev.currentTarget.style.background = isSel ? "#eff6ff" : "transparent"}
                   >
                     <div style={{
                       width: 28,
@@ -645,7 +645,7 @@ function Mdl({ title, onClose, children, maxWidth = 820 }) {
     <div style={{
       position: "fixed",
       inset: 0,
-      background: "rgba(59,7,100,0.55)",
+      background: "rgba(15, 23, 42,0.55)",
       backdropFilter: "blur(8px)",
       zIndex: 1000,
       display: "flex",
@@ -1128,7 +1128,7 @@ export default function AdminProposalManagement() {
                             fontWeight: 600,
                             fontFamily: "inherit",
                             whiteSpace: "nowrap",
-                            boxShadow: "0 2px 8px rgba(99,102,241,0.25)",
+                            boxShadow: "0 2px 8px rgba(37, 99, 235,0.25)",
                             transition: "all 0.2s"
                           }}
                           onMouseOver={(e) => e.currentTarget.style.transform = "translateY(-1px)"}

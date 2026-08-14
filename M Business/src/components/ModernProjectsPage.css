@@ -1,8 +1,8 @@
 /* ModernProjectsPage.css */
 .m-add-project-card:hover {
-  border-color: #00BCD4 !important;
+  border-color: #2563EB !important;
   transform: translateY(-3px);
-  box-shadow: 0 8px 28px rgba(0, 188, 212, 0.18);
+  box-shadow: 0 8px 28px rgba(37, 99, 235, 0.18);
 }
 
 .modern-app {
@@ -11,17 +11,17 @@
   --teal-light: var(--teal-light);
   --teal-lighter: var(--teal-lighter);
 
-  --bg: var(--app-bg, var(--theme-bg, #F5FAFA));
+  --bg: var(--app-bg, var(--theme-bg, #F8FAFC));
   --surface: var(--app-surface, var(--theme-surface, #FFFFFF));
   --surface2: var(--app-surface, #F8FAFB);
-  --border: var(--app-border, var(--theme-border, #E0EEF0));
-  --border2: var(--app-border, #C5DDE0);
+  --border: var(--app-border, var(--theme-border, #E2E8F0));
+  --border2: var(--app-border, #E2E8F0);
 
-  --text: var(--app-text, #1A2E35);
-  --text2: var(--app-muted, #607D86);
-  --text3: var(--app-muted, #A0B8BE);
+  --text: var(--app-text, #1E293B);
+  --text2: var(--app-muted, #64748B);
+  --text3: var(--app-muted, #64748B);
 
-  --green: #26C281;
+  --green: #16A34A;
   --green-bg: #E8FAF3;
 
   --amber: #F5A623;
@@ -583,7 +583,7 @@
 .m-project-card {
   background: #fff;
   border-radius: 10px;
-  box-shadow: 0 2px 12px rgba(0, 188, 212, 0.08);
+  box-shadow: 0 2px 12px rgba(37, 99, 235, 0.08);
   overflow: hidden;
   border: 1.5px solid transparent;
   transition: all 0.2s;
@@ -596,9 +596,9 @@
   align-items: center !important;
   justify-content: center !important;
   min-height: 260px !important;
-  border: 2.5px dashed var(--app-accent, var(--app-accent, #00BCD4)) !important;
+  border: 2.5px dashed var(--app-accent, var(--app-accent, #2563EB)) !important;
   border-radius: 16px !important;
-  background: linear-gradient(135deg, var(--teal-light, var(--teal-light, #E0F7FA)) 0%, #F0FDFF 100%) !important;
+  background: linear-gradient(135deg, var(--teal-light, var(--teal-light, #EFF6FF)) 0%, #F0FDFF 100%) !important;
   cursor: pointer !important;
   gap: 12px !important;
   transition: all 0.2s !important;
@@ -606,8 +606,8 @@
 
 .m-add-card-hover:hover {
   transform: translateY(-3px) !important;
-  box-shadow: 0 8px 28px rgba(0, 188, 212, 0.25) !important;
-  border-color: #00BCD4 !important;
+  box-shadow: 0 8px 28px rgba(37, 99, 235, 0.25) !important;
+  border-color: #2563EB !important;
 }
 
 @media (max-width: 1100px) {
@@ -788,7 +788,7 @@
 }
 
 .modern-app .m-pc-av:nth-child(2) {
-  background: #26C281;
+  background: #16A34A;
 }
 
 .modern-app .m-pc-av:nth-child(3) {

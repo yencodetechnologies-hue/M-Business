@@ -166,7 +166,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
 
   const sendThemeToIframe = () => {
     if (iframeRef.current && iframeRef.current.contentWindow) {
-      const color = getComputedStyle(document.documentElement).getPropertyValue('--app-accent').trim() || ' var(--app-accent, var(--app-accent, #00BCD4))';
+      const color = getComputedStyle(document.documentElement).getPropertyValue('--app-accent').trim() || ' var(--app-accent, var(--app-accent, #2563EB))';
       iframeRef.current.contentWindow.postMessage({ type: 'SET_THEME', color }, '*');
     }
   };
@@ -926,12 +926,12 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
       <div style={{ padding: "16px 14px", background: "#F5F8FA", minHeight: "100%", boxSizing: "border-box", maxWidth: "100%", overflowX: "hidden" }}>
         <div
           onClick={() => onBackOverride && onBackOverride()}
-          style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 4px 16px", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #00BCD4)" }}
+          style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 4px 16px", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #2563EB)" }}
         >
           <i className="ti ti-arrow-left" style={{ fontSize: 16 }}></i> Back to Dashboard
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #00BCD4), #0891b2)", borderRadius: 16, padding: "16px 18px", marginBottom: 14, boxShadow: "0 6px 18px rgba(0,188,212,0.25)" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #2563EB), #0891b2)", borderRadius: 16, padding: "16px 18px", marginBottom: 14, boxShadow: "0 6px 18px rgba(37, 99, 235,0.25)" }}>
           <div>
             <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.8)", letterSpacing: 0.5, textTransform: "uppercase" }}>Total Quotations</div>
             <div style={{ fontSize: 26, fontWeight: 800, color: "#fff" }}>{enrichedMinimal.length}</div>
@@ -942,7 +942,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
         </div>
 
         {enrichedMinimal.length === 0 ? (
-          <div style={{ padding: "40px 16px", textAlign: "center", color: "#A0B8BE", fontSize: 13, fontWeight: 600, background: "#fff", borderRadius: 16, boxShadow: "0 2px 10px rgba(15,28,46,0.05)" }}>
+          <div style={{ padding: "40px 16px", textAlign: "center", color: "#64748B", fontSize: 13, fontWeight: 600, background: "#fff", borderRadius: 16, boxShadow: "0 2px 10px rgba(15,28,46,0.05)" }}>
             No quotations found.
           </div>
         ) : (
@@ -969,16 +969,16 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
                     <div style={{ display: "flex", alignItems: "flex-start", gap: 10, minWidth: 0, flex: 1 }}>
                       <div style={{
                         width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
-                        background: "linear-gradient(135deg, var(--app-accent, #00BCD4), #0891b2)", color: "#fff",
+                        background: "linear-gradient(135deg, var(--app-accent, #2563EB), #0891b2)", color: "#fff",
                         display: "flex", alignItems: "center", justifyContent: "center",
                         fontSize: 14, fontWeight: 800
                       }}>
                         {initials(client)}
                       </div>
                       <div style={{ minWidth: 0, flex: 1 }}>
-                        <div style={{ fontWeight: 800, color: "#0f1c2e", fontSize: 14.5, wordBreak: "break-word" }}>{client}</div>
+                        <div style={{ fontWeight: 800, color: "#0f172a", fontSize: 14.5, wordBreak: "break-word" }}>{client}</div>
                         {quoteNo && (
-                          <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 3, fontSize: 11.5, color: "#607D86", fontWeight: 600 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 3, fontSize: 11.5, color: "#64748B", fontWeight: 600 }}>
                             <i className="ti ti-hash" style={{ fontSize: 12, flexShrink: 0 }} />
                             <span>{quoteNo}</span>
                           </div>
@@ -992,7 +992,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
                       {entry.status || "Draft"}
                     </span>
                   </div>
-                  <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 4, color: "var(--app-accent, #00BCD4)", fontSize: 12, fontWeight: 700 }}>
+                  <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 4, color: "var(--app-accent, #2563EB)", fontSize: 12, fontWeight: 700 }}>
                     View details <i className="ti ti-chevron-right" style={{ fontSize: 13 }} />
                   </div>
                 </div>
@@ -1061,10 +1061,10 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
     };
 
     return (
-      <div style={{ fontFamily: "var(--font, 'Nunito', sans-serif)", minHeight: "100%", width: "100%", maxWidth: "100%", overflowX: "hidden", boxSizing: "border-box", background: "var(--bg, #F5FAFA)" }}>
+      <div style={{ fontFamily: "var(--font, 'Nunito', sans-serif)", minHeight: "100%", width: "100%", maxWidth: "100%", overflowX: "hidden", boxSizing: "border-box", background: "var(--bg, #F8FAFC)" }}>
         {toastMsg && (
-          <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 99999, background: '#1A2E35', color: '#fff', borderRadius: 12, padding: '12px 20px', fontSize: 13, fontWeight: 700, boxShadow: '0 8px 24px rgba(0,0,0,0.18)', display: 'flex', alignItems: 'center', gap: 8 }}>
-            <i className="ti ti-check" style={{ fontSize: 15, color: '#26C281' }}></i> {toastMsg}
+          <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 99999, background: '#1E293B', color: '#fff', borderRadius: 12, padding: '12px 20px', fontSize: 13, fontWeight: 700, boxShadow: '0 8px 24px rgba(0,0,0,0.18)', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <i className="ti ti-check" style={{ fontSize: 15, color: '#16A34A' }}></i> {toastMsg}
           </div>
         )}
         <div className="content">
@@ -1092,38 +1092,38 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
           </div>
 
           <div className="stats-row" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14 }}>
-            <div className="stat-card" style={{ display: "flex", alignItems: "center", gap: 12, position: "relative", border: "1.5px solid var(--border,#E0EEF0)", borderRadius: 16, background: "#fff", padding: "18px 20px" }}>
+            <div className="stat-card" style={{ display: "flex", alignItems: "center", gap: 12, position: "relative", border: "1.5px solid var(--border,#E2E8F0)", borderRadius: 16, background: "#fff", padding: "18px 20px" }}>
               <div className="stat-icon" style={{ width: 44, height: 44, borderRadius: 12, background: "var(--teal-light)", color: "var(--teal)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}><i className="ti ti-file-text"></i></div>
               <div>
-                <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1A2E35)", lineHeight: 1 }}>{totalQuotes}</div>
-                <div style={{ fontSize: 11, color: "var(--text3,#A0B8BE)", fontWeight: 600, marginTop: 3 }}>Total Quotes</div>
+                <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1E293B)", lineHeight: 1 }}>{totalQuotes}</div>
+                <div style={{ fontSize: 11, color: "var(--text3,#64748B)", fontWeight: 600, marginTop: 3 }}>Total Quotes</div>
                 <div style={{ fontSize: 10, fontWeight: 700, marginTop: 4, color: "var(--teal)" }}>₹{totalValue.toLocaleString("en-IN")} value</div>
               </div>
             </div>
 
-            <div className="stat-card" style={{ display: "flex", alignItems: "center", gap: 12, position: "relative", border: "1.5px solid var(--border,#E0EEF0)", borderRadius: 16, background: "#fff", padding: "18px 20px" }}>
+            <div className="stat-card" style={{ display: "flex", alignItems: "center", gap: 12, position: "relative", border: "1.5px solid var(--border,#E2E8F0)", borderRadius: 16, background: "#fff", padding: "18px 20px" }}>
               <div className="stat-icon" style={{ width: 44, height: 44, borderRadius: 12, background: "var(--green-bg)", color: "var(--green)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}><i className="ti ti-circle-check"></i></div>
               <div>
-                <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1A2E35)", lineHeight: 1 }}>{wonCount}</div>
-                <div style={{ fontSize: 11, color: "var(--text3,#A0B8BE)", fontWeight: 600, marginTop: 3 }}>Accepted</div>
+                <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1E293B)", lineHeight: 1 }}>{wonCount}</div>
+                <div style={{ fontSize: 11, color: "var(--text3,#64748B)", fontWeight: 600, marginTop: 3 }}>Accepted</div>
                 <div style={{ fontSize: 10, fontWeight: 700, marginTop: 4, color: "var(--green)" }}>₹{wonValue.toLocaleString("en-IN")} won</div>
               </div>
             </div>
 
-            <div className="stat-card" style={{ display: "flex", alignItems: "center", gap: 12, position: "relative", border: "1.5px solid var(--border,#E0EEF0)", borderRadius: 16, background: "#fff", padding: "18px 20px" }}>
+            <div className="stat-card" style={{ display: "flex", alignItems: "center", gap: 12, position: "relative", border: "1.5px solid var(--border,#E2E8F0)", borderRadius: 16, background: "#fff", padding: "18px 20px" }}>
               <div className="stat-icon" style={{ width: 44, height: 44, borderRadius: 12, background: "var(--amber-bg)", color: "var(--amber)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}><i className="ti ti-clock"></i></div>
               <div>
-                <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1A2E35)", lineHeight: 1 }}>{pendingCount}</div>
-                <div style={{ fontSize: 11, color: "var(--text3,#A0B8BE)", fontWeight: 600, marginTop: 3 }}>Pending</div>
+                <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1E293B)", lineHeight: 1 }}>{pendingCount}</div>
+                <div style={{ fontSize: 11, color: "var(--text3,#64748B)", fontWeight: 600, marginTop: 3 }}>Pending</div>
                 <div style={{ fontSize: 10, fontWeight: 700, marginTop: 4, color: "var(--amber)" }}>₹{pendingValue.toLocaleString("en-IN")} pending</div>
               </div>
             </div>
 
-            <div className="stat-card" style={{ display: "flex", alignItems: "center", gap: 12, position: "relative", border: "1.5px solid var(--border,#E0EEF0)", borderRadius: 16, background: "#fff", padding: "18px 20px" }}>
+            <div className="stat-card" style={{ display: "flex", alignItems: "center", gap: 12, position: "relative", border: "1.5px solid var(--border,#E2E8F0)", borderRadius: 16, background: "#fff", padding: "18px 20px" }}>
               <div className="stat-icon" style={{ width: 44, height: 44, borderRadius: 12, background: "var(--purple-bg)", color: "var(--purple)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}><i className="ti ti-percentage"></i></div>
               <div>
-                <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1A2E35)", lineHeight: 1 }}>{winRate}%</div>
-                <div style={{ fontSize: 11, color: "var(--text3,#A0B8BE)", fontWeight: 600, marginTop: 3 }}>Win Rate</div>
+                <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1E293B)", lineHeight: 1 }}>{winRate}%</div>
+                <div style={{ fontSize: 11, color: "var(--text3,#64748B)", fontWeight: 600, marginTop: 3 }}>Win Rate</div>
                 <div style={{ fontSize: 10, fontWeight: 700, marginTop: 4, color: "var(--purple)" }}>{wonCount} of {sentCount} sent</div>
               </div>
             </div>
@@ -1286,7 +1286,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
           <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.5)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowSendPopup(false)}>
             <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: 16, padding: 24, width: 420, maxWidth: '92vw' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
-                <div style={{ fontSize: 16, fontWeight: 900, color: '#0D1B2A' }}>Send to Client Portal</div>
+                <div style={{ fontSize: 16, fontWeight: 900, color: '#0F172A' }}>Send to Client Portal</div>
                 <i className="ti ti-x" style={{ cursor: 'pointer', fontSize: 18 }} onClick={() => setShowSendPopup(false)}></i>
               </div>
               <div style={{ fontSize: 13, fontWeight: 700, color: '#374151', marginBottom: 8 }}>Select Client</div>
@@ -1389,8 +1389,8 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
         }
         `}</style>
         {toastMsg && (
-          <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 99999, background: '#1A2E35', color: '#fff', borderRadius: 12, padding: '12px 20px', fontSize: 13, fontWeight: 700, boxShadow: '0 8px 24px rgba(0,0,0,0.18)', display: 'flex', alignItems: 'center', gap: 8 }}>
-            <i className="ti ti-check" style={{ fontSize: 15, color: '#26C281' }}></i> {toastMsg}
+          <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 99999, background: '#1E293B', color: '#fff', borderRadius: 12, padding: '12px 20px', fontSize: 13, fontWeight: 700, boxShadow: '0 8px 24px rgba(0,0,0,0.18)', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <i className="ti ti-check" style={{ fontSize: 15, color: '#16A34A' }}></i> {toastMsg}
           </div>
         )}
         <style>{`
@@ -1633,7 +1633,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
           {/* Footer */}
           <div style={{ background: "#ffffff", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0, borderTop: "2px solid #f1f5f9", pageBreakBefore: "auto", breakBefore: "auto" }}>
             <div style={{ fontSize: 11, color: "#6b7280", fontWeight: 600 }}>{effectiveCompanyName}</div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: "#7c3aed" }}>{qt.footerMessage}</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "#2563eb" }}>{qt.footerMessage}</div>
             <div style={{ fontSize: 11, color: "#6b7280", fontWeight: 600 }}>{qt.quoteNo}</div>
           </div>
         </div>
@@ -1642,8 +1642,8 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
     ) : (
       <div className="print-wrapper" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "#ecfdf5", minHeight: "100vh", padding: "20px 12px" }}>
         {toastMsg && (
-          <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 99999, background: '#1A2E35', color: '#fff', borderRadius: 12, padding: '12px 20px', fontSize: 13, fontWeight: 700, boxShadow: '0 8px 24px rgba(0,0,0,0.18)', display: 'flex', alignItems: 'center', gap: 8 }}>
-            <i className="ti ti-check" style={{ fontSize: 15, color: '#26C281' }}></i> {toastMsg}
+          <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 99999, background: '#1E293B', color: '#fff', borderRadius: 12, padding: '12px 20px', fontSize: 13, fontWeight: 700, boxShadow: '0 8px 24px rgba(0,0,0,0.18)', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <i className="ti ti-check" style={{ fontSize: 15, color: '#16A34A' }}></i> {toastMsg}
           </div>
         )}
         <style>{`
@@ -1879,7 +1879,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
 
           <div style={{ background: "#ffffff", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0, borderTop: "2px solid #f1f5f9", pageBreakBefore: "auto", breakBefore: "auto" }}>
             <div style={{ fontSize: 11, color: "#6b7280", fontWeight: 600 }}>{effectiveCompanyName}</div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: "#7c3aed" }}>{qt.footerMessage}</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "#2563eb" }}>{qt.footerMessage}</div>
             <div style={{ fontSize: 11, color: "#6b7280", fontWeight: 600 }}>{qt.quoteNo}</div>
           </div>
         </div>

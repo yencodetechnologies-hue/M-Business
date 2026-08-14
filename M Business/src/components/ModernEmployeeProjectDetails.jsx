@@ -4,14 +4,14 @@ import { BASE_URL, FRONTEND_URL } from '../config';
 
 // ── palette -------------------------------------------------------
 const P = {
-  primary: ' var(--app-accent, var(--app-accent, #00BCD4))', primaryDark: '#00BCD4', primaryLight: 'var(--teal-light, var(--teal-light, #E0F7FA))', primaryMid: '#B2EBF2',
+  primary: ' var(--app-accent, var(--app-accent, #2563EB))', primaryDark: '#2563EB', primaryLight: 'var(--teal-light, var(--teal-light, #EFF6FF))', primaryMid: '#B2EBF2',
   textDark: '#1A2332', textMid: '#4A5568', textLight: '#718096',
   bg: '#F0F4F8', white: '#FFFFFF', border: '#E2E8F0',
-  green: '#26C281', greenLight: '#D1FAE5',
+  green: '#16A34A', greenLight: '#D1FAE5',
   orange: '#F59E0B', orangeLight: '#FEF3C7',
   red: '#FF6B6B', redLight: '#FEE2E2',
-  purple: '#8B5CF6', purpleLight: '#EDE9FE',
-  radius: '14px', shadow: '0 2px 12px rgba(0,188,212,.08)', shadowLg: '0 8px 32px rgba(0,188,212,.14)',
+  purple: '#8B5CF6', purpleLight: '#EFF6FF',
+  radius: '14px', shadow: '0 2px 12px rgba(37, 99, 235,.08)', shadowLg: '0 8px 32px rgba(37, 99, 235,.14)',
 };
 
 // ── CSS ------------------------------------------------------------
@@ -59,7 +59,7 @@ const CSS = `
 .epd2-btn { display:inline-flex; align-items:center; gap:7px; padding:9px 18px; border-radius:10px; font-family:'Nunito',sans-serif; font-size:13px; font-weight:700; cursor:pointer; border:none; transition:all .15s; }
 .epd2-btn-outline { background:transparent; border:1.5px solid ${P.border}; color:${P.textMid}; }
 .epd2-btn-outline:hover { border-color:${P.primary}; color:${P.primary}; background:${P.primaryLight}; }
-.epd2-btn-primary { background:${P.primary}; color:#fff; box-shadow:0 4px 12px rgba(0,188,212,.2); }
+.epd2-btn-primary { background:${P.primary}; color:#fff; box-shadow:0 4px 12px rgba(37, 99, 235,.2); }
 .epd2-btn-primary:hover { background:${P.primaryDark}; }
 .epd2-btn-sm { padding:6px 12px; font-size:12px; }
 
@@ -72,7 +72,7 @@ const CSS = `
 .epd2-uf.bl { border-left-color:${P.red}; }
 .epd2-uf.gn { border-left-color:${P.orange}; }
 .epd2-uf.dl { border-left-color:${P.purple}; }
-.epd2-uf.unread { box-shadow:0 4px 20px rgba(0,188,212,.18); }
+.epd2-uf.unread { box-shadow:0 4px 20px rgba(37, 99, 235,.18); }
 .epd2-uf:hover { box-shadow:${P.shadowLg}; }
 .epd2-uf-inner { padding:16px 18px; }
 .epd2-uf-top { display:flex; align-items:center; gap:8px; margin-bottom:10px; flex-wrap:wrap; }
@@ -163,7 +163,7 @@ function getInitials(name) {
   return p.length >= 2 ? (p[0][0] + p[1][0]).toUpperCase() : name.substring(0, 2).toUpperCase();
 }
 
-const AV_COLORS = [' var(--app-accent, var(--app-accent, #00BCD4))', '#8B5CF6', '#F59E0B', '#26C281', '#EC4899', '#3B82F6', '#EF4444', '#10B981'];
+const AV_COLORS = [' var(--app-accent, var(--app-accent, #2563EB))', '#8B5CF6', '#F59E0B', '#16A34A', '#EC4899', '#3B82F6', '#EF4444', '#10B981'];
 function avColor(name, i = 0) {
   if (!name) return AV_COLORS[i % AV_COLORS.length];
   return AV_COLORS[(name.charCodeAt(0) + i) % AV_COLORS.length];

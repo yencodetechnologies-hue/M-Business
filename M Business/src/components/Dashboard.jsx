@@ -316,10 +316,10 @@ function ClientDropdown({ clients, value, onChange, error, onAddClient }) {
       {open && (
         <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "#fff", border: "1.5px solid var(--app-border)", borderRadius: 12, boxShadow: "0 8px 32px rgba(var(--app-accent-rgb, 124, 58, 237),0.15)", zIndex: 999, overflow: "hidden" }}>
           <div style={{ padding: "10px 10px 6px" }}><div style={{ position: "relative" }}><span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12 }}>Search</span><input autoFocus placeholder="Search client..." value={search} onChange={e => setSearch(e.target.value)} onClick={e => e.stopPropagation()} style={{ width: "100%", padding: "7px 10px 7px 30px", border: "1.5px solid var(--app-border)", borderRadius: 8, fontSize: 12, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} /></div></div>
-          {onAddClient && <div onClick={() => { setOpen(false); setSearch(""); onAddClient(); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: "linear-gradient(90deg,#f3e8ff,var(--app-bg))", borderBottom: "2px solid var(--app-border)" }}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 17, fontWeight: 700, flexShrink: 0 }}>+</div><div><div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>Add New Client</div></div></div>}
+          {onAddClient && <div onClick={() => { setOpen(false); setSearch(""); onAddClient(); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: "linear-gradient(90deg,#eff6ff,var(--app-bg))", borderBottom: "2px solid var(--app-border)" }}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 17, fontWeight: 700, flexShrink: 0 }}>+</div><div><div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>Add New Client</div></div></div>}
           <div style={{ maxHeight: 180, overflowY: "auto" }}>
             {filtered.length === 0 ? <div style={{ padding: 14, textAlign: "center", color: "var(--app-muted)", fontSize: 13 }}>No clients found</div>
-              : filtered.map((c, i) => { const name = c.clientName || c.name || ""; const company = c.companyName || c.company || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "#f3e8ff" : "transparent", borderBottom: "1px solid var(--app-bg)" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "#f3e8ff" : "transparent"}><div style={{ width: 28, height: 28, borderRadius: "50%", background: c.logoUrl ? "#fff" : "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0, overflow: "hidden", border: c.logoUrl ? "1px solid var(--app-border)" : "none" }}>{c.logoUrl ? <img src={c.logoUrl} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} /> : (name[0]?.toUpperCase() || "?")}</div><div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</div>{company && <div style={{ fontSize: 11, color: "var(--app-muted)" }}>{company}</div>}</div>{isSel && <span style={{ fontSize: 14, color: "var(--app-accent)" }}>Yes</span>}</div>); })}
+              : filtered.map((c, i) => { const name = c.clientName || c.name || ""; const company = c.companyName || c.company || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "#eff6ff" : "transparent", borderBottom: "1px solid var(--app-bg)" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "#eff6ff" : "transparent"}><div style={{ width: 28, height: 28, borderRadius: "50%", background: c.logoUrl ? "#fff" : "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0, overflow: "hidden", border: c.logoUrl ? "1px solid var(--app-border)" : "none" }}>{c.logoUrl ? <img src={c.logoUrl} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} /> : (name[0]?.toUpperCase() || "?")}</div><div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</div>{company && <div style={{ fontSize: 11, color: "var(--app-muted)" }}>{company}</div>}</div>{isSel && <span style={{ fontSize: 14, color: "var(--app-accent)" }}>Yes</span>}</div>); })}
           </div>
         </div>
       )}
@@ -546,7 +546,7 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
                 setViewClient(null);
                 if (onCreateProject) onCreateProject(c);
               }}
-              style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#26C281,#00BCD4)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}
+              style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#16A34A,#2563EB)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}
             >+ Add Project</button>
             <button onClick={() => { setViewClient(null); openEdit(viewClient); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Edit</button>
             <button onClick={() => { setViewClient(null); setDeleteTarget(viewClient); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#EF4444,#dc2626)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Delete</button>
@@ -592,7 +592,7 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
 
           {/* BASIC INFO */}
           <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 12 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Company Basic Info</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Company Basic Info</div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
               <Fld label="Client / Display Name *" value={editForm.clientName} onChange={v => { setEditForm(p => ({ ...p, clientName: v })); setEditErr(p => ({ ...p, clientName: '' })); }} error={editErr.clientName} />
               <Fld label="Company Name" value={editForm.companyName} onChange={v => setEditForm(p => ({ ...p, companyName: v }))} />
@@ -606,7 +606,7 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
 
           {/* PRIMARY CONTACT */}
           <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 12 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Document Primary Contact</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Document Primary Contact</div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
               <Fld label="Contact Person Name" value={editForm.contactPersonName} onChange={v => setEditForm(p => ({ ...p, contactPersonName: v }))} />
               <Fld label="Designation" value={editForm.designation} onChange={v => setEditForm(p => ({ ...p, designation: v }))} />
@@ -619,7 +619,7 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
 
           {/* ADDRESS */}
           <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 12 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Location Address</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Location Address</div>
             <div style={{ marginBottom: 12 }}><Fld label="Street / Building Address" value={editForm.address} onChange={v => setEditForm(p => ({ ...p, address: v }))} /></div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
               <Fld label="City" value={editForm.city} onChange={v => setEditForm(p => ({ ...p, city: v }))} />
@@ -631,7 +631,7 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
 
           {/* ONLINE PRESENCE */}
           <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 12 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Web Online Presence</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Web Online Presence</div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
               <Fld label="Website URL" value={editForm.website} onChange={v => setEditForm(p => ({ ...p, website: v }))} />
               <Fld label="LinkedIn Profile" value={editForm.linkedin} onChange={v => setEditForm(p => ({ ...p, linkedin: v }))} />
@@ -640,7 +640,7 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
 
           {/* BILLING & TERMS */}
           <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 12 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}> Billing & Terms</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}> Billing & Terms</div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
               <Fld label="Billing Currency" value={editForm.billingCurrency} onChange={v => setEditForm(p => ({ ...p, billingCurrency: v }))} options={['INR — Indian Rupee', 'USD — US Dollar', 'GBP — British Pound', 'EUR — Euro', 'AED — UAE Dirham', 'SGD — Singapore Dollar', 'AUD — Australian Dollar']} />
               <Fld label="Payment Terms" value={editForm.paymentTerms} onChange={v => setEditForm(p => ({ ...p, paymentTerms: v }))} options={['', 'Due on receipt', 'Net 7', 'Net 15', 'Net 30', 'Net 45', 'Net 60', '50% Advance + 50% on delivery', 'Custom']} />
@@ -651,7 +651,7 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
 
           {/* PORTAL PASSWORD */}
           <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 12 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Secure Portal Access</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Secure Portal Access</div>
             <input type="password" value={editForm.password} onChange={e => setEditForm(p => ({ ...p, password: e.target.value }))}
               style={{ width: '100%', border: '1.5px solid var(--app-border)', borderRadius: 10, padding: '10px 14px', fontSize: 13, color: T.text, background: 'var(--app-bg)', boxSizing: 'border-box', outline: 'none' }}
               placeholder="Leave blank to keep current password" />
@@ -659,7 +659,7 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
 
           {/* INTERNAL NOTES */}
           <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Edit Internal Notes</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Edit Internal Notes</div>
             <textarea value={editForm.notes} onChange={e => setEditForm(p => ({ ...p, notes: e.target.value }))}
               style={{ width: '100%', border: '1.5px solid #E0E6EA', borderRadius: 10, padding: '10px 14px', fontSize: 13, color: T.text, background: '#fff', boxSizing: 'border-box', outline: 'none', minHeight: 70, resize: 'vertical', fontFamily: 'inherit' }}
               placeholder="Any internal context,  instructions..." />
@@ -1180,7 +1180,7 @@ function ProjectsPage({ projects, setProjects, clients, employees, config, onVie
                             ))}
                             {assignedEmployees.length > 2 && <div style={{ fontSize: 10, color: "var(--app-muted)", fontStyle: "italic" }}>+{assignedEmployees.length - 2} more</div>}
                           </div>
-                          : <button onClick={() => { setAssignModal(p); setAssignTo(Array.isArray(p.assignedTo) ? p.assignedTo : (p.assignedTo ? [p.assignedTo] : [])); }} style={{ background: "rgba(var(--app-accent-rgb, 124, 58, 237), 0.1)", border: "1px solid rgba(99,102,241,0.25)", borderRadius: 7, padding: "4px 10px", fontSize: 11, color: "var(--app-accent)", fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Assign</button>
+                          : <button onClick={() => { setAssignModal(p); setAssignTo(Array.isArray(p.assignedTo) ? p.assignedTo : (p.assignedTo ? [p.assignedTo] : [])); }} style={{ background: "rgba(var(--app-accent-rgb, 124, 58, 237), 0.1)", border: "1px solid rgba(37, 99, 235,0.25)", borderRadius: 7, padding: "4px 10px", fontSize: 11, color: "var(--app-accent)", fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Assign</button>
                       })()}
                     </td>
                     <td style={{ padding: "12px 14px" }}>
@@ -1288,7 +1288,7 @@ function ProjectsPage({ projects, setProjects, clients, employees, config, onVie
                     />
                     <label htmlFor={`edit-emp-${emp._id || emp.email}`} style={{ flex: 1, cursor: "pointer", fontSize: 13, color: "var(--app-sidebar)", display: "flex", alignItems: "center", gap: 8 }}>
                       <span>{emp.name}</span>
-                      {emp.department && <span style={{ fontSize: 11, color: "#a78bba", background: "#f3e8ff", padding: "2px 6px", borderRadius: 4 }}>{emp.department}</span>}
+                      {emp.department && <span style={{ fontSize: 11, color: "#a78bba", background: "#eff6ff", padding: "2px 6px", borderRadius: 4 }}>{emp.department}</span>}
                     </label>
                   </div>
                 ))}
@@ -1298,7 +1298,7 @@ function ProjectsPage({ projects, setProjects, clients, employees, config, onVie
                 <label style={{ display: "block", fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 6 }}>SELECTED EMPLOYEES ({editForm.assignedTo.length})</label>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                   {editForm.assignedTo.map(name => (
-                    <div key={name} style={{ display: "flex", alignItems: "center", gap: 6, background: "#f3e8ff", border: "1px solid #ddd6fe", borderRadius: 8, padding: "4px 10px" }}>
+                    <div key={name} style={{ display: "flex", alignItems: "center", gap: 6, background: "#eff6ff", border: "1px solid #e2e8f0", borderRadius: 8, padding: "4px 10px" }}>
                       <div style={{ width: 18, height: 18, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 8, fontWeight: 700 }}>{name ? name[0].toUpperCase() : "?"}</div>
                       <span style={{ fontSize: 12, fontWeight: 600, color: "var(--app-accent)" }}>{name}</span>
                       <button
@@ -1344,7 +1344,7 @@ function ProjectsPage({ projects, setProjects, clients, employees, config, onVie
                     />
                     <label htmlFor={`assign-emp-${emp._id || emp.email}`} style={{ flex: 1, cursor: "pointer", fontSize: 13, color: "var(--app-sidebar)", display: "flex", alignItems: "center", gap: 8 }}>
                       <span>{emp.name}</span>
-                      {emp.department && <span style={{ fontSize: 11, color: "#a78bba", background: "#f3e8ff", padding: "2px 6px", borderRadius: 4 }}>{emp.department}</span>}
+                      {emp.department && <span style={{ fontSize: 11, color: "#a78bba", background: "#eff6ff", padding: "2px 6px", borderRadius: 4 }}>{emp.department}</span>}
                     </label>
                   </div>
                 ))}
@@ -1354,7 +1354,7 @@ function ProjectsPage({ projects, setProjects, clients, employees, config, onVie
                 <label style={{ display: "block", fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 6 }}>SELECTED EMPLOYEES ({assignTo.length})</label>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                   {assignTo.map(name => (
-                    <div key={name} style={{ display: "flex", alignItems: "center", gap: 6, background: "#f3e8ff", border: "1px solid #ddd6fe", borderRadius: 8, padding: "4px 10px" }}>
+                    <div key={name} style={{ display: "flex", alignItems: "center", gap: 6, background: "#eff6ff", border: "1px solid #e2e8f0", borderRadius: 8, padding: "4px 10px" }}>
                       <div style={{ width: 18, height: 18, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 8, fontWeight: 700 }}>{name ? name[0].toUpperCase() : "?"}</div>
                       <span style={{ fontSize: 12, fontWeight: 600, color: "var(--app-accent)" }}>{name}</span>
                       <button
@@ -1400,7 +1400,7 @@ function SearchDropdown({ label, items, displayKey, value, onChange, error, plac
           <div style={{ padding: "8px 10px" }}><input autoFocus placeholder="Search..." value={search} onChange={e => setSearch(e.target.value)} onClick={e => e.stopPropagation()} style={{ width: "100%", padding: "7px 10px", border: "1.5px solid var(--app-border)", borderRadius: 8, fontSize: 12, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} /></div>
           <div style={{ maxHeight: 180, overflowY: "auto" }}>
             {filtered.length === 0 ? <div style={{ padding: 14, textAlign: "center", color: "var(--app-muted)", fontSize: 13 }}>No results</div>
-              : filtered.map((item, i) => { const name = item[displayKey] || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "#f3e8ff" : "transparent", borderBottom: "1px solid var(--app-bg)" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "#f3e8ff" : "transparent"}><div style={{ width: 26, height: 26, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{name[0]?.toUpperCase() || "?"}</div><span style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</span>{isSel && <span style={{ marginLeft: "auto", color: "var(--app-accent)" }}>Yes</span>}</div>); })}
+              : filtered.map((item, i) => { const name = item[displayKey] || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "#eff6ff" : "transparent", borderBottom: "1px solid var(--app-bg)" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "#eff6ff" : "transparent"}><div style={{ width: 26, height: 26, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{name[0]?.toUpperCase() || "?"}</div><span style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</span>{isSel && <span style={{ marginLeft: "auto", color: "var(--app-accent)" }}>Yes</span>}</div>); })}
           </div>
         </div>
       )}
@@ -1588,7 +1588,7 @@ function InterviewPage({ companyId, companyName }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
-      <div style={{ background: "linear-gradient(135deg,var(--app-sidebar),#2d1057)", borderRadius: 16, padding: "20px 24px", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", boxShadow: "0 8px 24px rgba(59,7,100,0.25)" }}>
+      <div style={{ background: "linear-gradient(135deg,var(--app-sidebar),#0f172a)", borderRadius: 16, padding: "20px 24px", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", boxShadow: "0 8px 24px rgba(15, 23, 42,0.25)" }}>
         <div style={{ width: 42, height: 42, borderRadius: 12, background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}></div>
         <div style={{ flex: 1, minWidth: 0 }}><div style={{ fontSize: 10, color: "rgba(255,255,255,0.5)", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>Candidate Application Link</div><div style={{ fontSize: 12, color: "var(--app-muted)", fontFamily: "monospace", wordBreak: "break-all" }}>{appLink}</div></div>
         <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
@@ -1808,7 +1808,7 @@ function Sidebar({ active, setActive, onLogout, open, onClose, navItems, initial
         className="sidebar app-sidebar-scroll"
         style={{
           width: 235,
-          background: "linear-gradient(165deg,#2d0f5c 0%,var(--app-sidebar) 45%,#25094a 100%)",
+          background: "linear-gradient(165deg,#0f172a 0%,var(--app-sidebar) 45%,#0f172a 100%)",
           color: "#fff", display: "flex", flexDirection: "column", height: "100vh",
           position: "fixed", top: 0, left: 0, zIndex: 999, flexShrink: 0, overflow: "hidden",
           boxShadow: "6px 0 32px rgba(20,0,50,0.35)",
@@ -1818,8 +1818,8 @@ function Sidebar({ active, setActive, onLogout, open, onClose, navItems, initial
         }}
       >
         {/* ambient glow accents */}
-        <div style={{ position: "absolute", top: -60, right: -60, width: 180, height: 180, borderRadius: "50%", background: "radial-gradient(circle,rgba(0,188,212,0.25),transparent 70%)", pointerEvents: "none", zIndex: 0 }} />
-        <div style={{ position: "absolute", bottom: -80, left: -60, width: 200, height: 200, borderRadius: "50%", background: "radial-gradient(circle,rgba(124,58,237,0.35),transparent 70%)", pointerEvents: "none", zIndex: 0 }} />
+        <div style={{ position: "absolute", top: -60, right: -60, width: 180, height: 180, borderRadius: "50%", background: "radial-gradient(circle,rgba(37, 99, 235,0.25),transparent 70%)", pointerEvents: "none", zIndex: 0 }} />
+        <div style={{ position: "absolute", bottom: -80, left: -60, width: 200, height: 200, borderRadius: "50%", background: "radial-gradient(circle,rgba(37, 99, 235,0.35),transparent 70%)", pointerEvents: "none", zIndex: 0 }} />
 
         <button onClick={onClose} className="sidebar-close" style={{ position: "absolute", top: 12, right: 12, zIndex: 2, width: 28, height: 28, borderRadius: 8, background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.8)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
           <X size={15} strokeWidth={2.5} />
@@ -1871,9 +1871,9 @@ function Sidebar({ active, setActive, onLogout, open, onClose, navItems, initial
                   position: "relative",
                   display: "flex", alignItems: "center", gap: 11, padding: "9px 12px", borderRadius: 11,
                   marginBottom: 4, cursor: "pointer", fontSize: 13, fontWeight: isActive ? 700 : 500,
-                  background: isActive ? "linear-gradient(135deg,rgba(0,188,212,0.22),rgba(255,255,255,0.08))" : "transparent",
+                  background: isActive ? "linear-gradient(135deg,rgba(37, 99, 235,0.22),rgba(255,255,255,0.08))" : "transparent",
                   color: isActive ? "#fff" : "rgba(255,255,255,0.62)",
-                  boxShadow: isActive ? "0 4px 14px rgba(0,188,212,0.18), inset 0 0 0 1px rgba(255,255,255,0.1)" : "none",
+                  boxShadow: isActive ? "0 4px 14px rgba(37, 99, 235,0.18), inset 0 0 0 1px rgba(255,255,255,0.1)" : "none",
                   transition: "background 0.18s ease, color 0.18s ease"
                 }}
               >
@@ -2135,7 +2135,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         const gRes = await axios.get(BASE_URL + "/api/groups");
         gId = gRes.data && gRes.data.length > 0 ? gRes.data[0]._id : null;
         if (!gId) {
-          const gNew = await axios.post(BASE_URL + "/api/groups", { label: "Tasks", color: "var(--app-accent, #00BCD4)" });
+          const gNew = await axios.post(BASE_URL + "/api/groups", { label: "Tasks", color: "var(--app-accent, #2563EB)" });
           gId = gNew.data._id;
         }
       } catch { }
@@ -2331,7 +2331,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         *{box-sizing:border-box}
         ::-webkit-scrollbar{width:5px}
-        ::-webkit-scrollbar-thumb{background:#d8b4fe;border-radius:3px}
+        ::-webkit-scrollbar-thumb{background:#eff6ff;border-radius:3px}
         button,input,select,textarea{font-family:inherit}
         .sidebar-nav-item:hover{background:rgba(255,255,255,0.09)!important;color:#fff!important;}
         .sidebar-logout-btn:hover{background:rgba(239,68,68,0.24)!important;transform:translateY(-1px);}
@@ -2480,8 +2480,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               {/* FLOATING STAT STRIP */}
               <div style={{ margin: "-72px 16px 0", position: "relative", zIndex: 5, display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10 }}>
                 {[
-                  { icon: "ti-users", label: "Clients", val: clients.length, grad: "linear-gradient(135deg,#7c3aed,#a78bfa)" },
-                  { icon: "ti-folder", label: "Projects", val: projects.length, grad: "linear-gradient(135deg,var(--app-accent),#00BCD4)" },
+                  { icon: "ti-users", label: "Clients", val: clients.length, grad: "linear-gradient(135deg,#2563eb,#2563eb)" },
+                  { icon: "ti-folder", label: "Projects", val: projects.length, grad: "linear-gradient(135deg,var(--app-accent),#2563EB)" },
                   { icon: "ti-user-circle", label: "Team", val: employees.length, grad: "linear-gradient(135deg,#f59e0b,#fbbf24)" },
                 ].map((s, i) => (
                   <div key={i} className="md-card" style={{ animationDelay: `${i * 70}ms`, background: "#fff", borderRadius: 18, padding: "14px 8px", boxShadow: "0 10px 30px rgba(15,10,41,0.14)", textAlign: "center", border: "1px solid rgba(0,0,0,0.03)" }}>
@@ -2891,7 +2891,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           {validActive === "proposals" && <ProjectProposalCreator clients={clients} companyLogo={user?.logoUrl} companyName={user?.companyName || "M Business"} />}
           {validActive === "tracking" && <ProjectStatusPage clients={clients} employees={employees} managers={managers} config={config} />}
           {validActive === "tasks" && <TaskPage projects={projects} employees={employees} onUpdate={() => fetchTasks()} config={config} user={user} selectedProjectId={selectedProjectForTasks?._id || null} selectedProjectName={selectedProjectForTasks?.name || null} onClearProjectFilter={() => setSelectedProjectForTasks(null)} onSelectProject={(p) => setSelectedProjectForTasks(p)} autoOpenAddModal={autoOpenTaskModal} onAddModalOpened={(val) => setAutoOpenTaskModal(!!val)} />}
-          {validActive === "calendar" && <CalendarPage projects={projects} tasks={tasks} clients={clients} user={user} onUpdateProject={() => fetchProjects()} onUpdateTask={() => fetchTasks()} THEME={{ accent: "#00BCD4", gradient: "linear-gradient(135deg, #00BCD4, #00BCD4)", muted: "#607D86", card: "#FFFFFF", bg: "#F5FAFA", border: "#E0EEF0", text: "#1A2E35" }} />}
+          {validActive === "calendar" && <CalendarPage projects={projects} tasks={tasks} clients={clients} user={user} onUpdateProject={() => fetchProjects()} onUpdateTask={() => fetchTasks()} THEME={{ accent: "#2563EB", gradient: "linear-gradient(135deg, #2563EB, #2563EB)", muted: "#64748B", card: "#FFFFFF", bg: "#F8FAFC", border: "#E2E8F0", text: "#1E293B" }} />}
           {validActive === "messaging" && <MessagingPage user={user} />}
           {validActive === "settings" && <SettingsPage THEME={T} user={user} triggerCrop={triggerCrop} onProfileUpdate={(updates) => { const updated = { ...user, ...updates }; setUser(updated); try { localStorage.setItem("user", JSON.stringify(updated)); } catch { } }} />}
 
@@ -2924,7 +2924,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             { icon: "ti-users", label: "Clients", key: "clients" },
             { icon: "ti-dots", label: "More", key: "settings" },
           ].map((n, i) => n.key === "add" ? (
-            <div key={i} className="md-tap" onClick={() => setActive("projects")} style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),#00BCD4)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 24, marginTop: -30, boxShadow: "0 10px 24px rgba(0,188,212,0.5)", border: "3px solid #08061a", cursor: "pointer" }}>+</div>
+            <div key={i} className="md-tap" onClick={() => setActive("projects")} style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),#2563EB)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 24, marginTop: -30, boxShadow: "0 10px 24px rgba(37, 99, 235,0.5)", border: "3px solid #08061a", cursor: "pointer" }}>+</div>
           ) : (
             <div key={i} className="md-tap" onClick={() => setActive(n.key)} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, color: active === n.key ? "var(--app-accent)" : "rgba(255,255,255,0.5)", padding: "4px 10px", cursor: "pointer" }}>
               <i className={`ti ${n.icon}`} style={{ fontSize: 19 }}></i>
@@ -3014,7 +3014,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
                 {[{ val: 'b2b', icon: '🏢', label: 'B2B', sub: 'Company / Business' }, { val: 'b2c', icon: '👤', label: 'B2C', sub: 'Individual person' }, { val: 'freelancer', icon: '💼', label: 'Freelancer', sub: 'Consultant / Solo' }].map(t => (
                   <div key={t.val} onClick={() => setNc(p => ({ ...p, clientType: t.val }))}
-                    style={{ border: `2px solid ${nc.clientType === t.val ? ' var(--app-accent, var(--app-accent, #00BCD4))' : '#E0E6EA'}`, borderRadius: 10, padding: '12px 8px', textAlign: 'center', cursor: 'pointer', background: nc.clientType === t.val ? 'var(--teal-light, var(--teal-light, #E0F7FA))' : '#F4F6F8', transition: 'all .15s', position: 'relative' }}>
+                    style={{ border: `2px solid ${nc.clientType === t.val ? ' var(--app-accent, var(--app-accent, #2563EB))' : '#E0E6EA'}`, borderRadius: 10, padding: '12px 8px', textAlign: 'center', cursor: 'pointer', background: nc.clientType === t.val ? 'var(--teal-light, var(--teal-light, #EFF6FF))' : '#F4F6F8', transition: 'all .15s', position: 'relative' }}>
                     {nc.clientType === t.val && <span style={{ position: 'absolute', top: 6, right: 6, width: 14, height: 14, borderRadius: '50%', background: accentColor, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}></span>}
                     <div style={{ fontSize: 22, marginBottom: 4 }}>{t.icon}</div>
                     <div style={{ fontSize: 12, fontWeight: 700, color: nc.clientType === t.val ? '#007B8A' : '#1A2332' }}>{t.label}</div>
@@ -3026,7 +3026,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
             {/* ── BASIC INFO ── */}
             <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Company Basic Info</div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Company Basic Info</div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
                 <Fld label="Client / Display Name *" value={nc.name} onChange={v => { setNc({ ...nc, name: v }); setNcError(p => ({ ...p, name: '' })); }} error={ncError.name} />
                 <Fld label="Company Name" value={nc.company} onChange={v => setNc({ ...nc, company: v })} />
@@ -3040,7 +3040,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
             {/* ── PRIMARY CONTACT ── */}
             <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Document Primary Contact</div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Document Primary Contact</div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
                 <Fld label="Contact Person Name" value={nc.contactPersonName} onChange={v => setNc({ ...nc, contactPersonName: v })} />
                 <Fld label="Designation" value={nc.designation || ''} onChange={v => setNc({ ...nc, designation: v })} />
@@ -3053,7 +3053,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
             {/* ── ADDRESS ── */}
             <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Location Address</div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Location Address</div>
               <div style={{ marginBottom: 12 }}><Fld label="Street / Building Address" value={nc.address} onChange={v => setNc({ ...nc, address: v })} /></div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
                 <Fld label="City" value={nc.city} onChange={v => setNc({ ...nc, city: v })} />
@@ -3065,7 +3065,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
             {/* ── ONLINE PRESENCE ── */}
             <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Web Online Presence</div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Web Online Presence</div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
                 <Fld label="Website URL" value={nc.website} onChange={v => setNc({ ...nc, website: v })} />
                 <Fld label="LinkedIn Profile" value={nc.linkedin} onChange={v => setNc({ ...nc, linkedin: v })} />
@@ -3074,7 +3074,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
             {/* ── BILLING & TERMS ── */}
             <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}> Billing & Terms</div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}> Billing & Terms</div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
                 <Fld label="Billing Currency" value={nc.billingCurrency} onChange={v => { setNc({ ...nc, billingCurrency: v }); saveCustomCurrency(v); }} options={['INR — Indian Rupee', 'USD — US Dollar', 'GBP — British Pound', 'EUR — Euro', 'AED — UAE Dirham', 'SGD — Singapore Dollar', 'AUD — Australian Dollar', ...customCurrencies]} allowCustom={true} />
                 <Fld label="Payment Terms" value={nc.paymentTerms} onChange={v => setNc({ ...nc, paymentTerms: v })} options={['', 'Due on receipt', 'Net 7', 'Net 15', 'Net 30', 'Net 45', 'Net 60', '50% Advance + 50% on delivery', 'Custom']} />
@@ -3085,7 +3085,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
             {/* ── PORTAL ACCESS ── */}
             <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Secure Portal Access</div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Secure Portal Access</div>
               <div style={{ position: 'relative', marginBottom: 4 }}>
                 <input type={showClientPass ? 'text' : 'password'} value={nc.password} onChange={e => setNc({ ...nc, password: e.target.value })}
                   style={{ width: '100%', border: `1.5px solid ${ncError.password ? '#EF4444' : 'var(--app-border)'}`, borderRadius: 10, padding: '10px 46px 10px 14px', fontSize: 13, color: T.text, background: 'var(--app-bg)', boxSizing: 'border-box', outline: 'none' }}
@@ -3097,7 +3097,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
             {/* ── INTERNAL NOTES ── */}
             <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Edit Internal Notes</div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Edit Internal Notes</div>
               <textarea value={nc.notes} onChange={e => setNc({ ...nc, notes: e.target.value })}
                 style={{ width: '100%', border: '1.5px solid #E0E6EA', borderRadius: 10, padding: '10px 14px', fontSize: 13, color: T.text, background: '#fff', boxSizing: 'border-box', outline: 'none', minHeight: 70, resize: 'vertical', fontFamily: 'inherit' }}
                 placeholder="Any internal context,  instructions, or notes..." />
@@ -3145,7 +3145,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               <div style={{ border: "1.5px solid var(--app-accent)", borderRadius: 10, padding: "10px 14px", fontSize: 13, background: "var(--app-bg)", display: "flex", alignItems: "center", gap: 8, minHeight: 42 }}>
                 <div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700 }}>{prefillClientName[0].toUpperCase()}</div>
                 <span style={{ fontWeight: 600, color: "var(--app-accent)" }}>{prefillClientName}</span>
-                <span style={{ marginLeft: "auto", fontSize: 10, background: "#f3e8ff", color: "var(--app-accent)", borderRadius: 6, padding: "2px 8px", fontWeight: 700 }}>Auto-selected</span>
+                <span style={{ marginLeft: "auto", fontSize: 10, background: "#eff6ff", color: "var(--app-accent)", borderRadius: 6, padding: "2px 8px", fontWeight: 700 }}>Auto-selected</span>
               </div>
             ) : (
               <ClientDropdown
@@ -3222,7 +3222,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   />
                   <label htmlFor={`emp-${e._id || e.email}`} style={{ flex: 1, cursor: "pointer", fontSize: 13, color: "var(--app-sidebar)", display: "flex", alignItems: "center", gap: 8 }}>
                     <span>{e.name}</span>
-                    {e.department && <span style={{ fontSize: 11, color: "#a78bba", background: "#f3e8ff", padding: "2px 6px", borderRadius: 4 }}>{e.department}</span>}
+                    {e.department && <span style={{ fontSize: 11, color: "#a78bba", background: "#eff6ff", padding: "2px 6px", borderRadius: 4 }}>{e.department}</span>}
                   </label>
                 </div>
               ))}
@@ -3232,7 +3232,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               <label style={{ display: "block", fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 6 }}>SELECTED EMPLOYEES ({np.assignedTo.length})</label>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                 {np.assignedTo.map(name => (
-                  <div key={name} style={{ display: "flex", alignItems: "center", gap: 6, background: "#f3e8ff", border: "1px solid #ddd6fe", borderRadius: 8, padding: "4px 10px" }}>
+                  <div key={name} style={{ display: "flex", alignItems: "center", gap: 6, background: "#eff6ff", border: "1px solid #e2e8f0", borderRadius: 8, padding: "4px 10px" }}>
                     <div style={{ width: 18, height: 18, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 8, fontWeight: 700 }}>{name ? name[0].toUpperCase() : "?"}</div>
                     <span style={{ fontSize: 12, fontWeight: 600, color: "var(--app-accent)" }}>{name}</span>
                     <button

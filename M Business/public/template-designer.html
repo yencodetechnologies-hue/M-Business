@@ -23,21 +23,21 @@
     }
 
     :root {
-      --teal: var(--app-accent, #00BCD4);
-      --teal2: var(--app-accent2, var(--app-accent2, #00BCD4));
+      --teal: var(--app-accent, #2563EB);
+      --teal2: var(--app-accent2, var(--app-accent2, #2563EB));
       --teal3: #26D0CE;
       --teal4: #006E7F;
-      --teal-light: var(--teal-light, #E0F7FA);
-      --teal-lighter: var(--teal-lighter, #F0FDFE);
-      --bg: #F5FAFA;
+      --teal-light: var(--teal-light, #EFF6FF);
+      --teal-lighter: var(--teal-lighter, #EFF6FF);
+      --bg: #F8FAFC;
       --surface: #FFFFFF;
       --surface2: #F8FAFB;
-      --border: #E0EEF0;
-      --border2: #C5DDE0;
-      --text: #1A2E35;
-      --text2: #607D86;
-      --text3: #A0B8BE;
-      --green: #26C281;
+      --border: #E2E8F0;
+      --border2: #E2E8F0;
+      --text: #1E293B;
+      --text2: #64748B;
+      --text3: #64748B;
+      --green: #16A34A;
       --green-bg: #E8FAF3;
       --amber: #F5A623;
       --amber-bg: #FEF5E6;
@@ -47,7 +47,7 @@
       --purple-bg: #EEE9FF;
       --blue: #2563EB;
       --blue-bg: #EFF4FF;
-      --sidebar-grad: linear-gradient(180deg, #26D0CE 0%, var(--teal) 35%, var(--app-accent2, #00BCD4) 65%, #006E7F 100%);
+      --sidebar-grad: linear-gradient(180deg, #26D0CE 0%, var(--teal) 35%, var(--app-accent2, #2563EB) 65%, #006E7F 100%);
       --lh-color: var(--teal);
       --font: 'Nunito', sans-serif;
     }
@@ -77,7 +77,7 @@
       padding: 16px 0 20px;
       gap: 4px;
       z-index: 100;
-      box-shadow: 3px 0 16px rgba(0, 188, 212, .2)
+      box-shadow: 3px 0 16px rgba(37, 99, 235, .2)
     }
 
     .ns-logo {
@@ -126,7 +126,7 @@
     .ns-tooltip {
       position: absolute;
       left: 48px;
-      background: #1A2E35;
+      background: #1E293B;
       color: #fff;
       font-size: 10px;
       font-weight: 700;
@@ -325,7 +325,7 @@
     .fi:focus {
       border-color: var(--teal);
       background: var(--surface);
-      box-shadow: 0 0 0 3px rgba(0, 188, 212, .08)
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, .08)
     }
 
     .fi::placeholder {
@@ -373,7 +373,7 @@
 
     .ta:focus {
       border-color: var(--teal);
-      box-shadow: 0 0 0 3px rgba(0, 188, 212, .08)
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, .08)
     }
 
     .ta::placeholder {
@@ -498,7 +498,7 @@
 
     .lo.sel {
       border-color: var(--teal);
-      box-shadow: 0 0 0 2px rgba(0, 188, 212, .15)
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, .15)
     }
 
     .lo-prev {
@@ -816,7 +816,7 @@
       background: var(--teal);
       color: #fff;
       border: none;
-      box-shadow: 0 2px 8px rgba(0, 188, 212, .25)
+      box-shadow: 0 2px 8px rgba(37, 99, 235, .25)
     }
 
     .btn-sm.solid:hover {
@@ -851,7 +851,7 @@
       padding: 28px 40px;
       font-size: 12.5px;
       line-height: 1.8;
-      color: #1A2E35;
+      color: #1E293B;
       flex: 1
     }
 
@@ -859,7 +859,7 @@
 
     /* LETTER BODY */
     .lb-date {
-      color: #607D86;
+      color: #64748B;
       margin-bottom: 14px;
       font-size: 11.5px
     }
@@ -875,13 +875,13 @@
     }
 
     .lb-recip-sub {
-      color: #607D86;
+      color: #64748B;
       font-size: 11.5px
     }
 
     .lb-ref {
       font-size: 11px;
-      color: #607D86;
+      color: #64748B;
       margin-bottom: 10px;
       display: none
     }
@@ -889,7 +889,7 @@
     .lb-subj {
       margin-bottom: 14px;
       padding-bottom: 8px;
-      border-bottom: 1.5px solid #E0EEF0;
+      border-bottom: 1.5px solid #E2E8F0;
       display: none
     }
 
@@ -898,7 +898,7 @@
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: .6px;
-      color: #A0B8BE;
+      color: #64748B;
       margin-bottom: 2px
     }
 
@@ -916,7 +916,7 @@
       min-height: 280px;
       outline: none;
       cursor: text;
-      color: #1A2E35;
+      color: #1E293B;
       line-height: 1.8;
       font-size: 12.5px;
       text-decoration: none;
@@ -926,7 +926,7 @@
 
     .lb-editor:empty::before {
       content: attr(data-ph);
-      color: #A0B8BE;
+      color: #64748B;
       pointer-events: none;
       font-style: italic
     }
@@ -951,13 +951,13 @@
     }
 
     .lb-sig-role {
-      color: #607D86;
+      color: #64748B;
       font-size: 11px;
       margin-top: 2px
     }
 
     .lb-sig-dept {
-      color: #A0B8BE;
+      color: #64748B;
       font-size: 10px;
       margin-top: 1px
     }
@@ -967,7 +967,7 @@
       padding: 22px;
       font-family: var(--font);
       font-size: 12px;
-      color: #1A2E35;
+      color: #1E293B;
       background: #fff;
       min-height: 600px
     }
@@ -1324,7 +1324,7 @@
       padding: 24px;
       font-family: var(--font);
       font-size: 12px;
-      color: #1A2E35;
+      color: #1E293B;
       background: #fff;
       min-height: 560px
     }
@@ -1616,7 +1616,7 @@
       scrollbar-color: var(--border2) transparent;
       font-family: var(--font);
       font-size: 12px;
-      color: #1A2E35
+      color: #1E293B
     }
 
     /* COVER */
@@ -2207,7 +2207,7 @@
 
     .peb-text {
       font-size: 10.5px;
-      color: #607D86;
+      color: #64748B;
       line-height: 1.6
     }
 
@@ -2222,7 +2222,7 @@
       align-items: center;
       gap: 6px;
       font-size: 10.5px;
-      color: #607D86
+      color: #64748B
     }
 
     .prop-del-item::before {
@@ -2283,7 +2283,7 @@
 
     .tlp-desc {
       font-size: 9.5px;
-      color: #A0B8BE;
+      color: #64748B;
       margin-top: 1px;
       line-height: 1.5
     }
@@ -2309,7 +2309,7 @@
     }
 
     .pricing-tbl tbody tr {
-      border-bottom: 1px solid #E0EEF0
+      border-bottom: 1px solid #E2E8F0
     }
 
     .pricing-tbl tbody tr:nth-child(even) {
@@ -2337,14 +2337,14 @@
       padding: 10px;
       background: #F8FAFB;
       border-radius: 8px;
-      border: 1px solid #E0EEF0;
+      border: 1px solid #E2E8F0;
       text-align: center
     }
 
     .sob-line {
       width: 70px;
       height: 1px;
-      background: #A0B8BE;
+      background: #64748B;
       margin: 0 auto 4px
     }
 
@@ -2355,7 +2355,7 @@
 
     .sob-role {
       font-size: 9px;
-      color: #A0B8BE
+      color: #64748B
     }
 
     /* SECTION LABEL */
@@ -2559,16 +2559,16 @@
               <div class="fg">
                 <label class="fl">Brand Color</label>
                 <div class="cswatches" id="cswatches">
-                  <div class="csw sel" style="background:#00BCD4" data-c="#00BCD4" onclick="pickColor(this)"></div>
+                  <div class="csw sel" style="background:#2563EB" data-c="#2563EB" onclick="pickColor(this)"></div>
                   <div class="csw" style="background:#006E7F" data-c="#006E7F" onclick="pickColor(this)"></div>
-                  <div class="csw" style="background:#26C281" data-c="#26C281" onclick="pickColor(this)"></div>
+                  <div class="csw" style="background:#16A34A" data-c="#16A34A" onclick="pickColor(this)"></div>
                   <div class="csw" style="background:#7C5CFC" data-c="#7C5CFC" onclick="pickColor(this)"></div>
                   <div class="csw" style="background:#2563EB" data-c="#2563EB" onclick="pickColor(this)"></div>
                   <div class="csw" style="background:#F5A623" data-c="#F5A623" onclick="pickColor(this)"></div>
                   <div class="csw" style="background:#F05C5C" data-c="#F05C5C" onclick="pickColor(this)"></div>
                   <div class="csw" style="background:#EC407A" data-c="#EC407A" onclick="pickColor(this)"></div>
-                  <div class="csw" style="background:#1A2E35" data-c="#1A2E35" onclick="pickColor(this)"></div>
-                  <div class="csw" style="background:#607D86" data-c="#607D86" onclick="pickColor(this)"></div>
+                  <div class="csw" style="background:#1E293B" data-c="#1E293B" onclick="pickColor(this)"></div>
+                  <div class="csw" style="background:#64748B" data-c="#64748B" onclick="pickColor(this)"></div>
                 </div>
                 <div style="display:flex;gap:7px;align-items:center">
                   <input type="color" id="cpicker" value=" var(--teal)" oninput="setCustomColor(this.value)"
@@ -2617,11 +2617,11 @@
                 <div class="lo sel" onclick="selLayout(this,'lh','logo-left')">
                   <div class="lo-prev"><svg width="80" height="48" viewBox="0 0 80 48">
                       <rect x="8" y="14" width="18" height="14" rx="3" fill=" var(--teal)" opacity=".9" />
-                      <rect x="30" y="15" width="26" height="5" rx="2" fill="#1A2E35" opacity=".8" />
-                      <rect x="30" y="23" width="18" height="3" rx="1.5" fill="#A0B8BE" />
-                      <rect x="56" y="15" width="16" height="3" rx="1.5" fill="#E0EEF0" />
-                      <rect x="56" y="21" width="12" height="2.5" rx="1.25" fill="#E0EEF0" />
-                      <rect x="56" y="27" width="16" height="2.5" rx="1.25" fill="#E0EEF0" />
+                      <rect x="30" y="15" width="26" height="5" rx="2" fill="#1E293B" opacity=".8" />
+                      <rect x="30" y="23" width="18" height="3" rx="1.5" fill="#64748B" />
+                      <rect x="56" y="15" width="16" height="3" rx="1.5" fill="#E2E8F0" />
+                      <rect x="56" y="21" width="12" height="2.5" rx="1.25" fill="#E2E8F0" />
+                      <rect x="56" y="27" width="16" height="2.5" rx="1.25" fill="#E2E8F0" />
                       <rect x="4" y="36" width="72" height="2" rx="1" fill=" var(--teal)" />
                     </svg></div>
                   <div class="lo-chk">✓</div>
@@ -2629,11 +2629,11 @@
                 </div>
                 <div class="lo" onclick="selLayout(this,'lh','logo-right')">
                   <div class="lo-prev"><svg width="80" height="48" viewBox="0 0 80 48">
-                      <rect x="8" y="15" width="16" height="3" rx="1.5" fill="#E0EEF0" />
-                      <rect x="8" y="21" width="12" height="2.5" rx="1.25" fill="#E0EEF0" />
-                      <rect x="8" y="27" width="16" height="2.5" rx="1.25" fill="#E0EEF0" />
-                      <rect x="28" y="15" width="22" height="5" rx="2" fill="#1A2E35" opacity=".8" />
-                      <rect x="28" y="23" width="16" height="3" rx="1.5" fill="#A0B8BE" />
+                      <rect x="8" y="15" width="16" height="3" rx="1.5" fill="#E2E8F0" />
+                      <rect x="8" y="21" width="12" height="2.5" rx="1.25" fill="#E2E8F0" />
+                      <rect x="8" y="27" width="16" height="2.5" rx="1.25" fill="#E2E8F0" />
+                      <rect x="28" y="15" width="22" height="5" rx="2" fill="#1E293B" opacity=".8" />
+                      <rect x="28" y="23" width="16" height="3" rx="1.5" fill="#64748B" />
                       <rect x="54" y="14" width="18" height="14" rx="3" fill=" var(--teal)" opacity=".9" />
                       <rect x="4" y="36" width="72" height="2" rx="1" fill=" var(--teal)" />
                     </svg></div>
@@ -2643,8 +2643,8 @@
                 <div class="lo" onclick="selLayout(this,'lh','centered')">
                   <div class="lo-prev"><svg width="80" height="48" viewBox="0 0 80 48">
                       <circle cx="40" cy="15" r="8" fill=" var(--teal)" opacity=".9" />
-                      <rect x="25" y="26" width="30" height="5" rx="2" fill="#1A2E35" opacity=".8" />
-                      <rect x="28" y="33" width="24" height="3" rx="1.5" fill="#A0B8BE" />
+                      <rect x="25" y="26" width="30" height="5" rx="2" fill="#1E293B" opacity=".8" />
+                      <rect x="28" y="33" width="24" height="3" rx="1.5" fill="#64748B" />
                       <rect x="4" y="41" width="72" height="2" rx="1" fill=" var(--teal)" />
                     </svg></div>
                   <div class="lo-chk">✓</div>
@@ -2669,10 +2669,10 @@
                       <rect x="4" y="12" width="14" height="12" rx="3" fill="rgba(255,255,255,.3)" />
                       <rect x="4" y="27" width="22" height="3.5" rx="1.75" fill="rgba(255,255,255,.85)" />
                       <rect x="4" y="33" width="16" height="2.5" rx="1.25" fill="rgba(255,255,255,.55)" />
-                      <rect x="36" y="13" width="36" height="2.5" rx="1.25" fill="#A0B8BE" />
-                      <rect x="36" y="19" width="28" height="2.5" rx="1.25" fill="#A0B8BE" />
-                      <rect x="36" y="25" width="34" height="2.5" rx="1.25" fill="#A0B8BE" />
-                      <rect x="36" y="31" width="30" height="2.5" rx="1.25" fill="#A0B8BE" />
+                      <rect x="36" y="13" width="36" height="2.5" rx="1.25" fill="#64748B" />
+                      <rect x="36" y="19" width="28" height="2.5" rx="1.25" fill="#64748B" />
+                      <rect x="36" y="25" width="34" height="2.5" rx="1.25" fill="#64748B" />
+                      <rect x="36" y="31" width="30" height="2.5" rx="1.25" fill="#64748B" />
                     </svg></div>
                   <div class="lo-chk">✓</div>
                   <div class="lo-lbl">Split Panel</div>
@@ -2681,12 +2681,12 @@
                   <div class="lo-prev" style="background:transparent"><svg width="80" height="48" viewBox="0 0 80 48">
                       <rect x="0" y="0" width="80" height="5" fill=" var(--teal)" />
                       <rect x="8" y="14" width="14" height="12" rx="3" fill=" var(--teal)" opacity=".8" />
-                      <rect x="26" y="15" width="22" height="4.5" rx="2" fill="#1A2E35" opacity=".8" />
-                      <rect x="26" y="22" width="16" height="3" rx="1.5" fill="#A0B8BE" />
-                      <rect x="54" y="15" width="18" height="2.5" rx="1.25" fill="#E0EEF0" />
-                      <rect x="54" y="21" width="14" height="2.5" rx="1.25" fill="#E0EEF0" />
-                      <rect x="54" y="27" width="18" height="2.5" rx="1.25" fill="#E0EEF0" />
-                      <rect x="4" y="36" width="72" height="1" rx=".5" fill="#E0EEF0" />
+                      <rect x="26" y="15" width="22" height="4.5" rx="2" fill="#1E293B" opacity=".8" />
+                      <rect x="26" y="22" width="16" height="3" rx="1.5" fill="#64748B" />
+                      <rect x="54" y="15" width="18" height="2.5" rx="1.25" fill="#E2E8F0" />
+                      <rect x="54" y="21" width="14" height="2.5" rx="1.25" fill="#E2E8F0" />
+                      <rect x="54" y="27" width="18" height="2.5" rx="1.25" fill="#E2E8F0" />
+                      <rect x="4" y="36" width="72" height="1" rx=".5" fill="#E2E8F0" />
                     </svg></div>
                   <div class="lo-chk">✓</div>
                   <div class="lo-lbl">Top Bar</div>
@@ -2825,10 +2825,10 @@
                 <div class="lo sel" onclick="selLayout(this,'quo','classic')">
                   <div class="lo-prev"><svg width="80" height="48" viewBox="0 0 80 48">
                       <rect x="8" y="10" width="14" height="14" rx="3" fill=" var(--teal)" opacity=".85" />
-                      <rect x="26" y="11" width="24" height="5" rx="2" fill="#1A2E35" opacity=".8" />
-                      <rect x="26" y="19" width="18" height="3" rx="1.5" fill="#A0B8BE" />
-                      <rect x="54" y="8" width="18" height="7" rx="2" fill="none" stroke="#A0B8BE" stroke-width="1" />
-                      <rect x="56" y="10" width="14" height="3" rx="1.5" fill="#A0B8BE" opacity=".6" />
+                      <rect x="26" y="11" width="24" height="5" rx="2" fill="#1E293B" opacity=".8" />
+                      <rect x="26" y="19" width="18" height="3" rx="1.5" fill="#64748B" />
+                      <rect x="54" y="8" width="18" height="7" rx="2" fill="none" stroke="#64748B" stroke-width="1" />
+                      <rect x="56" y="10" width="14" height="3" rx="1.5" fill="#64748B" opacity=".6" />
                       <rect x="4" y="33" width="72" height="3" rx="1.5" fill=" var(--teal)" />
                       <rect x="56" y="17" width="18" height="4" rx="2" fill=" var(--teal)" opacity=".2" />
                     </svg></div>
@@ -2854,9 +2854,9 @@
                   <div class="lo-prev"><svg width="80" height="48" viewBox="0 0 80 48">
                       <rect x="4" y="2" width="72" height="4" rx="2" fill=" var(--teal)" />
                       <rect x="8" y="14" width="12" height="12" rx="3" fill=" var(--teal)" opacity=".7" />
-                      <rect x="24" y="15" width="28" height="5" rx="2" fill="#1A2E35" opacity=".8" />
-                      <rect x="24" y="23" width="20" height="3" rx="1.5" fill="#A0B8BE" />
-                      <rect x="4" y="36" width="72" height="1" rx=".5" fill="#E0EEF0" />
+                      <rect x="24" y="15" width="28" height="5" rx="2" fill="#1E293B" opacity=".8" />
+                      <rect x="24" y="23" width="20" height="3" rx="1.5" fill="#64748B" />
+                      <rect x="4" y="36" width="72" height="1" rx=".5" fill="#E2E8F0" />
                     </svg></div>
                   <div class="lo-chk">✓</div>
                   <div class="lo-lbl">Minimal</div>
@@ -3002,8 +3002,8 @@
                   <div class="lo-prev"><svg width="80" height="48" viewBox="0 0 80 48">
                       <rect x="4" y="0" width="72" height="5" rx="2" fill=" var(--teal)" />
                       <rect x="8" y="12" width="16" height="16" rx="4" fill=" var(--teal)" opacity=".8" />
-                      <rect x="8" y="32" width="38" height="5" rx="2" fill="#1A2E35" opacity=".8" />
-                      <rect x="8" y="40" width="24" height="3" rx="1.5" fill="#A0B8BE" />
+                      <rect x="8" y="32" width="38" height="5" rx="2" fill="#1E293B" opacity=".8" />
+                      <rect x="8" y="40" width="24" height="3" rx="1.5" fill="#64748B" />
                     </svg></div>
                   <div class="lo-chk">✓</div>
                   <div class="lo-lbl">Clean Cover</div>
@@ -3014,9 +3014,9 @@
                       <rect x="6" y="10" width="14" height="14" rx="3" fill="rgba(255,255,255,.25)" />
                       <rect x="4" y="29" width="30" height="4" rx="2" fill="rgba(255,255,255,.9)" />
                       <rect x="4" y="36" width="22" height="3" rx="1.5" fill="rgba(255,255,255,.5)" />
-                      <rect x="44" y="10" width="28" height="3" rx="1.5" fill="#A0B8BE" />
-                      <rect x="44" y="17" width="22" height="2.5" rx="1.25" fill="#A0B8BE" opacity=".6" />
-                      <rect x="44" y="23" width="28" height="2.5" rx="1.25" fill="#A0B8BE" opacity=".6" />
+                      <rect x="44" y="10" width="28" height="3" rx="1.5" fill="#64748B" />
+                      <rect x="44" y="17" width="22" height="2.5" rx="1.25" fill="#64748B" opacity=".6" />
+                      <rect x="44" y="23" width="28" height="2.5" rx="1.25" fill="#64748B" opacity=".6" />
                       <rect x="44" y="36" width="18" height="5" rx="2" fill=" var(--teal)" opacity=".6" />
                     </svg></div>
                   <div class="lo-chk">✓</div>
@@ -3359,8 +3359,8 @@
                 <div class="lo sel" onclick="selLayout(this,'inv','classic')">
                   <div class="lo-prev"><svg width="80" height="48" viewBox="0 0 80 48">
                       <rect x="8" y="10" width="14" height="14" rx="3" fill=" var(--teal)" opacity=".85" />
-                      <rect x="26" y="11" width="24" height="5" rx="2" fill="#1A2E35" opacity=".8" />
-                      <rect x="26" y="19" width="18" height="3" rx="1.5" fill="#A0B8BE" />
+                      <rect x="26" y="11" width="24" height="5" rx="2" fill="#1E293B" opacity=".8" />
+                      <rect x="26" y="19" width="18" height="3" rx="1.5" fill="#64748B" />
                       <rect x="54" y="8" width="22" height="8" rx="2" fill="none" stroke=" var(--teal)"
                         stroke-width="1.5" />
                       <text x="65" y="13.5" font-size="5" font-weight="800" fill=" var(--teal)"
@@ -3386,10 +3386,10 @@
                   <div class="lo-prev"><svg width="80" height="48" viewBox="0 0 80 48">
                       <rect x="4" y="2" width="72" height="4" rx="2" fill=" var(--teal)" />
                       <rect x="8" y="13" width="12" height="12" rx="3" fill=" var(--teal)" opacity=".7" />
-                      <rect x="24" y="14" width="24" height="5" rx="2" fill="#1A2E35" opacity=".8" />
-                      <rect x="24" y="22" width="18" height="3" rx="1.5" fill="#A0B8BE" />
-                      <rect x="54" y="13" width="22" height="7" rx="2" fill="none" stroke="#A0B8BE" stroke-width="1" />
-                      <text x="65" y="17.5" font-size="4.5" font-weight="700" fill="#A0B8BE"
+                      <rect x="24" y="14" width="24" height="5" rx="2" fill="#1E293B" opacity=".8" />
+                      <rect x="24" y="22" width="18" height="3" rx="1.5" fill="#64748B" />
+                      <rect x="54" y="13" width="22" height="7" rx="2" fill="none" stroke="#64748B" stroke-width="1" />
+                      <text x="65" y="17.5" font-size="4.5" font-weight="700" fill="#64748B"
                         text-anchor="middle">INVOICE</text>
                     </svg></div>
                   <div class="lo-chk">✓</div>
@@ -3398,13 +3398,13 @@
                 <div class="lo" onclick="selLayout(this,'inv','right-align')">
                   <div class="lo-prev"><svg width="80" height="48" viewBox="0 0 80 48">
                       <rect x="8" y="10" width="12" height="12" rx="3" fill=" var(--teal)" opacity=".8" />
-                      <rect x="8" y="11" width="26" height="5" rx="2" fill="#1A2E35" opacity=".8" />
-                      <rect x="8" y="20" width="20" height="3" rx="1.5" fill="#A0B8BE" />
+                      <rect x="8" y="11" width="26" height="5" rx="2" fill="#1E293B" opacity=".8" />
+                      <rect x="8" y="20" width="20" height="3" rx="1.5" fill="#64748B" />
                       <rect x="38" y="8" width="34" height="26" rx="4" fill=" var(--teal)" opacity=".1"
                         stroke=" var(--teal)" stroke-width="1" /><text x="55" y="18" font-size="5" font-weight="800"
                         fill=" var(--teal)" text-anchor="middle">INVOICE</text>
-                      <rect x="42" y="20" width="26" height="2.5" rx="1.25" fill="#A0B8BE" opacity=".6" />
-                      <rect x="42" y="25" width="20" height="2.5" rx="1.25" fill="#A0B8BE" opacity=".6" />
+                      <rect x="42" y="20" width="26" height="2.5" rx="1.25" fill="#64748B" opacity=".6" />
+                      <rect x="42" y="25" width="20" height="2.5" rx="1.25" fill="#64748B" opacity=".6" />
                       <rect x="4" y="38" width="72" height="2" rx="1" fill=" var(--teal)" />
                     </svg></div>
                   <div class="lo-chk">✓</div>
@@ -3413,8 +3413,8 @@
                 <div class="lo" onclick="selLayout(this,'inv','centered')">
                   <div class="lo-prev"><svg width="80" height="48" viewBox="0 0 80 48">
                       <circle cx="40" cy="13" r="8" fill=" var(--teal)" opacity=".85" />
-                      <rect x="24" y="25" width="32" height="5" rx="2" fill="#1A2E35" opacity=".8" />
-                      <rect x="28" y="33" width="24" height="3" rx="1.5" fill="#A0B8BE" />
+                      <rect x="24" y="25" width="32" height="5" rx="2" fill="#1E293B" opacity=".8" />
+                      <rect x="28" y="33" width="24" height="3" rx="1.5" fill="#64748B" />
                       <rect x="4" y="40" width="72" height="2.5" rx="1.25" fill=" var(--teal)" />
                     </svg></div>
                   <div class="lo-chk">✓</div>
@@ -3422,7 +3422,7 @@
                 </div>
                 <div class="lo" onclick="selLayout(this,'inv','dark-header')">
                   <div class="lo-prev" style="background:transparent"><svg width="80" height="48" viewBox="0 0 80 48">
-                      <rect x="0" y="0" width="80" height="42" fill="#1A2E35" />
+                      <rect x="0" y="0" width="80" height="42" fill="#1E293B" />
                       <rect x="8" y="12" width="14" height="14" rx="3" fill=" var(--teal)" opacity=".8" />
                       <rect x="26" y="13" width="24" height="5" rx="2" fill="rgba(255,255,255,.9)" />
                       <rect x="26" y="21" width="18" height="3" rx="1.5" fill="rgba(255,255,255,.4)" />
@@ -3756,7 +3756,7 @@
 
     // ── STATE ──
     let docType = 'letterhead';
-    let color = '#00BCD4';
+    let color = '#2563EB';
     let font = 'Nunito, sans-serif';
     let logoUrl = null;
     let lhLayout = 'logo-left';
@@ -3916,10 +3916,10 @@
     // ── BG CONFIG ──
     function bgCfg(bgKey) {
       const map = {
-        white: { bg: '#ffffff', text: '#1A2E35', sub: '#607D86' },
+        white: { bg: '#ffffff', text: '#1E293B', sub: '#64748B' },
         color: { bg: color, text: '#ffffff', sub: 'rgba(255,255,255,.7)' },
-        light: { bg: h2r(color, .08), text: '#1A2E35', sub: '#607D86' },
-        dark: { bg: '#1A2E35', text: '#ffffff', sub: 'rgba(255,255,255,.65)' }
+        light: { bg: h2r(color, .08), text: '#1E293B', sub: '#64748B' },
+        dark: { bg: '#1E293B', text: '#ffffff', sub: 'rgba(255,255,255,.65)' }
       };
       return map[bgKey] || map.white;
     }
@@ -3927,7 +3927,7 @@
     function h2r(hex, alpha) {
       if (!hex || typeof hex !== 'string' || !hex.startsWith('#')) {
         // fallback for CSS var() strings or invalid input
-        return `rgba(0,188,212,${alpha})`;
+        return `rgba(37, 99, 235,${alpha})`;
       }
       let c = hex.substring(1);
       if (c.length === 3) c = c.split('').map(x => x + x).join('');
@@ -3979,9 +3979,9 @@
         const bBg = bgCfg('color');
         hdr = `<div style="background:${color};padding:${pad}px ${pad + 14}px;display:flex;align-items:center;justify-content:space-between;gap:14px"><div style="display:flex;align-items:center;gap:12px">${logo}<div style="font-size:${nameSz}px;font-weight:900;color:#fff">${co}${tl ? `<div style="font-size:10px;color:rgba(255,255,255,.65);margin-top:1px;font-weight:600">${tl}</div>` : ''}</div></div>${contactBlock('rgba(255,255,255,.8)')}</div>`;
       } else if (lhLayout === 'split') {
-        hdr = `<div style="display:flex;min-height:86px"><div style="background:${color};width:42%;padding:${Math.round(pad * .8)}px;display:flex;flex-direction:column;justify-content:center">${logo}<div style="margin-top:8px;font-size:${nameSz}px;font-weight:900;color:#fff">${co}</div>${tl ? `<div style="font-size:10px;color:rgba(255,255,255,.65);margin-top:2px">${tl}</div>` : ''}</div><div style="flex:1;padding:${Math.round(pad * .8)}px;background:#F8FAFB;display:flex;flex-direction:column;justify-content:center">${contactBlock('#607D86')}</div></div>${div}`;
+        hdr = `<div style="display:flex;min-height:86px"><div style="background:${color};width:42%;padding:${Math.round(pad * .8)}px;display:flex;flex-direction:column;justify-content:center">${logo}<div style="margin-top:8px;font-size:${nameSz}px;font-weight:900;color:#fff">${co}</div>${tl ? `<div style="font-size:10px;color:rgba(255,255,255,.65);margin-top:2px">${tl}</div>` : ''}</div><div style="flex:1;padding:${Math.round(pad * .8)}px;background:#F8FAFB;display:flex;flex-direction:column;justify-content:center">${contactBlock('#64748B')}</div></div>${div}`;
       } else if (lhLayout === 'top-bar') {
-        hdr = `<div style="height:5px;background:${color}"></div><div style="background:${bg.bg};padding:${Math.round(pad * .7)}px ${pad + 14}px"><div style="display:flex;align-items:center;justify-content:space-between;gap:14px"><div style="display:flex;align-items:center;gap:10px">${logo}<div>${compHtml}</div></div>${contact}</div></div><div style="height:1px;background:#E0EEF0"></div>`;
+        hdr = `<div style="height:5px;background:${color}"></div><div style="background:${bg.bg};padding:${Math.round(pad * .7)}px ${pad + 14}px"><div style="display:flex;align-items:center;justify-content:space-between;gap:14px"><div style="display:flex;align-items:center;gap:10px">${logo}<div>${compHtml}</div></div>${contact}</div></div><div style="height:1px;background:#E2E8F0"></div>`;
       }
 
       document.getElementById('docHeaderZone').innerHTML = hdr;
@@ -3989,7 +3989,7 @@
 
       const showFooter = chk('show-footer');
       document.getElementById('docFooterZone').innerHTML = showFooter
-        ? `<div style="height:3px;background:${color}"></div><div style="padding:8px 40px;background:#F8FAFB;display:flex;justify-content:space-between;font-size:9px;color:#A0B8BE;border-top:1px solid #E0EEF0"><span style="font-weight:700">${co}</span><span>${v('f-web') || v('f-email')}</span><span>${v('f-phone')}</span></div>`
+        ? `<div style="height:3px;background:${color}"></div><div style="padding:8px 40px;background:#F8FAFB;display:flex;justify-content:space-between;font-size:9px;color:#64748B;border-top:1px solid #E2E8F0"><span style="font-weight:700">${co}</span><span>${v('f-web') || v('f-email')}</span><span>${v('f-phone')}</span></div>`
         : '';
     }
 
@@ -4199,9 +4199,9 @@
       <div style="padding:26px 36px;background:#fff">
         ${logo}
         <div style="font-size:10px;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:1px;margin:12px 0 4px">Project Proposal</div>
-        <div style="font-size:18px;font-weight:900;color:#1A2E35;letter-spacing:-.3px">${title}</div>
-        ${client ? `<div style="font-size:11px;color:#607D86;margin-top:4px">Prepared for ${client}</div>` : ''}
-        <div style="font-size:10px;color:#A0B8BE;margin-top:10px">${fmtDate(v('f-prop-date'))} · ${v('f-prop-type')}</div>
+        <div style="font-size:18px;font-weight:900;color:#1E293B;letter-spacing:-.3px">${title}</div>
+        ${client ? `<div style="font-size:11px;color:#64748B;margin-top:4px">Prepared for ${client}</div>` : ''}
+        <div style="font-size:10px;color:#64748B;margin-top:10px">${fmtDate(v('f-prop-date'))} · ${v('f-prop-type')}</div>
       </div>`;
       } else if (propLayout === 'split-cover') {
         coverHtml = `<div style="display:flex;min-height:130px">
@@ -4211,8 +4211,8 @@
       </div>
       <div style="flex:1;padding:24px;background:#F8FAFB;display:flex;flex-direction:column;justify-content:center">
         <div style="font-size:10px;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:1px;margin-bottom:5px">Project Proposal</div>
-        <div style="font-size:15px;font-weight:900;color:#1A2E35;line-height:1.3">${title}</div>
-        ${client ? `<div style="font-size:11px;color:#607D86;margin-top:5px">For: ${client}</div>` : ''}
+        <div style="font-size:15px;font-weight:900;color:#1E293B;line-height:1.3">${title}</div>
+        ${client ? `<div style="font-size:11px;color:#64748B;margin-top:5px">For: ${client}</div>` : ''}
         <div style="margin-top:12px;padding:7px 11px;background:${color};border-radius:20px;display:inline-flex;align-items:center;gap:5px;width:fit-content"><span style="font-size:10px;font-weight:700;color:#fff">${v('f-prop-type')} · ${fmtDate(v('f-prop-date'))}</span></div>
       </div>
     </div>`;
@@ -4492,7 +4492,7 @@
       wcUpdate();
     }
     function insertTable() {
-      const t = `<table style="width:100%;border-collapse:collapse;font-size:12px;margin:12px 0"><thead><tr style="background:${color};color:#fff"><th style="padding:6px 9px;text-align:left">Item</th><th style="padding:6px 9px;text-align:left">Description</th><th style="padding:6px 9px;text-align:right">Amount</th></tr></thead><tbody><tr><td style="padding:6px 9px;border:1px solid #E0EEF0">1</td><td style="padding:6px 9px;border:1px solid #E0EEF0">—</td><td style="padding:6px 9px;border:1px solid #E0EEF0;text-align:right">—</td></tr></tbody></table>`;
+      const t = `<table style="width:100%;border-collapse:collapse;font-size:12px;margin:12px 0"><thead><tr style="background:${color};color:#fff"><th style="padding:6px 9px;text-align:left">Item</th><th style="padding:6px 9px;text-align:left">Description</th><th style="padding:6px 9px;text-align:right">Amount</th></tr></thead><tbody><tr><td style="padding:6px 9px;border:1px solid #E2E8F0">1</td><td style="padding:6px 9px;border:1px solid #E2E8F0">—</td><td style="padding:6px 9px;border:1px solid #E2E8F0;text-align:right">—</td></tr></tbody></table>`;
       ec('insertHTML', t);
     }
     function wcUpdate() {
@@ -4594,7 +4594,7 @@
 
       // Show toast
       const t = document.createElement('div');
-      t.style.cssText = "position:fixed;bottom:24px;right:24px;background:linear-gradient(135deg,#26C281, var(--teal));color:#fff;padding:14px 22px;border-radius:12px;font-weight:700;z-index:99999;box-shadow:0 8px 24px rgba(0,0,0,0.15);font-size:13px;display:flex;align-items:center;gap:8px;";
+      t.style.cssText = "position:fixed;bottom:24px;right:24px;background:linear-gradient(135deg,#16A34A, var(--teal));color:#fff;padding:14px 22px;border-radius:12px;font-weight:700;z-index:99999;box-shadow:0 8px 24px rgba(0,0,0,0.15);font-size:13px;display:flex;align-items:center;gap:8px;";
       t.innerHTML = '<i class="ti ti-circle-check" style="font-size:18px;"></i> Document sent to ' + clientName + '!';
       document.body.appendChild(t);
       setTimeout(() => { t.style.transition = 'opacity 0.4s'; t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 3000);
@@ -4696,16 +4696,16 @@
 
       // STATUS badge
       const statusMap = {
-        draft: { bg: '#F8FAFB', color: '#A0B8BE', border: '#C5DDE0', text: 'DRAFT' },
+        draft: { bg: '#F8FAFB', color: '#64748B', border: '#E2E8F0', text: 'DRAFT' },
         sent: { bg: '#EFF4FF', color: '#2563EB', border: '#BFDBFE', text: 'SENT' },
-        paid: { bg: '#E8FAF3', color: '#26C281', border: '#A7F3D0', text: 'PAID' },
+        paid: { bg: '#E8FAF3', color: '#16A34A', border: '#A7F3D0', text: 'PAID' },
         overdue: { bg: '#FEF2F2', color: '#F05C5C', border: '#FECACA', text: 'OVERDUE' }
       };
       const st = statusMap[status] || statusMap.draft;
       const statusBadge = `<span style="display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:800;background:${st.bg};color:${st.color};border:1.5px solid ${st.border}">${st.text}</span>`;
 
       // Company contact block
-      const contactHtml = contactBlock('#607D86');
+      const contactHtml = contactBlock('#64748B');
 
       // INVOICE title block
       const invTitleBlock = (titleColor, subColor) => `
@@ -4724,10 +4724,10 @@
         hdr = `<div style="padding:${pad}px ${pad + 16}px;background:#fff">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
         <div style="display:flex;align-items:center;gap:12px">${logo}<div>
-          <div style="font-size:${nameSz}px;font-weight:900;color:#1A2E35">${co}</div>
-          ${v('f-tagline') ? `<div style="font-size:10px;color:#A0B8BE">${v('f-tagline')}</div>` : ''}
+          <div style="font-size:${nameSz}px;font-weight:900;color:#1E293B">${co}</div>
+          ${v('f-tagline') ? `<div style="font-size:10px;color:#64748B">${v('f-tagline')}</div>` : ''}
         </div></div>
-        ${invTitleBlock(color, '#607D86')}
+        ${invTitleBlock(color, '#64748B')}
       </div>
     </div><div style="height:3px;background:${color}"></div>`;
 
@@ -4751,27 +4751,27 @@
         hdr = `<div style="height:4px;background:${color}"></div>
     <div style="padding:${pad}px ${pad + 16}px;background:#fff;display:flex;align-items:center;justify-content:space-between;gap:16px">
       <div style="display:flex;align-items:center;gap:10px">${logo}
-        <div style="font-size:${nameSz}px;font-weight:900;color:#1A2E35">${co}</div>
+        <div style="font-size:${nameSz}px;font-weight:900;color:#1E293B">${co}</div>
       </div>
       <div style="text-align:right">
         <div style="font-size:20px;font-weight:900;color:${color};letter-spacing:-.4px">INVOICE</div>
-        <div style="font-size:10px;color:#607D86;margin-top:2px">#${invNum} · ${invDate}</div>
+        <div style="font-size:10px;color:#64748B;margin-top:2px">#${invNum} · ${invDate}</div>
         <div style="margin-top:4px">${statusBadge}</div>
       </div>
-    </div><div style="height:1px;background:#E0EEF0"></div>`;
+    </div><div style="height:1px;background:#E2E8F0"></div>`;
 
       } else if (invLayout === 'right-align') {
         hdr = `<div style="padding:${pad}px ${pad + 16}px;background:#fff;display:flex;align-items:stretch;gap:16px">
       <div style="flex:1">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">${logo}
-          <div style="font-size:${nameSz}px;font-weight:900;color:#1A2E35">${co}</div>
+          <div style="font-size:${nameSz}px;font-weight:900;color:#1E293B">${co}</div>
         </div>
         ${contactHtml}
       </div>
       <div style="width:180px;flex-shrink:0;background:${h2r(color, .06)};border:1.5px solid ${h2r(color, .2)};border-radius:10px;padding:14px;display:flex;flex-direction:column;justify-content:center">
         <div style="font-size:18px;font-weight:900;color:${color};letter-spacing:-.3px">INVOICE</div>
-        <div style="font-size:11px;font-weight:700;color:#1A2E35;margin-top:5px">#${invNum}</div>
-        <div style="font-size:10px;color:#607D86;margin-top:3px;line-height:1.9">${invDate ? 'Issue: ' + invDate + '\n' : ''}${dueDate ? 'Due: ' + dueDate : ''}</div>
+        <div style="font-size:11px;font-weight:700;color:#1E293B;margin-top:5px">#${invNum}</div>
+        <div style="font-size:10px;color:#64748B;margin-top:3px;line-height:1.9">${invDate ? 'Issue: ' + invDate + '\n' : ''}${dueDate ? 'Due: ' + dueDate : ''}</div>
         <div style="margin-top:8px">${statusBadge}</div>
       </div>
     </div><div style="height:3px;background:${color}"></div>`;
@@ -4779,15 +4779,15 @@
       } else if (invLayout === 'centered') {
         hdr = `<div style="padding:${pad}px ${pad + 16}px;background:#fff;text-align:center">
       <div style="display:flex;justify-content:center;margin-bottom:10px">${logo}</div>
-      <div style="font-size:${nameSz}px;font-weight:900;color:#1A2E35">${co}</div>
-      ${v('f-tagline') ? `<div style="font-size:10px;color:#A0B8BE;margin-top:2px">${v('f-tagline')}</div>` : ''}
+      <div style="font-size:${nameSz}px;font-weight:900;color:#1E293B">${co}</div>
+      ${v('f-tagline') ? `<div style="font-size:10px;color:#64748B;margin-top:2px">${v('f-tagline')}</div>` : ''}
       <div style="font-size:24px;font-weight:900;color:${color};letter-spacing:-.4px;margin-top:10px">INVOICE</div>
-      <div style="font-size:11px;color:#607D86;margin-top:3px">#${invNum} &nbsp;·&nbsp; ${invDate}${dueDate ? ' &nbsp;·&nbsp; Due: ' + dueDate : ''}</div>
+      <div style="font-size:11px;color:#64748B;margin-top:3px">#${invNum} &nbsp;·&nbsp; ${invDate}${dueDate ? ' &nbsp;·&nbsp; Due: ' + dueDate : ''}</div>
       <div style="margin-top:8px;display:flex;justify-content:center">${statusBadge}</div>
     </div><div style="height:3px;background:${color}"></div>`;
 
       } else if (invLayout === 'dark-header') {
-        hdr = `<div style="background:#1A2E35;padding:${pad}px ${pad + 16}px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
+        hdr = `<div style="background:#1E293B;padding:${pad}px ${pad + 16}px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
       <div style="display:flex;align-items:center;gap:12px">${logo}<div>
         <div style="font-size:${nameSz}px;font-weight:900;color:#fff">${co}</div>
         ${v('f-tagline') ? `<div style="font-size:10px;color:rgba(255,255,255,.5)">${v('f-tagline')}</div>` : ''}
@@ -5194,23 +5194,23 @@
     @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
     .lh-wrap { max-width: 760px; margin: 0 auto; background: #fff; box-shadow: 0 8px 30px rgba(0,0,0,0.12); border-radius: 4px; display: flex; flex-direction: column; min-height: 900px; border: 1px solid #eaeaea; font-family: 'Nunito', sans-serif; overflow: hidden; }
     .lh-wrap * { box-sizing: border-box; }
-    .lh-wrap .doc-body { padding: 28px 40px; font-size: 12.5px; line-height: 1.8; color: #1A2E35; flex: 1; }
-    .lh-wrap .lb-date{color:#607D86;margin-bottom:14px;font-size:11.5px}
+    .lh-wrap .doc-body { padding: 28px 40px; font-size: 12.5px; line-height: 1.8; color: #1E293B; flex: 1; }
+    .lh-wrap .lb-date{color:#64748B;margin-bottom:14px;font-size:11.5px}
     .lh-wrap .lb-recip{margin-bottom:14px}
     .lh-wrap .lb-recip-name{font-weight:800;font-size:12.5px}
-    .lh-wrap .lb-recip-sub{color:#607D86;font-size:11.5px}
-    .lh-wrap .lb-ref{font-size:11px;color:#607D86;margin-bottom:10px}
-    .lh-wrap .lb-subj{margin-bottom:14px;padding-bottom:8px;border-bottom:1.5px solid #E0EEF0}
-    .lh-wrap .lb-subj-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#A0B8BE;margin-bottom:2px}
+    .lh-wrap .lb-recip-sub{color:#64748B;font-size:11.5px}
+    .lh-wrap .lb-ref{font-size:11px;color:#64748B;margin-bottom:10px}
+    .lh-wrap .lb-subj{margin-bottom:14px;padding-bottom:8px;border-bottom:1.5px solid #E2E8F0}
+    .lh-wrap .lb-subj-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#64748B;margin-bottom:2px}
     .lh-wrap .lb-subj-val{font-size:13px;font-weight:800}
     .lh-wrap .lb-salute{font-weight:600;margin-bottom:12px}
-    .lh-wrap .lb-editor{color:#1A2E35;line-height:1.8;font-size:12.5px;white-space:pre-wrap;word-wrap:break-word}
+    .lh-wrap .lb-editor{color:#1E293B;line-height:1.8;font-size:12.5px;white-space:pre-wrap;word-wrap:break-word}
     .lh-wrap .lb-closing{margin-top:28px}
     .lh-wrap .lb-close-text{margin-bottom:28px}
     .lh-wrap .lb-sig-line{width:90px;height:1.5px;margin-bottom:6px}
     .lh-wrap .lb-sig-name{font-weight:800;font-size:13px}
-    .lh-wrap .lb-sig-role{color:#607D86;font-size:11px;margin-top:2px}
-    .lh-wrap .lb-sig-dept{color:#A0B8BE;font-size:10px;margin-top:1px}
+    .lh-wrap .lb-sig-role{color:#64748B;font-size:11px;margin-top:2px}
+    .lh-wrap .lb-sig-dept{color:#64748B;font-size:10px;margin-top:1px}
   `;
       paperClone.prepend(styleTag);
 
@@ -5235,7 +5235,7 @@
       window.parent.postMessage({ type: 'SEND_DOCUMENT', payload: data }, '*');
 
       const t = document.createElement('div');
-      t.style.cssText = "position:fixed;bottom:24px;right:24px;background:linear-gradient(135deg,#26C281, var(--teal));color:#fff;padding:14px 22px;border-radius:12px;font-weight:700;z-index:99999;box-shadow:0 8px 24px rgba(0,0,0,0.15);font-size:13px;display:flex;align-items:center;gap:8px;";
+      t.style.cssText = "position:fixed;bottom:24px;right:24px;background:linear-gradient(135deg,#16A34A, var(--teal));color:#fff;padding:14px 22px;border-radius:12px;font-weight:700;z-index:99999;box-shadow:0 8px 24px rgba(0,0,0,0.15);font-size:13px;display:flex;align-items:center;gap:8px;";
       t.innerHTML = '<i class="ti ti-circle-check" style="font-size:18px;"></i> Letterhead sent to ' + name + '!';
       document.body.appendChild(t);
       setTimeout(() => { t.style.transition = 'opacity 0.4s'; t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 3000);
@@ -5756,15 +5756,15 @@
     style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.45);backdrop-filter:blur(4px);align-items:center;justify-content:center;">
     <div
       style="background:#fff;border-radius:18px;padding:32px;width:360px;box-shadow:0 20px 60px rgba(0,0,0,0.25);position:relative;">
-      <div style="font-size:17px;font-weight:800;color:#1A2E35;margin-bottom:6px;">Send Document</div>
-      <div style="font-size:12px;color:#607D86;margin-bottom:20px;">Choose who to send this document to</div>
+      <div style="font-size:17px;font-weight:800;color:#1E293B;margin-bottom:6px;">Send Document</div>
+      <div style="font-size:12px;color:#64748B;margin-bottom:20px;">Choose who to send this document to</div>
 
       <div style="margin-bottom:14px;">
         <label
-          style="font-size:10px;font-weight:700;color:#1A2E35;text-transform:uppercase;letter-spacing:.7px;display:block;margin-bottom:6px;">Send
+          style="font-size:10px;font-weight:700;color:#1E293B;text-transform:uppercase;letter-spacing:.7px;display:block;margin-bottom:6px;">Send
           To</label>
         <select id="sendModalType" onchange="updateSendModalRecipients()"
-          style="width:100%;padding:9px 12px;border:1.5px solid #E0EEF0;border-radius:8px;font-size:13px;font-family:inherit;color:#1A2E35;background:#fff;outline:none;">
+          style="width:100%;padding:9px 12px;border:1.5px solid #E2E8F0;border-radius:8px;font-size:13px;font-family:inherit;color:#1E293B;background:#fff;outline:none;">
           <option value="client">Client</option>
           <option value="employee">Employee</option>
         </select>
@@ -5772,18 +5772,18 @@
 
       <div style="margin-bottom:20px;">
         <label
-          style="font-size:10px;font-weight:700;color:#1A2E35;text-transform:uppercase;letter-spacing:.7px;display:block;margin-bottom:6px;">Recipient
+          style="font-size:10px;font-weight:700;color:#1E293B;text-transform:uppercase;letter-spacing:.7px;display:block;margin-bottom:6px;">Recipient
           Name</label>
         <select id="sendModalName"
-          style="width:100%;padding:9px 12px;border:1.5px solid #E0EEF0;border-radius:8px;font-size:13px;font-family:inherit;color:#1A2E35;outline:none;background:#fff;">
+          style="width:100%;padding:9px 12px;border:1.5px solid #E2E8F0;border-radius:8px;font-size:13px;font-family:inherit;color:#1E293B;outline:none;background:#fff;">
         </select>
       </div>
 
       <div style="display:flex;gap:10px;">
         <button onclick="closeSendModal()"
-          style="flex:1;padding:10px;border:1.5px solid #E0EEF0;border-radius:8px;background:#fff;font-size:13px;font-weight:600;color:#607D86;cursor:pointer;font-family:inherit;">Cancel</button>
+          style="flex:1;padding:10px;border:1.5px solid #E2E8F0;border-radius:8px;background:#fff;font-size:13px;font-weight:600;color:#64748B;cursor:pointer;font-family:inherit;">Cancel</button>
         <button onclick="confirmSendFromModal()"
-          style="flex:2;padding:10px;border:none;border-radius:8px;background:linear-gradient(135deg, var(--teal),var(--app-accent2, #00BCD4));font-size:13px;font-weight:700;color:#fff;cursor:pointer;font-family:inherit;">
+          style="flex:2;padding:10px;border:none;border-radius:8px;background:linear-gradient(135deg, var(--teal),var(--app-accent2, #2563EB));font-size:13px;font-weight:700;color:#fff;cursor:pointer;font-family:inherit;">
           <i class="ti ti-send" style="margin-right:6px;"></i>Send Now
         </button>
       </div>

@@ -55,7 +55,7 @@ function TextField({ label, required, error, tc, ...props }) {
   );
 }
 
-export default function AddClientView({ onBack, onClientAdded, onClientUpdated, user, editData, themeColor = 'var(--app-accent, #00BCD4)' }) {
+export default function AddClientView({ onBack, onClientAdded, onClientUpdated, user, editData, themeColor = 'var(--app-accent, #2563EB)' }) {
   const TC = themeColor; // shorthand
   const TC_LIGHT = `${themeColor}18`; // ~10% opacity tint
   const isEdit = !!editData;

@@ -32,9 +32,9 @@ export default function ProjectPdfButtons({
         title={enabled ? (file.name || label) : missing}
         style={{
           flex: compact ? "0 0 auto" : 1,
-          border: enabled ? "1.5px solid var(--app-accent, #00BCD4)" : "1.5px solid #E2E8F0",
-          background: enabled ? "var(--teal-light, #E0F7FA)" : "#F8FAFC",
-          color: enabled ? "var(--app-accent, #00BCD4)" : "#94A3B8",
+          border: enabled ? "1.5px solid var(--app-accent, #2563EB)" : "1.5px solid #E2E8F0",
+          background: enabled ? "var(--teal-light, #EFF6FF)" : "#F8FAFC",
+          color: enabled ? "var(--app-accent, #2563EB)" : "#94A3B8",
           borderRadius: 8,
           padding: compact ? "5px 8px" : "7px 10px",
           fontSize: compact ? 10 : 11,

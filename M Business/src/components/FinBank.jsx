@@ -90,8 +90,8 @@ export default function FinBank() {
   const toast = (msg) => alert(msg);
 
   const colors = [
-    { bg: "linear-gradient(135deg,var(--app-accent),#00BCD4)", badge: ' var(--app-accent, var(--app-accent, #00BCD4))' },
-    { bg: 'linear-gradient(135deg,#8B5CF6,#7C3AED)', badge: '#8B5CF6' },
+    { bg: "linear-gradient(135deg,var(--app-accent),#2563EB)", badge: ' var(--app-accent, var(--app-accent, #2563EB))' },
+    { bg: 'linear-gradient(135deg,#8B5CF6,#2563EB)', badge: '#8B5CF6' },
     { bg: 'linear-gradient(135deg,#F59E0B,#D97706)', badge: '#F59E0B' },
     { bg: 'linear-gradient(135deg,#10B981,#059669)', badge: '#10B981' }
   ];
@@ -101,15 +101,15 @@ export default function FinBank() {
       <style>{`
 /* ── M Business Finance Design System ── */
 :root {
-  --primary: var(--app-accent, var(--app-accent, #00BCD4)); --primary-dark:#00BCD4; --primary-light:var(--teal-light, var(--teal-light, #E0F7FA)); --primary-mid:#B2EBF2;
+  --primary: var(--app-accent, var(--app-accent, #2563EB)); --primary-dark:#2563EB; --primary-light:var(--teal-light, var(--teal-light, #EFF6FF)); --primary-mid:#B2EBF2;
   --text-dark:#1A2332; --text-mid:#4A5568; --text-light:#718096;
   --bg:#F0F4F8; --white:#FFFFFF; --border:#E2E8F0;
-  --green:#26C281; --green-light:#D1FAE5; --green-dark:#065F46;
+  --green:#16A34A; --green-light:#D1FAE5; --green-dark:#065F46;
   --orange:#F59E0B; --orange-light:#FEF3C7; --orange-dark:#92400E;
   --red:#FF6B6B; --red-dark:#EF4444; --red-light:#FEE2E2;
-  --purple:#8B5CF6; --purple-light:#EDE9FE;
+  --purple:#8B5CF6; --purple-light:#EFF6FF;
   --blue:#3B82F6; --blue-light:#DBEAFE;
-  --radius:14px; --shadow:0 2px 12px rgba(0,188,212,.08); --shadow-lg:0 8px 32px rgba(0,188,212,.14);
+  --radius:14px; --shadow:0 2px 12px rgba(37, 99, 235,.08); --shadow-lg:0 8px 32px rgba(37, 99, 235,.14);
 }
 * { box-sizing: border-box; }
 a { text-decoration: none; color: inherit; }

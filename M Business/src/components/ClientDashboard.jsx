@@ -47,24 +47,24 @@ const C = {
   surface: "#FFFFFF",
   surface2: "#F8FAFB",
   border: "#DFF0F2",
-  border2: "#C5DDE0",
+  border2: "#E2E8F0",
   text: "#0D2027",
   text2: "#4E6B75",
   text3: "#96B0B8",
-  teal: " var(--app-accent, var(--app-accent, #00BCD4))",
-  teal2: "var(--app-accent2, #00BCD4)",
+  teal: " var(--app-accent, var(--app-accent, #2563EB))",
+  teal2: "var(--app-accent2, #2563EB)",
   teal3: "#006E7F",
-  tealLight: "var(--teal-light, var(--teal-light, #E0F7FA))",
-  tealLighter: "var(--teal-lighter, #F0FDFE)",
-  tealMid: "rgba(0,188,212,.12)",
+  tealLight: "var(--teal-light, var(--teal-light, #EFF6FF))",
+  tealLighter: "var(--teal-lighter, #EFF6FF)",
+  tealMid: "rgba(37, 99, 235,.12)",
   green: "#1DB87A",
   greenBg: "#E3FAF0",
   amber: "#F59E0B",
   amberBg: "#FEF3C7",
   red: "#EF4444",
   redBg: "#FEF2F2",
-  purple: "#7C3AED",
-  purpleBg: "#EDE9FE",
+  purple: "#2563EB",
+  purpleBg: "#EFF6FF",
   blue: "#2563EB",
   blueBg: "#EFF4FF",
 };
@@ -121,7 +121,7 @@ function ProposalViewerModal({ proposal, clientName, BASE_URL, onClose, onSigned
     cv.width = rect.width || 500;
     cv.height = 150;
     const ctx = cv.getContext("2d");
-    ctx.strokeStyle = "#1a2e35";
+    ctx.strokeStyle = "#1e293b";
     ctx.lineWidth = 2.5;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
@@ -201,8 +201,8 @@ function ProposalViewerModal({ proposal, clientName, BASE_URL, onClose, onSigned
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.6)", display: "flex", flexDirection: "column" }}>
       {/* Top bar */}
-      <div style={{ background: "#fff", borderBottom: "1px solid #e0eef0", padding: "12px 24px", display: "flex", alignItems: "center", gap: 16, flexShrink: 0 }}>
-        <button onClick={onClose} style={{ background: "#f0fdfe", border: "1.5px solid #e0eef0", borderRadius: 8, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", color: " var(--app-accent, var(--app-accent, #00BCD4))", display: "flex", alignItems: "center", gap: 6 }}>
+      <div style={{ background: "#fff", borderBottom: "1px solid #e2e8f0", padding: "12px 24px", display: "flex", alignItems: "center", gap: 16, flexShrink: 0 }}>
+        <button onClick={onClose} style={{ background: "#eff6ff", border: "1.5px solid #e2e8f0", borderRadius: 8, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", color: " var(--app-accent, var(--app-accent, #2563EB))", display: "flex", alignItems: "center", gap: 6 }}>
           <i className="ti ti-arrow-left"></i> Back
         </button>
         <div style={{ flex: 1 }}>
@@ -216,21 +216,21 @@ function ProposalViewerModal({ proposal, clientName, BASE_URL, onClose, onSigned
             {st.charAt(0).toUpperCase() + st.slice(1)}
           </span>
         )}
-        <button onClick={() => printProposal(proposal)} style={{ background: "#f0fdfe", border: "1.5px solid #e0eef0", borderRadius: 8, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", color: " var(--app-accent, var(--app-accent, #00BCD4))", display: "flex", alignItems: "center", gap: 6 }}>
+        <button onClick={() => printProposal(proposal)} style={{ background: "#eff6ff", border: "1.5px solid #e2e8f0", borderRadius: 8, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", color: " var(--app-accent, var(--app-accent, #2563EB))", display: "flex", alignItems: "center", gap: 6 }}>
           <i className="ti ti-printer"></i> Print / PDF
         </button>
-        <button onClick={() => shareProposalAsPDF(proposal, agencyName, null)} style={{ background: " var(--app-accent, var(--app-accent, #00BCD4))", border: "none", borderRadius: 8, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", color: "#fff", display: "flex", alignItems: "center", gap: 6 }}>
+        <button onClick={() => shareProposalAsPDF(proposal, agencyName, null)} style={{ background: " var(--app-accent, var(--app-accent, #2563EB))", border: "none", borderRadius: 8, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", color: "#fff", display: "flex", alignItems: "center", gap: 6 }}>
           <i className="ti ti-share"></i> Share PDF
         </button>
       </div>
 
       {/* Body */}
-      <div style={{ flex: 1, overflowY: "auto", background: "#f5fafa", padding: "24px" }}>
+      <div style={{ flex: 1, overflowY: "auto", background: "#f8fafc", padding: "24px" }}>
         <div style={{ maxWidth: 900, margin: "0 auto", display: "flex", flexDirection: "column", gap: 20 }}>
 
           {/* Canvas-based proposal — show read-only canvas, same as admin side */}
           {prop.format === "canvas" && prop.canvasElements && prop.canvasElements.length > 0 ? (
-            <div style={{ background: '#fff', borderRadius: 14, border: '1.5px solid #e0eef0', overflow: 'hidden' }}>
+            <div style={{ background: '#fff', borderRadius: 14, border: '1.5px solid #e2e8f0', overflow: 'hidden' }}>
               <CanvasProposalEditor
                 isPreviewMode={true}
                 proposalData={prop}
@@ -239,7 +239,7 @@ function ProposalViewerModal({ proposal, clientName, BASE_URL, onClose, onSigned
           ) : prop.html ? (
             <>
               <style>{PROPOSAL_PREVIEW_CSS}</style>
-              <div className="prop-doc" style={{ background: "#fff", borderRadius: 14, border: "1.5px solid #e0eef0", boxShadow: "0 2px 12px rgba(0,0,0,0.06)", maxHeight: "none", overflow: "visible" }}
+              <div className="prop-doc" style={{ background: "#fff", borderRadius: 14, border: "1.5px solid #e2e8f0", boxShadow: "0 2px 12px rgba(0,0,0,0.06)", maxHeight: "none", overflow: "visible" }}
                 dangerouslySetInnerHTML={{
                   __html: (() => {
                     const div = document.createElement("div");
@@ -252,32 +252,32 @@ function ProposalViewerModal({ proposal, clientName, BASE_URL, onClose, onSigned
                   })()
                 }} />
             </>) : prop.slides && prop.slides.length > 0 ? (
-              <div style={{ background: "#fff", borderRadius: 14, border: "1.5px solid #e0eef0", padding: "32px 40px", boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}>
+              <div style={{ background: "#fff", borderRadius: 14, border: "1.5px solid #e2e8f0", padding: "32px 40px", boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}>
                 {/* Slide-based proposal summary */}
                 <div style={{ textAlign: "center", marginBottom: 28 }}>
                   <div style={{ fontSize: 28, fontWeight: 900, color: "#0D2027", marginBottom: 6 }}>{prop.title}</div>
-                  <div style={{ fontSize: 14, color: "#607D86" }}>Prepared for {prop.client || prop.clientName}</div>
+                  <div style={{ fontSize: 14, color: "#64748B" }}>Prepared for {prop.client || prop.clientName}</div>
                   <div style={{ fontSize: 13, color: "#96B0B8", marginTop: 4 }}>
                     {prop.sentAt ? new Date(prop.sentAt).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" }) : ""}
                   </div>
                 </div>
-                <div style={{ borderTop: "2px solid  var(--app-accent, var(--app-accent, #00BCD4))", marginBottom: 24 }}></div>
+                <div style={{ borderTop: "2px solid  var(--app-accent, var(--app-accent, #2563EB))", marginBottom: 24 }}></div>
                 {prop.slides.map((slide, si) => (
-                  <div key={si} style={{ marginBottom: 20, padding: "16px 20px", background: "#f5fafa", borderRadius: 10, border: "1px solid #e0eef0" }}>
-                    <div style={{ fontSize: 13, fontWeight: 800, color: " var(--app-accent, var(--app-accent, #00BCD4))", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>{slide.type}</div>
+                  <div key={si} style={{ marginBottom: 20, padding: "16px 20px", background: "#f8fafc", borderRadius: 10, border: "1px solid #e2e8f0" }}>
+                    <div style={{ fontSize: 13, fontWeight: 800, color: " var(--app-accent, var(--app-accent, #2563EB))", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>{slide.type}</div>
                     {slide.heading && <div style={{ fontSize: 16, fontWeight: 700, color: "#0D2027", marginBottom: 4 }}>{slide.heading}</div>}
                     {slide.title && <div style={{ fontSize: 16, fontWeight: 700, color: "#0D2027", marginBottom: 4 }}>{slide.title}</div>}
                     {slide.body && <div style={{ fontSize: 13, color: "#4E6B75", lineHeight: 1.7 }}>{slide.body}</div>}
                     {slide.subtitle && <div style={{ fontSize: 13, color: "#4E6B75" }}>{slide.subtitle}</div>}
                     {slide.items && slide.items.map((item, ii) => (
-                      <div key={ii} style={{ fontSize: 13, color: "#4E6B75", padding: "4px 0", borderBottom: "1px solid #e0eef0" }}>Yes {item}</div>
+                      <div key={ii} style={{ fontSize: 13, color: "#4E6B75", padding: "4px 0", borderBottom: "1px solid #e2e8f0" }}>Yes {item}</div>
                     ))}
                     {slide.rows && slide.rows.map((row, ri) => (
-                      <div key={ri} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, padding: "4px 0", borderBottom: "1px solid #e0eef0" }}>
+                      <div key={ri} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, padding: "4px 0", borderBottom: "1px solid #e2e8f0" }}>
                         <span>{row.item}</span><span style={{ fontWeight: 700 }}>{row.cost}</span>
                       </div>
                     ))}
-                    {slide.total && <div style={{ fontSize: 14, fontWeight: 800, color: " var(--app-accent, var(--app-accent, #00BCD4))", marginTop: 8 }}>Total: {slide.total}</div>}
+                    {slide.total && <div style={{ fontSize: 14, fontWeight: 800, color: " var(--app-accent, var(--app-accent, #2563EB))", marginTop: 8 }}>Total: {slide.total}</div>}
                     {slide.phases && slide.phases.map((ph, pi) => (
                       <div key={pi} style={{ fontSize: 13, color: "#4E6B75", padding: "3px 0" }}>Phase {pi + 1}: {ph.label} — {ph.dur}</div>
                     ))}
@@ -288,7 +288,7 @@ function ProposalViewerModal({ proposal, clientName, BASE_URL, onClose, onSigned
                 ))}
               </div>
             ) : (
-            <div style={{ background: "#fff", borderRadius: 14, border: "1.5px solid #e0eef0", padding: 40, textAlign: "center", color: "#96B0B8" }}>
+            <div style={{ background: "#fff", borderRadius: 14, border: "1.5px solid #e2e8f0", padding: 40, textAlign: "center", color: "#96B0B8" }}>
               No proposal content available.
             </div>
           )}
@@ -297,9 +297,9 @@ function ProposalViewerModal({ proposal, clientName, BASE_URL, onClose, onSigned
 
           {/* Signature box — show only if not yet signed */}
           {!prop.clientSignature && !saved && (
-            <div style={{ background: "#fff", borderRadius: 14, border: "2px solid  var(--app-accent, var(--app-accent, #00BCD4))", padding: "24px 28px", boxShadow: "0 4px 20px rgba(0,188,212,0.1)" }}>
+            <div style={{ background: "#fff", borderRadius: 14, border: "2px solid  var(--app-accent, var(--app-accent, #2563EB))", padding: "24px 28px", boxShadow: "0 4px 20px rgba(37, 99, 235,0.1)" }}>
               <div style={{ fontSize: 15, fontWeight: 800, color: "#0D2027", marginBottom: 4 }}>
-                <i className="ti ti-writing" style={{ color: " var(--app-accent, var(--app-accent, #00BCD4))", marginRight: 8 }}></i>
+                <i className="ti ti-writing" style={{ color: " var(--app-accent, var(--app-accent, #2563EB))", marginRight: 8 }}></i>
                 Awaiting Client Signature
               </div>
               <div style={{ fontSize: 12, color: "#96B0B8", marginBottom: 18 }}>
@@ -307,9 +307,9 @@ function ProposalViewerModal({ proposal, clientName, BASE_URL, onClose, onSigned
               </div>
 
               {/* Tabs */}
-              <div style={{ display: "flex", gap: 4, background: "#f5fafa", borderRadius: 10, padding: 4, marginBottom: 16, width: "fit-content" }}>
+              <div style={{ display: "flex", gap: 4, background: "#f8fafc", borderRadius: 10, padding: 4, marginBottom: 16, width: "fit-content" }}>
                 {["draw", "type"].map(mode => (
-                  <button key={mode} onClick={() => setSigMode(mode)} style={{ padding: "6px 16px", borderRadius: 8, border: "none", fontWeight: 700, fontSize: 12, cursor: "pointer", background: sigMode === mode ? " var(--app-accent, var(--app-accent, #00BCD4))" : "transparent", color: sigMode === mode ? "#fff" : "#607D86" }}>
+                  <button key={mode} onClick={() => setSigMode(mode)} style={{ padding: "6px 16px", borderRadius: 8, border: "none", fontWeight: 700, fontSize: 12, cursor: "pointer", background: sigMode === mode ? " var(--app-accent, var(--app-accent, #2563EB))" : "transparent", color: sigMode === mode ? "#fff" : "#64748B" }}>
                     {mode === "draw" ? "Draw" : "Type"}
                   </button>
                 ))}
@@ -317,10 +317,10 @@ function ProposalViewerModal({ proposal, clientName, BASE_URL, onClose, onSigned
 
               {sigMode === "draw" ? (
                 <div>
-                  <div style={{ background: "#f5fafa", border: "1.5px dashed #c5dde0", borderRadius: 10, overflow: "hidden", marginBottom: 12 }}>
+                  <div style={{ background: "#f8fafc", border: "1.5px dashed #e2e8f0", borderRadius: 10, overflow: "hidden", marginBottom: 12 }}>
                     <canvas ref={canvasRef} style={{ width: "100%", height: 150, cursor: "crosshair", display: "block", touchAction: "none" }} />
                   </div>
-                  <button onClick={clearCanvas} style={{ background: "none", border: "1px solid #e0eef0", borderRadius: 7, padding: "5px 12px", fontSize: 11, fontWeight: 700, cursor: "pointer", color: "#607D86", marginBottom: 12 }}>
+                  <button onClick={clearCanvas} style={{ background: "none", border: "1px solid #e2e8f0", borderRadius: 7, padding: "5px 12px", fontSize: 11, fontWeight: 700, cursor: "pointer", color: "#64748B", marginBottom: 12 }}>
                     Clear
                   </button>
                 </div>
@@ -330,7 +330,7 @@ function ProposalViewerModal({ proposal, clientName, BASE_URL, onClose, onSigned
                     value={sigText}
                     onChange={e => setSigText(e.target.value)}
                     placeholder="Type your full name to sign..."
-                    style={{ width: "100%", padding: "12px 16px", border: "1.5px solid #e0eef0", borderRadius: 10, fontSize: 22, fontFamily: "'Dancing Script', cursive", color: "#0D2027", outline: "none", boxSizing: "border-box" }}
+                    style={{ width: "100%", padding: "12px 16px", border: "1.5px solid #e2e8f0", borderRadius: 10, fontSize: 22, fontFamily: "'Dancing Script', cursive", color: "#0D2027", outline: "none", boxSizing: "border-box" }}
                   />
                   {sigText && (
                     <div style={{ marginTop: 8, fontSize: 11, color: "#96B0B8" }}>
@@ -344,7 +344,7 @@ function ProposalViewerModal({ proposal, clientName, BASE_URL, onClose, onSigned
               <button
                 onClick={saveSignature}
                 disabled={saving}
-                style={{ width: "100%", padding: "13px", background: saving ? "#96B0B8" : " var(--app-accent, var(--app-accent, #00BCD4))", color: "#fff", border: "none", borderRadius: 10, fontSize: 14, fontWeight: 800, cursor: saving ? "not-allowed" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, boxShadow: "0 4px 14px rgba(0,188,212,0.3)" }}>
+                style={{ width: "100%", padding: "13px", background: saving ? "#96B0B8" : " var(--app-accent, var(--app-accent, #2563EB))", color: "#fff", border: "none", borderRadius: 10, fontSize: 14, fontWeight: 800, cursor: saving ? "not-allowed" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, boxShadow: "0 4px 14px rgba(37, 99, 235,0.3)" }}>
                 <i className="ti ti-writing" style={{ fontSize: 16 }}></i>
                 {saving ? "Saving Signature..." : "Sign & Accept Proposal"}
               </button>
@@ -360,7 +360,7 @@ function ProposalViewerModal({ proposal, clientName, BASE_URL, onClose, onSigned
             <div style={{ background: "#f0fdf4", border: "1.5px solid #86efac", borderRadius: 14, padding: "20px 28px", textAlign: "center" }}>
               <i className="ti ti-circle-check" style={{ fontSize: 36, color: "#15803D" }}></i>
               <div style={{ fontSize: 16, fontWeight: 800, color: "#15803D", marginTop: 8 }}>Proposal Signed Successfully!</div>
-              <div style={{ fontSize: 12, color: "#607D86", marginTop: 4 }}>Your signature has been saved and the subadmin has been notified.</div>
+              <div style={{ fontSize: 12, color: "#64748B", marginTop: 4 }}>Your signature has been saved and the subadmin has been notified.</div>
             </div>
           )}
 
@@ -390,7 +390,7 @@ function QuotationViewerModal({ quotation, clientName, BASE_URL, onClose, onSign
     cv.width = rect.width || 500;
     cv.height = 150;
     const ctx = cv.getContext("2d");
-    ctx.strokeStyle = "#1a2e35";
+    ctx.strokeStyle = "#1e293b";
     ctx.lineWidth = 2.5;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
@@ -502,8 +502,8 @@ function QuotationViewerModal({ quotation, clientName, BASE_URL, onClose, onSign
 
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.6)", display: "flex", flexDirection: "column" }}>
-      <div style={{ background: "#fff", borderBottom: "1px solid #e0eef0", padding: "12px 24px", display: "flex", alignItems: "center", gap: 16, flexShrink: 0 }}>
-        <button onClick={onClose} style={{ background: "#f0fdfe", border: "1.5px solid #e0eef0", borderRadius: 8, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", color: "#00BCD4", display: "flex", alignItems: "center", gap: 6 }}>
+      <div style={{ background: "#fff", borderBottom: "1px solid #e2e8f0", padding: "12px 24px", display: "flex", alignItems: "center", gap: 16, flexShrink: 0 }}>
+        <button onClick={onClose} style={{ background: "#eff6ff", border: "1.5px solid #e2e8f0", borderRadius: 8, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", color: "#2563EB", display: "flex", alignItems: "center", gap: 6 }}>
           <i className="ti ti-arrow-left"></i> Back
         </button>
         <div style={{ flex: 1 }}>
@@ -515,7 +515,7 @@ function QuotationViewerModal({ quotation, clientName, BASE_URL, onClose, onSign
             {st.charAt(0).toUpperCase() + st.slice(1)}
           </span>
         )}
-        <button onClick={() => window.print()} className="no-print" style={{ padding: "8px 16px", background: "#00BCD4", border: "none", borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: "pointer", color: "#fff", marginLeft: 12 }}>
+        <button onClick={() => window.print()} className="no-print" style={{ padding: "8px 16px", background: "#2563EB", border: "none", borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: "pointer", color: "#fff", marginLeft: 12 }}>
           Print / PDF
         </button>
       </div>
@@ -529,7 +529,7 @@ function QuotationViewerModal({ quotation, clientName, BASE_URL, onClose, onSign
         }
       `}</style>
 
-      <div id="qt-portal-scroll" style={{ flex: 1, overflowY: "auto", background: "#f5fafa", padding: "24px" }}>
+      <div id="qt-portal-scroll" style={{ flex: 1, overflowY: "auto", background: "#f8fafc", padding: "24px" }}>
         <div style={{ maxWidth: 900, margin: "0 auto", display: "flex", flexDirection: "column", gap: 20 }}>
 
           <div id="qt-portal-paper" style={{ position: "relative", maxWidth: 794, margin: "0 auto", background: "#fff", borderRadius: 18, boxShadow: "0 24px 80px rgba(5,150,105,0.15)", display: "flex", flexDirection: "column" }}>
@@ -539,7 +539,7 @@ function QuotationViewerModal({ quotation, clientName, BASE_URL, onClose, onSign
                   {qt.companyLogo ? (
                     <img src={qt.companyLogo} alt="logo" style={{ height: 85, borderRadius: 10, marginBottom: 12, objectFit: "contain" }} />
                   ) : (
-                    <div style={{ height: 60, width: 60, background: "#00BCD4", borderRadius: 10, marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, fontWeight: 900, color: "#fff" }}>
+                    <div style={{ height: 60, width: 60, background: "#2563EB", borderRadius: 10, marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, fontWeight: 900, color: "#fff" }}>
                       {(qt.companyName || "?")[0]}
                     </div>
                   )}
@@ -550,15 +550,15 @@ function QuotationViewerModal({ quotation, clientName, BASE_URL, onClose, onSign
                 </div>
                 <div style={{ textAlign: "right" }}>
                   <div style={{ fontSize: 32, fontWeight: 900, color: "rgba(5,150,105,0.1)", letterSpacing: -2, lineHeight: 1, marginBottom: 4 }}>QUOTATION</div>
-                  <div style={{ fontSize: 16, fontWeight: 800, color: "#00BCD4" }}>{qt.quoteNo || q.quoteNo}</div>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: "#2563EB" }}>{qt.quoteNo || q.quoteNo}</div>
                   {qt.refNo && <div style={{ fontSize: 11, color: "#065f46", marginTop: 3 }}>Ref # {qt.refNo}</div>}
                   <div style={{ marginTop: 14, display: "flex", gap: 20, justifyContent: "flex-end" }}>
                     <div style={{ textAlign: "right" }}>
-                      <div style={{ fontSize: 9, color: "#00BCD4", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>DATE</div>
+                      <div style={{ fontSize: 9, color: "#2563EB", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>DATE</div>
                       <div style={{ fontSize: 12, color: "#064e3b", fontWeight: 700 }}>{formatQtDate(qt.date)}</div>
                     </div>
                     <div style={{ textAlign: "right" }}>
-                      <div style={{ fontSize: 9, color: "#00BCD4", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>VALID UNTIL</div>
+                      <div style={{ fontSize: 9, color: "#2563EB", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>VALID UNTIL</div>
                       <div style={{ fontSize: 12, color: "#ea580c", fontWeight: 700 }}>{formatQtDate(qt.expiryDate)}</div>
                     </div>
                   </div>
@@ -568,12 +568,12 @@ function QuotationViewerModal({ quotation, clientName, BASE_URL, onClose, onSign
 
             <div style={{ display: "grid", gridTemplateColumns: qt.project ? "1fr 1fr" : "1fr", borderBottom: "2px solid #f0fdf4" }}>
               <div style={{ padding: "20px 32px", borderRight: qt.project ? "1px solid #f0fdf4" : "none" }}>
-                <div style={{ fontSize: 9, color: "#00BCD4", fontWeight: 700, letterSpacing: 2, marginBottom: 10 }}>PREPARED FOR</div>
+                <div style={{ fontSize: 9, color: "#2563EB", fontWeight: 700, letterSpacing: 2, marginBottom: 10 }}>PREPARED FOR</div>
                 <div style={{ fontSize: 17, fontWeight: 800, color: "#111827" }}>{qt.client || qt.toName || clientName || "—"}</div>
               </div>
               {qt.project && (
                 <div style={{ padding: "20px 32px" }}>
-                  <div style={{ fontSize: 9, color: "#00BCD4", fontWeight: 700, letterSpacing: 2, marginBottom: 10 }}>PROJECT</div>
+                  <div style={{ fontSize: 9, color: "#2563EB", fontWeight: 700, letterSpacing: 2, marginBottom: 10 }}>PROJECT</div>
                   <div style={{ fontSize: 15, fontWeight: 700, color: "#111827" }}>{qt.project}</div>
                 </div>
               )}
@@ -584,7 +584,7 @@ function QuotationViewerModal({ quotation, clientName, BASE_URL, onClose, onSign
                 <thead>
                   <tr style={{ background: "linear-gradient(90deg,#f0fdf4,#f7fffe)" }}>
                     {["#", "Description", "Qty", "Unit Rate", "Amount"].map((h, i) => (
-                      <th key={i} style={{ padding: "9px 11px", fontSize: 9, fontWeight: 700, color: "#00BCD4", letterSpacing: 1.5, borderBottom: "2px solid #d1fae5", textAlign: ["Amount", "Unit Rate", "Qty"].includes(h) ? "right" : "left" }}>{h.toUpperCase()}</th>
+                      <th key={i} style={{ padding: "9px 11px", fontSize: 9, fontWeight: 700, color: "#2563EB", letterSpacing: 1.5, borderBottom: "2px solid #d1fae5", textAlign: ["Amount", "Unit Rate", "Qty"].includes(h) ? "right" : "left" }}>{h.toUpperCase()}</th>
                     ))}
                   </tr>
                 </thead>
@@ -625,19 +625,19 @@ function QuotationViewerModal({ quotation, clientName, BASE_URL, onClose, onSign
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 {qt.notes && (
                   <div style={{ background: "#f0fdf4", borderRadius: 11, padding: "14px 16px", border: "1px solid #d1fae5" }}>
-                    <div style={{ fontSize: 9, color: "#00BCD4", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>NOTES</div>
+                    <div style={{ fontSize: 9, color: "#2563EB", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>NOTES</div>
                     <div style={{ fontSize: 12, color: "#374151", lineHeight: 1.7 }}>{qt.notes}</div>
                   </div>
                 )}
                 {qt.terms && (
                   <div style={{ background: "#f0fdf4", borderRadius: 11, padding: "14px 16px", border: "1px solid #d1fae5" }}>
-                    <div style={{ fontSize: 9, color: "#00BCD4", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>TERMS & CONDITIONS</div>
+                    <div style={{ fontSize: 9, color: "#2563EB", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>TERMS & CONDITIONS</div>
                     <div style={{ fontSize: 12, color: "#374151", lineHeight: 1.7 }}>{qt.terms}</div>
                   </div>
                 )}
                 {(qt.upiId || qt.bankName) && (
                   <div style={{ background: "#f8fafc", borderRadius: 11, padding: "14px 16px", border: "1px solid #e2e8f0" }}>
-                    <div style={{ fontSize: 9, color: "#00BCD4", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>PAYMENT INSTRUCTIONS</div>
+                    <div style={{ fontSize: 9, color: "#2563EB", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>PAYMENT INSTRUCTIONS</div>
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 20px" }}>
                       {qt.upiId && (
                         <div>
@@ -670,7 +670,7 @@ function QuotationViewerModal({ quotation, clientName, BASE_URL, onClose, onSign
                 )}
               </div>
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", background: "#f0fdf4", borderRadius: 12, padding: "14px 16px", border: "1px solid #d1fae5", minWidth: 110 }}>
-                <div style={{ fontSize: 8, color: "#00BCD4", fontWeight: 700, letterSpacing: 1.5, marginBottom: 8, textAlign: "center" }}>SCAN QUOTE</div>
+                <div style={{ fontSize: 8, color: "#2563EB", fontWeight: 700, letterSpacing: 1.5, marginBottom: 8, textAlign: "center" }}>SCAN QUOTE</div>
                 <div style={{ background: "#fff", padding: 6, borderRadius: 8, border: "1px solid #d1fae5" }}>
                   <QRCodeSVG value={`${FRONTEND_URL}/quotation-view?no=${qt.quoteNo || q.quoteNo || ""}`} size={88} bgColor="#ffffff" fgColor="#064e3b" />
                 </div>
@@ -680,7 +680,7 @@ function QuotationViewerModal({ quotation, clientName, BASE_URL, onClose, onSign
 
             <div style={{ background: "#ffffff", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "2px solid #f1f5f9" }}>
               <div style={{ fontSize: 11, color: "#6b7280", fontWeight: 600 }}>{qt.companyName || qt.fromCompany || ""}</div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: "#7c3aed" }}>{qt.footerMessage}</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "#2563eb" }}>{qt.footerMessage}</div>
               <div style={{ fontSize: 11, color: "#6b7280", fontWeight: 600 }}>{qt.quoteNo || q.quoteNo}</div>
             </div>
           </div>
@@ -710,7 +710,7 @@ function QuickApprovePopup({ target, clientName, BASE_URL, onClose, onApproved }
     cv.width = rect.width || 400;
     cv.height = 140;
     const ctx = cv.getContext("2d");
-    ctx.strokeStyle = "#1a2e35";
+    ctx.strokeStyle = "#1e293b";
     ctx.lineWidth = 2.5;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
@@ -796,25 +796,25 @@ function QuickApprovePopup({ target, clientName, BASE_URL, onClose, onApproved }
     <div style={{ position: "fixed", inset: 0, zIndex: 99999, background: "rgba(0,0,0,.5)", display: "flex", alignItems: "center", justifyContent: "center" }} onClick={onClose}>
       <div onClick={e => e.stopPropagation()} style={{ background: "#fff", borderRadius: 16, padding: 24, width: 440, maxWidth: "92vw" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-          <div style={{ fontSize: 16, fontWeight: 900, color: "#0D1B2A" }}>Sign to Approve</div>
+          <div style={{ fontSize: 16, fontWeight: 900, color: "#0F172A" }}>Sign to Approve</div>
           <i className="ti ti-x" style={{ cursor: "pointer", fontSize: 18 }} onClick={onClose}></i>
         </div>
-        <div style={{ display: "flex", gap: 4, background: "#f5fafa", borderRadius: 10, padding: 4, marginBottom: 14, width: "fit-content" }}>
+        <div style={{ display: "flex", gap: 4, background: "#f8fafc", borderRadius: 10, padding: 4, marginBottom: 14, width: "fit-content" }}>
           {["draw", "type"].map(mode => (
-            <button key={mode} onClick={() => setSigMode(mode)} style={{ padding: "6px 16px", borderRadius: 8, border: "none", fontWeight: 700, fontSize: 12, cursor: "pointer", background: sigMode === mode ? "#00BCD4" : "transparent", color: sigMode === mode ? "#fff" : "#607D86" }}>
+            <button key={mode} onClick={() => setSigMode(mode)} style={{ padding: "6px 16px", borderRadius: 8, border: "none", fontWeight: 700, fontSize: 12, cursor: "pointer", background: sigMode === mode ? "#2563EB" : "transparent", color: sigMode === mode ? "#fff" : "#64748B" }}>
               {mode === "draw" ? "Draw" : "Type"}
             </button>
           ))}
         </div>
         {sigMode === "draw" ? (
           <div>
-            <div style={{ background: "#f5fafa", border: "1.5px dashed #c5dde0", borderRadius: 10, overflow: "hidden", marginBottom: 10 }}>
+            <div style={{ background: "#f8fafc", border: "1.5px dashed #e2e8f0", borderRadius: 10, overflow: "hidden", marginBottom: 10 }}>
               <canvas ref={canvasRef} style={{ width: "100%", height: 140, cursor: "crosshair", display: "block", touchAction: "none" }} />
             </div>
-            <button onClick={clearCanvas} style={{ background: "none", border: "1px solid #e0eef0", borderRadius: 7, padding: "5px 12px", fontSize: 11, fontWeight: 700, cursor: "pointer", color: "#607D86", marginBottom: 14 }}>Clear</button>
+            <button onClick={clearCanvas} style={{ background: "none", border: "1px solid #e2e8f0", borderRadius: 7, padding: "5px 12px", fontSize: 11, fontWeight: 700, cursor: "pointer", color: "#64748B", marginBottom: 14 }}>Clear</button>
           </div>
         ) : (
-          <input value={sigText} onChange={e => setSigText(e.target.value)} placeholder="Type your full name to sign..." style={{ width: "100%", padding: "12px 16px", border: "1.5px solid #e0eef0", borderRadius: 10, fontSize: 20, fontFamily: "'Dancing Script', cursive", color: "#0D2027", outline: "none", boxSizing: "border-box", marginBottom: 14 }} />
+          <input value={sigText} onChange={e => setSigText(e.target.value)} placeholder="Type your full name to sign..." style={{ width: "100%", padding: "12px 16px", border: "1.5px solid #e2e8f0", borderRadius: 10, fontSize: 20, fontFamily: "'Dancing Script', cursive", color: "#0D2027", outline: "none", boxSizing: "border-box", marginBottom: 14 }} />
         )}
         <div style={{ display: "flex", gap: 10 }}>
           <button onClick={onClose} style={{ flex: 1, padding: "10px", background: "#F3F4F6", color: "#374151", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Cancel</button>
@@ -863,20 +863,20 @@ function QuickReviewPopup({ target, BASE_URL, onClose, onReviewed }) {
     <div style={{ position: "fixed", inset: 0, zIndex: 99999, background: "rgba(0,0,0,.5)", display: "flex", alignItems: "center", justifyContent: "center" }} onClick={onClose}>
       <div onClick={e => e.stopPropagation()} style={{ background: "#fff", borderRadius: 16, padding: 24, width: 420, maxWidth: "92vw" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-          <div style={{ fontSize: 16, fontWeight: 900, color: "#0D1B2A" }}>Write a Review</div>
+          <div style={{ fontSize: 16, fontWeight: 900, color: "#0F172A" }}>Write a Review</div>
           <i className="ti ti-x" style={{ cursor: "pointer", fontSize: 18 }} onClick={onClose}></i>
         </div>
-        <textarea value={text} onChange={e => setText(e.target.value)} rows={4} placeholder="Type your review or comments here..." style={{ width: "100%", padding: "12px 14px", border: "1.5px solid #e0eef0", borderRadius: 10, fontSize: 13, fontFamily: "inherit", resize: "vertical", outline: "none", boxSizing: "border-box", marginBottom: 14 }} />
+        <textarea value={text} onChange={e => setText(e.target.value)} rows={4} placeholder="Type your review or comments here..." style={{ width: "100%", padding: "12px 14px", border: "1.5px solid #e2e8f0", borderRadius: 10, fontSize: 13, fontFamily: "inherit", resize: "vertical", outline: "none", boxSizing: "border-box", marginBottom: 14 }} />
         <div style={{ display: "flex", gap: 10 }}>
           <button onClick={onClose} style={{ flex: 1, padding: "10px", background: "#F3F4F6", color: "#374151", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Cancel</button>
-          <button onClick={submit} disabled={saving} style={{ flex: 1, padding: "10px", background: saving ? "#96B0B8" : "#00BCD4", color: "#fff", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: saving ? "not-allowed" : "pointer" }}>{saving ? "Submitting..." : "Submit Review"}</button>
+          <button onClick={submit} disabled={saving} style={{ flex: 1, padding: "10px", background: saving ? "#96B0B8" : "#2563EB", color: "#fff", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: saving ? "not-allowed" : "pointer" }}>{saving ? "Submitting..." : "Submit Review"}</button>
         </div>
       </div>
     </div>
   );
 }
 
-export default function ClientDashboard({ user: userProp, setUser, portalMode = false, themeColor = "#00BCD4" }) {
+export default function ClientDashboard({ user: userProp, setUser, portalMode = false, themeColor = "#2563EB" }) {
   useAssets();
   const [active, setActive] = useState(() =>
     portalMode ? "dashboard" : (localStorage.getItem("activeTab_client") || "dashboard")
@@ -1500,7 +1500,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
   if (portalMode && !portalUser) {
     return (
       <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#F3F8F9", fontFamily: "inherit", padding: 24, textAlign: "center" }}>
-        <div style={{ background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 16, padding: "40px 32px", maxWidth: 420 }}>
+        <div style={{ background: "#fff", border: "1.5px solid #E2E8F0", borderRadius: 16, padding: "40px 32px", maxWidth: 420 }}>
           <div style={{ fontSize: 40, marginBottom: 16 }}>🔒</div>
           <div style={{ fontSize: 18, fontWeight: 800, color: "#0D2027", marginBottom: 8 }}>You've been signed out</div>
           <div style={{ fontSize: 13, color: "#6B8790", lineHeight: 1.6 }}>
@@ -1685,7 +1685,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
       if (mime.includes('pdf') || fname.endsWith('.pdf')) {
         icon = 'ti-file-type-pdf'; bg = C.redBg; col = C.red; fileType = 'Documents';
       } else if (mime.includes('image') || /\.(jpg|jpeg|png|gif|webp|svg)$/.test(fname)) {
-        icon = 'ti-photo'; bg = C.purpleBg || '#f3e8ff'; col = C.purple || '#7c3aed'; fileType = 'Designs';
+        icon = 'ti-photo'; bg = C.purpleBg || '#eff6ff'; col = C.purple || '#2563eb'; fileType = 'Designs';
       } else if (mime.includes('spreadsheet') || mime.includes('excel') || /\.(xlsx|xls|csv)$/.test(fname)) {
         icon = 'ti-file-spreadsheet'; bg = C.greenBg; col = C.green; fileType = 'Reports';
       } else if (mime.includes('word') || /\.(doc|docx)$/.test(fname)) {
@@ -1693,7 +1693,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
       } else if (mime.includes('zip') || mime.includes('rar') || /\.(zip|rar|tar|gz)$/.test(fname)) {
         icon = 'ti-file-zip'; bg = C.amberBg || '#fef3c7'; col = C.amber || '#d97706'; fileType = 'Documents';
       } else if (mime.includes('video') || /\.(mp4|mov|avi|mkv)$/.test(fname)) {
-        icon = 'ti-video'; bg = C.purpleBg || '#f3e8ff'; col = C.purple || '#7c3aed'; fileType = 'Designs';
+        icon = 'ti-video'; bg = C.purpleBg || '#eff6ff'; col = C.purple || '#2563eb'; fileType = 'Designs';
       }
       if (/invoice/i.test(fname)) {
         fileType = 'Invoices';
@@ -1765,7 +1765,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
   if (portalMode && targetProject && targetProject.portalSettings && targetProject.portalSettings.enablePortal === false) {
     return (
       <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#F3F8F9", fontFamily: "inherit", padding: 24, textAlign: "center" }}>
-        <div style={{ background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 16, padding: "40px 32px", maxWidth: 420 }}>
+        <div style={{ background: "#fff", border: "1.5px solid #E2E8F0", borderRadius: 16, padding: "40px 32px", maxWidth: 420 }}>
           <div style={{ fontSize: 40, marginBottom: 16 }}>🔒</div>
           <div style={{ fontSize: 18, fontWeight: 800, color: "#0D2027", marginBottom: 8 }}>Portal Unavailable</div>
           <div style={{ fontSize: 13, color: "#6B8790", lineHeight: 1.6 }}>
@@ -1782,13 +1782,13 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
 --teal: ${themeColor};
       --teal2: ${themeColor};
       --teal3: #006E7F;
-      --teal-light: var(--teal-light, var(--teal-light, #E0F7FA));
-      --teal-lighter: var(--teal-lighter, #F0FDFE);
+      --teal-light: var(--teal-light, var(--teal-light, #EFF6FF));
+      --teal-lighter: var(--teal-lighter, #EFF6FF);
       --bg: #F3F8F9;
       --surface: #FFFFFF;
       --surface2: #F8FAFB;
       --border: #DFF0F2;
-      --border2: #C5DDE0;
+      --border2: #E2E8F0;
       --text: #0D2027;
       --text2: #4E6B75;
       --text3: #96B0B8;
@@ -1798,8 +1798,8 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
       --amber-bg: #FEF3C7;
       --red: #EF4444;
       --red-bg: #FEF2F2;
-      --purple: #7C3AED;
-      --purple-bg: #EDE9FE;
+      --purple: #2563EB;
+      --purple-bg: #EFF6FF;
       --blue: #2563EB;
       --blue-bg: #EFF4FF;
       --radius: 16px;
@@ -1821,14 +1821,14 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     .cp-root .topnav { background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 12px rgba(0,0,0,.05); backdrop-filter: blur(8px); }
     .cp-root .topnav-inner { max-width: 1240px; margin: 0 auto; padding: 0 24px; height: 66px; display: flex; align-items: center; gap: 16px; }
     .cp-root .tn-brand { display: flex; align-items: center; gap: 11px; }
-    .cp-root .tn-logo { width: 40px; height: 40px; border-radius: 11px; background: linear-gradient(135deg, var(--teal3), var(--teal)); display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 900; color: #fff; letter-spacing: -.5px; box-shadow: 0 6px 16px rgba(0,188,212,0.3); }
+    .cp-root .tn-logo { width: 40px; height: 40px; border-radius: 11px; background: linear-gradient(135deg, var(--teal3), var(--teal)); display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 900; color: #fff; letter-spacing: -.5px; box-shadow: 0 6px 16px rgba(37, 99, 235,0.3); }
     .cp-root .tn-company { font-size: 15px; font-weight: 800; color: var(--text); letter-spacing: -0.2px; }
     .cp-root .tn-powered { font-size: 10px; color: var(--text3); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 1px; }
     .cp-root .tn-nav { display: flex; gap: 3px; margin-left: 20px; background: var(--bg); padding: 4px; border-radius: 12px; border: 1px solid var(--border); }
     .cp-root .tn-item { display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 9px; font-size: 12.5px; font-weight: 700; color: var(--text2); cursor: pointer; transition: all .15s; border: none; background: none; white-space: nowrap; }
     .cp-root .tn-item i { font-size: 14px; opacity: 0.8; }
     .cp-root .tn-item:hover { background: rgba(255,255,255,0.6); color: var(--text); }
-    .cp-root .tn-item.active { background: #fff; color: var(--teal); box-shadow: 0 2px 8px rgba(0,188,212,0.18); }
+    .cp-root .tn-item.active { background: #fff; color: var(--teal); box-shadow: 0 2px 8px rgba(37, 99, 235,0.18); }
     .cp-root .tn-item.active i { opacity: 1; }
     .cp-root .tn-right { margin-left: auto; display: flex; align-items: center; gap: 10px; position: relative; }
     .cp-root .tn-notif { width: 38px; height: 38px; border-radius: 10px; background: var(--bg); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 17px; color: var(--text2); position: relative; transition: all 0.2s; }
@@ -1910,7 +1910,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     .cp-root .step-item { flex: 0 1 160px; }
     .cp-root .step-item { display: flex; flex-direction: column; align-items: center; gap: 6px; position: relative; z-index: 1; }
     .cp-root .step-circle { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; border: 2px solid transparent; transition: all .2s; cursor: pointer; }
-    .cp-root .step-circle.done { background: var(--teal); color: #fff; border-color: var(--teal); box-shadow: 0 3px 10px rgba(0,188,212,.3); }
+    .cp-root .step-circle.done { background: var(--teal); color: #fff; border-color: var(--teal); box-shadow: 0 3px 10px rgba(37, 99, 235,.3); }
     .cp-root .step-circle.active { background: var(--surface); color: var(--teal); border-color: var(--teal); box-shadow: 0 0 0 4px var(--teal-light); }
     .cp-root .step-circle.pending { background: var(--surface2); color: var(--text3); border-color: var(--border); }
     .cp-root .step-name { font-size: 10px; font-weight: 700; color: var(--text2); text-align: center; max-width: 80px; }
@@ -1935,7 +1935,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
 .cp-root .mpd-member-row { padding: 14px 8px !important; }
 .cp-root .mpd-topbar { margin-bottom: 28px !important; padding-top: 4px !important; }
     .cp-root .file-card { background: var(--surface2); border: 1.5px solid var(--border); border-radius: 12px; padding: 14px; cursor: pointer; transition: all .2s; position: relative; overflow: hidden; }
-    .cp-root .file-card:hover { border-color: var(--teal); box-shadow: 0 4px 14px rgba(0,188,212,.1); transform: translateY(-1px); }
+    .cp-root .file-card:hover { border-color: var(--teal); box-shadow: 0 4px 14px rgba(37, 99, 235,.1); transform: translateY(-1px); }
     .cp-root .fc-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 10px; }
     .cp-root .fc-name { font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .cp-root .fc-meta { font-size: 10px; color: var(--text3); font-weight: 600; }
@@ -2000,7 +2000,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     .cp-root .cal-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
     .cp-root .cal-day { height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: var(--text2); cursor: pointer; transition: all .15s; position: relative; }
     .cp-root .cal-day:hover { background: var(--teal-light); color: var(--teal); }
-    .cp-root .cal-day.today { background: var(--teal); color: #fff; font-weight: 800; box-shadow: 0 2px 8px rgba(0,188,212,.3); }
+    .cp-root .cal-day.today { background: var(--teal); color: #fff; font-weight: 800; box-shadow: 0 2px 8px rgba(37, 99, 235,.3); }
     .cp-root .cal-day.has-event::after { content: ''; position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%); width: 5px; height: 5px; border-radius: 50%; background: var(--amber); }
     .cp-root .cal-day.has-event.today::after { background: #fff; }
     .cp-root .cal-day.other-month { color: var(--text3); opacity: .4; }
@@ -2051,8 +2051,8 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     .cp-root .feedback-input { width: 100%; padding: 10px 13px; background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; font-size: 12px; color: var(--text); outline: none; resize: none; min-height: 72px; transition: all .15s; }
     .cp-root .feedback-input:focus { border-color: var(--teal); background: #fff; }
     .cp-root .feedback-input::placeholder { color: var(--text3); }
-    .cp-root .feedback-submit { width: 100%; margin-top: 10px; padding: 11px; background: var(--teal); color: #fff; border: none; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; transition: background .15s; box-shadow: 0 3px 10px rgba(0,188,212,.25); }
-    .cp-root .feedback-submit:hover { background: var(--app-accent-dark, #00BCD4); color: #fff; }
+    .cp-root .feedback-submit { width: 100%; margin-top: 10px; padding: 11px; background: var(--teal); color: #fff; border: none; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; transition: background .15s; box-shadow: 0 3px 10px rgba(37, 99, 235,.25); }
+    .cp-root .feedback-submit:hover { background: var(--app-accent-dark, #2563EB); color: #fff; }
 
     /* ── CONTACT CARD ── */
     .cp-root .contact-card { background: linear-gradient(135deg, #004D5E, var(--teal)); border-radius: var(--radius); padding: 22px; color: #fff; }
@@ -2125,7 +2125,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
         <style>{CSS}</style>
         {renderTopNav()}
         <div style={{ maxWidth: 600, margin: "40px auto", padding: "0 24px" }}>
-          <div style={{ background: "#fff", borderRadius: 16, border: "1.5px solid #E0EEF0", padding: "32px" }}>
+          <div style={{ background: "#fff", borderRadius: 16, border: "1.5px solid #E2E8F0", padding: "32px" }}>
             <div style={{ fontSize: 18, fontWeight: 800, color: "#0D2027", marginBottom: 20 }}>Account Settings</div>
             <div style={{ marginBottom: 16 }}>
               <div style={{ fontSize: 11, fontWeight: 700, color: "#96B0B8", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 6 }}>Company Name</div>
@@ -2528,23 +2528,23 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
           </div>
           <style>{`
             .lh-wrap { max-width: 760px; margin: 0 auto; background: #fff; box-shadow: 0 8px 30px rgba(0,0,0,0.12); border-radius: 4px; display: flex; flex-direction: column; border: 1px solid #eaeaea; font-family: 'Nunito', sans-serif; overflow: hidden; }
-            .doc-body { padding: 28px 40px; font-size: 12.5px; line-height: 1.8; color: #1A2E35; flex: 1; }
-            .lb-date{color:#607D86;margin-bottom:14px;font-size:11.5px}
+            .doc-body { padding: 28px 40px; font-size: 12.5px; line-height: 1.8; color: #1E293B; flex: 1; }
+            .lb-date{color:#64748B;margin-bottom:14px;font-size:11.5px}
             .lb-recip{margin-bottom:14px;display:block}
             .lb-recip-name{font-weight:800;font-size:12.5px}
-            .lb-recip-sub{color:#607D86;font-size:11.5px}
-            .lb-ref{font-size:11px;color:#607D86;margin-bottom:10px;display:block}
-            .lb-subj{margin-bottom:14px;padding-bottom:8px;border-bottom:1.5px solid #E0EEF0;display:block}
-            .lb-subj-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#A0B8BE;margin-bottom:2px}
+            .lb-recip-sub{color:#64748B;font-size:11.5px}
+            .lb-ref{font-size:11px;color:#64748B;margin-bottom:10px;display:block}
+            .lb-subj{margin-bottom:14px;padding-bottom:8px;border-bottom:1.5px solid #E2E8F0;display:block}
+            .lb-subj-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#64748B;margin-bottom:2px}
             .lb-subj-val{font-size:13px;font-weight:800}
             .lb-salute{font-weight:600;margin-bottom:12px}
-            .lb-editor{color:#1A2E35;line-height:1.8;font-size:12.5px;white-space:pre-wrap;word-wrap:break-word;min-height:0}
+            .lb-editor{color:#1E293B;line-height:1.8;font-size:12.5px;white-space:pre-wrap;word-wrap:break-word;min-height:0}
             .lb-closing{margin-top:28px}
             .lb-close-text{margin-bottom:28px}
             .lb-sig-line{display:none}
             .lb-sig-name{font-weight:800;font-size:13px}
-            .lb-sig-role{color:#607D86;font-size:11px;margin-top:2px}
-            .lb-sig-dept{color:#A0B8BE;font-size:10px;margin-top:1px}
+            .lb-sig-role{color:#64748B;font-size:11px;margin-top:2px}
+            .lb-sig-dept{color:#64748B;font-size:10px;margin-top:1px}
           `}</style>
           <div style={{ flex: 1, background: "#fff", borderRadius: 12, padding: "20px", overflowY: "auto", border: "1px solid " + C.border, minHeight: 350, maxHeight: "70vh", color: "#333", fontSize: 13, lineHeight: 1.6 }} dangerouslySetInnerHTML={{ __html: selectedDoc.htmlContent || `<p>No preview available.</p>` }} />
         </div>
@@ -2606,23 +2606,23 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
           </div>
           <style>{`
             .lh-wrap { max-width: 760px; margin: 0 auto; background: #fff; box-shadow: 0 8px 30px rgba(0,0,0,0.12); border-radius: 4px; display: flex; flex-direction: column; border: 1px solid #eaeaea; font-family: 'Nunito', sans-serif; overflow: hidden; }
-            .doc-body { padding: 28px 40px; font-size: 12.5px; line-height: 1.8; color: #1A2E35; flex: 1; }
-            .lb-date{color:#607D86;margin-bottom:14px;font-size:11.5px}
+            .doc-body { padding: 28px 40px; font-size: 12.5px; line-height: 1.8; color: #1E293B; flex: 1; }
+            .lb-date{color:#64748B;margin-bottom:14px;font-size:11.5px}
             .lb-recip{margin-bottom:14px;display:block}
             .lb-recip-name{font-weight:800;font-size:12.5px}
-            .lb-recip-sub{color:#607D86;font-size:11.5px}
-            .lb-ref{font-size:11px;color:#607D86;margin-bottom:10px;display:block}
-            .lb-subj{margin-bottom:14px;padding-bottom:8px;border-bottom:1.5px solid #E0EEF0;display:block}
-            .lb-subj-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#A0B8BE;margin-bottom:2px}
+            .lb-recip-sub{color:#64748B;font-size:11.5px}
+            .lb-ref{font-size:11px;color:#64748B;margin-bottom:10px;display:block}
+            .lb-subj{margin-bottom:14px;padding-bottom:8px;border-bottom:1.5px solid #E2E8F0;display:block}
+            .lb-subj-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#64748B;margin-bottom:2px}
             .lb-subj-val{font-size:13px;font-weight:800}
             .lb-salute{font-weight:600;margin-bottom:12px}
-            .lb-editor{color:#1A2E35;line-height:1.8;font-size:12.5px;white-space:pre-wrap;word-wrap:break-word;min-height:0}
+            .lb-editor{color:#1E293B;line-height:1.8;font-size:12.5px;white-space:pre-wrap;word-wrap:break-word;min-height:0}
             .lb-closing{margin-top:28px}
             .lb-close-text{margin-bottom:28px}
             .lb-sig-line{display:none}
             .lb-sig-name{font-weight:800;font-size:13px}
-            .lb-sig-role{color:#607D86;font-size:11px;margin-top:2px}
-            .lb-sig-dept{color:#A0B8BE;font-size:10px;margin-top:1px}
+            .lb-sig-role{color:#64748B;font-size:11px;margin-top:2px}
+            .lb-sig-dept{color:#64748B;font-size:10px;margin-top:1px}
           `}</style>
           <div style={{ background: "#fff", borderRadius: 12, padding: "20px", overflowY: "auto", border: "1px solid " + C.border, minHeight: 350, maxHeight: 500, color: "#333", fontSize: 13, lineHeight: 1.6 }} dangerouslySetInnerHTML={{ __html: selectedDoc.htmlContent || `<p>No preview available.</p>` }} />
         </div>
@@ -2741,23 +2741,23 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
           </div>
           <style>{`
             .lh-wrap { max-width: 760px; margin: 0 auto; background: #fff; box-shadow: 0 8px 30px rgba(0,0,0,0.12); border-radius: 4px; display: flex; flex-direction: column; border: 1px solid #eaeaea; font-family: 'Nunito', sans-serif; overflow: hidden; }
-            .doc-body { padding: 28px 40px; font-size: 12.5px; line-height: 1.8; color: #1A2E35; flex: 1; }
-            .lb-date{color:#607D86;margin-bottom:14px;font-size:11.5px}
+            .doc-body { padding: 28px 40px; font-size: 12.5px; line-height: 1.8; color: #1E293B; flex: 1; }
+            .lb-date{color:#64748B;margin-bottom:14px;font-size:11.5px}
             .lb-recip{margin-bottom:14px;display:block}
             .lb-recip-name{font-weight:800;font-size:12.5px}
-            .lb-recip-sub{color:#607D86;font-size:11.5px}
-            .lb-ref{font-size:11px;color:#607D86;margin-bottom:10px;display:block}
-            .lb-subj{margin-bottom:14px;padding-bottom:8px;border-bottom:1.5px solid #E0EEF0;display:block}
-            .lb-subj-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#A0B8BE;margin-bottom:2px}
+            .lb-recip-sub{color:#64748B;font-size:11.5px}
+            .lb-ref{font-size:11px;color:#64748B;margin-bottom:10px;display:block}
+            .lb-subj{margin-bottom:14px;padding-bottom:8px;border-bottom:1.5px solid #E2E8F0;display:block}
+            .lb-subj-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#64748B;margin-bottom:2px}
             .lb-subj-val{font-size:13px;font-weight:800}
             .lb-salute{font-weight:600;margin-bottom:12px}
-            .lb-editor{color:#1A2E35;line-height:1.8;font-size:12.5px;white-space:pre-wrap;word-wrap:break-word;min-height:0}
+            .lb-editor{color:#1E293B;line-height:1.8;font-size:12.5px;white-space:pre-wrap;word-wrap:break-word;min-height:0}
             .lb-closing{margin-top:28px}
             .lb-close-text{margin-bottom:28px}
             .lb-sig-line{display:none}
             .lb-sig-name{font-weight:800;font-size:13px}
-            .lb-sig-role{color:#607D86;font-size:11px;margin-top:2px}
-            .lb-sig-dept{color:#A0B8BE;font-size:10px;margin-top:1px}
+            .lb-sig-role{color:#64748B;font-size:11px;margin-top:2px}
+            .lb-sig-dept{color:#64748B;font-size:10px;margin-top:1px}
           `}</style>
           <div style={{ flex: 1, background: "#fff", borderRadius: 12, padding: "20px", overflowY: "auto", border: "1px solid " + C.border, minHeight: 350, color: "#333", fontSize: 13, lineHeight: 1.6 }} dangerouslySetInnerHTML={{ __html: selectedDoc.htmlContent || `<p>No HTML preview available. Standard attachment file: <b>${selectedDoc.fileName || "document.pdf"}</b></p>` }} />
         </div>
@@ -3211,7 +3211,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
               cursor: 'pointer',
               transition: 'all .2s',
             }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = C.teal; e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,188,212,.12)'; }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = C.teal; e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(37, 99, 235,.12)'; }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.04)'; }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
@@ -3627,7 +3627,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
           <div>
             <div className="sec-header">
               <div className="sec-title">
-                <div className="sec-title-icon" style={{ background: "#EDE9FE", color: "#7C3AED" }}><i className="ti ti-presentation"></i></div>
+                <div className="sec-title-icon" style={{ background: "#EFF6FF", color: "#2563EB" }}><i className="ti ti-presentation"></i></div>
                 Project Proposals
               </div>
               <div style={{ fontSize: 12, color: C.text3, fontWeight: 600 }}>{proposals.length} proposal{proposals.length !== 1 ? "s" : ""} received</div>
@@ -3652,7 +3652,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                   const sentDate = prop.sentAt || prop.submittedAt || prop.updatedAt;
                   return (
                     <div key={prop._id || idx} style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: 14, padding: "18px 22px", display: "flex", alignItems: "center", gap: 18, boxShadow: "0 2px 10px rgba(0,0,0,.04)" }}>
-                      <div style={{ width: 44, height: 44, borderRadius: 12, background: "#EDE9FE", color: "#7C3AED", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>
+                      <div style={{ width: 44, height: 44, borderRadius: 12, background: "#EFF6FF", color: "#2563EB", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>
                         <i className="ti ti-presentation"></i>
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
@@ -3875,9 +3875,9 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                   return (
                     <div key={proj._id || idx}
                       onClick={() => { setSelectedClientProject(proj); setActive('projects'); }}
-                      style={{ background: C.surface, border: '1.5px solid ' + C.border, borderRadius: 16, padding: '20px 22px', cursor: 'pointer', transition: 'all .2s', boxShadow: '0 2px 12px rgba(0,188,212,.06)' }}
-                      onMouseEnter={e => { e.currentTarget.style.borderColor = C.teal; e.currentTarget.style.boxShadow = '0 6px 24px rgba(0,188,212,.15)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
-                      onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,188,212,.06)'; e.currentTarget.style.transform = 'none'; }}
+                      style={{ background: C.surface, border: '1.5px solid ' + C.border, borderRadius: 16, padding: '20px 22px', cursor: 'pointer', transition: 'all .2s', boxShadow: '0 2px 12px rgba(37, 99, 235,.06)' }}
+                      onMouseEnter={e => { e.currentTarget.style.borderColor = C.teal; e.currentTarget.style.boxShadow = '0 6px 24px rgba(37, 99, 235,.15)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                      onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.boxShadow = '0 2px 12px rgba(37, 99, 235,.06)'; e.currentTarget.style.transform = 'none'; }}
                     >
                       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 10 }}>
                         <div style={{ flex: 1, minWidth: 0 }}>

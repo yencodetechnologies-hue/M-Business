@@ -122,15 +122,15 @@ export default function FinDashboard() {
       <style>{`
 /* ── M Business Finance Design System ── */
 :root {
-  --primary: var(--app-accent, var(--app-accent, #00BCD4)); --primary-dark:#00BCD4; --primary-light:var(--teal-light, var(--teal-light, #E0F7FA)); --primary-mid:#B2EBF2;
+  --primary: var(--app-accent, var(--app-accent, #2563EB)); --primary-dark:#2563EB; --primary-light:var(--teal-light, var(--teal-light, #EFF6FF)); --primary-mid:#B2EBF2;
   --text-dark:#1A2332; --text-mid:#4A5568; --text-light:#718096;
   --bg:#F0F4F8; --white:#FFFFFF; --border:#E2E8F0;
-  --green:#26C281; --green-light:#D1FAE5; --green-dark:#065F46;
+  --green:#16A34A; --green-light:#D1FAE5; --green-dark:#065F46;
   --orange:#F59E0B; --orange-light:#FEF3C7; --orange-dark:#92400E;
   --red:#FF6B6B; --red-dark:#EF4444; --red-light:#FEE2E2;
-  --purple:#8B5CF6; --purple-light:#EDE9FE;
+  --purple:#8B5CF6; --purple-light:#EFF6FF;
   --blue:#3B82F6; --blue-light:#DBEAFE;
-  --radius:14px; --shadow:0 2px 12px rgba(0,188,212,.08); --shadow-lg:0 8px 32px rgba(0,188,212,.14);
+  --radius:14px; --shadow:0 2px 12px rgba(37, 99, 235,.08); --shadow-lg:0 8px 32px rgba(37, 99, 235,.14);
 }
 * { box-sizing: border-box; }
 a { text-decoration: none; color: inherit; }
@@ -149,7 +149,7 @@ a { text-decoration: none; color: inherit; }
 .kpi-grid{display:grid;gap:16px;margin-bottom:22px;}
 .kpi-grid-4{grid-template-columns:repeat(4,1fr);}
 .kpi-grid-5{grid-template-columns:repeat(5,1fr);}
-.kpi{background:var(--white);border:1.5px solid #E0EEF0;border-radius:14px;padding:14px 16px;box-shadow:0 2px 10px rgba(0,0,0,0.02);height:96px;box-sizing:border-box;display:flex;flex-direction:row;align-items:center;gap:12px;overflow:hidden;}
+.kpi{background:var(--white);border:1.5px solid #E2E8F0;border-radius:14px;padding:14px 16px;box-shadow:0 2px 10px rgba(0,0,0,0.02);height:96px;box-sizing:border-box;display:flex;flex-direction:row;align-items:center;gap:12px;overflow:hidden;}
 .kpi-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
 .kpi-body{display:flex;flex-direction:column;justify-content:center;gap:2px;overflow:hidden;min-width:0;}
 .kpi-label{font-size:10px;font-weight:800;color:var(--text-light);text-transform:uppercase;letter-spacing:.6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -162,7 +162,7 @@ a { text-decoration: none; color: inherit; }
 .kpi.expense .kpi-icon{background:rgba(220,38,38,0.15);color:var(--red-dark);}
 .kpi.profit .kpi-icon{background:rgba(37,99,235,0.15);color:var(--primary);}
 .kpi.pending .kpi-icon{background:rgba(245,158,11,0.15);color:#F59E0B;}
-.kpi.vendor .kpi-icon{background:rgba(139,92,246,0.15);color:var(--purple);}
+.kpi.vendor .kpi-icon{background:rgba(37, 99, 235,0.15);color:var(--purple);}
 .table-wrap{overflow-x:auto;}
 table{width:100%;border-collapse:collapse;font-size:13px;}
 thead tr{background:var(--bg);}

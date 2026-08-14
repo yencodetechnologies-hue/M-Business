@@ -228,10 +228,10 @@ export default function AuthPage({ setUser, initialTab = "login" }) {
           max-width: 900px;
           min-height: 500px;
           border-radius: 22px;
-border: 2px solid #00BCD4;
+border: 2px solid #2563EB;
 -webkit-box-shadow:
-0 0 0 1px rgba(0,188,212,0.12),
-            0 0 60px rgba(0,188,212,0.28),
+0 0 0 1px rgba(37, 99, 235,0.12),
+            0 0 60px rgba(37, 99, 235,0.28),
             0 24px 80px rgba(0,0,0,0.5);
           display: flex;
           overflow: visible;
@@ -262,7 +262,7 @@ border: 2px solid #00BCD4;
           position: absolute;
           top: 0; bottom: 0;
           width: 42%;
-background: linear-gradient(155deg, #00BCD4, #00BCD4 60%, #00BCD4 100%);
+background: linear-gradient(155deg, #2563EB, #2563EB 60%, #2563EB 100%);
           display: flex;
           flex-direction: column;
           justify-content: center;
@@ -303,12 +303,12 @@ background: linear-gradient(155deg, #00BCD4, #00BCD4 60%, #00BCD4 100%);
 
         .purple-btn {
           width: 100%; padding: 13px 0;
-background: linear-gradient(90deg, #00BCD4, #00BCD4);
+background: linear-gradient(90deg, #2563EB, #2563EB);
           border: none; border-radius: 50px;
           color: #fff; font-size: 15px; font-weight: 700;
           cursor: pointer; font-family: inherit;
           display: flex; align-items: center; justify-content: center; gap: 8px;
-box-shadow: 0 4px 22px #00BCD4;
+box-shadow: 0 4px 22px #2563EB;
           margin-top: 8px; transition: opacity .2s;
         }
         .purple-btn:disabled { opacity: 0.55; cursor: not-allowed; }
@@ -325,7 +325,7 @@ box-shadow: 0 4px 22px #00BCD4;
 
         .link-btn {
           background: none; border: none;
-color: #00BCD4; font-weight: 700;
+color: #2563EB; font-weight: 700;
           cursor: pointer; font-family: inherit; font-size: 13px;
         }
 
@@ -487,7 +487,7 @@ color: #00BCD4; font-weight: 700;
 
               <div style={{ textAlign: "right", marginBottom: 22, marginTop: -4 }}>
                 <button onClick={() => { setTab("forgot"); setError(""); setSuccess(""); }}
-                  style={{ background: "none", border: "none", color: "#00BCD4", fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>
+                  style={{ background: "none", border: "none", color: "#2563EB", fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>
                   Forgot Password?
                 </button>
               </div>
@@ -506,7 +506,7 @@ color: #00BCD4; font-weight: 700;
             <div style={{ maxWidth: 380, margin: "0 auto", width: "100%" }}>
               <h2 style={{ color: "#fff", fontSize: 24, fontWeight: 800, margin: "0 0 12px", textAlign: "center" }}>Verify OTP</h2>
               <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", marginBottom: 24, textAlign: "center" }}>
-                6-digit OTP sent to <strong style={{ color: "#00BCD4" }}>{verifyEmail}</strong>
+                6-digit OTP sent to <strong style={{ color: "#2563EB" }}>{verifyEmail}</strong>
               </p>
               {success && <Alert type="success" msg={success} />}
               {error && <Alert type="error" msg={error} />}

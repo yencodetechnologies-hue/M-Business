@@ -249,7 +249,7 @@ const renderMembersAvatars = (inv) => {
 
   const clientInitials = inv.clientName ? inv.clientName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() : "MB";
 
-  const colors = ["#00BCC0", "#26C281", "#7C5CFC", "#F5A623"];
+  const colors = ["#00BCC0", "#16A34A", "#7C5CFC", "#F5A623"];
 
   return (
 
@@ -799,7 +799,7 @@ function ActionBtns({ onView, onEdit, onDelete, onShare }) {
 
     <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
 
-      {onView && <button onClick={(e) => { e.stopPropagation(); onView(); }} title="View" style={{ background: "var(--app-bg)", border: "1px solid #ddd6fe", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "var(--app-muted)", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 4 }}>View</button>}
+      {onView && <button onClick={(e) => { e.stopPropagation(); onView(); }} title="View" style={{ background: "var(--app-bg)", border: "1px solid #e2e8f0", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "var(--app-muted)", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 4 }}>View</button>}
 
       {onShare && <button onClick={(e) => { e.stopPropagation(); onShare(); }} title="Share Onboarding Link" style={{ background: "#dcfce7", border: "1px solid #86efac", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "#166534", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 4 }}><span></span></button>}
 
@@ -975,11 +975,11 @@ function InvoicesListPage({ invoices, onViewInvoice, clients = [], projects = []
       {/* Back to Dashboard — top-left, fixed position for every page */}
   <div
         onClick={() => onBack && onBack()}
-        style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 4px 16px", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #00BCD4)" }}
+        style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 4px 16px", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #2563EB)" }}
       >
         <i className="ti ti-arrow-left" style={{ fontSize: 16 }}></i> Back to Dashboard
       </div>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #00BCD4), #0891b2)", borderRadius: 16, padding: "16px 18px", marginBottom: 14, boxShadow: "0 6px 18px rgba(0,188,212,0.25)" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #2563EB), #0891b2)", borderRadius: 16, padding: "16px 18px", marginBottom: 14, boxShadow: "0 6px 18px rgba(37, 99, 235,0.25)" }}>
         <div>
           <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.8)", letterSpacing: 0.5, textTransform: "uppercase" }}>Total Invoices</div>
           <div style={{ fontSize: 26, fontWeight: 800, color: "#fff" }}>{all.length}</div>
@@ -990,13 +990,13 @@ function InvoicesListPage({ invoices, onViewInvoice, clients = [], projects = []
       </div>
 
       <div style={{ position: "relative", marginBottom: 12 }}>
-        <i className="ti ti-search" style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", fontSize: 15, color: "#A0B8BE" }} />
+        <i className="ti ti-search" style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", fontSize: 15, color: "#64748B" }} />
         <input
           type="text"
           placeholder="Search invoices..."
           value={search}
           onChange={e => setSearch(e.target.value)}
-          style={{ width: "100%", padding: "12px 12px 12px 38px", border: "none", borderRadius: 12, fontSize: 13, outline: "none", background: "#fff", color: "#1A2E35", boxSizing: "border-box", boxShadow: "0 2px 10px rgba(15,28,46,0.06)" }}
+          style={{ width: "100%", padding: "12px 12px 12px 38px", border: "none", borderRadius: 12, fontSize: 13, outline: "none", background: "#fff", color: "#1E293B", boxSizing: "border-box", boxShadow: "0 2px 10px rgba(15,28,46,0.06)" }}
         />
       </div>
 
@@ -1008,13 +1008,13 @@ function InvoicesListPage({ invoices, onViewInvoice, clients = [], projects = []
             style={{
               padding: "7px 16px",
               borderRadius: 20,
-              border: filterMode === f ? "none" : "1.5px solid #E0EEF0",
+              border: filterMode === f ? "none" : "1.5px solid #E2E8F0",
               fontSize: 12,
               fontWeight: 700,
               cursor: "pointer",
               textTransform: "capitalize",
               background: filterMode === f ? "#1A2332" : "#fff",
-              color: filterMode === f ? "#fff" : "#607D86",
+              color: filterMode === f ? "#fff" : "#64748B",
               whiteSpace: "nowrap",
               transition: "all 0.15s ease"
             }}
@@ -1025,7 +1025,7 @@ function InvoicesListPage({ invoices, onViewInvoice, clients = [], projects = []
       </div>
 
       {filtered.length === 0 ? (
-        <div style={{ padding: "40px 16px", textAlign: "center", color: "#A0B8BE", fontSize: 13, fontWeight: 600, background: "#fff", borderRadius: 16, boxShadow: "0 2px 10px rgba(15,28,46,0.05)" }}>
+        <div style={{ padding: "40px 16px", textAlign: "center", color: "#64748B", fontSize: 13, fontWeight: 600, background: "#fff", borderRadius: 16, boxShadow: "0 2px 10px rgba(15,28,46,0.05)" }}>
           No invoices found.
         </div>
       ) : (
@@ -1052,22 +1052,22 @@ function InvoicesListPage({ invoices, onViewInvoice, clients = [], projects = []
                   <div style={{ display: "flex", alignItems: "flex-start", gap: 10, minWidth: 0, flex: 1 }}>
                     <div style={{
                       width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
-                      background: "linear-gradient(135deg, var(--app-accent, #00BCD4), #0891b2)", color: "#fff",
+                      background: "linear-gradient(135deg, var(--app-accent, #2563EB), #0891b2)", color: "#fff",
                       display: "flex", alignItems: "center", justifyContent: "center",
                       fontSize: 14, fontWeight: 800
                     }}>
                       {initials(name)}
                     </div>
                     <div style={{ minWidth: 0, flex: 1 }}>
-                      <div style={{ fontWeight: 800, color: "#0f1c2e", fontSize: 14.5, wordBreak: "break-word" }}>{name}</div>
+                      <div style={{ fontWeight: 800, color: "#0f172a", fontSize: 14.5, wordBreak: "break-word" }}>{name}</div>
                       {matchedProject && (
-                        <div style={{ display: "flex", alignItems: "flex-start", gap: 4, marginTop: 3, fontSize: 11.5, color: "#607D86", fontWeight: 600 }}>
+                        <div style={{ display: "flex", alignItems: "flex-start", gap: 4, marginTop: 3, fontSize: 11.5, color: "#64748B", fontWeight: 600 }}>
                           <i className="ti ti-folder" style={{ fontSize: 12, flexShrink: 0, marginTop: 1 }} />
                           <span style={{ wordBreak: "break-word" }}>{matchedProject.name}</span>
                         </div>
                       )}
                       {(inv.grandTotal || inv.total) && (
-                        <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 2, fontSize: 11.5, color: "#607D86", fontWeight: 600 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 2, fontSize: 11.5, color: "#64748B", fontWeight: 600 }}>
                           <i className="ti ti-currency-rupee" style={{ fontSize: 12, flexShrink: 0 }} />
                           {Number(inv.grandTotal || inv.total).toLocaleString("en-IN")}
                         </div>
@@ -1081,7 +1081,7 @@ function InvoicesListPage({ invoices, onViewInvoice, clients = [], projects = []
                     {inv.status || "Unpaid"}
                   </span>
                 </div>
-                <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 4, color: "var(--app-accent, #00BCD4)", fontSize: 12, fontWeight: 700 }}>
+                <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 4, color: "var(--app-accent, #2563EB)", fontSize: 12, fontWeight: 700 }}>
                   View details <i className="ti ti-chevron-right" style={{ fontSize: 13 }} />
                 </div>
               </div>
@@ -1364,11 +1364,11 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
     const s = (status || "Active").toLowerCase();
 
-    if (s === "active") return { bg: "#E8FAF3", color: "#26C281", dot: "#26C281", label: "Active" };
+    if (s === "active") return { bg: "#E8FAF3", color: "#16A34A", dot: "#16A34A", label: "Active" };
 
     if (s === "pending") return { bg: "#FEF5E6", color: "#F5A623", dot: "#F5A623", label: "Pending" };
 
-    return { bg: "#F8FAFB", color: "#A0B8BE", dot: "#A0B8BE", label: "Inactive" };
+    return { bg: "#F8FAFB", color: "#64748B", dot: "#64748B", label: "Inactive" };
 
   };
 
@@ -1386,7 +1386,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
   const getAvatarColor = (c, idx = 0) => {
 
-    const colors = ["#F5A623", "#26C281", "#7C5CFC", "#2563EB", "#F05C5C", "var(--app-accent, #00BCD4)", "#E91E63"];
+    const colors = ["#F5A623", "#16A34A", "#7C5CFC", "#2563EB", "#F05C5C", "var(--app-accent, #2563EB)", "#E91E63"];
 
     const key = c._id || c.email || "";
 
@@ -1428,7 +1428,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
     return (
 
-      <div key={c._id} onClick={() => { setActiveClientId(c._id); setActiveTab("overview"); }} style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 16px", cursor: "pointer", transition: "all .15s", borderBottom: "1px solid rgba(224,238,240,.5)", position: "relative", background: isActive ? "var(--teal-lighter, #F0FDFE)" : "transparent", borderRight: isActive ? "3px solid  var(--app-accent, var(--app-accent, #00BCD4))" : "3px solid transparent" }} onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = "var(--teal-lighter, #F0FDFE)"; }} onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = "transparent"; }}>
+      <div key={c._id} onClick={() => { setActiveClientId(c._id); setActiveTab("overview"); }} style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 16px", cursor: "pointer", transition: "all .15s", borderBottom: "1px solid rgba(224,238,240,.5)", position: "relative", background: isActive ? "var(--teal-lighter, #EFF6FF)" : "transparent", borderRight: isActive ? "3px solid  var(--app-accent, var(--app-accent, #2563EB))" : "3px solid transparent" }} onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = "var(--teal-lighter, #EFF6FF)"; }} onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = "transparent"; }}>
 
         <div style={{ width: 40, height: 40, borderRadius: "50%", background: `linear-gradient(135deg,${color},${color}bb)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800, color: "#fff", flexShrink: 0, position: "relative" }}>
 
@@ -1440,9 +1440,9 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
  <div style={{ flex: 1, minWidth: 0 }}>
 
-          <div style={{ fontSize: 13, fontWeight: 700, color: "#1A2E35", lineHeight: 1.3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.clientName || c.name || "—"}</div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "#1E293B", lineHeight: 1.3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.clientName || c.name || "—"}</div>
 
-          <div style={{ fontSize: 11, color: "#A0B8BE", marginTop: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.companyName || c.company || "—"}</div>
+          <div style={{ fontSize: 11, color: "#64748B", marginTop: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.companyName || c.company || "—"}</div>
 
         </div>
        
@@ -1472,13 +1472,13 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
         {/* Contact Info */}
 
-        <div style={{ background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 14, overflow: "hidden" }}>
+        <div style={{ background: "#fff", border: "1.5px solid #E2E8F0", borderRadius: 14, overflow: "hidden" }}>
 
-          <div style={{ padding: "13px 16px", borderBottom: "1px solid #E0EEF0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ padding: "13px 16px", borderBottom: "1px solid #E2E8F0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
 
-            <span style={{ fontSize: 12, fontWeight: 800, color: "#1A2E35", display: "flex", alignItems: "center", gap: 8 }}>
+            <span style={{ fontSize: 12, fontWeight: 800, color: "#1E293B", display: "flex", alignItems: "center", gap: 8 }}>
 
-              <div style={{ width: 26, height: 26, borderRadius: 7, background: "var(--teal-light, var(--teal-light, #E0F7FA))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: "var(--app-accent, #00BCD4)" }}><i className="ti ti-user-circle" /></div>
+              <div style={{ width: 26, height: 26, borderRadius: 7, background: "var(--teal-light, var(--teal-light, #EFF6FF))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: "var(--app-accent, #2563EB)" }}><i className="ti ti-user-circle" /></div>
 
               Contact Information
 
@@ -1501,19 +1501,19 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
             {[
 
-              { icon: "ti-mail", label: "Email Address", val: activeClient.email, bg: "var(--teal-light, var(--teal-light, #E0F7FA))", col: "var(--app-accent, #00BCD4)" },
+              { icon: "ti-mail", label: "Email Address", val: activeClient.email, bg: "var(--teal-light, var(--teal-light, #EFF6FF))", col: "var(--app-accent, #2563EB)" },
 
-              { icon: "ti-user", label: "Contact Person Name", val: activeClient.contactPersonName || "—", bg: "var(--teal-light, var(--teal-light, #E0F7FA))", col: "var(--app-accent, #00BCD4)" },
+              { icon: "ti-user", label: "Contact Person Name", val: activeClient.contactPersonName || "—", bg: "var(--teal-light, var(--teal-light, #EFF6FF))", col: "var(--app-accent, #2563EB)" },
 
-              { icon: "ti-user", label: "Contact Person No", val: activeClient.contactPersonNo || "—", bg: "var(--teal-light, var(--teal-light, #E0F7FA))", col: "var(--app-accent, #00BCD4)" },
+              { icon: "ti-user", label: "Contact Person No", val: activeClient.contactPersonNo || "—", bg: "var(--teal-light, var(--teal-light, #EFF6FF))", col: "var(--app-accent, #2563EB)" },
 
-              { icon: "ti-briefcase", label: "Category", val: activeClient.category || activeClient.industry || "—", bg: "#F3E8FF", col: "#7C5CFC" },
+              { icon: "ti-briefcase", label: "Category", val: activeClient.category || activeClient.industry || "—", bg: "#EFF6FF", col: "#7C5CFC" },
 
-              { icon: "ti-phone", label: "Office Phone", val: activeClient.phone || "—", bg: "var(--teal-light, var(--teal-light, #E0F7FA))", col: "var(--app-accent, #00BCD4)" },
+              { icon: "ti-phone", label: "Office Phone", val: activeClient.phone || "—", bg: "var(--teal-light, var(--teal-light, #EFF6FF))", col: "var(--app-accent, #2563EB)" },
 
               { icon: "ti-building-bank", label: "Company Tax / GST", val: activeClient.gstNumber || "—", bg: "#EFF4FF", col: "#2563EB" },
 
-              { icon: "ti-toggle-right", label: "Status", val: activeClient.status || "Active", bg: "#E8FAF3", col: "#26C281" },
+              { icon: "ti-toggle-right", label: "Status", val: activeClient.status || "Active", bg: "#E8FAF3", col: "#16A34A" },
 
               { icon: "ti-map-pin", label: "Company Address", val: activeClient.address, bg: "#FEF5E6", col: "#F5A623" },
 
@@ -1525,7 +1525,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
                 <div style={{ width: 30, height: 30, borderRadius: 8, background: row.bg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: row.col, flexShrink: 0 }}><i className={`ti ${row.icon}`} /></div>
 
-                <div><div style={{ fontSize: 10, color: "#A0B8BE", fontWeight: 600 }}>{row.label}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#1A2E35", marginTop: 1 }}>{row.val || "—"}</div></div>
+                <div><div style={{ fontSize: 10, color: "#64748B", fontWeight: 600 }}>{row.label}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#1E293B", marginTop: 1 }}>{row.val || "—"}</div></div>
 
               </div>
 
@@ -1539,11 +1539,11 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
         {/* Projects */}
 
-        <div style={{ background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 14, overflow: "hidden" }}>
+        <div style={{ background: "#fff", border: "1.5px solid #E2E8F0", borderRadius: 14, overflow: "hidden" }}>
 
-          <div style={{ padding: "13px 16px", borderBottom: "1px solid #E0EEF0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ padding: "13px 16px", borderBottom: "1px solid #E2E8F0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
 
-            <span style={{ fontSize: 12, fontWeight: 800, color: "#1A2E35", display: "flex", alignItems: "center", gap: 8 }}>
+            <span style={{ fontSize: 12, fontWeight: 800, color: "#1E293B", display: "flex", alignItems: "center", gap: 8 }}>
 
               <div style={{ width: 26, height: 26, borderRadius: 7, background: "#EFF4FF", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: "#2563EB" }}><i className="ti ti-briefcase" /></div>
 
@@ -1551,7 +1551,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
             </span>
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-<button onClick={() => onCreateProject && onCreateProject(activeClient)} style={{ background: "var(--app-accent, #00BCD4)", border: "none", borderRadius: 5, padding: isMobileWidth ? "2px 5px" : "4px 10px", fontSize: isMobileWidth ? 7 : 11, fontFamily: "inherit", fontStyle: "normal", letterSpacing: "0.2px", color: "#fff", cursor: "pointer", fontWeight: 500, display: "flex", alignItems: "center", gap: 1, whiteSpace: "nowrap", flexShrink: 0 }}>
+<button onClick={() => onCreateProject && onCreateProject(activeClient)} style={{ background: "var(--app-accent, #2563EB)", border: "none", borderRadius: 5, padding: isMobileWidth ? "2px 5px" : "4px 10px", fontSize: isMobileWidth ? 7 : 11, fontFamily: "inherit", fontStyle: "normal", letterSpacing: "0.2px", color: "#fff", cursor: "pointer", fontWeight: 500, display: "flex", alignItems: "center", gap: 1, whiteSpace: "nowrap", flexShrink: 0 }}>
   <i className="ti ti-plus" style={{ fontSize: isMobileWidth ? 7 : 11 }} /> {isMobileWidth ? "Add Project" : "Add Project"}
 </button>
               <span onClick={() => setActiveTab("projects")} style={{ fontSize: 11, color: "var(--app-accent)", fontWeight: 700, cursor: "pointer" }}>View all</span>
@@ -1565,7 +1565,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
             {cProjs.length === 0 ? (
 
-              <div style={{ textAlign: "center", color: "#A0B8BE", fontSize: 12, padding: "20px 0" }}>
+              <div style={{ textAlign: "center", color: "#64748B", fontSize: 12, padding: "20px 0" }}>
 
               </div>
 
@@ -1583,9 +1583,9 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
               return (
 
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 0", borderBottom: i < cProjs.length - 1 ? "1px solid #E0EEF0" : "none" }}>
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 0", borderBottom: i < cProjs.length - 1 ? "1px solid #E2E8F0" : "none" }}>
 
-                  <div style={{ width: 4, height: 36, borderRadius: 2, background: "var(--app-accent, #00BCD4)", flexShrink: 0 }} />
+                  <div style={{ width: 4, height: 36, borderRadius: 2, background: "var(--app-accent, #2563EB)", flexShrink: 0 }} />
 
                   <div style={{ flex: 1, minWidth: 0 }}>
 
@@ -1593,7 +1593,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
                       onClick={() => onViewProject && onViewProject(p)}
 
-                      style={{ fontSize: 12, fontWeight: 700, color: "#1A2E35", cursor: "pointer" }}
+                      style={{ fontSize: 12, fontWeight: 700, color: "#1E293B", cursor: "pointer" }}
 
                     >
 
@@ -1601,7 +1601,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
                     </div>
 
-                    <div style={{ fontSize: 10, color: "#A0B8BE", marginTop: 1 }}>{p.type || p.status}</div>
+                    <div style={{ fontSize: 10, color: "#64748B", marginTop: 1 }}>{p.type || p.status}</div>
 
                   </div>
 
@@ -1610,16 +1610,16 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
                     <div style={{ textAlign: "right", marginRight: 8 }}>
                       <div style={{ fontSize: 12, fontWeight: 800, color: "var(--app-accent)" }}>{pct}%</div>
 
-                      <div style={{ width: 60, height: 4, background: "#E0EEF0", borderRadius: 2, overflow: "hidden", marginTop: 4 }}>
+                      <div style={{ width: 60, height: 4, background: "#E2E8F0", borderRadius: 2, overflow: "hidden", marginTop: 4 }}>
 
-                        <div style={{ height: "100%", borderRadius: 2, background: "linear-gradient(90deg, var(--app-accent, var(--app-accent, #00BCD4)),#26D0CE)", width: `${pct}%` }} />
+                        <div style={{ height: "100%", borderRadius: 2, background: "linear-gradient(90deg, var(--app-accent, var(--app-accent, #2563EB)),#26D0CE)", width: `${pct}%` }} />
 
                       </div>
 
                     </div>
 
 <button onClick={() => onCreateProject && onCreateProject(p, true)} title="Edit" style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "#FFF7ED", border: "1px solid #FED7AA", borderRadius: 6, width: 26, height: 26, color: "#F59E0B", cursor: "pointer" }}><i className="ti ti-edit" style={{ fontSize: 13 }} /></button>
-<button onClick={() => onViewProject && onViewProject(p)} title="View" style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "var(--teal-light, var(--teal-light, #E0F7FA))", border: "none", borderRadius: 6, width: 26, height: 26, color: "var(--app-accent, #00BCD4)", cursor: "pointer" }}><i className="ti ti-eye" style={{ fontSize: 13 }} /></button>
+<button onClick={() => onViewProject && onViewProject(p)} title="View" style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "var(--teal-light, var(--teal-light, #EFF6FF))", border: "none", borderRadius: 6, width: 26, height: 26, color: "var(--app-accent, #2563EB)", cursor: "pointer" }}><i className="ti ti-eye" style={{ fontSize: 13 }} /></button>
 <button onClick={async (e) => {
   e.stopPropagation();
   if (!window.confirm(`Are you sure you want to delete "${p.name}"?`)) return;
@@ -1658,13 +1658,13 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
       {clientProjects.length === 0 ? (
 
-        <div style={{ textAlign: "center", padding: 40, color: "#A0B8BE", fontSize: 13 }}>No projects for this client</div>
+        <div style={{ textAlign: "center", padding: 40, color: "#64748B", fontSize: 13 }}>No projects for this client</div>
 
       ) : clientProjects.map((p, i) => (
 
-        <div key={p._id || i} style={{ background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 12, padding: "16px 18px", display: "flex", alignItems: "center", gap: 14, minHeight: 64, flexWrap: "wrap", overflow: "hidden" }}>
+        <div key={p._id || i} style={{ background: "#fff", border: "1.5px solid #E2E8F0", borderRadius: 12, padding: "16px 18px", display: "flex", alignItems: "center", gap: 14, minHeight: 64, flexWrap: "wrap", overflow: "hidden" }}>
 
-          <div style={{ width: 40, height: 40, borderRadius: 10, background: "var(--teal-light, var(--teal-light, #E0F7FA))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>📁</div>
+          <div style={{ width: 40, height: 40, borderRadius: 10, background: "var(--teal-light, var(--teal-light, #EFF6FF))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>📁</div>
 
           <div style={{ flex: 1 }}>
 
@@ -1672,7 +1672,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
               onClick={() => onViewProject && onViewProject(p)}
 
-              style={{ fontSize: 13, fontWeight: 700, color: "#1A2E35", cursor: "pointer" }}
+              style={{ fontSize: 13, fontWeight: 700, color: "#1E293B", cursor: "pointer" }}
 
             >
 
@@ -1680,15 +1680,15 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
             </div>
 
-            <div style={{ fontSize: 11, color: "#A0B8BE", marginTop: 2 }}> {p.end ? new Date(p.end).toLocaleDateString("en-IN") : "No deadline"}</div>
+            <div style={{ fontSize: 11, color: "#64748B", marginTop: 2 }}> {p.end ? new Date(p.end).toLocaleDateString("en-IN") : "No deadline"}</div>
 
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", flexShrink: 0 }}>
 
-            <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "#E8FAF3", color: "#26C281" }}>{p.status || "Active"}</span>
+            <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "#E8FAF3", color: "#16A34A" }}>{p.status || "Active"}</span>
 
-          {onViewProject && <button onClick={() => onViewProject(p)} title="View" style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "var(--teal-light, var(--teal-light, #E0F7FA))", border: "none", borderRadius: 6, width: 28, height: 28, color: "var(--app-accent, #00BCD4)", cursor: "pointer" }}><i className="ti ti-eye" style={{ fontSize: 14 }} /></button>}
+          {onViewProject && <button onClick={() => onViewProject(p)} title="View" style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "var(--teal-light, var(--teal-light, #EFF6FF))", border: "none", borderRadius: 6, width: 28, height: 28, color: "var(--app-accent, #2563EB)", cursor: "pointer" }}><i className="ti ti-eye" style={{ fontSize: 14 }} /></button>}
 <button onClick={() => onCreateProject && onCreateProject(p, true)} title="Edit" style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "#FFF7ED", border: "1px solid #FED7AA", borderRadius: 6, width: 28, height: 28, color: "#F59E0B", cursor: "pointer" }}><i className="ti ti-edit" style={{ fontSize: 14 }} /></button>
 <button onClick={async (e) => {
   e.stopPropagation();
@@ -1828,7 +1828,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
           <label style={{
 
-            background: "var(--app-accent, #00BCD4)", border: "none", borderRadius: 8,
+            background: "var(--app-accent, #2563EB)", border: "none", borderRadius: 8,
 
             padding: "7px 14px", fontSize: 12, color: "#fff", cursor: "pointer",
 
@@ -1858,7 +1858,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
         {docs.length === 0 ? (
 
-          <div style={{ textAlign: "center", padding: 40, color: "#A0B8BE", fontSize: 12 }}>
+          <div style={{ textAlign: "center", padding: 40, color: "#64748B", fontSize: 12 }}>
 
             <div style={{ fontSize: 32, marginBottom: 8 }}></div>
 
@@ -1874,19 +1874,19 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
               <div key={i} style={{
 
-                padding: 12, background: "#F5FAFA",
+                padding: 12, background: "#F8FAFC",
 
-                border: "1.5px solid #E0EEF0", borderRadius: 10, position: "relative"
+                border: "1.5px solid #E2E8F0", borderRadius: 10, position: "relative"
 
               }}>
 
                 <div style={{ fontSize: 22, marginBottom: 8 }}>📄</div>
 
-                <div style={{ fontSize: 11, fontWeight: 700, color: "#1A2E35" }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "#1E293B" }}>
                   {d.name || d.fileName || "Document"}
                 </div>
 
-                <div style={{ fontSize: 10, color: "#A0B8BE", marginTop: 2 }}>
+                <div style={{ fontSize: 10, color: "#64748B", marginTop: 2 }}>
 
                   {d.size || d.type || "—"}
 
@@ -1894,7 +1894,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
                 <div style={{ display: "flex", gap: 6, marginTop: 8 }}>
                   <label
-                    style={{ flex: 1, padding: "4px 0", fontSize: 10, fontWeight: 700, color: "var(--app-accent, #00BCD4)", background: "#fff", border: "1px solid #C5DDE0", borderRadius: 6, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 4 }}
+                    style={{ flex: 1, padding: "4px 0", fontSize: 10, fontWeight: 700, color: "var(--app-accent, #2563EB)", background: "#fff", border: "1px solid #E2E8F0", borderRadius: 6, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 4 }}
                   >
                     <i className="ti ti-edit" style={{ fontSize: 11 }} /> Edit
                     <input
@@ -2005,7 +2005,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
     const activity = [
 
-      { icon: "ti-user-plus", bg: "var(--teal-light, var(--teal-light, #E0F7FA))", color: "var(--app-accent, #00BCD4)", title: `<b>${activeClient?.clientName || activeClient?.name}</b> added as client`, time: activeClient?.createdAt ? new Date(activeClient.createdAt).toLocaleDateString("en-IN") : "—" },
+      { icon: "ti-user-plus", bg: "var(--teal-light, var(--teal-light, #EFF6FF))", color: "var(--app-accent, #2563EB)", title: `<b>${activeClient?.clientName || activeClient?.name}</b> added as client`, time: activeClient?.createdAt ? new Date(activeClient.createdAt).toLocaleDateString("en-IN") : "—" },
 
       ...clientProjects.map(p => ({ icon: "ti-briefcase", bg: "#EFF4FF", color: "#2563EB", title: `Project <b>${p.name}</b> created`, time: p.createdAt ? new Date(p.createdAt).toLocaleDateString("en-IN") : "—" })),
 
@@ -2023,14 +2023,14 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
               <div style={{ width: 30, height: 30, borderRadius: "50%", background: a.bg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: a.color }}><i className={`ti ${a.icon}`} /></div>
 
-              {i < activity.length - 1 && <div style={{ width: 2, background: "#E0EEF0", flex: 1, margin: "4px 0", minHeight: 12 }} />}
+              {i < activity.length - 1 && <div style={{ width: 2, background: "#E2E8F0", flex: 1, margin: "4px 0", minHeight: 12 }} />}
 
             </div>
 
             <div>
 
-              <div style={{ fontSize: 12, fontWeight: 700, color: "#1A2E35", lineHeight: 1.4 }} dangerouslySetInnerHTML={{ __html: a.title }} />
-              <div style={{ fontSize: 10, color: "#A0B8BE", marginTop: 2 }}>{a.time}</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "#1E293B", lineHeight: 1.4 }} dangerouslySetInnerHTML={{ __html: a.title }} />
+              <div style={{ fontSize: 10, color: "#64748B", marginTop: 2 }}>{a.time}</div>
             </div>
           </div>
         ))}
@@ -2082,7 +2082,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
     return (
       <div>
         {/* Portal Hero Card */}
-        <div style={{ background: "linear-gradient(135deg,#004D5E, var(--app-accent, var(--app-accent, #00BCD4)))", borderRadius: 14, padding: 20, color: "#fff", marginBottom: 16 }}>
+        <div style={{ background: "linear-gradient(135deg,#004D5E, var(--app-accent, var(--app-accent, #2563EB)))", borderRadius: 14, padding: 20, color: "#fff", marginBottom: 16 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
             <div style={{ width: 38, height: 38, borderRadius: 10, background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
               🌐
@@ -2135,24 +2135,24 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
         {/* Portal Stats */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10, marginBottom: 16 }}>
           {[
-            { val: clientProjects.length, label: "Projects", icon: "ti-briefcase", color: "var(--app-accent, #00BCD4)" },
-            { val: clientProjects.filter(p => (p.status || "").toLowerCase() === "completed").length, label: "Completed", icon: "ti-check", color: "#26C281" },
+            { val: clientProjects.length, label: "Projects", icon: "ti-briefcase", color: "var(--app-accent, #2563EB)" },
+            { val: clientProjects.filter(p => (p.status || "").toLowerCase() === "completed").length, label: "Completed", icon: "ti-check", color: "#16A34A" },
             { val: c.status || "Active", label: "Status", icon: "ti-toggle-right", color: "#F5A623" }
           ].map((s, i) => (
-            <div key={i} style={{ padding: "12px", background: "#fff", borderRadius: 9, border: "1.5px solid #E0EEF0", textAlign: "center" }}>
+            <div key={i} style={{ padding: "12px", background: "#fff", borderRadius: 9, border: "1.5px solid #E2E8F0", textAlign: "center" }}>
               <i className={`ti ${s.icon}`} style={{ fontSize: 18, color: s.color, display: "block", marginBottom: 4 }} />
-              <div style={{ fontSize: 17, fontWeight: 800, color: "#1A2E35" }}>{s.val}</div>
-              <div style={{ fontSize: 10, color: "#A0B8BE", marginTop: 2 }}>{s.label}</div>
+              <div style={{ fontSize: 17, fontWeight: 800, color: "#1E293B" }}>{s.val}</div>
+              <div style={{ fontSize: 10, color: "#64748B", marginTop: 2 }}>{s.label}</div>
             </div>
           ))}
         </div>
 
         {/* Portal Access Info */}
-        <div style={{ background: "var(--teal-lighter, #F0FDFE)", border: "1.5px solid #B2EBF2", borderRadius: 10, padding: "12px 14px" }}>
+        <div style={{ background: "var(--teal-lighter, #EFF6FF)", border: "1.5px solid #B2EBF2", borderRadius: 10, padding: "12px 14px" }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: "#004D5E", marginBottom: 6, display: "flex", alignItems: "center", gap: 6 }}>
             <i className="ti ti-info-circle" style={{ fontSize: 14 }} /> Portal Access Info
           </div>
-          <div style={{ fontSize: 11, color: "#607D86", lineHeight: 1.6 }}>
+          <div style={{ fontSize: 11, color: "#64748B", lineHeight: 1.6 }}>
             <div>📧 Login Email: <strong>{c.email || "Not set"}</strong></div>
 
             <div>🌐 Portal URL: <span style={{ fontFamily: "monospace", fontSize: 10 }}>{portalUrl}</span></div>
@@ -2177,7 +2177,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
     if (activeTab === "feedback") return renderFeedback();
 
-    return <div style={{ padding: 40, textAlign: "center", color: "#A0B8BE" }}>Coming soon...</div>;
+    return <div style={{ padding: 40, textAlign: "center", color: "#64748B" }}>Coming soon...</div>;
 
   };
 
@@ -2210,18 +2210,18 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
         {feedbackLoading ? (
           null
         ) : clientFeedback.length === 0 ? (
-          <div style={{ color: "#A0B8BE", textAlign: "center", padding: 30, fontSize: 12 }}>No feedback submitted yet.</div>
+          <div style={{ color: "#64748B", textAlign: "center", padding: 30, fontSize: 12 }}>No feedback submitted yet.</div>
         ) : (
           clientFeedback.map((fb, i) => (
-            <div key={fb._id || i} style={{ background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 12, padding: 16, marginBottom: 12 }}>
+            <div key={fb._id || i} style={{ background: "#fff", border: "1.5px solid #E2E8F0", borderRadius: 12, padding: 16, marginBottom: 12 }}>
 
               <div style={{ display: "flex", gap: 2, marginBottom: 8 }}>
                 {[1, 2, 3, 4, 5].map(star => (
-                  <i key={star} className="ti ti-star-filled" style={{ fontSize: 16, color: (fb.rating || 0) >= star ? "#F59E0B" : "#E0EEF0" }}></i>
+                  <i key={star} className="ti ti-star-filled" style={{ fontSize: 16, color: (fb.rating || 0) >= star ? "#F59E0B" : "#E2E8F0" }}></i>
                 ))}
               </div>
               <div style={{ fontSize: 13, color: "#4A5568", marginBottom: 8 }}>{fb.message || "—"}</div>
-              <div style={{ fontSize: 11, color: "#A0B8BE" }}>{fb.createdAt ? new Date(fb.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : ''}</div>
+              <div style={{ fontSize: 11, color: "#64748B" }}>{fb.createdAt ? new Date(fb.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : ''}</div>
             </div>
           ))
         )}
@@ -2270,21 +2270,21 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, padding: "4px 4px 16px" }}>
           <div
             onClick={() => onBack && onBack()}
-            style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #00BCD4)" }}
+            style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #2563EB)" }}
           >
             <i className="ti ti-arrow-left" style={{ fontSize: 16 }}></i> Back to Dashboard
           </div>
           {onAddClient && (
             <button
               onClick={onAddClient}
-              style={{ display: "flex", alignItems: "center", gap: 4, background: "var(--app-accent, #00BCD4)", color: "#fff", border: "none", borderRadius: 20, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", boxShadow: "0 3px 10px rgba(0,188,212,0.35)", whiteSpace: "nowrap" }}
+              style={{ display: "flex", alignItems: "center", gap: 4, background: "var(--app-accent, #2563EB)", color: "#fff", border: "none", borderRadius: 20, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", boxShadow: "0 3px 10px rgba(37, 99, 235,0.35)", whiteSpace: "nowrap" }}
             >
               <i className="ti ti-plus" style={{ fontSize: 13 }}></i> New Client
             </button>
           )}
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #00BCD4), #0891b2)", borderRadius: 16, padding: "16px 18px", marginBottom: 14, boxShadow: "0 6px 18px rgba(0,188,212,0.25)" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #2563EB), #0891b2)", borderRadius: 16, padding: "16px 18px", marginBottom: 14, boxShadow: "0 6px 18px rgba(37, 99, 235,0.25)" }}>
           <div>
             <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.8)", letterSpacing: 0.5, textTransform: "uppercase" }}>Total Clients</div>
             <div style={{ fontSize: 26, fontWeight: 800, color: "#fff" }}>{clients.length}</div>
@@ -2295,13 +2295,13 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
         </div>
 
         <div style={{ position: "relative", marginBottom: 12 }}>
-          <i className="ti ti-search" style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", fontSize: 15, color: "#A0B8BE" }} />
+          <i className="ti ti-search" style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", fontSize: 15, color: "#64748B" }} />
           <input
             type="text"
             placeholder="Search clients..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            style={{ width: "100%", padding: "12px 12px 12px 38px", border: "none", borderRadius: 12, fontSize: 13, outline: "none", background: "#fff", color: "#1A2E35", boxSizing: "border-box", boxShadow: "0 2px 10px rgba(15,28,46,0.06)" }}
+            style={{ width: "100%", padding: "12px 12px 12px 38px", border: "none", borderRadius: 12, fontSize: 13, outline: "none", background: "#fff", color: "#1E293B", boxSizing: "border-box", boxShadow: "0 2px 10px rgba(15,28,46,0.06)" }}
           />
         </div>
 
@@ -2313,15 +2313,15 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
               style={{
                 padding: "7px 16px",
                 borderRadius: 20,
-                border: filterMode === f ? "none" : "1.5px solid #E0EEF0",
+                border: filterMode === f ? "none" : "1.5px solid #E2E8F0",
                 fontSize: 12,
                 fontWeight: 700,
                 cursor: "pointer",
                 textTransform: "capitalize",
-                background: filterMode === f ? "var(--app-accent, #00BCD4)" : "#fff",
-                color: filterMode === f ? "#fff" : "#607D86",
+                background: filterMode === f ? "var(--app-accent, #2563EB)" : "#fff",
+                color: filterMode === f ? "#fff" : "#64748B",
                 whiteSpace: "nowrap",
-                boxShadow: filterMode === f ? "0 3px 10px rgba(0,188,212,0.35)" : "none",
+                boxShadow: filterMode === f ? "0 3px 10px rgba(37, 99, 235,0.35)" : "none",
                 transition: "all 0.15s ease"
               }}
             >
@@ -2331,7 +2331,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
         </div>
 
         {mListFiltered.length === 0 ? (
-          <div style={{ padding: "40px 16px", textAlign: "center", color: "#A0B8BE", fontSize: 13, fontWeight: 600, background: "#fff", borderRadius: 16, boxShadow: "0 2px 10px rgba(15,28,46,0.05)" }}>
+          <div style={{ padding: "40px 16px", textAlign: "center", color: "#64748B", fontSize: 13, fontWeight: 600, background: "#fff", borderRadius: 16, boxShadow: "0 2px 10px rgba(15,28,46,0.05)" }}>
             No clients found.
           </div>
         ) : (
@@ -2357,22 +2357,22 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
                     <div style={{ display: "flex", alignItems: "flex-start", gap: 10, minWidth: 0, flex: 1 }}>
                       <div style={{
                         width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
-                        background: "linear-gradient(135deg, var(--app-accent, #00BCD4), #0891b2)", color: "#fff",
+                        background: "linear-gradient(135deg, var(--app-accent, #2563EB), #0891b2)", color: "#fff",
                         display: "flex", alignItems: "center", justifyContent: "center",
                         fontSize: 14, fontWeight: 800
                       }}>
                         {initials(name)}
                       </div>
                       <div style={{ minWidth: 0, flex: 1 }}>
-                        <div style={{ fontWeight: 800, color: "#0f1c2e", fontSize: 14.5, wordBreak: "break-word" }}>{name}</div>
+                        <div style={{ fontWeight: 800, color: "#0f172a", fontSize: 14.5, wordBreak: "break-word" }}>{name}</div>
                         {c.email && (
-                          <div style={{ display: "flex", alignItems: "flex-start", gap: 4, marginTop: 3, fontSize: 11.5, color: "#607D86", fontWeight: 600 }}>
+                          <div style={{ display: "flex", alignItems: "flex-start", gap: 4, marginTop: 3, fontSize: 11.5, color: "#64748B", fontWeight: 600 }}>
                             <i className="ti ti-mail" style={{ fontSize: 12, flexShrink: 0, marginTop: 1 }} />
                             <span style={{ wordBreak: "break-word" }}>{c.email}</span>
                           </div>
                         )}
                         {c.contactPersonNo && (
-                          <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 2, fontSize: 11.5, color: "#607D86", fontWeight: 600 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 2, fontSize: 11.5, color: "#64748B", fontWeight: 600 }}>
                             <i className="ti ti-phone" style={{ fontSize: 12, flexShrink: 0 }} />
                             {c.contactPersonNo}
                           </div>
@@ -2386,7 +2386,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
                       {c.status || "Active"}
                     </span>
                   </div>
-                  <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 4, color: "var(--app-accent, #00BCD4)", fontSize: 12, fontWeight: 700 }}>
+                  <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 4, color: "var(--app-accent, #2563EB)", fontSize: 12, fontWeight: 700 }}>
                     View details <i className="ti ti-chevron-right" style={{ fontSize: 13 }} />
                   </div>
                 </div>
@@ -2415,17 +2415,17 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
       {/* STAT PILLS — matches Projects page style */}
       <div className="client-stat-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 20 }}>
-        <div style={{ cursor: "pointer", background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)", boxSizing: "border-box", height: 80, minWidth: 0 }}>
-          <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(0,188,212,0.1)", color: "var(--app-accent)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}><i className="ti ti-users" /></div>
-          <div><div style={{ fontSize: 24, fontWeight: 800, color: "#1A2332" }}>{totalClients}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#607D86" }}>All Clients</div></div>
+        <div style={{ cursor: "pointer", background: "#fff", border: "1.5px solid #E2E8F0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)", boxSizing: "border-box", height: 80, minWidth: 0 }}>
+          <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(37, 99, 235,0.1)", color: "var(--app-accent)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}><i className="ti ti-users" /></div>
+          <div><div style={{ fontSize: 24, fontWeight: 800, color: "#1A2332" }}>{totalClients}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#64748B" }}>All Clients</div></div>
         </div>
-        <div style={{ cursor: "pointer", background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)", boxSizing: "border-box", height: 80, minWidth: 0 }}>
+        <div style={{ cursor: "pointer", background: "#fff", border: "1.5px solid #E2E8F0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)", boxSizing: "border-box", height: 80, minWidth: 0 }}>
           <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(22,163,74,0.1)", color: "#16a34a", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}><i className="ti ti-user-check" /></div>
-          <div><div style={{ fontSize: 24, fontWeight: 800, color: "#1A2332" }}>{activeClientsCount}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#607D86" }}>Active</div></div>
+          <div><div style={{ fontSize: 24, fontWeight: 800, color: "#1A2332" }}>{activeClientsCount}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#64748B" }}>Active</div></div>
         </div>
-        <div style={{ cursor: "pointer", background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)", boxSizing: "border-box", height: 80, minWidth: 0 }}>
+        <div style={{ cursor: "pointer", background: "#fff", border: "1.5px solid #E2E8F0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)", boxSizing: "border-box", height: 80, minWidth: 0 }}>
           <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(220,38,38,0.1)", color: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}><i className="ti ti-user-off" /></div>
-          <div><div style={{ fontSize: 24, fontWeight: 800, color: "#1A2332" }}>{inactiveClientsCount}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#607D86" }}>Inactive</div></div>
+          <div><div style={{ fontSize: 24, fontWeight: 800, color: "#1A2332" }}>{inactiveClientsCount}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#64748B" }}>Inactive</div></div>
         </div>
       </div>
 
@@ -2435,20 +2435,20 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
 
       {/* LEFT-PANEL + DETAIL VIEW (always visible, embedded below stat cards) */}
- <div className="client-detail-layout" style={{ display: "flex", position: "relative", flex: 1, minHeight: 0, maxHeight: isMobileWidth ? "none" : "60vh", background: "#fff", marginTop: 4, border: isMobileWidth ? "none" : "1.5px solid #E0EEF0", borderRadius: isMobileWidth ? 0 : 14, overflow: isMobileWidth ? "visible" : "hidden" }}>
-        <div className="client-list-panel" style={{ width: 260, minWidth: 260, borderRight: "1.5px solid #E0EEF0", display: "flex", flexDirection: "column", background: "#fff", overflow: "hidden" }}>
+ <div className="client-detail-layout" style={{ display: "flex", position: "relative", flex: 1, minHeight: 0, maxHeight: isMobileWidth ? "none" : "60vh", background: "#fff", marginTop: 4, border: isMobileWidth ? "none" : "1.5px solid #E2E8F0", borderRadius: isMobileWidth ? 0 : 14, overflow: isMobileWidth ? "visible" : "hidden" }}>
+        <div className="client-list-panel" style={{ width: 260, minWidth: 260, borderRight: "1.5px solid #E2E8F0", display: "flex", flexDirection: "column", background: "#fff", overflow: "hidden" }}>
 
           {/* Search + Add */}
-          <div style={{ padding: "14px 12px 8px", borderBottom: "1px solid #E0EEF0", flexShrink: 0 }}>
+          <div style={{ padding: "14px 12px 8px", borderBottom: "1px solid #E2E8F0", flexShrink: 0 }}>
             <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
               <div style={{ position: "relative", flex: 1 }}>
-                <i className="ti ti-search" style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 13, color: "#A0B8BE" }} />
+                <i className="ti ti-search" style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 13, color: "#64748B" }} />
                 <input
                   type="text"
                   placeholder="Search clients..."
                   value={search}
                   onChange={e => setSearch(e.target.value)}
-                  style={{ width: "100%", padding: "8px 10px 8px 30px", border: "1.5px solid #E0EEF0", borderRadius: 9, fontSize: 12, outline: "none", background: "#F5FAFA", color: "#1A2E35", boxSizing: "border-box" }}
+                  style={{ width: "100%", padding: "8px 10px 8px 30px", border: "1.5px solid #E2E8F0", borderRadius: 9, fontSize: 12, outline: "none", background: "#F8FAFC", color: "#1E293B", boxSizing: "border-box" }}
                 />
               </div>
 
@@ -2464,12 +2464,12 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
                     flex: 1,
                     padding: "5px 4px",
                     borderRadius: 7,
-                    border: filterMode === f ? "1.5px solid var(--app-accent, #00BCD4)" : "1.5px solid transparent",
+                    border: filterMode === f ? "1.5px solid var(--app-accent, #2563EB)" : "1.5px solid transparent",
                     fontSize: 10,
                     fontWeight: 700,
                     cursor: "pointer",
-                    background: filterMode === f ? "var(--app-accent, #00BCD4)" : "var(--teal-lighter, #F0FDFE)",
-                    color: filterMode === f ? "#fff" : "#607D86",
+                    background: filterMode === f ? "var(--app-accent, #2563EB)" : "var(--teal-lighter, #EFF6FF)",
+                    color: filterMode === f ? "#fff" : "#64748B",
                     textTransform: "capitalize",
                     transition: "all 0.15s ease"
                   }}
@@ -2485,20 +2485,20 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
             {filtered.length === 0 ? (
               <div style={{ padding: 30, textAlign: "center" }}>
                 <div style={{ fontSize: 28, marginBottom: 8 }}>👥</div>
-                <div style={{ fontSize: 12, color: "#A0B8BE", fontWeight: 600 }}>No clients found</div>
+                <div style={{ fontSize: 12, color: "#64748B", fontWeight: 600 }}>No clients found</div>
 
               </div>
             ) : (
               <>
                 {activeSection.length > 0 && (
                   <>
-                    <div style={{ padding: "8px 14px 4px", fontSize: 9, fontWeight: 800, color: "#A0B8BE", letterSpacing: 1, textTransform: "uppercase" }}>Active ({activeSection.length})</div>
+                    <div style={{ padding: "8px 14px 4px", fontSize: 9, fontWeight: 800, color: "#64748B", letterSpacing: 1, textTransform: "uppercase" }}>Active ({activeSection.length})</div>
                     {activeSection.map(c => renderClientItem(c))}
                   </>
                 )}
                 {otherSection.length > 0 && (
                   <>
-                    <div style={{ padding: "8px 14px 4px", fontSize: 9, fontWeight: 800, color: "#A0B8BE", letterSpacing: 1, textTransform: "uppercase" }}>Others ({otherSection.length})</div>
+                    <div style={{ padding: "8px 14px 4px", fontSize: 9, fontWeight: 800, color: "#64748B", letterSpacing: 1, textTransform: "uppercase" }}>Others ({otherSection.length})</div>
                     {otherSection.map(c => renderClientItem(c))}
                   </>
                 )}
@@ -2541,11 +2541,11 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
             {/* HERO */}
 
-            <div style={{ background: "#fff", borderBottom: "1.5px solid #E0EEF0", padding: "20px 28px", flexShrink: 0 }}>
+            <div style={{ background: "#fff", borderBottom: "1.5px solid #E2E8F0", padding: "20px 28px", flexShrink: 0 }}>
 
               <div style={{ display: "flex", alignItems: "flex-start", gap: 16, marginBottom: 16 }}>
 
-                <div style={{ width: 64, height: 64, borderRadius: "50%", background: activeClient.logoUrl ? "#f1f5f9" : `linear-gradient(135deg,${acColor || "#00BCD4"},${acColor || "#00BCD4"})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, fontWeight: 900, color: "#fff", flexShrink: 0, position: "relative", boxShadow: "0 4px 14px rgba(0,0,0,.15)", overflow: "hidden" }}>
+                <div style={{ width: 64, height: 64, borderRadius: "50%", background: activeClient.logoUrl ? "#f1f5f9" : `linear-gradient(135deg,${acColor || "#2563EB"},${acColor || "#2563EB"})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, fontWeight: 900, color: "#fff", flexShrink: 0, position: "relative", boxShadow: "0 4px 14px rgba(0,0,0,.15)", overflow: "hidden" }}>
 
                   {activeClient.logoUrl ? <img src={activeClient.logoUrl} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} /> : getAvatar(activeClient)}
 
@@ -2557,7 +2557,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
                   <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 4 }}>
 
-                    <div style={{ fontSize: 20, fontWeight: 900, color: "#1A2E35", letterSpacing: "-.3px" }}>{activeClient.clientName || activeClient.name || "—"}</div>
+                    <div style={{ fontSize: 20, fontWeight: 900, color: "#1E293B", letterSpacing: "-.3px" }}>{activeClient.clientName || activeClient.name || "—"}</div>
 
                     {/* Status badge with dropdown */}
 
@@ -2570,9 +2570,9 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
                       {statusDropOpen && (
 
-                        <div style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 10, boxShadow: "0 8px 24px rgba(0,0,0,.12)", zIndex: 100, minWidth: 160, overflow: "hidden" }}>
+                        <div style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, background: "#fff", border: "1.5px solid #E2E8F0", borderRadius: 10, boxShadow: "0 8px 24px rgba(0,0,0,.12)", zIndex: 100, minWidth: 160, overflow: "hidden" }}>
 
-                          <div style={{ padding: "6px 12px 4px", fontSize: 9, fontWeight: 700, color: "#A0B8BE", textTransform: "uppercase", letterSpacing: .7, background: "#F8FAFB", borderBottom: "1px solid #E0EEF0" }}>Set Client Status</div>
+                          <div style={{ padding: "6px 12px 4px", fontSize: 9, fontWeight: 700, color: "#64748B", textTransform: "uppercase", letterSpacing: .7, background: "#F8FAFB", borderBottom: "1px solid #E2E8F0" }}>Set Client Status</div>
 
                           {["Active", "Inactive"].map(s => {
 
@@ -2606,9 +2606,9 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
                   <div style={{ display: "flex", gap: 6, marginTop: 8, flexWrap: "wrap" }}>
 
-                    {activeClient.address && <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "var(--teal-light, var(--teal-light, #E0F7FA))", color: "var(--app-accent, #00BCD4)" }}><i className="ti ti-map-pin" style={{ fontSize: 10, marginRight: 2 }} />{activeClient.address}</span>}
+                    {activeClient.address && <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "var(--teal-light, var(--teal-light, #EFF6FF))", color: "var(--app-accent, #2563EB)" }}><i className="ti ti-map-pin" style={{ fontSize: 10, marginRight: 2 }} />{activeClient.address}</span>}
 
-                    <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "#F8FAFB", color: "#A0B8BE" }}><i className="ti ti-clock" style={{ fontSize: 10, marginRight: 2 }} />Joined {activeClient.createdAt ? new Date(activeClient.createdAt).toLocaleDateString("en-IN") : "—"}</span>
+                    <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "#F8FAFB", color: "#64748B" }}><i className="ti ti-clock" style={{ fontSize: 10, marginRight: 2 }} />Joined {activeClient.createdAt ? new Date(activeClient.createdAt).toLocaleDateString("en-IN") : "—"}</span>
 
                   </div>
 
@@ -2616,9 +2616,9 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
                 <div style={{ display: "flex", gap: 6, flexShrink: 0, flexWrap: "wrap" }}>
 
-                  <button onClick={() => openEdit(activeClient)} title="Edit" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 5, padding: isMobileWidth ? "7px" : "7px 14px", width: isMobileWidth ? 30 : "auto", height: isMobileWidth ? 30 : "auto", borderRadius: 9, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all .15s", border: "1.5px solid #E0EEF0", background: "#F5FAFA", color: "#607D86" }} onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--app-accent, #00BCD4)"; e.currentTarget.style.color = "var(--app-accent, #00BCD4)"; }} onMouseLeave={e => { e.currentTarget.style.borderColor = "#E0EEF0"; e.currentTarget.style.color = "#607D86"; }}><i className="ti ti-edit" style={{ fontSize: 13 }} />{!isMobileWidth && "Edit"}</button>
+                  <button onClick={() => openEdit(activeClient)} title="Edit" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 5, padding: isMobileWidth ? "7px" : "7px 14px", width: isMobileWidth ? 30 : "auto", height: isMobileWidth ? 30 : "auto", borderRadius: 9, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all .15s", border: "1.5px solid #E2E8F0", background: "#F8FAFC", color: "#64748B" }} onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--app-accent, #2563EB)"; e.currentTarget.style.color = "var(--app-accent, #2563EB)"; }} onMouseLeave={e => { e.currentTarget.style.borderColor = "#E2E8F0"; e.currentTarget.style.color = "#64748B"; }}><i className="ti ti-edit" style={{ fontSize: 13 }} />{!isMobileWidth && "Edit"}</button>
 
-                  <button onClick={() => setDeleteTarget(activeClient)} title="Delete" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 5, padding: isMobileWidth ? "7px" : "7px 14px", width: isMobileWidth ? 30 : "auto", height: isMobileWidth ? 30 : "auto", borderRadius: 9, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all .15s", border: "1.5px solid #E0EEF0", background: "#F5FAFA", color: "#607D86" }} onMouseEnter={e => { e.currentTarget.style.borderColor = "#F05C5C"; e.currentTarget.style.color = "#F05C5C"; }} onMouseLeave={e => { e.currentTarget.style.borderColor = "#E0EEF0"; e.currentTarget.style.color = "#607D86"; }}><i className="ti ti-trash" style={{ fontSize: 13 }} />{!isMobileWidth && "Delete"}</button>
+                  <button onClick={() => setDeleteTarget(activeClient)} title="Delete" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 5, padding: isMobileWidth ? "7px" : "7px 14px", width: isMobileWidth ? 30 : "auto", height: isMobileWidth ? 30 : "auto", borderRadius: 9, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all .15s", border: "1.5px solid #E2E8F0", background: "#F8FAFC", color: "#64748B" }} onMouseEnter={e => { e.currentTarget.style.borderColor = "#F05C5C"; e.currentTarget.style.color = "#F05C5C"; }} onMouseLeave={e => { e.currentTarget.style.borderColor = "#E2E8F0"; e.currentTarget.style.color = "#64748B"; }}><i className="ti ti-trash" style={{ fontSize: 13 }} />{!isMobileWidth && "Delete"}</button>
 
                 </div>
 
@@ -2628,22 +2628,22 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
               {/* Stats bar */}
 
-              <div style={{ display: "flex", gap: 0, background: "#F5FAFA", border: "1.5px solid #E0EEF0", borderRadius: 10, overflow: "hidden" }}>
+              <div style={{ display: "flex", gap: 0, background: "#F8FAFC", border: "1.5px solid #E2E8F0", borderRadius: 10, overflow: "hidden" }}>
 
                 {[
 
-                  { val: cRevenue ? "Rs." + Number(cRevenue).toLocaleString("en-IN") : "Rs.0", label: "Total Revenue", color: "var(--app-accent, #00BCD4)" },
+                  { val: cRevenue ? "Rs." + Number(cRevenue).toLocaleString("en-IN") : "Rs.0", label: "Total Revenue", color: "var(--app-accent, #2563EB)" },
                   { val: clientProjects.length, label: "Projects" },
                   { val: invoices.filter(inv => (inv.clientId === activeClient?._id) || (inv.clientName === (activeClient?.clientName || activeClient?.name))).length, label: "Invoices" },
                   { val: (activeClient?.documents?.length || 0), label: "Documents" },
 
                 ].map((s, i, arr) => (
 
-                  <div key={i} style={{ flex: 1, padding: "10px 14px", textAlign: "center", borderRight: i < arr.length - 1 ? "1px solid #E0EEF0" : "none" }}>
+                  <div key={i} style={{ flex: 1, padding: "10px 14px", textAlign: "center", borderRight: i < arr.length - 1 ? "1px solid #E2E8F0" : "none" }}>
 
-                    <div style={{ fontSize: 17, fontWeight: 900, color: s.color || "#1A2E35", letterSpacing: "-.3px" }}>{s.val}</div>
+                    <div style={{ fontSize: 17, fontWeight: 900, color: s.color || "#1E293B", letterSpacing: "-.3px" }}>{s.val}</div>
 
-                    <div style={{ fontSize: 10, color: "#A0B8BE", fontWeight: 600, marginTop: 2, textTransform: "uppercase", letterSpacing: .4 }}>{s.label}</div>
+                    <div style={{ fontSize: 10, color: "#64748B", fontWeight: 600, marginTop: 2, textTransform: "uppercase", letterSpacing: .4 }}>{s.label}</div>
 
                   </div>
 
@@ -2657,7 +2657,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
             {/* TABS */}
 
-            <div className="client-tabs-row" style={{ background: "#fff", borderBottom: "1.5px solid #E0EEF0", padding: isMobileWidth ? "0 12px" : "0 28px", display: "flex", flexShrink: 0, overflowX: "auto", overflowY: "hidden", WebkitOverflowScrolling: "touch" }}>
+            <div className="client-tabs-row" style={{ background: "#fff", borderBottom: "1.5px solid #E2E8F0", padding: isMobileWidth ? "0 12px" : "0 28px", display: "flex", flexShrink: 0, overflowX: "auto", overflowY: "hidden", WebkitOverflowScrolling: "touch" }}>
 
               {[
 
@@ -2675,7 +2675,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
               ].map(tab => (
 
-                <button key={tab.key} onClick={() => setActiveTab(tab.key)} style={{ padding: isMobileWidth ? "9px 7px" : "12px 16px", fontSize: isMobileWidth ? 10 : 12, fontWeight: 700, color: activeTab === tab.key ? "var(--app-accent, #00BCD4)" : "#607D86", cursor: "pointer", border: "none", background: "none", fontFamily: "inherit", borderBottom: `2.5px solid ${activeTab === tab.key ? "var(--app-accent, #00BCD4)" : "transparent"}`, transition: "all .15s", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 3, flexShrink: 0 }}>
+                <button key={tab.key} onClick={() => setActiveTab(tab.key)} style={{ padding: isMobileWidth ? "9px 7px" : "12px 16px", fontSize: isMobileWidth ? 10 : 12, fontWeight: 700, color: activeTab === tab.key ? "var(--app-accent, #2563EB)" : "#64748B", cursor: "pointer", border: "none", background: "none", fontFamily: "inherit", borderBottom: `2.5px solid ${activeTab === tab.key ? "var(--app-accent, #2563EB)" : "transparent"}`, transition: "all .15s", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 3, flexShrink: 0 }}>
 
                   <i className={`ti ${tab.icon}`} style={{ fontSize: isMobileWidth ? 12 : 14 }} />{tab.label}
 
@@ -2745,7 +2745,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
               {activeClient.logoUrl ? (
 
-                <img src={activeClient.logoUrl} alt="logo" style={{ width: 80, height: 80, borderRadius: 16, objectFit: "contain", background: "#fff", border: "2px solid #E0EEF0" }} />
+                <img src={activeClient.logoUrl} alt="logo" style={{ width: 80, height: 80, borderRadius: 16, objectFit: "contain", background: "#fff", border: "2px solid #E2E8F0" }} />
 
               ) : (
 
@@ -2817,18 +2817,18 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
             ].map((row, i) => (
 
-          <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8, padding: "7px 10px", background: "#F5FAFA", borderRadius: 8, border: "1px solid #E0EEF0" }}>
+          <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8, padding: "7px 10px", background: "#F8FAFC", borderRadius: 8, border: "1px solid #E2E8F0" }}>
 
-  <div style={{ width: 24, height: 24, borderRadius: 6, background: "var(--teal-light, var(--teal-light, #E0F7FA))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "var(--app-accent, #00BCD4)", flexShrink: 0 }}>
+  <div style={{ width: 24, height: 24, borderRadius: 6, background: "var(--teal-light, var(--teal-light, #EFF6FF))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "var(--app-accent, #2563EB)", flexShrink: 0 }}>
 
     <i className={`ti ${row.icon}`} />
                 </div>
 
                 <div style={{ flex: 1, minWidth: 0 }}>
 
-                  <div style={{ fontSize: 10, color: "#A0B8BE", fontWeight: 600 }}>{row.label}</div>
+                  <div style={{ fontSize: 10, color: "#64748B", fontWeight: 600 }}>{row.label}</div>
 
-                  <div style={{ fontSize: 13, fontWeight: 700, color: "#1A2E35", marginTop: 1, wordBreak: "break-word" }}>{row.val}</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "#1E293B", marginTop: 1, wordBreak: "break-word" }}>{row.val}</div>
 
                 </div>
 
@@ -2879,18 +2879,18 @@ function UnpaidInvoicesListPage({ invoices, onViewInvoice, onBack, onAddInvoice 
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, padding: "4px 4px 16px" }}>
         <div
           onClick={() => onBack && onBack()}
-          style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #00BCD4)" }}
+          style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #2563EB)" }}
         >
           <i className="ti ti-arrow-left" style={{ fontSize: 16 }}></i> Back to Dashboard
         </div>
         {onAddInvoice && (
-          <button onClick={onAddInvoice} style={{ display: "flex", alignItems: "center", gap: 4, background: "var(--app-accent, #00BCD4)", color: "#fff", border: "none", borderRadius: 20, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", boxShadow: "0 3px 10px rgba(0,188,212,0.35)", whiteSpace: "nowrap" }}>
+          <button onClick={onAddInvoice} style={{ display: "flex", alignItems: "center", gap: 4, background: "var(--app-accent, #2563EB)", color: "#fff", border: "none", borderRadius: 20, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", boxShadow: "0 3px 10px rgba(37, 99, 235,0.35)", whiteSpace: "nowrap" }}>
             <i className="ti ti-plus" style={{ fontSize: 13 }}></i> New Invoice
           </button>
         )}
       </div>
 
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #00BCD4), #0891b2)", borderRadius: 16, padding: "16px 18px", marginBottom: 14, boxShadow: "0 6px 18px rgba(0,188,212,0.25)" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #2563EB), #0891b2)", borderRadius: 16, padding: "16px 18px", marginBottom: 14, boxShadow: "0 6px 18px rgba(37, 99, 235,0.25)" }}>
         <div>
           <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.8)", letterSpacing: 0.5, textTransform: "uppercase" }}>Total Unpaid Invoices</div>
           <div style={{ fontSize: 26, fontWeight: 800, color: "#fff" }}>{unpaid.length}</div>
@@ -2901,13 +2901,13 @@ function UnpaidInvoicesListPage({ invoices, onViewInvoice, onBack, onAddInvoice 
       </div>
 
       <div style={{ position: "relative", marginBottom: 12 }}>
-        <i className="ti ti-search" style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", fontSize: 15, color: "#A0B8BE" }} />
+        <i className="ti ti-search" style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", fontSize: 15, color: "#64748B" }} />
         <input
           type="text"
           placeholder="Search invoices..."
           value={search}
           onChange={e => setSearch(e.target.value)}
-          style={{ width: "100%", padding: "12px 12px 12px 38px", border: "none", borderRadius: 12, fontSize: 13, outline: "none", background: "#fff", color: "#1A2E35", boxSizing: "border-box", boxShadow: "0 2px 10px rgba(15,28,46,0.06)" }}
+          style={{ width: "100%", padding: "12px 12px 12px 38px", border: "none", borderRadius: 12, fontSize: 13, outline: "none", background: "#fff", color: "#1E293B", boxSizing: "border-box", boxShadow: "0 2px 10px rgba(15,28,46,0.06)" }}
         />
       </div>
 
@@ -2919,13 +2919,13 @@ function UnpaidInvoicesListPage({ invoices, onViewInvoice, onBack, onAddInvoice 
             style={{
               padding: "7px 16px",
               borderRadius: 20,
-              border: filterMode === f ? "none" : "1.5px solid #E0EEF0",
+              border: filterMode === f ? "none" : "1.5px solid #E2E8F0",
               fontSize: 12,
               fontWeight: 700,
               cursor: "pointer",
               textTransform: "capitalize",
               background: filterMode === f ? "#1A2332" : "#fff",
-              color: filterMode === f ? "#fff" : "#607D86",
+              color: filterMode === f ? "#fff" : "#64748B",
               whiteSpace: "nowrap",
               transition: "all 0.15s ease"
             }}
@@ -2936,7 +2936,7 @@ function UnpaidInvoicesListPage({ invoices, onViewInvoice, onBack, onAddInvoice 
       </div>
 
       {filtered.length === 0 ? (
-        <div style={{ padding: "40px 16px", textAlign: "center", color: "#A0B8BE", fontSize: 13, fontWeight: 600, background: "#fff", borderRadius: 16, boxShadow: "0 2px 10px rgba(15,28,46,0.05)" }}>
+        <div style={{ padding: "40px 16px", textAlign: "center", color: "#64748B", fontSize: 13, fontWeight: 600, background: "#fff", borderRadius: 16, boxShadow: "0 2px 10px rgba(15,28,46,0.05)" }}>
           No unpaid invoices found.
         </div>
       ) : (
@@ -2962,22 +2962,22 @@ function UnpaidInvoicesListPage({ invoices, onViewInvoice, onBack, onAddInvoice 
                   <div style={{ display: "flex", alignItems: "flex-start", gap: 10, minWidth: 0, flex: 1 }}>
                     <div style={{
                       width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
-                      background: "linear-gradient(135deg, var(--app-accent, #00BCD4), #0891b2)", color: "#fff",
+                      background: "linear-gradient(135deg, var(--app-accent, #2563EB), #0891b2)", color: "#fff",
                       display: "flex", alignItems: "center", justifyContent: "center",
                       fontSize: 14, fontWeight: 800
                     }}>
                       {initials(name)}
                     </div>
                     <div style={{ minWidth: 0, flex: 1 }}>
-                      <div style={{ fontWeight: 800, color: "#0f1c2e", fontSize: 14.5, wordBreak: "break-word" }}>{name}</div>
+                      <div style={{ fontWeight: 800, color: "#0f172a", fontSize: 14.5, wordBreak: "break-word" }}>{name}</div>
                       {inv.invoiceNo && (
-                        <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 3, fontSize: 11.5, color: "#607D86", fontWeight: 600 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 3, fontSize: 11.5, color: "#64748B", fontWeight: 600 }}>
                           <i className="ti ti-hash" style={{ fontSize: 12, flexShrink: 0 }} />
                           <span>{inv.invoiceNo}</span>
                         </div>
                       )}
                       {(inv.grandTotal || inv.total) && (
-                        <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 2, fontSize: 11.5, color: "#607D86", fontWeight: 600 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 2, fontSize: 11.5, color: "#64748B", fontWeight: 600 }}>
                           <i className="ti ti-currency-rupee" style={{ fontSize: 12, flexShrink: 0 }} />
                           {Number(inv.grandTotal || inv.total).toLocaleString("en-IN")}
                         </div>
@@ -2991,7 +2991,7 @@ function UnpaidInvoicesListPage({ invoices, onViewInvoice, onBack, onAddInvoice 
                     {inv.status || "Unpaid"}
                   </span>
                 </div>
-                <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 4, color: "var(--app-accent, #00BCD4)", fontSize: 12, fontWeight: 700 }}>
+                <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 4, color: "var(--app-accent, #2563EB)", fontSize: 12, fontWeight: 700 }}>
                   View details <i className="ti ti-chevron-right" style={{ fontSize: 13 }} />
                 </div>
               </div>
@@ -3027,16 +3027,16 @@ function ProposalsListPage({ proposals, onViewProposal, onBack, onAddProposal })
 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, padding: "4px 4px 16px" }}>
         <div
           onClick={() => onBack && onBack()}
-          style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #00BCD4)" }}
+          style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #2563EB)" }}
         >
           <i className="ti ti-arrow-left" style={{ fontSize: 16 }}></i> Back to Dashboard
         </div>
         {onAddProposal && (
-          <button onClick={onAddProposal} style={{ display: "flex", alignItems: "center", gap: 4, background: "var(--app-accent, #00BCD4)", color: "#fff", border: "none", borderRadius: 20, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", boxShadow: "0 3px 10px rgba(0,188,212,0.35)", whiteSpace: "nowrap" }}>
+          <button onClick={onAddProposal} style={{ display: "flex", alignItems: "center", gap: 4, background: "var(--app-accent, #2563EB)", color: "#fff", border: "none", borderRadius: 20, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", boxShadow: "0 3px 10px rgba(37, 99, 235,0.35)", whiteSpace: "nowrap" }}>
             <i className="ti ti-plus" style={{ fontSize: 13 }}></i> New Proposal
           </button>
         )}
-      </div> <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #00BCD4), #0891b2)", borderRadius: 16, padding: "16px 18px", marginBottom: 14, boxShadow: "0 6px 18px rgba(0,188,212,0.25)" }}>
+      </div> <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #2563EB), #0891b2)", borderRadius: 16, padding: "16px 18px", marginBottom: 14, boxShadow: "0 6px 18px rgba(37, 99, 235,0.25)" }}>
 
         <div>
           <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.8)", letterSpacing: 0.5, textTransform: "uppercase" }}>Total Proposals</div>
@@ -3048,13 +3048,13 @@ function ProposalsListPage({ proposals, onViewProposal, onBack, onAddProposal })
       </div>
 
       <div style={{ position: "relative", marginBottom: 12 }}>
-        <i className="ti ti-search" style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", fontSize: 15, color: "#A0B8BE" }} />
+        <i className="ti ti-search" style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", fontSize: 15, color: "#64748B" }} />
         <input
           type="text"
           placeholder="Search proposals..."
           value={search}
           onChange={e => setSearch(e.target.value)}
-          style={{ width: "100%", padding: "12px 12px 12px 38px", border: "none", borderRadius: 12, fontSize: 13, outline: "none", background: "#fff", color: "#1A2E35", boxSizing: "border-box", boxShadow: "0 2px 10px rgba(15,28,46,0.06)" }}
+          style={{ width: "100%", padding: "12px 12px 12px 38px", border: "none", borderRadius: 12, fontSize: 13, outline: "none", background: "#fff", color: "#1E293B", boxSizing: "border-box", boxShadow: "0 2px 10px rgba(15,28,46,0.06)" }}
         />
       </div>
 
@@ -3066,13 +3066,13 @@ function ProposalsListPage({ proposals, onViewProposal, onBack, onAddProposal })
             style={{
               padding: "7px 16px",
               borderRadius: 20,
-              border: filterMode === f ? "none" : "1.5px solid #E0EEF0",
+              border: filterMode === f ? "none" : "1.5px solid #E2E8F0",
               fontSize: 12,
               fontWeight: 700,
               cursor: "pointer",
               textTransform: "capitalize",
               background: filterMode === f ? "#1A2332" : "#fff",
-              color: filterMode === f ? "#fff" : "#607D86",
+              color: filterMode === f ? "#fff" : "#64748B",
               whiteSpace: "nowrap",
               transition: "all 0.15s ease"
             }}
@@ -3083,7 +3083,7 @@ function ProposalsListPage({ proposals, onViewProposal, onBack, onAddProposal })
       </div>
 
       {filtered.length === 0 ? (
-        <div style={{ padding: "40px 16px", textAlign: "center", color: "#A0B8BE", fontSize: 13, fontWeight: 600, background: "#fff", borderRadius: 16, boxShadow: "0 2px 10px rgba(15,28,46,0.05)" }}>
+        <div style={{ padding: "40px 16px", textAlign: "center", color: "#64748B", fontSize: 13, fontWeight: 600, background: "#fff", borderRadius: 16, boxShadow: "0 2px 10px rgba(15,28,46,0.05)" }}>
           No proposals found.
         </div>
       ) : (
@@ -3109,16 +3109,16 @@ function ProposalsListPage({ proposals, onViewProposal, onBack, onAddProposal })
                   <div style={{ display: "flex", alignItems: "flex-start", gap: 10, minWidth: 0, flex: 1 }}>
                     <div style={{
                       width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
-                      background: "linear-gradient(135deg, var(--app-accent, #00BCD4), #0891b2)", color: "#fff",
+                      background: "linear-gradient(135deg, var(--app-accent, #2563EB), #0891b2)", color: "#fff",
                       display: "flex", alignItems: "center", justifyContent: "center",
                       fontSize: 14, fontWeight: 800
                     }}>
                       {initials(title)}
                     </div>
                     <div style={{ minWidth: 0, flex: 1 }}>
-                      <div style={{ fontWeight: 800, color: "#0f1c2e", fontSize: 14.5, wordBreak: "break-word" }}>{title}</div>
+                      <div style={{ fontWeight: 800, color: "#0f172a", fontSize: 14.5, wordBreak: "break-word" }}>{title}</div>
                       {p.reviewComment && (
-                        <div style={{ display: "flex", alignItems: "flex-start", gap: 4, marginTop: 3, fontSize: 11.5, color: "#607D86", fontWeight: 600 }}>
+                        <div style={{ display: "flex", alignItems: "flex-start", gap: 4, marginTop: 3, fontSize: 11.5, color: "#64748B", fontWeight: 600 }}>
                           <i className="ti ti-message-2" style={{ fontSize: 12, flexShrink: 0, marginTop: 1 }} />
                           <span style={{ wordBreak: "break-word" }}>{p.reviewComment}</span>
                         </div>
@@ -3132,7 +3132,7 @@ function ProposalsListPage({ proposals, onViewProposal, onBack, onAddProposal })
                     {(p.status || "draft").toUpperCase()}
                   </span>
                 </div>
-                <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 4, color: "var(--app-accent, #00BCD4)", fontSize: 12, fontWeight: 700 }}>
+                <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 4, color: "var(--app-accent, #2563EB)", fontSize: 12, fontWeight: 700 }}>
                   View details <i className="ti ti-chevron-right" style={{ fontSize: 13 }} />
                 </div>
               </div>
@@ -3168,10 +3168,10 @@ function QuotationsListPage({ quotations, onViewQuotation, onBack, onAddQuotatio
         {/* Back to Dashboard — top-left, fixed position for every page */}
       <div
         onClick={() => onBack && onBack()}
-        style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 4px 16px", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #00BCD4)" }}
+        style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 4px 16px", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #2563EB)" }}
       >
         <i className="ti ti-arrow-left" style={{ fontSize: 16 }}></i> Back to Dashboard
-      </div> <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #00BCD4), #0891b2)", borderRadius: 16, padding: "16px 18px", marginBottom: 14, boxShadow: "0 6px 18px rgba(0,188,212,0.25)" }}>
+      </div> <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #2563EB), #0891b2)", borderRadius: 16, padding: "16px 18px", marginBottom: 14, boxShadow: "0 6px 18px rgba(37, 99, 235,0.25)" }}>
         <div>
           <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.8)", letterSpacing: 0.5, textTransform: "uppercase" }}>Total Quotations</div>
           <div style={{ fontSize: 26, fontWeight: 800, color: "#fff" }}>{all.length}</div>
@@ -3182,13 +3182,13 @@ function QuotationsListPage({ quotations, onViewQuotation, onBack, onAddQuotatio
       </div>
 
       <div style={{ position: "relative", marginBottom: 12 }}>
-        <i className="ti ti-search" style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", fontSize: 15, color: "#A0B8BE" }} />
+        <i className="ti ti-search" style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", fontSize: 15, color: "#64748B" }} />
         <input
           type="text"
           placeholder="Search quotations..."
           value={search}
           onChange={e => setSearch(e.target.value)}
-          style={{ width: "100%", padding: "12px 12px 12px 38px", border: "none", borderRadius: 12, fontSize: 13, outline: "none", background: "#fff", color: "#1A2E35", boxSizing: "border-box", boxShadow: "0 2px 10px rgba(15,28,46,0.06)" }}
+          style={{ width: "100%", padding: "12px 12px 12px 38px", border: "none", borderRadius: 12, fontSize: 13, outline: "none", background: "#fff", color: "#1E293B", boxSizing: "border-box", boxShadow: "0 2px 10px rgba(15,28,46,0.06)" }}
         />
       </div>
 
@@ -3200,13 +3200,13 @@ function QuotationsListPage({ quotations, onViewQuotation, onBack, onAddQuotatio
             style={{
               padding: "7px 16px",
               borderRadius: 20,
-              border: filterMode === f ? "none" : "1.5px solid #E0EEF0",
+              border: filterMode === f ? "none" : "1.5px solid #E2E8F0",
               fontSize: 12,
               fontWeight: 700,
               cursor: "pointer",
               textTransform: "capitalize",
               background: filterMode === f ? "#1A2332" : "#fff",
-              color: filterMode === f ? "#fff" : "#607D86",
+              color: filterMode === f ? "#fff" : "#64748B",
               whiteSpace: "nowrap",
               transition: "all 0.15s ease"
             }}
@@ -3217,7 +3217,7 @@ function QuotationsListPage({ quotations, onViewQuotation, onBack, onAddQuotatio
       </div>
 
       {filtered.length === 0 ? (
-        <div style={{ padding: "40px 16px", textAlign: "center", color: "#A0B8BE", fontSize: 13, fontWeight: 600, background: "#fff", borderRadius: 16, boxShadow: "0 2px 10px rgba(15,28,46,0.05)" }}>
+        <div style={{ padding: "40px 16px", textAlign: "center", color: "#64748B", fontSize: 13, fontWeight: 600, background: "#fff", borderRadius: 16, boxShadow: "0 2px 10px rgba(15,28,46,0.05)" }}>
           No quotations found.
         </div>
       ) : (
@@ -3245,22 +3245,22 @@ function QuotationsListPage({ quotations, onViewQuotation, onBack, onAddQuotatio
                   <div style={{ display: "flex", alignItems: "flex-start", gap: 10, minWidth: 0, flex: 1 }}>
                     <div style={{
                       width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
-                      background: "linear-gradient(135deg, var(--app-accent, #00BCD4), #0891b2)", color: "#fff",
+                      background: "linear-gradient(135deg, var(--app-accent, #2563EB), #0891b2)", color: "#fff",
                       display: "flex", alignItems: "center", justifyContent: "center",
                       fontSize: 14, fontWeight: 800
                     }}>
                       {initials(client)}
                     </div>
                     <div style={{ minWidth: 0, flex: 1 }}>
-                      <div style={{ fontWeight: 800, color: "#0f1c2e", fontSize: 14.5, wordBreak: "break-word" }}>{client}</div>
+                      <div style={{ fontWeight: 800, color: "#0f172a", fontSize: 14.5, wordBreak: "break-word" }}>{client}</div>
                       {quoteNo && (
-                        <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 3, fontSize: 11.5, color: "#607D86", fontWeight: 600 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 3, fontSize: 11.5, color: "#64748B", fontWeight: 600 }}>
                           <i className="ti ti-hash" style={{ fontSize: 12, flexShrink: 0 }} />
                           <span>{quoteNo}</span>
                         </div>
                       )}
                       {total && (
-                        <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 2, fontSize: 11.5, color: "#607D86", fontWeight: 600 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 2, fontSize: 11.5, color: "#64748B", fontWeight: 600 }}>
                           <i className="ti ti-currency-rupee" style={{ fontSize: 12, flexShrink: 0 }} />
                           {Number(total).toLocaleString("en-IN")}
                         </div>
@@ -3274,7 +3274,7 @@ function QuotationsListPage({ quotations, onViewQuotation, onBack, onAddQuotatio
                     {q.status || "sent"}
                   </span>
                 </div>
-                <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 4, color: "var(--app-accent, #00BCD4)", fontSize: 12, fontWeight: 700 }}>
+                <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 4, color: "var(--app-accent, #2563EB)", fontSize: 12, fontWeight: 700 }}>
                   View details <i className="ti ti-chevron-right" style={{ fontSize: 13 }} />
                 </div>
               </div>
@@ -3913,17 +3913,17 @@ if (viewEmp) {
      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, padding: "4px 4px 16px" }}>
        <div
          onClick={() => setActive("dashboard")}
-         style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #00BCD4)" }}
+         style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #2563EB)" }}
        >
          <i className="ti ti-arrow-left" style={{ fontSize: 16 }}></i> Back to Dashboard
        </div>
        {onAddEmployeeClick && (
-         <button onClick={onAddEmployeeClick} style={{ display: "flex", alignItems: "center", gap: 4, background: "var(--app-accent, #00BCD4)", color: "#fff", border: "none", borderRadius: 20, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", boxShadow: "0 3px 10px rgba(0,188,212,0.35)", whiteSpace: "nowrap" }}>
+         <button onClick={onAddEmployeeClick} style={{ display: "flex", alignItems: "center", gap: 4, background: "var(--app-accent, #2563EB)", color: "#fff", border: "none", borderRadius: 20, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", boxShadow: "0 3px 10px rgba(37, 99, 235,0.35)", whiteSpace: "nowrap" }}>
            <i className="ti ti-plus" style={{ fontSize: 13 }}></i> New Team Member
          </button>
        )}
      </div>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #00BCD4), #0891b2)", borderRadius: 16, padding: "16px 18px", marginBottom: 14, boxShadow: "0 6px 18px rgba(0,188,212,0.25)" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #2563EB), #0891b2)", borderRadius: 16, padding: "16px 18px", marginBottom: 14, boxShadow: "0 6px 18px rgba(37, 99, 235,0.25)" }}>
           <div>
             <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.8)", letterSpacing: 0.5, textTransform: "uppercase" }}>Total Team</div>
             <div style={{ fontSize: 26, fontWeight: 800, color: "#fff" }}>{employees.length}</div>
@@ -3934,13 +3934,13 @@ if (viewEmp) {
         </div>
 
         <div style={{ position: "relative", marginBottom: 12 }}>
-          <i className="ti ti-search" style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", fontSize: 15, color: "#A0B8BE" }} />
+          <i className="ti ti-search" style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", fontSize: 15, color: "#64748B" }} />
           <input
             type="text"
             placeholder="Search team..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            style={{ width: "100%", padding: "12px 12px 12px 38px", border: "none", borderRadius: 12, fontSize: 13, outline: "none", background: "#fff", color: "#1A2E35", boxSizing: "border-box", boxShadow: "0 2px 10px rgba(15,28,46,0.06)" }}
+            style={{ width: "100%", padding: "12px 12px 12px 38px", border: "none", borderRadius: 12, fontSize: 13, outline: "none", background: "#fff", color: "#1E293B", boxSizing: "border-box", boxShadow: "0 2px 10px rgba(15,28,46,0.06)" }}
           />
         </div>
 
@@ -3952,12 +3952,12 @@ if (viewEmp) {
               style={{
                 padding: "7px 16px",
                 borderRadius: 20,
-                border: statusFilter === f ? "none" : "1.5px solid #E0EEF0",
+                border: statusFilter === f ? "none" : "1.5px solid #E2E8F0",
                 fontSize: 12,
                 fontWeight: 700,
                 cursor: "pointer",
                 background: statusFilter === f ? "#1A2332" : "#fff",
-                color: statusFilter === f ? "#fff" : "#607D86",
+                color: statusFilter === f ? "#fff" : "#64748B",
                 whiteSpace: "nowrap",
                 transition: "all 0.15s ease"
               }}
@@ -3968,7 +3968,7 @@ if (viewEmp) {
         </div>
 
         {filtered.length === 0 ? (
-          <div style={{ padding: "40px 16px", textAlign: "center", color: "#A0B8BE", fontSize: 13, fontWeight: 600, background: "#fff", borderRadius: 16, boxShadow: "0 2px 10px rgba(15,28,46,0.05)" }}>
+          <div style={{ padding: "40px 16px", textAlign: "center", color: "#64748B", fontSize: 13, fontWeight: 600, background: "#fff", borderRadius: 16, boxShadow: "0 2px 10px rgba(15,28,46,0.05)" }}>
             No team members found.
           </div>
         ) : (
@@ -3993,22 +3993,22 @@ if (viewEmp) {
                     <div style={{ display: "flex", alignItems: "flex-start", gap: 10, minWidth: 0, flex: 1 }}>
                       <div style={{
                         width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
-                        background: "linear-gradient(135deg, var(--app-accent, #00BCD4), #0891b2)", color: "#fff",
+                        background: "linear-gradient(135deg, var(--app-accent, #2563EB), #0891b2)", color: "#fff",
                         display: "flex", alignItems: "center", justifyContent: "center",
                         fontSize: 14, fontWeight: 800
                       }}>
                         {initials(e.name)}
                       </div>
                       <div style={{ minWidth: 0, flex: 1 }}>
-                        <div style={{ fontWeight: 800, color: "#0f1c2e", fontSize: 14.5, wordBreak: "break-word" }}>{e.name || "—"}</div>
+                        <div style={{ fontWeight: 800, color: "#0f172a", fontSize: 14.5, wordBreak: "break-word" }}>{e.name || "—"}</div>
                         {e.email && (
-                          <div style={{ display: "flex", alignItems: "flex-start", gap: 4, marginTop: 3, fontSize: 11.5, color: "#607D86", fontWeight: 600 }}>
+                          <div style={{ display: "flex", alignItems: "flex-start", gap: 4, marginTop: 3, fontSize: 11.5, color: "#64748B", fontWeight: 600 }}>
                             <i className="ti ti-mail" style={{ fontSize: 12, flexShrink: 0, marginTop: 1 }} />
                             <span style={{ wordBreak: "break-word" }}>{e.email}</span>
                           </div>
                         )}
                         {e.phone && (
-                          <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 2, fontSize: 11.5, color: "#607D86", fontWeight: 600 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 2, fontSize: 11.5, color: "#64748B", fontWeight: 600 }}>
                             <i className="ti ti-phone" style={{ fontSize: 12, flexShrink: 0 }} />
                             {e.phone}
                           </div>
@@ -4022,7 +4022,7 @@ if (viewEmp) {
                       {e.status || "Active"}
                     </span>
                   </div>
-                  <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 4, color: "var(--app-accent, #00BCD4)", fontSize: 12, fontWeight: 700 }}>
+                  <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 4, color: "var(--app-accent, #2563EB)", fontSize: 12, fontWeight: 700 }}>
                     View details <i className="ti ti-chevron-right" style={{ fontSize: 13 }} />
                   </div>
                 </div>
@@ -4044,7 +4044,7 @@ if (viewEmp) {
 
       {/* Share Onboarding Link Card (Kept as requested) */}
 
-      <div className="employees-onboard-card" style={{ background: "var(--app-sidebar)", borderRadius: 16, padding: "20px 24px", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", boxShadow: "0 8px 24px rgba(59,7,100,0.2)", marginBottom: 6 }}>
+      <div className="employees-onboard-card" style={{ background: "var(--app-sidebar)", borderRadius: 16, padding: "20px 24px", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", boxShadow: "0 8px 24px rgba(15, 23, 42,0.2)", marginBottom: 6 }}>
 
         <div style={{ width: 42, height: 42, borderRadius: 12, background: "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
           <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -4135,7 +4135,7 @@ ${onboardingLink}`;
 
           <i className="ti ti-search" style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "var(--text-soft)", fontSize: 16 }}></i>
 
-          <input type="text" placeholder="Search by name, email, role..." value={search} onChange={e => setSearch(e.target.value)} style={{ width: "100%", padding: "10px 12px 10px 38px", background: "#fff", border: "1.5px solid var(--border)", borderRadius: 8, fontFamily: "'Nunito',sans-serif", fontSize: 13, color: "var(--text)", outline: "none", transition: "border-color 0.2s" }} onFocus={e => e.target.style.borderColor = "var(--app-accent, #00BCD4)"} onBlur={e => e.target.style.borderColor = "var(--border)"} />
+          <input type="text" placeholder="Search by name, email, role..." value={search} onChange={e => setSearch(e.target.value)} style={{ width: "100%", padding: "10px 12px 10px 38px", background: "#fff", border: "1.5px solid var(--border)", borderRadius: 8, fontFamily: "'Nunito',sans-serif", fontSize: 13, color: "var(--text)", outline: "none", transition: "border-color 0.2s" }} onFocus={e => e.target.style.borderColor = "var(--app-accent, #2563EB)"} onBlur={e => e.target.style.borderColor = "var(--border)"} />
 
         </div>
 
@@ -4166,7 +4166,7 @@ ${onboardingLink}`;
 
 
 
-      <div style={{ background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 14, overflow: "hidden", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+      <div style={{ background: "#fff", border: "1.5px solid #E2E8F0", borderRadius: 14, overflow: "hidden", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
         <div style={{ padding: "18px 20px 12px" }}>
           <div style={{ fontSize: 14, fontWeight: 900, color: "#1A2332", marginBottom: 14 }}>All Employees ({filtered.length})</div>
         </div>
@@ -4207,7 +4207,7 @@ ${onboardingLink}`;
 
 
 
-                  const avColors = ["var(--app-accent, var(--app-accent, #00BCD4))", "linear-gradient(135deg,#7c3aed,#5b21b6)", "linear-gradient(135deg,#d97706,#b45309)", "linear-gradient(135deg,#16a34a,#15803d)", "linear-gradient(135deg,#dc2626,#991b1b)", "linear-gradient(135deg,#ec4899,#be185d)"];
+                  const avColors = ["var(--app-accent, var(--app-accent, #2563EB))", "linear-gradient(135deg,#2563eb,#5b21b6)", "linear-gradient(135deg,#d97706,#b45309)", "linear-gradient(135deg,#16a34a,#15803d)", "linear-gradient(135deg,#dc2626,#991b1b)", "linear-gradient(135deg,#ec4899,#be185d)"];
 
                   const avBg = avColors[i % avColors.length];
 
@@ -4513,9 +4513,9 @@ function ManagersPage({ managers, setManagers }) {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>
 
         {[{ t: "Total Managers", v: managers.length, i: "🧑‍💼", c: "#f59e0b" }, { t: "Active", v: managers.filter(m => m.status === "Active").length, i: "Yes", c: "#22C55E" }, { t: "Inactive", v: managers.filter(m => m.status === "Inactive").length, i: "⛔", c: "#EF4444" }].map(({ t, v, i, c }) => (
-          <div key={t} style={{ background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+          <div key={t} style={{ background: "#fff", border: "1.5px solid #E2E8F0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
             <div style={{ width: 40, height: 40, borderRadius: 10, background: `${c}15`, color: c, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>{i}</div>
-            <div><div style={{ fontSize: 24, fontWeight: 800, color: "#1A2332" }}>{v}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#607D86" }}>{t}</div></div>
+            <div><div style={{ fontSize: 24, fontWeight: 800, color: "#1A2332" }}>{v}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#64748B" }}>{t}</div></div>
           </div>
         ))}
 
@@ -5055,7 +5055,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 
               </div>
 
-              <div style={{ background: "var(--app-bg)", borderRadius: 12, padding: 14, border: "1px solid #ddd6fe", textAlign: "center" }}>
+              <div style={{ background: "var(--app-bg)", borderRadius: 12, padding: 14, border: "1px solid #e2e8f0", textAlign: "center" }}>
 
                 <div style={{ fontSize: 11, color: "var(--app-muted)", fontWeight: 700, marginBottom: 4 }}>EMPLOYEES</div>
 
@@ -5459,17 +5459,17 @@ return (
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, padding: "4px 4px 16px" }}>
         <div
           onClick={() => setActive("dashboard")}
-          style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #00BCD4)" }}
+          style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #2563EB)" }}
         >
           <i className="ti ti-arrow-left" style={{ fontSize: 16 }}></i> Back to Dashboard
         </div>
         {onCreateProject && (
-          <button onClick={onCreateProject} style={{ display: "flex", alignItems: "center", gap: 4, background: "var(--app-accent, #00BCD4)", color: "#fff", border: "none", borderRadius: 20, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", boxShadow: "0 3px 10px rgba(0,188,212,0.35)", whiteSpace: "nowrap" }}>
+          <button onClick={onCreateProject} style={{ display: "flex", alignItems: "center", gap: 4, background: "var(--app-accent, #2563EB)", color: "#fff", border: "none", borderRadius: 20, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", boxShadow: "0 3px 10px rgba(37, 99, 235,0.35)", whiteSpace: "nowrap" }}>
             <i className="ti ti-plus" style={{ fontSize: 13 }}></i> New Project
           </button>
         )}
       </div>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #00BCD4), #0891b2)", borderRadius: 16, padding: "16px 18px", marginBottom: 16, boxShadow: "0 6px 18px rgba(0,188,212,0.25)" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #2563EB), #0891b2)", borderRadius: 16, padding: "16px 18px", marginBottom: 16, boxShadow: "0 6px 18px rgba(37, 99, 235,0.25)" }}>
           <div>
             <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.8)", letterSpacing: 0.5, textTransform: "uppercase" }}>Total Projects</div>
             <div style={{ fontSize: 26, fontWeight: 800, color: "#fff" }}>{plist.length}</div>
@@ -5480,7 +5480,7 @@ return (
         </div>
 
         {plist.length === 0 ? (
-          <div style={{ padding: "40px 16px", textAlign: "center", color: "#A0B8BE", fontSize: 13, fontWeight: 600, background: "#fff", borderRadius: 16, boxShadow: "0 2px 10px rgba(15,28,46,0.05)" }}>
+          <div style={{ padding: "40px 16px", textAlign: "center", color: "#64748B", fontSize: 13, fontWeight: 600, background: "#fff", borderRadius: 16, boxShadow: "0 2px 10px rgba(15,28,46,0.05)" }}>
             No projects found.
           </div>
         ) : (
@@ -5505,14 +5505,14 @@ return (
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                       <div style={{
                         width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
-                        background: "linear-gradient(135deg, var(--app-accent, #00BCD4), #0891b2)", color: "#fff",
+                        background: "linear-gradient(135deg, var(--app-accent, #2563EB), #0891b2)", color: "#fff",
                         display: "flex", alignItems: "center", justifyContent: "center",
                         fontSize: 14, fontWeight: 800
                       }}>
                         {initials(p.name)}
                       </div>
                       <div>
-                        <div style={{ fontWeight: 800, color: "#0f1c2e", fontSize: 14.5 }}>{p.name || "—"}</div>
+                        <div style={{ fontWeight: 800, color: "#0f172a", fontSize: 14.5 }}>{p.name || "—"}</div>
 
                       </div>
                     </div>
@@ -5523,7 +5523,7 @@ return (
                       {p.status || "Active"}
                     </span>
                   </div>
-                  <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 4, color: "var(--app-accent, #00BCD4)", fontSize: 12, fontWeight: 700 }}>
+                  <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 4, color: "var(--app-accent, #2563EB)", fontSize: 12, fontWeight: 700 }}>
                     View details <i className="ti ti-chevron-right" style={{ fontSize: 13 }} />
                   </div>
                 </div>
@@ -5540,7 +5540,7 @@ return (
       {/* Back to Dashboard — top-left, fixed position for every page */}
       <div
         onClick={() => { window.__fullProjectsList = false; setActive("dashboard"); }}
-        style={{ display: "flex", alignItems: "center", gap: 6, padding: "16px 16px 4px", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #00BCD4)" }}
+        style={{ display: "flex", alignItems: "center", gap: 6, padding: "16px 16px 4px", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #2563EB)" }}
       >
         <i className="ti ti-arrow-left" style={{ fontSize: 16 }}></i> Back to Dashboard
       </div>
@@ -5822,7 +5822,7 @@ return (
 
                   {assignTo.map(name => (
 
-                    <div key={name} style={{ display: "flex", alignItems: "center", gap: 6, background: "var(--app-border)", border: "1px solid #ddd6fe", borderRadius: 8, padding: "4px 10px" }}>
+                    <div key={name} style={{ display: "flex", alignItems: "center", gap: 6, background: "var(--app-border)", border: "1px solid #e2e8f0", borderRadius: 8, padding: "4px 10px" }}>
 
                       <div style={{ width: 18, height: 18, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 8, fontWeight: 700 }}>{name ? name[0].toUpperCase() : "?"}</div>
 
@@ -6356,7 +6356,7 @@ function InterviewPage({ companyId, companyName }) {
 
       {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
 
-      <div style={{ background: "var(--app-sidebar)", borderRadius: 16, padding: "20px 24px", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", boxShadow: "0 8px 24px rgba(59,7,100,0.25)" }}>
+      <div style={{ background: "var(--app-sidebar)", borderRadius: 16, padding: "20px 24px", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", boxShadow: "0 8px 24px rgba(15, 23, 42,0.25)" }}>
 
         <div style={{ width: 42, height: 42, borderRadius: 12, background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}></div>
 
@@ -6375,9 +6375,9 @@ function InterviewPage({ companyId, companyName }) {
       <div className="dash-stats" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12 }}>
 
         {[{ t: "Total", v: counts.total, i: "🎯", c: "var(--app-accent)" }, { t: "Pending", v: counts.pending, i: "⏳", c: "#F59E0B" }, { t: "Hired", v: counts.hired, i: "✅", c: "#22C55E" }, { t: "Rejected", v: counts.rejected, i: "❌", c: "#EF4444" }].map(({ t, v, i, c }) => (
-          <div key={t} style={{ background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+          <div key={t} style={{ background: "#fff", border: "1.5px solid #E2E8F0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
             <div style={{ width: 40, height: 40, borderRadius: 10, background: `${c}15`, color: c, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>{i}</div>
-            <div><div style={{ fontSize: 24, fontWeight: 800, color: "#1A2332" }}>{v}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#607D86" }}>{t}</div></div>
+            <div><div style={{ fontSize: 24, fontWeight: 800, color: "#1A2332" }}>{v}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#64748B" }}>{t}</div></div>
           </div>
         ))}
 
@@ -6453,7 +6453,7 @@ function InterviewPage({ companyId, companyName }) {
 
       {viewModal && (
 
-        <div style={{ position: "fixed", inset: 0, background: "rgba(59,7,100,0.55)", backdropFilter: "blur(8px)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+        <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42,0.55)", backdropFilter: "blur(8px)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
 
           <div style={{ background: "#fff", borderRadius: 20, width: "100%", maxWidth: 820, maxHeight: "90vh", overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 32px 80px rgba(var(--app-accent-rgb, 124, 58, 237),0.25)" }}>
 
@@ -6645,7 +6645,7 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
 
   return (
 
-    <div style={{ position: "fixed", inset: 0, background: "rgba(59,7,100,0.6)", backdropFilter: "blur(10px)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }} onClick={onClose}>
+    <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42,0.6)", backdropFilter: "blur(10px)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }} onClick={onClose}>
 
       <div style={{ background: "#fff", borderRadius: 22, width: "100%", maxWidth: 420, maxHeight: "90vh", boxShadow: "0 32px 80px rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", display: "flex", flexDirection: "column", overflow: "hidden" }} onClick={e => e.stopPropagation()}>
 
@@ -6727,7 +6727,7 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
 
             <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", background: "#fdf4ff", borderRadius: 9, border: "1px solid #fae8ff", marginBottom: 16 }}>
 
-              <div style={{ width: 30, height: 30, borderRadius: 8, background: "rgba(168,85,247,0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0 }}>🏢</div>
+              <div style={{ width: 30, height: 30, borderRadius: 8, background: "rgba(37, 99, 235,0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0 }}>🏢</div>
 
               <div style={{ flex: 1 }}>
 
@@ -7148,7 +7148,7 @@ function PackagesPage({ packages, onSubscribe, THEME }) {
 
         <div style={{ display: "inline-block", padding: "6px 16px", background: `${THEME.accent}12`, borderRadius: 100, color: THEME.accent, fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: 1.2, marginBottom: 14 }}>💎 Choose Plan</div>
 
-        <h1 style={{ fontSize: 34, fontWeight: 900, color: "#1e1b4b", margin: "0 0 10px", letterSpacing: "-1px", lineHeight: 1 }}>Choose your Plan</h1>
+        <h1 style={{ fontSize: 34, fontWeight: 900, color: "#1e293b", margin: "0 0 10px", letterSpacing: "-1px", lineHeight: 1 }}>Choose your Plan</h1>
 
         <p style={{ color: "#64748b", fontWeight: 600, fontSize: 14, maxWidth: 400, margin: "0 auto" }}>Select the best plan for your business growth.</p>
 
@@ -7255,7 +7255,7 @@ function PackagesPage({ packages, onSubscribe, THEME }) {
 
 
 
-                <div style={{ fontSize: 20, fontWeight: 900, color: "#1e1b4b", marginBottom: 4, letterSpacing: "-0.4px" }}>{p.title}</div>
+                <div style={{ fontSize: 20, fontWeight: 900, color: "#1e293b", marginBottom: 4, letterSpacing: "-0.4px" }}>{p.title}</div>
 
                 <div style={{ fontSize: 11, color: "#94a3b8", marginBottom: 20, fontWeight: 700, textTransform: "uppercase" }}>Monthly Plan</div>
 
@@ -7263,7 +7263,7 @@ function PackagesPage({ packages, onSubscribe, THEME }) {
 
                 <div style={{ display: "flex", alignItems: "flex-end", gap: 4, marginBottom: 8 }}>
 
-                  <span style={{ fontSize: 42, fontWeight: 900, color: "#1e1b4b", lineHeight: 1, letterSpacing: "-2px" }}>
+                  <span style={{ fontSize: 42, fontWeight: 900, color: "#1e293b", lineHeight: 1, letterSpacing: "-2px" }}>
 
                     {p.type === "free" ? "Free" : p.price ? `Rs.${parseFloat(p.price).toLocaleString("en-IN")}` : "Custom"}
 
@@ -7313,7 +7313,7 @@ function PackagesPage({ packages, onSubscribe, THEME }) {
 
                     border: isPro ? "none" : `1.5px solid ${THEME.border}`,
 
-                    color: isPro ? "#fff" : "#1e1b4b"
+                    color: isPro ? "#fff" : "#1e293b"
 
                   }}
 
@@ -7972,19 +7972,19 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
   const [draggingStatCard, setDraggingStatCard] = useState(null);
   const [mobStatCardOrder, setMobStatCardOrder] = useState([
-    { id: "mobClients", icon: "ti-users", label: "Clients", grad: "linear-gradient(135deg,var(--app-accent),#00BCD4)" },
-    { id: "mobProjects", icon: "ti-folder", label: "Projects", grad: "linear-gradient(135deg,var(--app-accent),#00BCD4)" },
-    { id: "mobTeam", icon: "ti-user-circle", label: "Team", grad: "linear-gradient(135deg,var(--app-accent),#00BCD4)" },
-    { id: "mobRevenue", icon: "ti-currency-rupee", label: "Revenue", grad: "linear-gradient(135deg,var(--app-accent),#00BCD4)" },
+    { id: "mobClients", icon: "ti-users", label: "Clients", grad: "linear-gradient(135deg,var(--app-accent),#2563EB)" },
+    { id: "mobProjects", icon: "ti-folder", label: "Projects", grad: "linear-gradient(135deg,var(--app-accent),#2563EB)" },
+    { id: "mobTeam", icon: "ti-user-circle", label: "Team", grad: "linear-gradient(135deg,var(--app-accent),#2563EB)" },
+    { id: "mobRevenue", icon: "ti-currency-rupee", label: "Revenue", grad: "linear-gradient(135deg,var(--app-accent),#2563EB)" },
 
   ]);
   const [draggingSecondRow, setDraggingSecondRow] = useState(null);
   const projectCarouselIndexRef = useRef(0);
   const [mobSecondRowOrder, setMobSecondRowOrder] = useState([
-    { id: "unpaidInv", popupId: "mobUnpaidInvoices", icon: "ti-file-invoice", label: "Unpaid Invoices", grad: "linear-gradient(135deg,var(--app-accent),#00BCD4)" },
-    { id: "totalInv", popupId: "qaInvoice", icon: "ti-file-invoice", label: "Invoices", grad: "linear-gradient(135deg,var(--app-accent),#00BCD4)" },
-    { id: "totalProp", popupId: "qaProposal", icon: "ti-clipboard-list", label: "Proposals", grad: "linear-gradient(135deg,var(--app-accent),#00BCD4)" },
-    { id: "totalQuote", popupId: "qaQuote", icon: "ti-receipt", label: "Quotations", grad: "linear-gradient(135deg,var(--app-accent),#00BCD4)" },
+    { id: "unpaidInv", popupId: "mobUnpaidInvoices", icon: "ti-file-invoice", label: "Unpaid Invoices", grad: "linear-gradient(135deg,var(--app-accent),#2563EB)" },
+    { id: "totalInv", popupId: "qaInvoice", icon: "ti-file-invoice", label: "Invoices", grad: "linear-gradient(135deg,var(--app-accent),#2563EB)" },
+    { id: "totalProp", popupId: "qaProposal", icon: "ti-clipboard-list", label: "Proposals", grad: "linear-gradient(135deg,var(--app-accent),#2563EB)" },
+    { id: "totalQuote", popupId: "qaQuote", icon: "ti-receipt", label: "Quotations", grad: "linear-gradient(135deg,var(--app-accent),#2563EB)" },
   ]);
   const openMobilePopup = (key) => setMobilePopupSection(key);
   const closeMobilePopup = () => setMobilePopupSection(null);
@@ -8005,7 +8005,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
         <div
           onClick={(e) => e.stopPropagation()}
           style={{
-            background: "var(--app-accent, #00BCD4)", borderRadius: "20px 20px 0 0", width: "100%", maxWidth: 480,
+            background: "var(--app-accent, #2563EB)", borderRadius: "20px 20px 0 0", width: "100%", maxWidth: 480,
             maxHeight: "75vh", overflowY: "auto", padding: 20, boxShadow: "0 -4px 24px rgba(0,0,0,0.2)",
           }}
         >
@@ -8103,7 +8103,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
       try {
         const res = await axios.get(`${BASE_URL}/api/groups`);
         if (res.data && res.data.length > 0) return res.data[0]._id;
-        const newGroup = await axios.post(`${BASE_URL}/api/groups`, { label: "Tasks", color: "var(--app-accent, #00BCD4)" });
+        const newGroup = await axios.post(`${BASE_URL}/api/groups`, { label: "Tasks", color: "var(--app-accent, #2563EB)" });
         return newGroup.data._id;
       } catch (e) {
         console.error("Failed to get/create group:", e);
@@ -8148,7 +8148,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
       <div style={{ position: "fixed", inset: 0, background: "rgba(15,10,41,0.45)", zIndex: 9999, display: "flex", alignItems: "flex-end", justifyContent: "center" }} onClick={onClose}>
         <div style={{ background: "#fff", borderRadius: "20px 20px 0 0", width: "100%", maxWidth: 480, maxHeight: "88vh", overflowY: "auto", padding: 20 }} onClick={e => e.stopPropagation()}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-            <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e" }}>Add Task</div>
+            <div style={{ fontSize: 16, fontWeight: 800, color: "#0f172a" }}>Add Task</div>
             <button onClick={onClose} style={{ background: "none", border: "none", fontSize: 20, color: "#94a3b8", cursor: "pointer" }}>&times;</button>
           </div>
           <form onSubmit={handleSave} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -8195,7 +8195,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                 {(employees || []).map((emp, i) => <option key={i} value={emp.name || emp.employeeName}>{emp.name || emp.employeeName}</option>)}
               </select>
             </div>
-            <button type="submit" disabled={saving} style={{ marginTop: 8, background: "var(--app-accent, #00BCD4)", color: "#fff", border: "none", borderRadius: 12, padding: "12px 0", fontSize: 14, fontWeight: 800, cursor: "pointer" }}>
+            <button type="submit" disabled={saving} style={{ marginTop: 8, background: "var(--app-accent, #2563EB)", color: "#fff", border: "none", borderRadius: 12, padding: "12px 0", fontSize: 14, fontWeight: 800, cursor: "pointer" }}>
               {saving ? "Saving..." : "Save Task"}
             </button>
           </form>
@@ -8278,18 +8278,18 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
     const statusGroups = [
       { key: "unpaid", label: "Unpaid", color: "#d97706", bg: "#fff7ed" },
       { key: "overdue", label: "Overdue", color: "#dc2626", bg: "#fef2f2" },
-      { key: "partpaid", label: "Part Paid", color: "#7c3aed", bg: "#f3e8ff" },
+      { key: "partpaid", label: "Part Paid", color: "#2563eb", bg: "#eff6ff" },
       { key: "paid", label: "Paid", color: "#16a34a", bg: "#f0fdf4" },
     ];
 
     return (
       <div style={{ padding: "0 16px", marginTop: 16 }}>
         {/* Teal action section */}
-        <div style={{ background: "var(--app-accent, #00BCD4)", borderRadius: 18, padding: 20, boxShadow: "0 8px 24px rgba(0,188,212,0.25)" }}>
+        <div style={{ background: "var(--app-accent, #2563EB)", borderRadius: 18, padding: 20, boxShadow: "0 8px 24px rgba(37, 99, 235,0.25)" }}>
           <div style={{ display: "flex", gap: 12 }}>
             <button
               onClick={() => { setJumpProject(null); setJumpInvoice(null); setInvoicePrefill(null); setSidebarNavClickId(id => id + 1); setActive("invoices"); }}
-              style={{ flex: 1, background: "#fff", color: "var(--app-accent, #00BCD4)", border: "none", borderRadius: 12, padding: "12px 0", fontSize: 14, fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
+              style={{ flex: 1, background: "#fff", color: "var(--app-accent, #2563EB)", border: "none", borderRadius: 12, padding: "12px 0", fontSize: 14, fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
             >
               <i className="ti ti-file-invoice"></i> Create Invoice
             </button>
@@ -8391,7 +8391,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                   </button>
                   <button
                     type="submit"
-                    style={{ padding: "10px 24px", borderRadius: 10, border: "none", background: "#00BCD4", color: "#fff", fontWeight: 800, fontSize: 13, cursor: "pointer" }}
+                    style={{ padding: "10px 24px", borderRadius: 10, border: "none", background: "#2563EB", color: "#fff", fontWeight: 800, fontSize: 13, cursor: "pointer" }}
                   >
                     Add Task
                   </button>
@@ -8405,7 +8405,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
           {!mobShowInvoiceList ? (
             <>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-                <div style={{ fontSize: 15, fontWeight: 800, color: "#0f1c2e" }}>Projects</div>
+                <div style={{ fontSize: 15, fontWeight: 800, color: "#0f172a" }}>Projects</div>
               </div>
 
               <div style={{ display: "flex", flexDirection: "column" }}>
@@ -8456,22 +8456,22 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                     >
                       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
                         <div style={{ minWidth: 0 }}>
-                          <div style={{ fontSize: 14.5, fontWeight: 800, color: "#0f1c2e", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                          <div style={{ fontSize: 14.5, fontWeight: 800, color: "#0f172a", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                             {p.name}
                           </div>
                           {clientLabelP ? (
-                            <div style={{ fontSize: 12.5, color: "var(--app-accent, #00BCD4)", marginTop: 3, fontWeight: 500 }}>{clientLabelP}</div>
+                            <div style={{ fontSize: 12.5, color: "var(--app-accent, #2563EB)", marginTop: 3, fontWeight: 500 }}>{clientLabelP}</div>
                           ) : null}
                         </div>
                         <span style={{ background: statusMeta.bg, color: statusMeta.color, padding: "6px 14px", borderRadius: 20, fontSize: 12.5, fontWeight: 700, flexShrink: 0 }}>{status}</span>
                       </div>
                       <div>
-                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "#0f1c2e", marginBottom: 3 }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "#0f172a", marginBottom: 3 }}>
                           <span>Budget Used</span>
-                          <span style={{ fontWeight: 700, color: "#0f1c2e" }}>{budgetPct}%</span>
+                          <span style={{ fontWeight: 700, color: "#0f172a" }}>{budgetPct}%</span>
                         </div>
                         <div style={{ height: 5, background: "#ffffff", borderRadius: 4, overflow: "hidden" }}>
-                          <div style={{ width: `${budgetPct}%`, height: "100%", background: "#7c3aed", borderRadius: 4 }} />
+                          <div style={{ width: `${budgetPct}%`, height: "100%", background: "#2563eb", borderRadius: 4 }} />
                         </div>
                       </div> </div>
                   );
@@ -8479,7 +8479,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
               {allProjects.length > 3 && (
                 <button
                   onClick={() => setMobShowAllProjects(v => !v)}
-                  style={{ width: "100%", marginTop: 14, background: "#fff", border: "1.5px solid var(--app-accent, #00BCD4)", color: "var(--app-accent, #00BCD4)", borderRadius: 12, padding: "10px 0", fontSize: 13, fontWeight: 800, cursor: "pointer" }}
+                  style={{ width: "100%", marginTop: 14, background: "#fff", border: "1.5px solid var(--app-accent, #2563EB)", color: "var(--app-accent, #2563EB)", borderRadius: 12, padding: "10px 0", fontSize: 13, fontWeight: 800, cursor: "pointer" }}
                 >
                   {mobShowAllProjects ? "▲ See Less" : `▼ See All ${allProjects.length} Projects`}
                 </button>
@@ -8488,8 +8488,8 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
           ) : (
             <>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-                <div style={{ fontSize: 15, fontWeight: 800, color: "#0f1c2e" }}>Invoice List</div>
-                <div onClick={() => setMobShowInvoiceList(false)} style={{ fontSize: 12, fontWeight: 700, color: "var(--app-accent, #00BCD4)", cursor: "pointer" }}>Back to Projects</div>
+                <div style={{ fontSize: 15, fontWeight: 800, color: "#0f172a" }}>Invoice List</div>
+                <div onClick={() => setMobShowInvoiceList(false)} style={{ fontSize: 12, fontWeight: 700, color: "var(--app-accent, #2563EB)", cursor: "pointer" }}>Back to Projects</div>
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                 {statusGroups.map(g => {
@@ -8530,7 +8530,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
           maxHeight: 320, overflowY: "auto",
         }}
       >
-        <div style={{ fontSize: 14, fontWeight: 800, color: "#0f1c2e", marginBottom: 10 }}>{title}</div>
+        <div style={{ fontSize: 14, fontWeight: 800, color: "#0f172a", marginBottom: 10 }}>{title}</div>
         {children}
       </div>
     );
@@ -8548,7 +8548,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
             padding: "16px 20px", cursor: isDesktopWidth ? "default" : "pointer", userSelect: "none",
           }}
         >
-          <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
+          <div style={{ fontSize: 16, fontWeight: 800, color: "#0f172a", display: "flex", alignItems: "center", gap: 8 }}>
             {icon} {title}
           </div>
           {!isDesktopWidth && (
@@ -8586,7 +8586,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
   const [showThemePicker, setShowThemePicker] = useState(false);
 
-  const [customColor, setCustomColor] = useState(() => localStorage.getItem("appCustomColor") || "#00BCD4");
+  const [customColor, setCustomColor] = useState(() => localStorage.getItem("appCustomColor") || "#2563EB");
 
   const [showColorPicker, setShowColorPicker] = useState(false);
 
@@ -8698,11 +8698,11 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
     slate: { label: "Slate", sidebar: "#475569", accent: "#475569", bg: "#f8fafc", muted: "#334155", border: "#94a3b8", dot: "#475569" },
 
-    mint: { label: "Mint", sidebar: "#0d9488", accent: "#0d9488", bg: "#f0fdfa", muted: "#0f766e", border: "#5eead4", dot: "#0d9488" },
+    mint: { label: "Mint", sidebar: "#2563eb", accent: "#2563eb", bg: "#f0fdfa", muted: "#0f766e", border: "#5eead4", dot: "#2563eb" },
 
     candy: { label: "Candy", sidebar: "#c026d3", accent: "#c026d3", bg: "#fdf4ff", muted: "#a21caf", border: "#f5d0fe", dot: "#c026d3" },
 
-    teal: { label: "Teal", sidebar: "#00BCD4", accent: "#00BCD4", bg: "#F5FAFA", muted: "#607D86", border: "#E0EEF0", dot: "#00BCD4" },
+    teal: { label: "Teal", sidebar: "#2563EB", accent: "#2563EB", bg: "#F8FAFC", muted: "#64748B", border: "#E2E8F0", dot: "#2563EB" },
 
   };
 
@@ -11304,7 +11304,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                 )}
                 {showNotifPanel && (
                   <div onClick={e => e.stopPropagation()} style={{ position: 'absolute', top: 44, right: 0, width: 380, background: '#fff', borderRadius: 16, boxShadow: '0 8px 32px rgba(0,0,0,0.18)', border: '1px solid #E2E8F0', zIndex: 99999, overflow: 'hidden' }}>
-                    <div style={{ padding: '16px 20px', borderBottom: '1px solid #E2E8F0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--app-accent, var(--app-accent, #00BCD4))' }}>
+                    <div style={{ padding: '16px 20px', borderBottom: '1px solid #E2E8F0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--app-accent, var(--app-accent, #2563EB))' }}>
                       <div style={{ fontSize: 15, fontWeight: 800, color: '#fff', display: 'flex', alignItems: 'center', gap: 8 }}>
                         <i className="ti ti-bell"></i> Notifications
                         {pendingLeaves.length > 0 && <span style={{ background: '#EF4444', color: '#fff', borderRadius: 20, padding: '2px 8px', fontSize: 10, fontWeight: 800 }}>{pendingLeaves.length}</span>}
@@ -11348,7 +11348,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                       )}
                     </div>
                     <div style={{ padding: '12px 16px', borderTop: '1px solid #E2E8F0', textAlign: 'center' }}>
-                      <button onClick={() => setShowNotifPanel(false)} style={{ background: 'none', border: 'none', color: ' var(--app-accent, var(--app-accent, #00BCD4))', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                      <button onClick={() => setShowNotifPanel(false)} style={{ background: 'none', border: 'none', color: ' var(--app-accent, var(--app-accent, #2563EB))', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
                         Close
                       </button>
                     </div>
@@ -11447,7 +11447,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
             {/* GLOBAL MOBILE BOTTOM NAV — always mounted regardless of active page, portaled to body */}
             {!isDesktopWidth && !sidebarOpen && !HIDE_NAV_PAGES.includes(validActive) && createPortal(
-              <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "var(--app-accent, #00BCD4)", borderRadius: 0, display: "flex", justifyContent: "space-around", alignItems: "center", padding: "12px 6px calc(12px + env(safe-area-inset-bottom, 0px))", zIndex: 1000000, boxShadow: "0 -2px 12px rgba(0,0,0,0.15)" }}>
+              <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "var(--app-accent, #2563EB)", borderRadius: 0, display: "flex", justifyContent: "space-around", alignItems: "center", padding: "12px 6px calc(12px + env(safe-area-inset-bottom, 0px))", zIndex: 1000000, boxShadow: "0 -2px 12px rgba(0,0,0,0.15)" }}>
                 {[
                   { icon: "ti-home", label: "Home", key: "dashboard" },
                   { icon: "ti-file-invoice", label: "Invoice", key: "invoices" },
@@ -11455,7 +11455,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                   { icon: "ti-users", label: "Clients", key: "clients" },
                   { icon: "ti-settings", label: "Settings", key: "settings" },
                 ].map((n, i) => n.key === "add" ? (
-                  <div key={i} onClick={() => setShowMobileAddMenu(true)} style={{ width: 52, height: 52, borderRadius: "50%", background: "var(--app-accent, #00BCD4)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 24, lineHeight: 1, boxShadow: "0 10px 24px rgba(0,188,212,0.5)", position: "absolute", top: -30, left: "50%", transform: "translateX(-50%)" }}>+</div>
+                  <div key={i} onClick={() => setShowMobileAddMenu(true)} style={{ width: 52, height: 52, borderRadius: "50%", background: "var(--app-accent, #2563EB)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 24, lineHeight: 1, boxShadow: "0 10px 24px rgba(37, 99, 235,0.5)", position: "absolute", top: -30, left: "50%", transform: "translateX(-50%)" }}>+</div>
                 ) : (
                   <div key={i} onClick={() => {
                     if (n.key === "dashboard") {
@@ -11490,8 +11490,8 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
             )}
 
             {trialToast && (
-              <div style={{ position: "fixed", top: 24, left: "50%", transform: "translateX(-50%)", width: "max-content", maxWidth: "90vw", zIndex: 9999, background: "#fff", border: "1.5px solid #00BCD4", borderRadius: 14, padding: "14px 26px", fontSize: 14, fontWeight: 800, color: "#00BCD4", boxShadow: "0 10px 32px rgba(0,188,212,0.25), 0 4px 12px rgba(0,0,0,0.1)", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, textAlign: "center" }}>
-                <i className="ti ti-circle-check" style={{ fontSize: 18, color: "#00BCD4" }}></i> Free Trial Activated
+              <div style={{ position: "fixed", top: 24, left: "50%", transform: "translateX(-50%)", width: "max-content", maxWidth: "90vw", zIndex: 9999, background: "#fff", border: "1.5px solid #2563EB", borderRadius: 14, padding: "14px 26px", fontSize: 14, fontWeight: 800, color: "#2563EB", boxShadow: "0 10px 32px rgba(37, 99, 235,0.25), 0 4px 12px rgba(0,0,0,0.1)", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, textAlign: "center" }}>
+                <i className="ti ti-circle-check" style={{ fontSize: 18, color: "#2563EB" }}></i> Free Trial Activated
               </div>
             )}
             {/* Trial toast trigger runs once via useEffect below, not inline during render */}
@@ -11509,7 +11509,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
             {/* ── Dashboard ── */}{validActive === "dashboard" && (
               <>
                 {/* MOBILE DASHBOARD (visible only under 768px) */}
-                <div className="mobile-dashboard-view" style={{ display: "none", width: "100vw", marginLeft: "calc(50% - 50vw)", marginRight: "calc(50% - 50vw)", marginTop: 0, background: "var(--app-bg, #F5FAFA)", paddingBottom: 90 }}>
+                <div className="mobile-dashboard-view" style={{ display: "none", width: "100vw", marginLeft: "calc(50% - 50vw)", marginRight: "calc(50% - 50vw)", marginTop: 0, background: "var(--app-bg, #F8FAFC)", paddingBottom: 90 }}>
                   <style>{`
     @media (max-width: 768px) {
       .mobile-dashboard-view { display: block !important; }
@@ -11530,7 +11530,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
   `}</style>
 
                   {/* TEAL NAME/BELL STRIP — sits above the logo row */}
-                  <div style={{ background: "linear-gradient(160deg, var(--app-accent) 0%, #00BCD4 100%)", padding: "6px 20px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div style={{ background: "linear-gradient(160deg, var(--app-accent) 0%, #2563EB 100%)", padding: "6px 20px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <div
                       data-profile-anchor="true"
                       onClick={(e) => { e.stopPropagation(); setProfileDropdownOpen(v => !v); setShowProfile(false); }}
@@ -11542,7 +11542,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                       <div onClick={() => { setMobNotifExpanded(v => !v); fetchPendingLeaves(); }} style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(255,255,255,0.18)", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
                         <i className="ti ti-bell" style={{ fontSize: 16, color: "#fff" }}></i>
                         {pendingLeaves.length > 0 && (
-                          <span style={{ position: "absolute", top: 3, right: 4, width: 7, height: 7, borderRadius: "50%", background: "#ff4d6d", boxShadow: "0 0 0 2px #00BCD4" }}></span>
+                          <span style={{ position: "absolute", top: 3, right: 4, width: 7, height: 7, borderRadius: "50%", background: "#ff4d6d", boxShadow: "0 0 0 2px #2563EB" }}></span>
                         )}
                       </div>
                     </div>
@@ -11558,11 +11558,11 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
   {companyLogo ? (
     <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
   ) : (
-    <i className="ti ti-building" style={{ fontSize: 16, color: "var(--app-accent, #00BCD4)" }}></i>
+    <i className="ti ti-building" style={{ fontSize: 16, color: "var(--app-accent, #2563EB)" }}></i>
   )}
 </div>
                     <div onClick={() => setSidebarOpen(true)} style={{ width: "clamp(26px, 8vw, 28px)", height: "clamp(26px, 8vw, 28px)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
-                      <i className="ti ti-menu-2" style={{ fontSize: 20, color: "var(--app-accent, #00BCD4)" }}></i>
+                      <i className="ti ti-menu-2" style={{ fontSize: 20, color: "var(--app-accent, #2563EB)" }}></i>
                     </div>
                   </div>
 
@@ -11581,7 +11581,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                   {/* HERO HEADER — glass + gradient mesh */}    <div style={{
                     position: "relative",
                     zIndex: 1,
-                    background: "linear-gradient(160deg, var(--app-accent) 0%, #00BCD4 60%, #00BCD4 100%)",
+                    background: "linear-gradient(160deg, var(--app-accent) 0%, #2563EB 60%, #2563EB 100%)",
                     borderRadius: "0",
                     margin: "0",
                     padding: "18px 18px 60px",
@@ -11591,7 +11591,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                   }}>
                     {/* decorative mesh blobs */}
                     <div style={{ position: "absolute", top: -60, right: -40, width: 200, height: 200, borderRadius: "50%", background: "radial-gradient(circle, var(--app-accent) 0%, transparent 70%)", opacity: 0.35, filter: "blur(10px)" }} />
-                    <div style={{ position: "absolute", bottom: -80, left: -30, width: 180, height: 180, borderRadius: "50%", background: "radial-gradient(circle, #00BCD4 0%, transparent 70%)", opacity: 0.25, filter: "blur(14px)" }} />
+                    <div style={{ position: "absolute", bottom: -80, left: -30, width: 180, height: 180, borderRadius: "50%", background: "radial-gradient(circle, #2563EB 0%, transparent 70%)", opacity: 0.25, filter: "blur(14px)" }} />
 
                     <div style={{ position: "relative", zIndex: 2 }}>
                       <div style={{ display: "flex", flexDirection: "column", gap: 14, marginBottom: 4 }}>
@@ -11665,7 +11665,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                                       transform="rotate(-90 22 22)"
                                     />
                                   </svg>
-                                  <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10.5, fontWeight: 800, color: "#0f1c2e" }}>
+                                  <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10.5, fontWeight: 800, color: "#0f172a" }}>
                                     {pct}%
                                   </div>
                                 </div>
@@ -11680,15 +11680,15 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                                       <div style={{ marginTop: 4, paddingTop: 6 }}>
                                         <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9.5, color: "#94a3b8" }}>
                                           <span>Quotation No.</span>
-                                          <span style={{ fontWeight: 700, color: "#0f1c2e" }}>{pQuote.qt?.quoteNo || pQuote.quoteNo || "—"}</span>
+                                          <span style={{ fontWeight: 700, color: "#0f172a" }}>{pQuote.qt?.quoteNo || pQuote.quoteNo || "—"}</span>
                                         </div>
                                         <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9.5, color: "#94a3b8", marginTop: 2 }}>
                                           <span>Quotation Amount</span>
-                                          <span style={{ fontWeight: 700, color: "#0f1c2e" }}>{formatCurrency(pQuote.total || pQuote.qt?.total, pQuote.qt?.currency)}</span>
+                                          <span style={{ fontWeight: 700, color: "#0f172a" }}>{formatCurrency(pQuote.total || pQuote.qt?.total, pQuote.qt?.currency)}</span>
                                         </div>
                                         <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9.5, color: "#94a3b8", marginTop: 2 }}>
                                           <span>Sent To</span>
-                                          <span style={{ fontWeight: 700, color: "#0f1c2e" }}>{pQuote.qt?.client || pQuote.client || pQuote.clientName || "—"}</span>
+                                          <span style={{ fontWeight: 700, color: "#0f172a" }}>{pQuote.qt?.client || pQuote.client || pQuote.clientName || "—"}</span>
                                         </div>
                                       </div>
                                     );
@@ -11706,13 +11706,13 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                       <div style={{ display: "flex", gap: 12 }}>
                         <button
                           onClick={() => { setJumpProject(null); setJumpInvoice(null); setInvoicePrefill(null); if (typeof window !== "undefined" && window.innerWidth < 769) { setShowMobileInvoiceModal(true); } else { setActive("invoiceDetails"); } }}
-                          style={{ flex: 1, background: "var(--app-accent, #00BCD4)", color: "#fff", border: "none", borderRadius: 12, padding: "12px 0", fontSize: 13.5, fontWeight: 800, cursor: "pointer", boxShadow: "0 4px 12px rgba(0,188,212,0.3)" }}
+                          style={{ flex: 1, background: "var(--app-accent, #2563EB)", color: "#fff", border: "none", borderRadius: 12, padding: "12px 0", fontSize: 13.5, fontWeight: 800, cursor: "pointer", boxShadow: "0 4px 12px rgba(37, 99, 235,0.3)" }}
                         >
                           Create Invoice
                         </button>
                         <button
                           onClick={() => setShowDashboardAddTaskModal(true)}
-                          style={{ flex: 1, background: "var(--app-accent, #00BCD4)", color: "#fff", border: "none", borderRadius: 12, padding: "12px 0", fontSize: 13.5, fontWeight: 800, cursor: "pointer", boxShadow: "0 4px 12px rgba(0,188,212,0.3)" }}
+                          style={{ flex: 1, background: "var(--app-accent, #2563EB)", color: "#fff", border: "none", borderRadius: 12, padding: "12px 0", fontSize: 13.5, fontWeight: 800, cursor: "pointer", boxShadow: "0 4px 12px rgba(37, 99, 235,0.3)" }}
                         >
                           Add Task
                         </button>
@@ -11796,7 +11796,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                               </button>
                               <button
                                 type="submit"
-                                style={{ padding: "10px 24px", borderRadius: 10, border: "none", background: "#00BCD4", color: "#fff", fontWeight: 800, fontSize: 13, cursor: "pointer" }}
+                                style={{ padding: "10px 24px", borderRadius: 10, border: "none", background: "#2563EB", color: "#fff", fontWeight: 800, fontSize: 13, cursor: "pointer" }}
                               >
                                 Add Task
                               </button>
@@ -11805,15 +11805,15 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                         </div>
                       </div>
                     )}
-                    <div style={{ marginTop: 14, height: 8, background: "rgba(0,188,212,0.12)", marginLeft: -16, marginRight: -16 }} />
+                    <div style={{ marginTop: 14, height: 8, background: "rgba(37, 99, 235,0.12)", marginLeft: -16, marginRight: -16 }} />
 
                     {!mobShowInvoiceList && (
                       <div style={{ marginTop: 14, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                        <span style={{ fontSize: 14, fontWeight: 800, color: "#0f1c2e" }}>Projects</span>
+                        <span style={{ fontSize: 14, fontWeight: 800, color: "#0f172a" }}>Projects</span>
                         {projectsWithProgress.length > 3 && (
                           <span
                             onClick={() => setMobShowAllProjects(v => !v)}
-                            style={{ color: "var(--app-accent, #00BCD4)", fontSize: 14, fontWeight: 800, cursor: "pointer" }}
+                            style={{ color: "var(--app-accent, #2563EB)", fontSize: 14, fontWeight: 800, cursor: "pointer" }}
                           >
                             {mobShowAllProjects ? "▲" : "▼"}
                           </span>
@@ -11827,7 +11827,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                     >
                       <MobIdleInvoiceArmer projectsWithProgress={projectsWithProgress} invoices={invoices} mobShowInvoiceList={mobShowInvoiceList} setMobShowInvoiceList={setMobShowInvoiceList} />
                       {!mobShowInvoiceList && (
-                        <div style={{ background: "#E0F7FA", border: "1px solid #B2EBF2", borderRadius: 12, overflow: "hidden" }}>
+                        <div style={{ background: "#EFF6FF", border: "1px solid #B2EBF2", borderRadius: 12, overflow: "hidden" }}>
                           {(mobShowAllProjects ? projectsWithProgress : projectsWithProgress.slice(0, 3)).map((p, idx) => {
                             const parseAmt = (val) => {
                               if (val === undefined || val === null) return 0;
@@ -11882,20 +11882,20 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                                 style={{ padding: "12px 14px", borderBottom: idx === (mobShowAllProjects ? projectsWithProgress : projectsWithProgress.slice(0, 3)).length - 1 ? "none" : "1px solid #B2EBF2", cursor: "pointer", display: "flex", flexDirection: "row", alignItems: "center", gap: 14 }}
                               >
                                 <div style={{ minWidth: 0, flexShrink: 0, width: "28%" }}>
-                                  <div style={{ fontSize: 14.5, fontWeight: 800, color: "#0f1c2e", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                  <div style={{ fontSize: 14.5, fontWeight: 800, color: "#0f172a", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                                     {p.name}
                                   </div>
                                   {clientLabelP ? (
-                                    <div style={{ fontSize: 12.5, color: "var(--app-accent, #00BCD4)", marginTop: 3, fontWeight: 500, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{clientLabelP}</div>
+                                    <div style={{ fontSize: 12.5, color: "var(--app-accent, #2563EB)", marginTop: 3, fontWeight: 500, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{clientLabelP}</div>
                                   ) : null}
                                 </div>
                                 <div style={{ flex: 1, minWidth: 0 }}>
-                                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, fontWeight: 700, color: "#0f1c2e", marginBottom: 3 }}>
+                                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, fontWeight: 700, color: "#0f172a", marginBottom: 3 }}>
                                     <span>Budget Used</span>
-                                    <span style={{ fontWeight: 700, color: "#0f1c2e" }}>{budgetPct}%</span>
+                                    <span style={{ fontWeight: 700, color: "#0f172a" }}>{budgetPct}%</span>
                                   </div>
                                   <div style={{ height: 5, background: "#ffffff", borderRadius: 4, overflow: "hidden" }}>
-                                    <div style={{ width: `${budgetPct}%`, height: "100%", background: "#7c3aed", borderRadius: 4 }} />
+                                    <div style={{ width: `${budgetPct}%`, height: "100%", background: "#2563eb", borderRadius: 4 }} />
                                   </div>
                                 </div>
                                 <span style={{ background: statusMeta.bg, color: statusMeta.color, padding: "6px 14px", borderRadius: 20, fontSize: 12.5, fontWeight: 700, flexShrink: 0 }}>{status}</span> </div>
@@ -11910,23 +11910,23 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                     {mobShowInvoiceList && (invoices || []).length > 0 && (
                       <div style={{ marginTop: 4 }}>
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-                          <span style={{ fontSize: 15, fontWeight: 800, color: "#0f1c2e" }}>Invoices</span>
+                          <span style={{ fontSize: 15, fontWeight: 800, color: "#0f172a" }}>Invoices</span>
                           {(invoices || []).filter(inv => (inv.status || "").toLowerCase() !== "paid").length > 3 && (
                             <span
                               onClick={() => setMobShowAllInvoicesList(v => !v)}
-                              style={{ color: "var(--app-accent, #00BCD4)", fontSize: 14, fontWeight: 800, cursor: "pointer" }}
+                              style={{ color: "var(--app-accent, #2563EB)", fontSize: 14, fontWeight: 800, cursor: "pointer" }}
                             >
                               {mobShowAllInvoicesList ? "▲" : "▼"}
                             </span>
                           )}
                         </div>
-                        <div style={{ background: "#E0F7FA", border: "1px solid #B2EBF2", borderRadius: 12, overflow: "hidden" }}>
+                        <div style={{ background: "#EFF6FF", border: "1px solid #B2EBF2", borderRadius: 12, overflow: "hidden" }}>
                           {(() => {
                             const statusMeta = (raw) => {
                               const s = (raw || "").toLowerCase();
                               if (s === "paid") return { label: "Paid", color: "#16a34a", bg: "#dcfce7" };
                               if (s === "overdue") return { label: "Overdue", color: "#dc2626", bg: "#fef2f2" };
-                              if (s === "part paid" || s === "partpaid" || s === "part-paid") return { label: "Part Paid", color: "#7c3aed", bg: "#f3e8ff" };
+                              if (s === "part paid" || s === "partpaid" || s === "part-paid") return { label: "Part Paid", color: "#2563eb", bg: "#eff6ff" };
                               return { label: "Unpaid", color: "#d97706", bg: "#fff7ed" };
                             };
                             const allRows = (invoices || [])
@@ -11947,7 +11947,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                                   style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: "12px 14px", borderBottom: i === rows.length - 1 ? "none" : "1px solid #B2EBF2", cursor: "pointer" }}
                                 >
                                   <div style={{ minWidth: 0 }}>
-                                    <div style={{ fontSize: 12.5, fontWeight: 700, color: "#0f1c2e", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                    <div style={{ fontSize: 12.5, fontWeight: 700, color: "#0f172a", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                                       {inv.invoiceNo ? `Invoice ${inv.invoiceNo}` : (inv.clientName || inv.client || "Invoice")}
                                     </div>
                                     {inv.clientName || inv.client ? (
@@ -11967,7 +11967,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                   </div>
 
                   {/* FLOATING STAT STRIP — draggable reorder, sits below hero (no overlap) */}
-                  <div style={{ margin: "16px 16px 0", fontSize: 15, fontWeight: 800, color: "#0f1c2e" }}>Quick Actions</div>
+                  <div style={{ margin: "16px 16px 0", fontSize: 15, fontWeight: 800, color: "#0f172a" }}>Quick Actions</div>
                   <div style={{ margin: "8px 16px 0", position: "relative", zIndex: 5, display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12 }}>
                     {mobStatCardOrder.map((s, i) => (
                       <div
@@ -12064,7 +12064,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                               setMobListPage(null);
                               setActive("clients");
                             }}
-                            style={{ padding: 14, background: "#E0F7FA", borderRadius: 10, cursor: "pointer" }}
+                            style={{ padding: 14, background: "#EFF6FF", borderRadius: 10, cursor: "pointer" }}
                           >
                             <div style={{ fontWeight: 700 }}>{c.name || c.clientName || c.companyName}</div>
                             <div style={{ fontSize: 12, color: "#94a3b8" }}>{c.status || "-"}</div>
@@ -12170,7 +12170,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                         <div onClick={() => setClientResponsesExpanded(v => !v)} style={{ padding: "14px 16px", borderBottom: clientResponsesExpanded ? "1px solid #f1f5f9" : "none", background: "#fff", display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer" }}>
                           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                             <i className="ti ti-clipboard-check" style={{ color: "var(--app-accent)" }}></i>
-                            <span style={{ fontSize: 14, fontWeight: 800, color: "#0f1c2e" }}>Recent Activity</span>
+                            <span style={{ fontSize: 14, fontWeight: 800, color: "#0f172a" }}>Recent Activity</span>
                           </div>
                           <span style={{ fontSize: 13, color: "var(--app-accent)", fontWeight: 800 }}>
                             {clientResponsesExpanded ? "▲" : "▼"}
@@ -12402,7 +12402,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                             <div style={{ width: 44, height: 44, borderRadius: 12, background: "var(--app-accent)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>
                               <i className={`ti ${opt.icon}`}></i>
                             </div>
-                            <div style={{ fontSize: 15, fontWeight: 700, color: "#0f1c2e" }}>+ {opt.label}</div>
+                            <div style={{ fontSize: 15, fontWeight: 700, color: "#0f172a" }}>+ {opt.label}</div>
                           </div>
                         ))}
                       </div>
@@ -12707,15 +12707,15 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                               >
                                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
                                   <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                                    <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(0,188,212,0.1)", color: "#00BCD4", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
+                                    <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(37, 99, 235,0.1)", color: "#2563EB", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
                                       <i className="ti ti-currency-rupee"></i>
                                     </div>
-                                    <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e" }}>
+                                    <div style={{ fontSize: 26, fontWeight: 800, color: "#0f172a" }}>
                                       {formatShortCurrency(totalIncome)}
                                     </div>
                                   </div>
                                   {totalIncome > 0 && (
-                                    <div style={{ background: "#e6fbf9", color: "#00BCD4", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
+                                    <div style={{ background: "#e6fbf9", color: "#2563EB", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
                                       <i className="ti ti-trending-up"></i> Active
                                     </div>
                                   )}
@@ -12741,7 +12741,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                                       <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(22,163,74,0.1)", color: "#16a34a", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
                                         <i className="ti ti-users"></i>
                                       </div>
-                                      <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e" }}>
+                                      <div style={{ fontSize: 26, fontWeight: 800, color: "#0f172a" }}>
                                         {clients.length}
                                       </div>
                                     </div>
@@ -12804,7 +12804,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                                       <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(37,99,235,0.1)", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
                                         <i className="ti ti-folder"></i>
                                       </div>
-                                      <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e" }}>
+                                      <div style={{ fontSize: 26, fontWeight: 800, color: "#0f172a" }}>
                                         {projects.length}
                                       </div>
                                     </div>
@@ -12820,10 +12820,10 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                                   const statusMeta = (raw) => {
                                     const s = (raw || "").toLowerCase().replace(/[\s_-]/g, "");
                                     if (["active", "inprogress", "inreview", "started"].includes(s)) return { label: "Active", color: "#16a34a" };
-                                    if (["onhold", "hold", "paused", "suspended"].includes(s)) return { label: "On Hold", color: "#7c3aed" };
+                                    if (["onhold", "hold", "paused", "suspended"].includes(s)) return { label: "On Hold", color: "#2563eb" };
                                     if (["completed", "done", "delivered", "closed"].includes(s)) return { label: "Completed", color: "#2563eb" };
                                     if (["overdue", "late"].includes(s)) return { label: "Overdue", color: "#dc2626" };
-                                    return { label: raw || "On Hold", color: "#7c3aed" };
+                                    return { label: raw || "On Hold", color: "#2563eb" };
                                   };
                                   return (
                                     <>
@@ -12832,7 +12832,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                                         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                                           {projectsWithProgress.slice(0, 8).map((p, i) => {
                                             const meta = statusMeta(p.status);
-                                            const badgeBg = meta.color === "#16a34a" ? "#dcfce7" : meta.color === "#7c3aed" ? "#f3e8ff" : meta.color === "#2563eb" ? "#dbeafe" : meta.color === "#dc2626" ? "#fee2e2" : "#f3e8ff";
+                                            const badgeBg = meta.color === "#16a34a" ? "#dcfce7" : meta.color === "#2563eb" ? "#eff6ff" : meta.color === "#2563eb" ? "#dbeafe" : meta.color === "#dc2626" ? "#fee2e2" : "#eff6ff";
                                             return (
                                               <div
                                                 key={p._id || p.id || i}
@@ -12866,7 +12866,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                                         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                                           {projectsWithProgress.map((p, idx) => {
                                             const meta = statusMeta(p.status);
-                                            const badgeBg = meta.color === "#16a34a" ? "#dcfce7" : meta.color === "#7c3aed" ? "#f3e8ff" : meta.color === "#2563eb" ? "#dbeafe" : meta.color === "#dc2626" ? "#fee2e2" : "#f3e8ff";
+                                            const badgeBg = meta.color === "#16a34a" ? "#dcfce7" : meta.color === "#2563eb" ? "#eff6ff" : meta.color === "#2563eb" ? "#dbeafe" : meta.color === "#dc2626" ? "#fee2e2" : "#eff6ff";
                                             return (
                                               <div key={p._id || p.id || idx} style={{ borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 10 }}>
                                                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
@@ -12907,7 +12907,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                                       <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(220,38,38,0.1)", color: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
                                         <i className="ti ti-file-invoice"></i>
                                       </div>
-                                      <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e" }}>
+                                      <div style={{ fontSize: 26, fontWeight: 800, color: "#0f172a" }}>
                                         {pendingInvCount}
                                       </div>
                                     </div>
@@ -12960,15 +12960,15 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                                 <div style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}>
                                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
                                     <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                                      <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(124,58,237,0.1)", color: "#7c3aed", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
+                                      <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(37, 99, 235,0.1)", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
                                         <i className="ti ti-user-circle"></i>
                                       </div>
-                                      <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e" }}>
+                                      <div style={{ fontSize: 26, fontWeight: 800, color: "#0f172a" }}>
                                         {employees.length}
                                       </div>
                                     </div>
                                     {employees.length > 0 && (
-                                      <div style={{ background: "#f3e8ff", color: "#6b21a8", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
+                                      <div style={{ background: "#eff6ff", color: "#2563eb", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
                                         <i className="ti ti-trending-up"></i> {employees.length}
                                       </div>
                                     )}
@@ -13034,7 +13034,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                                         <div style={{ fontSize: 13, color: "rgba(15,28,46,0.6)", fontWeight: 700, marginBottom: 4 }}>Total Revenue</div>
 
-                                        <div style={{ fontSize: 24, fontWeight: 800, color: "#0f1c2e" }}>{formatShortCurrency(totalIncome)} <span style={{ fontSize: 13, fontWeight: 600, color: "rgba(15,28,46,0.4)" }}>this year</span></div>
+                                        <div style={{ fontSize: 24, fontWeight: 800, color: "#0f172a" }}>{formatShortCurrency(totalIncome)} <span style={{ fontSize: 13, fontWeight: 600, color: "rgba(15,28,46,0.4)" }}>this year</span></div>
 
                                       </div>
 
@@ -13100,7 +13100,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
 
-                                      <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
+                                      <div style={{ fontSize: 16, fontWeight: 800, color: "#0f172a", display: "flex", alignItems: "center", gap: 8 }}>
 
                                         <i className="ti ti-folder" style={{ color: "var(--app-accent)" }}></i> Active Projects
 
@@ -13140,7 +13140,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                                               <div>
 
-                                                <div style={{ fontSize: 14, fontWeight: 700, color: "#0f1c2e" }}>{p.name || p.title}</div>
+                                                <div style={{ fontSize: 14, fontWeight: 700, color: "#0f172a" }}>{p.name || p.title}</div>
 
                                                 <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)", marginTop: 2 }}>{clients.find(c => c._id === p.clientId)?.clientName || "Internal"} Due {p.deadline ? new Date(p.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "TBA"}</div>
 
@@ -13198,9 +13198,9 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                                   <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
 
-                                    <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", marginBottom: 20, display: "flex", alignItems: "center", gap: 8 }}>
+                                    <div style={{ fontSize: 16, fontWeight: 800, color: "#0f172a", marginBottom: 20, display: "flex", alignItems: "center", gap: 8 }}>
 
-                                      <i className="ti ti-bolt" style={{ color: "#00BCD4" }}></i> Quick Access
+                                      <i className="ti ti-bolt" style={{ color: "#2563EB" }}></i> Quick Access
 
                                     </div>
 
@@ -13208,9 +13208,9 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                                       {[
 
-                                        { icon: "ti-users", color: "#00BCD4", bg: "rgba(0,188,212,0.1)", label: "Clients", sub: `${clients.length} total`, act: "clients" },
+                                        { icon: "ti-users", color: "#2563EB", bg: "rgba(37, 99, 235,0.1)", label: "Clients", sub: `${clients.length} total`, act: "clients" },
 
-                                        { icon: "ti-user-circle", color: "#7c3aed", bg: "rgba(124,58,237,0.1)", label: "Employees", sub: `${employees.length} staff`, act: "employees" },
+                                        { icon: "ti-user-circle", color: "#2563eb", bg: "rgba(37, 99, 235,0.1)", label: "Employees", sub: `${employees.length} staff`, act: "employees" },
 
                                         { icon: "ti-file-invoice", color: "#16a34a", bg: "rgba(22,163,74,0.1)", label: "Invoices", sub: `${pendingInvCount} unpaid`, act: "invoices" },
 
@@ -13220,7 +13220,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                                         { icon: "ti-template", color: "#db2777", bg: "rgba(219,39,119,0.1)", label: "Templates", sub: "Designer", act: "templates" },
 
-                                        { icon: "ti-messages", color: "#00BCD4", bg: "rgba(0,188,212,0.1)", label: "Messages", sub: "Internal", act: "messaging" },
+                                        { icon: "ti-messages", color: "#2563EB", bg: "rgba(37, 99, 235,0.1)", label: "Messages", sub: "Internal", act: "messaging" },
 
                                         { icon: "ti-world", color: "#16a34a", bg: "rgba(22,163,74,0.1)", label: "Client Portal", sub: "External", act: "clients" },
 
@@ -13245,7 +13245,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                                             <i className={`ti ${q.icon}`}></i>
                                           </div>
                                           <div>
-                                            <div style={{ fontSize: 13, fontWeight: 700, color: "#0f1c2e" }}>{q.label}</div>
+                                            <div style={{ fontSize: 13, fontWeight: 700, color: "#0f172a" }}>{q.label}</div>
                                             <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)", marginTop: 2 }}>{q.sub}</div>
                                           </div>
                                         </div>
@@ -13260,7 +13260,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                                           💬
                                         </div>
                                         <div>
-                                          <div style={{ fontSize: 13, fontWeight: 700, color: "#0f1c2e" }}>WhatsApp</div>
+                                          <div style={{ fontSize: 13, fontWeight: 700, color: "#0f172a" }}>WhatsApp</div>
                                           <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)", marginTop: 2 }}>Open Chat</div>
                                         </div>
                                       </div>                              </div>
@@ -13272,13 +13272,13 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
 
-                                      <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
+                                      <div style={{ fontSize: 16, fontWeight: 800, color: "#0f172a", display: "flex", alignItems: "center", gap: 8 }}>
 
-                                        <i className="ti ti-user-circle" style={{ color: "#00BCD4" }}></i> Team
+                                        <i className="ti ti-user-circle" style={{ color: "#2563EB" }}></i> Team
 
                                       </div>
 
-                                      <div onClick={() => setActive("employees")} style={{ fontSize: 13, fontWeight: 700, color: "#00BCD4", cursor: "pointer" }}>
+                                      <div onClick={() => setActive("employees")} style={{ fontSize: 13, fontWeight: 700, color: "#2563EB", cursor: "pointer" }}>
 
                                         View All
 
@@ -13291,7 +13291,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                                       {employees.slice(0, 3).map(e => (
                                         <div key={e._id} style={{ display: "flex", alignItems: "center", gap: 12 }}>
 
-                                          <div style={{ width: 38, height: 38, borderRadius: "50%", background: "linear-gradient(135deg,  var(--app-accent, var(--app-accent, #00BCD4)), #00BCD4)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 800 }}>
+                                          <div style={{ width: 38, height: 38, borderRadius: "50%", background: "linear-gradient(135deg,  var(--app-accent, var(--app-accent, #2563EB)), #2563EB)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 800 }}>
 
                                             {(e.name || "E")[0].toUpperCase()}
 
@@ -13299,7 +13299,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                                           <div style={{ flex: 1 }}>
 
-                                            <div style={{ fontSize: 14, fontWeight: 700, color: "#0f1c2e" }}>{e.name}</div>
+                                            <div style={{ fontSize: 14, fontWeight: 700, color: "#0f172a" }}>{e.name}</div>
 
                                             <div style={{ fontSize: 12, color: "rgba(15,28,46,0.5)" }}>{e.role || "Employee"}</div>
 
@@ -13338,7 +13338,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
 
-                                      <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
+                                      <div style={{ fontSize: 16, fontWeight: 800, color: "#0f172a", display: "flex", alignItems: "center", gap: 8 }}>
 
                                         <i className="ti ti-user-x" style={{ color: "var(--app-accent)" }}></i> Leave Requests
 
@@ -13346,7 +13346,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                                       </div>
 
-                                      <div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent, #00BCD4)", cursor: "pointer" }}>
+                                      <div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent, #2563EB)", cursor: "pointer" }}>
 
                                         HR Panel
 
@@ -13402,7 +13402,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                                             <div style={{ flex: 1 }}>
 
-                                              <div style={{ fontSize: 14, fontWeight: 700, color: "#0f1c2e" }}>{l.employeeName}</div>
+                                              <div style={{ fontSize: 14, fontWeight: 700, color: "#0f172a" }}>{l.employeeName}</div>
 
                                               <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)" }}>{detail}</div>
 
@@ -13456,9 +13456,9 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
 
-                                      <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
+                                      <div style={{ fontSize: 16, fontWeight: 800, color: "#0f172a", display: "flex", alignItems: "center", gap: 8 }}>
 
-                                        <i className="ti ti-alert-circle" style={{ color: "var(--app-accent, #00BCD4)" }}></i> Overdue Tasks
+                                        <i className="ti ti-alert-circle" style={{ color: "var(--app-accent, #2563EB)" }}></i> Overdue Tasks
 
                                         <span style={{ background: "#fef2f2", color: "#dc2626", padding: "4px 8px", borderRadius: 6, fontSize: 10, fontWeight: 800 }}>
 
@@ -13468,7 +13468,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                                       </div>
 
-                                      <div onClick={() => { setSidebarOverride("dashboard"); setActive("tasks"); }} style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent, #00BCD4)", cursor: "pointer" }}>
+                                      <div onClick={() => { setSidebarOverride("dashboard"); setActive("tasks"); }} style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent, #2563EB)", cursor: "pointer" }}>
 
                                         All Tasks
 
@@ -13482,11 +13482,11 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                                         <div key={t._id} style={{ display: "flex", alignItems: "flex-start", gap: 12, paddingBottom: 16, borderBottom: idx === 4 ? "none" : "1px solid rgba(0,0,0,0.04)" }}>
 
-                                          <input type="checkbox" style={{ marginTop: 2, accentColor: "var(--app-accent, #00BCD4)" }} />
+                                          <input type="checkbox" style={{ marginTop: 2, accentColor: "var(--app-accent, #2563EB)" }} />
 
                                           <div style={{ flex: 1 }}>
 
-                                            <div style={{ fontSize: 13, fontWeight: 700, color: "#0f1c2e", marginBottom: 2 }}>{t.title}</div>
+                                            <div style={{ fontSize: 13, fontWeight: 700, color: "#0f172a", marginBottom: 2 }}>{t.title}</div>
 
                                             <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)" }}>{employees.find(e => e._id === t.assignee)?.name || "Unassigned"} Due {t.deadline ? new Date(t.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "TBA"}</div>
 
@@ -13510,15 +13510,15 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
 
-                                      <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
+                                      <div style={{ fontSize: 16, fontWeight: 800, color: "#0f172a", display: "flex", alignItems: "center", gap: 8 }}>
 
-                                        <i className="ti ti-file-description" style={{ color: "var(--app-accent, #00BCD4)" }}></i> Doc Requests
+                                        <i className="ti ti-file-description" style={{ color: "var(--app-accent, #2563EB)" }}></i> Doc Requests
 
                                         <span style={{ background: "#fff7ed", color: "#ea580c", padding: "4px 8px", borderRadius: 6, fontSize: 10, fontWeight: 800 }}>{employeeDocs.filter(d => d.status === "PENDING").length} PENDING</span>
 
                                       </div>
 
-                                      <div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent, #00BCD4)", cursor: "pointer" }}>
+                                      <div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent, #2563EB)", cursor: "pointer" }}>
 
                                         Manage
 
@@ -13536,7 +13536,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                                           d.docType === "pan" ? { bg: "#f1f5f9", c: "#0ea5e9" } :
 
-                                            d.docType === "passbook" ? { bg: "#f3e8ff", c: "#a855f7" } :
+                                            d.docType === "passbook" ? { bg: "#eff6ff", c: "#a855f7" } :
 
                                               d.docType === "aadhaar" ? { bg: "#dcfce7", c: "#22c55e" } :
 
@@ -13562,7 +13562,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                                             <div style={{ flex: 1 }}>
 
-                                              <div style={{ fontSize: 13, fontWeight: 700, color: "#0f1c2e" }}>{docName}</div>
+                                              <div style={{ fontSize: 13, fontWeight: 700, color: "#0f172a" }}>{docName}</div>
 
                                               <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)" }}>{d.employeeName}</div>
 
@@ -14556,7 +14556,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
             {validActive === "letterhead" && (
 
-              <div style={{ flex: 1, display: "flex", flexDirection: "column", height: "100%", background: "#F5FAFA" }}>
+              <div style={{ flex: 1, display: "flex", flexDirection: "column", height: "100%", background: "#F8FAFC" }}>
 
                 <iframe
 
@@ -15279,7 +15279,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                                   width: 60,
                                   height: 60,
                                   borderRadius: 14,
-                                  background: "var(--app-accent, #00BCD4)",
+                                  background: "var(--app-accent, #2563EB)",
                                   display: "flex",
                                   alignItems: "center",
                                   justifyContent: "center",
@@ -15287,7 +15287,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                                 }}>
                                   📷
                                 </div>
-                                <div style={{ fontSize: 10, fontWeight: 800, color: "#607D86", textTransform: "uppercase", letterSpacing: 1 }}>Upload Logo</div>
+                                <div style={{ fontSize: 10, fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: 1 }}>Upload Logo</div>
                               </div>)}
                           </div>
 
@@ -15327,9 +15327,9 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                         <div key={t.val} onClick={() => setNc(p => ({ ...p, clientType: t.val }))}
 
-                          style={{ border: `2px solid ${nc.clientType === t.val ? ' var(--app-accent, var(--app-accent, #00BCD4))' : '#E0E6EA'}`, borderRadius: 10, padding: '12px 8px', textAlign: 'center', cursor: 'pointer', background: nc.clientType === t.val ? 'var(--teal-light, var(--teal-light, #E0F7FA))' : '#F4F6F8', transition: 'all .15s', position: 'relative' }}>
+                          style={{ border: `2px solid ${nc.clientType === t.val ? ' var(--app-accent, var(--app-accent, #2563EB))' : '#E0E6EA'}`, borderRadius: 10, padding: '12px 8px', textAlign: 'center', cursor: 'pointer', background: nc.clientType === t.val ? 'var(--teal-light, var(--teal-light, #EFF6FF))' : '#F4F6F8', transition: 'all .15s', position: 'relative' }}>
 
-                          {nc.clientType === t.val && <span style={{ position: 'absolute', top: 6, right: 6, width: 14, height: 14, borderRadius: '50%', background: ' var(--app-accent, var(--app-accent, #00BCD4))', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}></span>}
+                          {nc.clientType === t.val && <span style={{ position: 'absolute', top: 6, right: 6, width: 14, height: 14, borderRadius: '50%', background: ' var(--app-accent, var(--app-accent, #2563EB))', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}></span>}
 
                           <div style={{ fontSize: 22, marginBottom: 4 }}>{t.icon}</div>
 
@@ -15350,7 +15350,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                   <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
 
-                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, var(--app-accent, #00BCD4))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-building" style={{ color: '#fff', fontSize: 16 }}></i></span> Basic Info</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, var(--app-accent, #2563EB))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-building" style={{ color: '#fff', fontSize: 16 }}></i></span> Basic Info</div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
 
@@ -15378,7 +15378,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                   <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
 
-                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, var(--app-accent, #00BCD4))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-phone-call" style={{ color: '#fff', fontSize: 16 }}></i></span> Primary Contact</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, var(--app-accent, #2563EB))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-phone-call" style={{ color: '#fff', fontSize: 16 }}></i></span> Primary Contact</div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
 
@@ -15404,7 +15404,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                   <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
 
-                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, var(--app-accent, #00BCD4))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-map-pin" style={{ color: '#fff', fontSize: 16 }}></i></span> Address</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, var(--app-accent, #2563EB))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-map-pin" style={{ color: '#fff', fontSize: 16 }}></i></span> Address</div>
 
                     <div style={{ marginBottom: 12 }}><Fld label="Street / Building Address" value={nc.address} onChange={v => setNc({ ...nc, address: v })} /></div>
 
@@ -15427,8 +15427,8 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                   {/* ── ONLINE PRESENCE ── */}
                   <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <span style={{ background: ' var(--app-accent, var(--app-accent, #00BCD4))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ background: ' var(--app-accent, var(--app-accent, #2563EB))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
                         <i className="ti ti-link" style={{ color: '#fff', fontSize: 16 }}></i>
                       </span>
                       Online Presence
@@ -15445,7 +15445,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                   <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
 
-                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, var(--app-accent, #00BCD4))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-credit-card" style={{ color: '#fff', fontSize: 16 }}></i></span> Billing & Terms</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, var(--app-accent, #2563EB))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-credit-card" style={{ color: '#fff', fontSize: 16 }}></i></span> Billing & Terms</div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
 
@@ -15467,7 +15467,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                   <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
 
-                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Search Portal Access</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Search Portal Access</div>
 
                     <div style={{ position: 'relative', marginBottom: 4 }}>
 
@@ -15491,7 +15491,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                   <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
 
-                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, var(--app-accent, #00BCD4))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-notes" style={{ color: '#fff', fontSize: 16 }}></i></span> Internal Notes</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, var(--app-accent, #2563EB))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-notes" style={{ color: '#fff', fontSize: 16 }}></i></span> Internal Notes</div>
 
                     <textarea value={nc.notes} onChange={e => setNc({ ...nc, notes: e.target.value })}
 
@@ -15624,7 +15624,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
                     <div style={{ border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px 14px", fontSize: 13, color: "var(--app-text, #333)", background: "var(--app-bg)", fontWeight: 600, display: "flex", alignItems: "center", gap: 8 }}>
                       <span style={{ fontSize: 16 }}>👤</span>
                       <span>{np.client}</span>
-                      <span style={{ marginLeft: "auto", fontSize: 10, color: "var(--app-accent)", background: "rgba(124,58,237,0.08)", borderRadius: 6, padding: "2px 8px", fontWeight: 700 }}>Auto-filled</span>
+                      <span style={{ marginLeft: "auto", fontSize: 10, color: "var(--app-accent)", background: "rgba(37, 99, 235,0.08)", borderRadius: 6, padding: "2px 8px", fontWeight: 700 }}>Auto-filled</span>
                     </div>
                   ) : (
                     <ClientDropdown
@@ -15943,11 +15943,11 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                         borderRadius: 12,
 
-                        border: npkg.businessLimit === mode ? "1.5px solid #7c3aed" : "1.5px solid #e2e8f0",
+                        border: npkg.businessLimit === mode ? "1.5px solid #2563eb" : "1.5px solid #e2e8f0",
 
-                        background: npkg.businessLimit === mode ? "#f5f3ff" : "#fff",
+                        background: npkg.businessLimit === mode ? "#eff6ff" : "#fff",
 
-                        color: npkg.businessLimit === mode ? "#7c3aed" : "#64748b",
+                        color: npkg.businessLimit === mode ? "#2563eb" : "#64748b",
 
                         fontSize: 13,
 
@@ -16017,7 +16017,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                     {subadmins.map(s => (
 
-                      <label key={s._id} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: T.text, cursor: "pointer", background: npkg.assignedSubadmins.includes(s._id) ? "rgba(124, 58, 237, 0.1)" : "transparent", padding: "4px 8px", borderRadius: 6 }}>
+                      <label key={s._id} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: T.text, cursor: "pointer", background: npkg.assignedSubadmins.includes(s._id) ? "rgba(37, 99, 235, 0.1)" : "transparent", padding: "4px 8px", borderRadius: 6 }}>
 
                         <input
 
@@ -16229,11 +16229,11 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                           borderRadius: 12,
 
-                          border: editPkgForm.businessLimit === mode ? "1.5px solid #7c3aed" : "1.5px solid #e2e8f0",
+                          border: editPkgForm.businessLimit === mode ? "1.5px solid #2563eb" : "1.5px solid #e2e8f0",
 
-                          background: editPkgForm.businessLimit === mode ? "#f5f3ff" : "#fff",
+                          background: editPkgForm.businessLimit === mode ? "#eff6ff" : "#fff",
 
-                          color: editPkgForm.businessLimit === mode ? "#7c3aed" : "#64748b",
+                          color: editPkgForm.businessLimit === mode ? "#2563eb" : "#64748b",
 
                           fontSize: 13,
 
@@ -16305,7 +16305,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
                       {subadmins.map(s => (
 
-                        <label key={s._id} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: T.text, cursor: "pointer", background: editPkgForm.assignedSubadmins?.includes(s._id) ? "rgba(124, 58, 237, 0.1)" : "transparent", padding: "4px 8px", borderRadius: 6 }}>
+                        <label key={s._id} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: T.text, cursor: "pointer", background: editPkgForm.assignedSubadmins?.includes(s._id) ? "rgba(37, 99, 235, 0.1)" : "transparent", padding: "4px 8px", borderRadius: 6 }}>
 
                           <input
 

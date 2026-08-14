@@ -18,7 +18,7 @@
     html,
     body {
       margin: 0;
-      background: #F5FAFA;
+      background: #F8FAFC;
     }
 
     html.dark-mode,
@@ -42,22 +42,22 @@
       try {
         var dm = localStorage.getItem("empDarkMode") === "true" || localStorage.getItem("adminDarkMode") === "true";
         var THEMES = {
-          purple: { sidebar: "#7c3aed", bg: "#f5f3ff" },
+          purple: { sidebar: "#2563eb", bg: "#eff6ff" },
           ocean: { sidebar: "#0284c7", bg: "#f0f9ff" },
           forest: { sidebar: "#16a34a", bg: "#f0fdf4" },
           sunset: { sidebar: "#ea580c", bg: "#fff7ed" },
           rose: { sidebar: "#e11d48", bg: "#fff1f2" },
           slate: { sidebar: "#475569", bg: "#f8fafc" },
-          mint: { sidebar: "#0d9488", bg: "#f0fdfa" },
+          mint: { sidebar: "#2563eb", bg: "#f0fdfa" },
           candy: { sidebar: "#c026d3", bg: "#fdf4ff" },
-          teal: { sidebar: "#00BCD4", bg: "#F5FAFA" }
+          teal: { sidebar: "#2563EB", bg: "#F8FAFC" }
         };
         var appTheme = localStorage.getItem("appTheme") || "teal";
         var sidebarColor, bgColor;
         if (appTheme === "custom") {
-          var customColor = localStorage.getItem("appCustomColor") || "#00BCD4";
+          var customColor = localStorage.getItem("appCustomColor") || "#2563EB";
           sidebarColor = customColor;
-          bgColor = "#F5FAFA";
+          bgColor = "#F8FAFC";
         } else {
           var t = THEMES[appTheme] || THEMES.teal;
           sidebarColor = t.sidebar;

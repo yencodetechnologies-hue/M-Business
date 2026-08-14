@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 
-const primary = ' var(--app-accent, var(--app-accent, #00BCD4))';
-const primaryDark = '#00BCD4';
-const primaryLight = 'var(--teal-light, #E0F7FA)';
+const primary = ' var(--app-accent, var(--app-accent, #2563EB))';
+const primaryDark = '#2563EB';
+const primaryLight = 'var(--teal-light, #EFF6FF)';
 const primaryMid = '#B2EBF2';
 const textDark = '#1A2332';
 const textMid = '#4A5568';
@@ -10,16 +10,16 @@ const textLight = '#718096';
 const bg = '#F0F4F8';
 const white = '#FFFFFF';
 const border = '#E2E8F0';
-const green = '#26C281';
+const green = '#16A34A';
 const greenLight = '#D1FAE5';
 const orange = '#F59E0B';
 const orangeLight = '#FEF3C7';
 const red = '#FF6B6B';
 const purple = '#8B5CF6';
-const purpleLight = '#EDE9FE';
+const purpleLight = '#EFF6FF';
 const radius = '14px';
-const shadow = '0 2px 12px rgba(0,188,212,.08)';
-const shadowLg = '0 8px 32px rgba(0,188,212,.14)';
+const shadow = '0 2px 12px rgba(37, 99, 235,.08)';
+const shadowLg = '0 8px 32px rgba(37, 99, 235,.14)';
 
 const css = [
   '.mep-root { font-family:Nunito,sans-serif; min-height:100vh; }',
@@ -36,7 +36,7 @@ const css = [
   '.mep-progress-bg { background:' + bg + '; border-radius:20px; height:8px; overflow:hidden; }',
   '.mep-progress-fill { height:100%; border-radius:20px; background:linear-gradient(90deg,' + primary + ',' + primaryDark + '); }',
   '.mep-progress-fill.g { background:linear-gradient(90deg,' + green + ',#059669); }',
-  '.mep-progress-fill.p { background:linear-gradient(90deg,' + purple + ',#7C3AED); }',
+  '.mep-progress-fill.p { background:linear-gradient(90deg,' + purple + ',#2563EB); }',
   '.mep-welcome { background:linear-gradient(135deg,' + primary + ',' + primaryDark + '); border-radius:' + radius + '; padding:22px 26px; margin-bottom:20px; display:flex; align-items:center; justify-content:space-between; }',
   '.mep-welcome h2 { font-size:19px; font-weight:900; color:#fff; margin:0; }',
   '.mep-welcome p { font-size:13px; color:rgba(255,255,255,.8); margin:3px 0 0; }',
@@ -72,9 +72,9 @@ const css = [
 ].join('\n');
 
 const STRIPES = [
-  { bg: 'linear-gradient(90deg, var(--app-accent, var(--app-accent, #00BCD4)),#00BCD4)', cls: '' },
-  { bg: 'linear-gradient(90deg,#8B5CF6,#7C3AED)', cls: 'p' },
-  { bg: 'linear-gradient(90deg,#26C281,#059669)', cls: 'g' },
+  { bg: 'linear-gradient(90deg, var(--app-accent, var(--app-accent, #2563EB)),#2563EB)', cls: '' },
+  { bg: 'linear-gradient(90deg,#8B5CF6,#2563EB)', cls: 'p' },
+  { bg: 'linear-gradient(90deg,#16A34A,#059669)', cls: 'g' },
 ];
 
 function badgeProps(status) {

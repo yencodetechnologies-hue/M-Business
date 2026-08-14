@@ -205,9 +205,9 @@ export function EmployeeProfilePanel({ empName, user, notify, onDocStatusChange,
     <>
       {open && <div onClick={handleClose} style={{ position: "fixed", inset: 0, background: "rgba(15,23,42,0.4)", zIndex: 997, backdropFilter: "blur(2px)" }} />}
 
-      <div style={{ position: "fixed", top: 0, right: 0, bottom: 0, width: 340, background: "#fff", zIndex: 998, boxShadow: "-8px 0 40px rgba(99,102,241,0.18)", transform: open ? "translateX(0)" : "translateX(100%)", transition: "transform 0.3s cubic-bezier(0.4,0,0.2,1)", display: "flex", flexDirection: "column", overflowY: "auto" }}>
+      <div style={{ position: "fixed", top: 0, right: 0, bottom: 0, width: 340, background: "#fff", zIndex: 998, boxShadow: "-8px 0 40px rgba(37, 99, 235,0.18)", transform: open ? "translateX(0)" : "translateX(100%)", transition: "transform 0.3s cubic-bezier(0.4,0,0.2,1)", display: "flex", flexDirection: "column", overflowY: "auto" }}>
         {/* Header */}
-        <div style={{ background: THEME?.sidebar || "linear-gradient(135deg,#0f172a,#1e1b4b)", padding: "20px 18px 16px", flexShrink: 0 }}>
+        <div style={{ background: THEME?.sidebar || "linear-gradient(135deg,#0f172a,#1e293b)", padding: "20px 18px 16px", flexShrink: 0 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 14 }}>
             <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase" }}>My Profile</div>
             <button onClick={handleClose} style={{ background: "rgba(255,255,255,0.1)", border: "none", borderRadius: 8, width: 28, height: 28, cursor: "pointer", color: "rgba(255,255,255,0.6)", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center" }}>Close</button>
@@ -222,7 +222,7 @@ export function EmployeeProfilePanel({ empName, user, notify, onDocStatusChange,
           <div style={{ marginTop: 14 }}>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
               <span style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", fontWeight: 700 }}>DOCUMENTS UPLOADED</span>
-              <span style={{ fontSize: 10, color: "#a5b4fc", fontWeight: 800 }}>{uploadedCount}/{DOC_TYPES.length}</span>
+              <span style={{ fontSize: 10, color: "#64748b", fontWeight: 800 }}>{uploadedCount}/{DOC_TYPES.length}</span>
             </div>
             <div style={{ background: "rgba(255,255,255,0.1)", borderRadius: 99, height: 5 }}>
               <div style={{ width: `${(uploadedCount / DOC_TYPES.length) * 100}%`, background: uploadedCount === DOC_TYPES.length ? "linear-gradient(90deg,#10b981,#34d399)" : "linear-gradient(90deg,var(--app-accent),var(--app-muted))", borderRadius: 99, height: "100%", transition: "width 0.5s" }} />
@@ -342,7 +342,7 @@ export function SubAdminDocumentsPage({ employees = [] }) {
                   const uploaded = docStatusMap[emp.name] || [];
                   const isSel = selected?.name === emp.name;
                   return (
-                    <tr key={i} style={{ borderBottom: "1px solid var(--app-bg)", background: isSel ? "#f3e8ff" : "transparent" }}>
+                    <tr key={i} style={{ borderBottom: "1px solid var(--app-bg)", background: isSel ? "#eff6ff" : "transparent" }}>
                       <td style={{ padding: "11px 12px" }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                           <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700 }}>

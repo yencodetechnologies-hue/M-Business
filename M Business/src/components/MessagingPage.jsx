@@ -102,7 +102,7 @@ export default function MessagingPage({ user }) {
   ).sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
 
   return (
-    <div className="chat-app" style={{ fontFamily: "var(--font, 'Nunito', sans-serif)", background: "var(--bg, #F5FAFA)" }}>
+    <div className="chat-app" style={{ fontFamily: "var(--font, 'Nunito', sans-serif)", background: "var(--bg, #F8FAFC)" }}>
       {/* CONVERSATIONS PANEL */}
       <div className="conv-panel show" id="convPanel">
         <div className="conv-header">

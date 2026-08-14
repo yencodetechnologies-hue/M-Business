@@ -11,7 +11,7 @@ const MODES = ['Cash', 'Card', 'UPI', 'Bank Transfer', 'Cheque', 'NEFT', 'RTGS',
 function Toast({ msg, type }) {
   if (!msg) return null;
   return (
-    <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 9999, background: type === 'error' ? '#EF4444' : '#26C281', color: '#fff', borderRadius: 12, padding: '13px 22px', fontWeight: 700, fontSize: 14, boxShadow: '0 4px 20px rgba(0,0,0,.18)' }}>
+    <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 9999, background: type === 'error' ? '#EF4444' : '#16A34A', color: '#fff', borderRadius: 12, padding: '13px 22px', fontWeight: 700, fontSize: 14, boxShadow: '0 4px 20px rgba(0,0,0,.18)' }}>
       {msg}
     </div>
   );
@@ -122,19 +122,19 @@ export default function FinIncome({ income: propIncome, setIncome: propSetIncome
             <div style={{ fontSize: 22, fontWeight: 900, color: '#1A2332' }}>Payments / Income</div>
             <div style={{ fontSize: 13, color: '#718096', marginTop: 2 }}>Track all incoming payments and revenue</div>
           </div>
-          <button style={S.btn('#26C281')} onClick={() => { setForm(emptyForm); setAddOpen(true); }}>
+          <button style={S.btn('#16A34A')} onClick={() => { setForm(emptyForm); setAddOpen(true); }}>
             <i className="ti ti-plus" /> Record Income
           </button>
         </div>
 
         {/* KPI CARDS */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginBottom: 22 }} className="fi-kpi-row">
-          {[['Total Income', total, '#26C281', 'ti-cash', income.length + ' records'], ['Received', received, '#00BCD4', 'ti-check', income.filter(i => i.status !== 'Pending').length + ' payments'], ['Pending', pending, '#F59E0B', 'ti-clock', income.filter(i => i.status === 'Pending').length + ' outstanding']].map(([label, val, color, icon, sub]) => (
-            <div key={label} style={{ cursor: 'default', minWidth: 0, background: '#fff', border: '1.5px solid #E0EEF0', borderRadius: 14, padding: '14px 10px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 8, boxShadow: '0 2px 10px rgba(0,0,0,0.02)', overflow: 'hidden' }}>
+          {[['Total Income', total, '#16A34A', 'ti-cash', income.length + ' records'], ['Received', received, '#2563EB', 'ti-check', income.filter(i => i.status !== 'Pending').length + ' payments'], ['Pending', pending, '#F59E0B', 'ti-clock', income.filter(i => i.status === 'Pending').length + ' outstanding']].map(([label, val, color, icon, sub]) => (
+            <div key={label} style={{ cursor: 'default', minWidth: 0, background: '#fff', border: '1.5px solid #E2E8F0', borderRadius: 14, padding: '14px 10px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 8, boxShadow: '0 2px 10px rgba(0,0,0,0.02)', overflow: 'hidden' }}>
               <div style={{ width: 32, height: 32, borderRadius: 8, background: `${color}1a`, color: color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, flexShrink: 0 }}><i className={`ti ${icon}`} /></div>
               <div style={{ minWidth: 0, width: '100%' }}>
                 <div style={{ fontSize: 'clamp(13px, 4.2vw, 20px)', fontWeight: 800, color: '#1A2332', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{fmt(val)}</div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: '#607D86', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: '#64748B', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</div>
               </div>
             </div>
           ))}
@@ -157,7 +157,7 @@ export default function FinIncome({ income: propIncome, setIncome: propSetIncome
         </div>
 
         {/* TABLE */}
-        <div style={{ background: '#fff', borderRadius: 14, boxShadow: '0 2px 12px rgba(0,188,212,.08)', overflow: 'hidden' }}>
+        <div style={{ background: '#fff', borderRadius: 14, boxShadow: '0 2px 12px rgba(37, 99, 235,.08)', overflow: 'hidden' }}>
           <div style={{ overflowX: 'auto' }}>
             <table className="fi-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
@@ -177,7 +177,7 @@ export default function FinIncome({ income: propIncome, setIncome: propSetIncome
                     <td style={{ fontWeight: 700 }}>{inc.client || '—'}</td>
                     <td>{inc.title || inc.description || '—'}</td>
                     <td>{inc.category || '—'}</td>
-                    <td style={{ color: '#26C281', fontWeight: 800 }}>+{fmt(inc.amount)}</td>
+                    <td style={{ color: '#16A34A', fontWeight: 800 }}>+{fmt(inc.amount)}</td>
                     <td>{inc.paymentMode || '—'}</td>
                     <td><span className={`fi-badge-${(inc.status || 'received').toLowerCase()}`}>{inc.status || 'Received'}</span></td>
                     <td>
@@ -203,7 +203,7 @@ export default function FinIncome({ income: propIncome, setIncome: propSetIncome
         <div style={S.overlay} onClick={e => e.target === e.currentTarget && setViewItem(null)}>
           <div style={S.modal}>
             <div style={{ fontSize: 18, fontWeight: 900, color: '#1A2332', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
-              <i className="ti ti-cash" style={{ color: '#26C281' }} /> Income Details
+              <i className="ti ti-cash" style={{ color: '#16A34A' }} /> Income Details
             </div>
             {[['Client', viewItem.client], ['Title', viewItem.title], ['Description', viewItem.description], ['Category', viewItem.category], ['Amount', fmt(viewItem.amount)], ['Payment Mode', viewItem.paymentMode], ['Status', viewItem.status], ['Date', new Date(viewItem.date || viewItem.createdAt).toLocaleDateString('en-IN')]].map(([l, v]) => (
               <div key={l} style={{ display: 'flex', justifyContent: 'space-between', padding: '11px 0', borderBottom: '1px solid #F0F4F8', fontSize: 13 }}>
@@ -213,7 +213,7 @@ export default function FinIncome({ income: propIncome, setIncome: propSetIncome
             ))}
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 22 }}>
               <button style={S.btn('#F0F4F8', '#1A2332')} onClick={() => setViewItem(null)}>Close</button>
-              <button style={S.btn('#26C281')} onClick={() => { const item = viewItem; setViewItem(null); setEditItem(item); setEditForm({ client: item.client || '', title: item.title || '', description: item.description || '', category: item.category || 'Project Revenue', amount: item.amount, paymentMode: item.paymentMode || 'Bank Transfer', status: item.status || 'Received', date: (item.date || item.createdAt || '').slice(0, 10) }); }}>Edit</button>
+              <button style={S.btn('#16A34A')} onClick={() => { const item = viewItem; setViewItem(null); setEditItem(item); setEditForm({ client: item.client || '', title: item.title || '', description: item.description || '', category: item.category || 'Project Revenue', amount: item.amount, paymentMode: item.paymentMode || 'Bank Transfer', status: item.status || 'Received', date: (item.date || item.createdAt || '').slice(0, 10) }); }}>Edit</button>
             </div>
           </div>
         </div>
@@ -224,7 +224,7 @@ export default function FinIncome({ income: propIncome, setIncome: propSetIncome
         <div style={S.overlay} onClick={e => e.target === e.currentTarget && setAddOpen(false)}>
           <div style={S.modal}>
             <div style={{ fontSize: 18, fontWeight: 900, color: '#1A2332', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
-              <i className="ti ti-plus" style={{ color: '#26C281' }} /> Record Income
+              <i className="ti ti-plus" style={{ color: '#16A34A' }} /> Record Income
             </div>
             {[['Client *', 'client', 'text', 'Client name'], ['Title *', 'title', 'text', 'e.g. Milestone 1 Payment'], ['Amount (₹) *', 'amount', 'number', '0.00'], ['Date', 'date', 'date', '']].map(([label, key, type, ph]) => (
               <div key={key} style={{ marginBottom: 14 }}>
@@ -242,7 +242,7 @@ export default function FinIncome({ income: propIncome, setIncome: propSetIncome
             </div>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 22, paddingTop: 16, borderTop: '1px solid #E2E8F0' }}>
               <button style={S.btn('#F0F4F8', '#1A2332')} onClick={() => setAddOpen(false)}>Cancel</button>
-              <button style={S.btn('#26C281')} disabled={saving} onClick={handleAdd}>{saving ? 'Saving...' : 'Save Income'}</button>
+              <button style={S.btn('#16A34A')} disabled={saving} onClick={handleAdd}>{saving ? 'Saving...' : 'Save Income'}</button>
             </div>
           </div>
         </div>
@@ -253,7 +253,7 @@ export default function FinIncome({ income: propIncome, setIncome: propSetIncome
         <div style={S.overlay} onClick={e => e.target === e.currentTarget && setEditItem(null)}>
           <div style={S.modal}>
             <div style={{ fontSize: 18, fontWeight: 900, color: '#1A2332', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
-              <i className="ti ti-pencil" style={{ color: '#26C281' }} /> Edit Income
+              <i className="ti ti-pencil" style={{ color: '#16A34A' }} /> Edit Income
             </div>
             {[['Client *', 'client', 'text', ''], ['Title', 'title', 'text', ''], ['Description', 'description', 'text', ''], ['Amount (₹) *', 'amount', 'number', ''], ['Date', 'date', 'date', '']].map(([label, key, type, ph]) => (
               <div key={key} style={{ marginBottom: 14 }}>
@@ -271,7 +271,7 @@ export default function FinIncome({ income: propIncome, setIncome: propSetIncome
             </div>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 22, paddingTop: 16, borderTop: '1px solid #E2E8F0' }}>
               <button style={S.btn('#F0F4F8', '#1A2332')} onClick={() => setEditItem(null)}>Cancel</button>
-              <button style={S.btn('#26C281')} disabled={saving} onClick={handleEdit}>{saving ? 'Updating...' : 'Update Income'}</button>
+              <button style={S.btn('#16A34A')} disabled={saving} onClick={handleEdit}>{saving ? 'Updating...' : 'Update Income'}</button>
             </div>
           </div>
         </div>

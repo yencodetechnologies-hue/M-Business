@@ -29,23 +29,23 @@ const NAV_ICONS = {
 
 const THEME_MAP = {
   light: {
-    bg: "#f5f3ff",
+    bg: "#f8fafc",
     sidebar: "#ffffff",
     card: "#ffffff",
-    surface: "#f5f3ff",
-    text: "#1e1b4b",
-    muted: "#6b7280",
-    border: "#ede9fe",
-    accent: "#7c3aed",
-    accentSecondary: "#a78bfa",
-    shadow: "0 10px 25px rgba(124,58,237,0.06)",
-    gradient: "linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%)",
+    surface: "#f8fafc",
+    text: "#1e293b",
+    muted: "#64748b",
+    border: "#e2e8f0",
+    accent: "#2563eb",
+    accentSecondary: "#2563eb",
+    shadow: "0 10px 25px rgba(37, 99, 235,0.06)",
+    gradient: "linear-gradient(135deg, #0f172a 0%, #2563eb 100%)",
   },
   dark: {
     bg: "#0a1628",           // deep navy page background
-    sidebar: "#0d1b2a",      // slightly lighter navy sidebar
+    sidebar: "#0f172a",      // slightly lighter navy sidebar
     card: "#112240",         // card surface
-    surface: "#0d1b2a",      // inner surface / table headers
+    surface: "#0f172a",      // inner surface / table headers
     text: "#e2e8f0",         // soft white text
     muted: "#94a3b8",        // muted blue-gray
     border: "#1e3a5f",       // dark navy border
@@ -153,7 +153,7 @@ export default function AdminDashboard({ user, setUser }) {
   const T = darkMode ? {
     bg: "#0a1628",
     surface: "#112240",
-    sidebar: "#0d1b2a",
+    sidebar: "#0f172a",
     sidebarActive: "rgba(56,189,248,0.12)",
     sidebarText: "rgba(255,255,255,0.45)",
     sidebarTextActive: "#38bdf8",
@@ -184,19 +184,19 @@ export default function AdminDashboard({ user, setUser }) {
     shadowLg: "0 12px 32px rgba(0,0,0,0.4)",
   } : {
     // Your existing light theme object here
-    bg: "#f5f3ff",
+    bg: "#f8fafc",
     surface: "#ffffff",
     sidebar: "#ffffff",
-    sidebarActive: "rgba(124,58,237,0.08)",
+    sidebarActive: "rgba(37, 99, 235,0.08)",
     sidebarText: "#94a3b8",
-    sidebarTextActive: "#7c3aed",
-    border: "#ede9fe",
-    borderDark: "#ddd6fe",
-    text: "#1e1b4b",
-    textMuted: "#6b7280",
-    textFaint: "#a5b4fc",
-    accent: "#7c3aed",
-    accentLight: "#f5f3ff",
+    sidebarTextActive: "#2563eb",
+    border: "#e2e8f0",
+    borderDark: "#e2e8f0",
+    text: "#1e293b",
+    textMuted: "#64748b",
+    textFaint: "#64748b",
+    accent: "#2563eb",
+    accentLight: "#eff6ff",
     success: "#16a34a",
     successBg: "#f0fdf4",
     successBorder: "#bbf7d0",
@@ -206,15 +206,15 @@ export default function AdminDashboard({ user, setUser }) {
     danger: "#dc2626",
     dangerBg: "#fef2f2",
     dangerBorder: "#fecaca",
-    info: "#7c3aed",
-    infoBg: "#f5f3ff",
-    infoBorder: "#ddd6fe",
+    info: "#2563eb",
+    infoBg: "#eff6ff",
+    infoBorder: "#e2e8f0",
     radius: "14px",
     radiusSm: "9px",
     radiusLg: "20px",
-    shadow: "0 1px 4px rgba(124,58,237,0.06)",
-    shadowMd: "0 4px 16px rgba(124,58,237,0.10)",
-    shadowLg: "0 12px 32px rgba(124,58,237,0.13)",
+    shadow: "0 1px 4px rgba(37, 99, 235,0.06)",
+    shadowMd: "0 4px 16px rgba(37, 99, 235,0.10)",
+    shadowLg: "0 12px 32px rgba(37, 99, 235,0.13)",
   };
 
   const THEME = darkMode ? THEME_MAP.dark : THEME_MAP.light;
@@ -471,13 +471,13 @@ export default function AdminDashboard({ user, setUser }) {
         table th { background: ${THEME.surface} !important; color: ${THEME.muted} !important; border-bottom: 1.5px solid ${THEME.border} !important; }
         table td { border-bottom: 1px solid ${THEME.border} !important; color: ${THEME.text} !important; }
         input, select, textarea { background: ${THEME.card} !important; color: ${THEME.text} !important; border: 1.5px solid ${THEME.border} !important; }
-        .adm-nav-item:hover { background: ${darkMode ? "rgba(255,255,255,0.06)" : "rgba(124,58,237,0.06)"} !important; }
+        .adm-nav-item:hover { background: ${darkMode ? "rgba(255,255,255,0.06)" : "rgba(37, 99, 235,0.06)"} !important; }
         .adm-logout-btn:hover { background: rgba(239,68,68,0.18) !important; transform: translateY(-1px); }
         .adm-theme-toggle:hover { background: ${darkMode ? "rgba(56,189,248,0.14)" : "rgba(0,0,0,0.05)"} !important; }
       `}</style>
 
       {/* SIDEBAR */}
-      <div style={{ width: 264, background: THEME.sidebar, color: darkMode ? "#fff" : THEME.text, display: "flex", flexDirection: "column", position: "relative", zIndex: 100, borderRight: `1.5px solid ${THEME.border}`, boxShadow: darkMode ? "4px 0 24px rgba(0,0,0,0.3)" : "4px 0 24px rgba(124,58,237,0.05)" }}>
+      <div style={{ width: 264, background: THEME.sidebar, color: darkMode ? "#fff" : THEME.text, display: "flex", flexDirection: "column", position: "relative", zIndex: 100, borderRight: `1.5px solid ${THEME.border}`, boxShadow: darkMode ? "4px 0 24px rgba(0,0,0,0.3)" : "4px 0 24px rgba(37, 99, 235,0.05)" }}>
         <div style={{ padding: "28px 22px 22px", display: "flex", alignItems: "center", gap: 12, borderBottom: `1px solid ${THEME.border}` }}>
           <div style={{ width: 46, height: 46, background: THEME.gradient, borderRadius: 13, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", padding: 4, boxShadow: `0 8px 18px ${THEME.accent}40` }}>
             {user?.logoUrl ? <img src={user.logoUrl} alt="logo" style={{ maxHeight: "100%", maxWidth: "100%", objectFit: "contain", borderRadius: 9 }} /> : <span style={{ color: "#fff", fontWeight: 900, fontSize: 18 }}>A</span>}
@@ -498,7 +498,7 @@ export default function AdminDashboard({ user, setUser }) {
                 className="adm-nav-item"
                 style={{
                   width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "10px 12px",
-                  background: on ? (darkMode ? "linear-gradient(90deg,rgba(56,189,248,0.16),rgba(56,189,248,0.02))" : "linear-gradient(90deg,rgba(124,58,237,0.12),rgba(124,58,237,0.02))") : "transparent",
+                  background: on ? (darkMode ? "linear-gradient(90deg,rgba(56,189,248,0.16),rgba(56,189,248,0.02))" : "linear-gradient(90deg,rgba(37, 99, 235,0.12),rgba(37, 99, 235,0.02))") : "transparent",
                   border: "none", borderRadius: 12, color: on ? THEME.accent : (darkMode ? "rgba(255,255,255,0.55)" : "#64748b"),
                   fontWeight: on ? 800 : 600, fontSize: 13.5, cursor: "pointer", marginBottom: 4, transition: "background 0.18s ease"
                 }}>
@@ -558,7 +558,7 @@ export default function AdminDashboard({ user, setUser }) {
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
             {active === "packages" && (
               <button onClick={() => { setEditPkg(null); setNpkg({ title: "", description: "", icon: "Package", isFree: false, price: "", noOfDays: "30", planDuration: "Monthly Plan", businessLimit: "Single business manage", managerLimit: "1", clientLimit: "3", employeeLimit: "10", assignedSubadmins: [] }); setPkgError({}); setModal("package_add"); }}
-                style={{ background: THEME.accent, color: "#fff", border: "none", borderRadius: 12, padding: "10px 24px", fontWeight: 800, fontSize: 13, cursor: "pointer", boxShadow: "0 4px 12px rgba(99,102,241,0.2)" }}>
+                style={{ background: THEME.accent, color: "#fff", border: "none", borderRadius: 12, padding: "10px 24px", fontWeight: 800, fontSize: 13, cursor: "pointer", boxShadow: "0 4px 12px rgba(37, 99, 235,0.2)" }}>
                 + Add Package
               </button>
             )}
@@ -692,7 +692,7 @@ export default function AdminDashboard({ user, setUser }) {
                       background: "#f8fafc", boxSizing: "border-box",
                       transition: "border-color 0.2s"
                     }}
-                    onFocus={e => e.target.style.borderColor = "#7c3aed"}
+                    onFocus={e => e.target.style.borderColor = "#2563eb"}
                     onBlur={e => e.target.style.borderColor = pkgError.title ? "#ef4444" : "#e2e8f0"}
                   />
                   {pkgError.title && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4 }}>Warning {pkgError.title}</div>}
@@ -749,11 +749,11 @@ export default function AdminDashboard({ user, setUser }) {
                           cursor: "pointer", fontFamily: "inherit",
                           border: "1.5px solid",
                           borderColor: (type === "Free" ? npkg.isFree : !npkg.isFree)
-                            ? "#7c3aed" : "#e2e8f0",
+                            ? "#2563eb" : "#e2e8f0",
                           background: (type === "Free" ? npkg.isFree : !npkg.isFree)
-                            ? "#f5f3ff" : "#f8fafc",
+                            ? "#eff6ff" : "#f8fafc",
                           color: (type === "Free" ? npkg.isFree : !npkg.isFree)
-                            ? "#7c3aed" : "#64748b",
+                            ? "#2563eb" : "#64748b",
                           transition: "all 0.15s"
                         }}
                       >
@@ -817,7 +817,7 @@ export default function AdminDashboard({ user, setUser }) {
                       <button key={d} onClick={() => setNpkg({ ...npkg, planDuration: d, noOfDays: d === "Monthly Plan" ? "30" : d === "90 days" ? "90" : "365" })} style={{
                         padding: "8px 12px", borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: "pointer", border: "1.5px solid",
                         borderColor: npkg.planDuration === d ? "var(--app-accent)" : "#e2e8f0",
-                        background: npkg.planDuration === d ? "#f5f3ff" : "transparent",
+                        background: npkg.planDuration === d ? "#eff6ff" : "transparent",
                         color: npkg.planDuration === d ? "var(--app-accent)" : "#64748b",
                         transition: "0.2s", display: "flex", alignItems: "center", gap: 4
                       }}>
@@ -836,7 +836,7 @@ export default function AdminDashboard({ user, setUser }) {
                     <button key={b} onClick={() => setNpkg({ ...npkg, businessLimit: b })} style={{
                       flex: 1, padding: "10px", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: "pointer", border: "1.5px solid",
                       borderColor: npkg.businessLimit === b ? "var(--app-accent)" : "#e2e8f0",
-                      background: npkg.businessLimit === b ? "#f5f3ff" : "transparent",
+                      background: npkg.businessLimit === b ? "#eff6ff" : "transparent",
                       color: npkg.businessLimit === b ? "var(--app-accent)" : "#64748b",
                       transition: "0.2s", display: "flex", alignItems: "center", justifyContent: "center", gap: 6
                     }}>
@@ -927,7 +927,7 @@ export default function AdminDashboard({ user, setUser }) {
                   }}
                 />
                 {/* {(npkg.assignedSubadmins?.length || 0) > 0 && (
-            <div style={{ fontSize: 11, color: "#7c3aed", marginTop: 4, fontWeight: 600 }}>
+            <div style={{ fontSize: 11, color: "#2563eb", marginTop: 4, fontWeight: 600 }}>
               Yes {npkg.assignedSubadmins.length} subadmin(s) selected
             </div>
           )} */}
@@ -955,13 +955,13 @@ export default function AdminDashboard({ user, setUser }) {
                   style={{
                     flex: 2, padding: "12px",
                     background: pkgSaveLoading
-                      ? "#a78bfa"
-                      : "linear-gradient(135deg, #7c3aed, #6d28d9)",
+                      ? "#2563eb"
+                      : "linear-gradient(135deg, #2563eb, #6d28d9)",
                     border: "none", borderRadius: 10,
                     fontSize: 13, fontWeight: 700,
                     color: "#fff", cursor: pkgSaveLoading ? "not-allowed" : "pointer",
                     fontFamily: "inherit",
-                    boxShadow: "0 4px 14px rgba(124,58,237,0.35)",
+                    boxShadow: "0 4px 14px rgba(37, 99, 235,0.35)",
                     transition: "all 0.2s"
                   }}
                 >
@@ -1223,8 +1223,8 @@ function SubadminsList({ THEME, subadmins, refresh, packages, subscriptions, fet
                   </td>
                   <td style={{ padding: "14px 16px" }}>
                     <span style={{
-                      background: el.toLowerCase().includes("unlimited") ? "rgba(16,185,129,0.1)" : "rgba(124,58,237,0.1)",
-                      color: el.toLowerCase().includes("unlimited") ? "#10b981" : "#7c3aed",
+                      background: el.toLowerCase().includes("unlimited") ? "rgba(16,185,129,0.1)" : "rgba(37, 99, 235,0.1)",
+                      color: el.toLowerCase().includes("unlimited") ? "#10b981" : "#2563eb",
                       padding: "3px 10px", borderRadius: 8, fontSize: 11, fontWeight: 700
                     }}>{el}</span>
                   </td>
@@ -1381,7 +1381,7 @@ function SubadminsList({ THEME, subadmins, refresh, packages, subscriptions, fet
                 </div>
                 <div style={{ display: "flex", gap: 12, marginTop: 4 }}>
                   <button onClick={() => setAssignModalOpen(false)} style={{ flex: 1, padding: 12, borderRadius: 12, border: `1px solid ${THEME.border}`, fontWeight: 700, background: THEME.surface, color: THEME.text, cursor: "pointer" }}>Cancel</button>
-                  <button onClick={handleAssignPackage} disabled={assignLoading} style={{ flex: 2, padding: 12, borderRadius: 12, border: "none", background: assignLoading ? "#a78bfa" : THEME.accent, color: "#fff", fontWeight: 700, cursor: assignLoading ? "not-allowed" : "pointer" }}>
+                  <button onClick={handleAssignPackage} disabled={assignLoading} style={{ flex: 2, padding: 12, borderRadius: 12, border: "none", background: assignLoading ? "#2563eb" : THEME.accent, color: "#fff", fontWeight: 700, cursor: assignLoading ? "not-allowed" : "pointer" }}>
                     {assignLoading ? "Assigning..." : "Yes Assign Package"}
                   </button>
                 </div>
@@ -1403,7 +1403,7 @@ function formatDate(d) {
 function SubscriptionsPage({ THEME, subscriptions, subadmins }) {
   const [filter, setFilter] = useState("all");
   const filtered = subscriptions.filter(s => filter === "all" || s.status?.toLowerCase() === filter.toLowerCase());
-  const statusColors = { active: "#10b981", pending: "#f59e0b", expired: "#ef4444", cancelled: "#64748b", trial: "#a78bfa" };
+  const statusColors = { active: "#10b981", pending: "#f59e0b", expired: "#ef4444", cancelled: "#64748b", trial: "#2563eb" };
 
   const getSubadminLimits = (sub) => {
     const sa = subadmins?.find(s => s._id === sub.userId || s._id === sub.companyId);
@@ -1464,8 +1464,8 @@ function SubscriptionsPage({ THEME, subscriptions, subadmins }) {
                   </td>
                   <td style={{ padding: "14px 16px" }}>
                     <span style={{
-                      background: el.toLowerCase().includes("unlimited") ? "rgba(16,185,129,0.1)" : "rgba(124,58,237,0.1)",
-                      color: el.toLowerCase().includes("unlimited") ? "#10b981" : "#7c3aed",
+                      background: el.toLowerCase().includes("unlimited") ? "rgba(16,185,129,0.1)" : "rgba(37, 99, 235,0.1)",
+                      color: el.toLowerCase().includes("unlimited") ? "#10b981" : "#2563eb",
                       padding: "3px 10px", borderRadius: 8, fontSize: 11, fontWeight: 700
                     }}>{el}</span>
                   </td>
@@ -1499,7 +1499,7 @@ function SubadminDropdown({ value, options, onChange, darkMode }) {
         onClick={() => setOpen(!open)}
         style={{
           width: "100%", padding: "11px 14px",
-          border: `1.5px solid ${open ? "var(--app-accent, #7c3aed)" : "#e2e8f0"}`,
+          border: `1.5px solid ${open ? "var(--app-accent, #2563eb)" : "#e2e8f0"}`,
           borderRadius: 12, fontSize: 13, outline: "none",
           background: darkMode ? "#1e293b" : "#f8fafc",
           color: darkMode ? "#f8fafc" : "#0f172a",
@@ -1550,7 +1550,7 @@ function SubadminDropdown({ value, options, onChange, darkMode }) {
                   }}
                   style={{
                     padding: "10px 14px", cursor: "pointer", fontSize: 13, borderRadius: 8,
-                    background: isSelected ? "var(--app-accent, #7c3aed)" : "transparent",
+                    background: isSelected ? "var(--app-accent, #2563eb)" : "transparent",
                     color: isSelected ? "#fff" : (darkMode ? "#f8fafc" : "#0f172a"),
                     marginBottom: "2px", transition: "0.2s",
                     display: "flex", justifyContent: "space-between", alignItems: "center"
@@ -1645,8 +1645,8 @@ function PackagesPage({ THEME, packages, onEdit, onDelete, darkMode }) {
                   onClick={(e) => { e.stopPropagation(); onEdit(p); }}
                   title="Edit Package"
                   style={{
-                    background: "rgba(99, 102, 241, 0.1)",
-                    border: "1px solid rgba(99, 102, 241, 0.2)",
+                    background: "rgba(37, 99, 235, 0.1)",
+                    border: "1px solid rgba(37, 99, 235, 0.2)",
                     color: "#6366f1",
                     borderRadius: 8,
                     padding: "6px 12px",
@@ -1660,11 +1660,11 @@ function PackagesPage({ THEME, packages, onEdit, onDelete, darkMode }) {
                     fontFamily: "inherit"
                   }}
                   onMouseEnter={e => {
-                    e.currentTarget.style.background = "rgba(99, 102, 241, 0.2)";
+                    e.currentTarget.style.background = "rgba(37, 99, 235, 0.2)";
                     e.currentTarget.style.transform = "translateY(-1px)";
                   }}
                   onMouseLeave={e => {
-                    e.currentTarget.style.background = "rgba(99, 102, 241, 0.1)";
+                    e.currentTarget.style.background = "rgba(37, 99, 235, 0.1)";
                     e.currentTarget.style.transform = "translateY(0)";
                   }}
                 >
@@ -2158,7 +2158,7 @@ function ProjectsPage({ THEME, projects, tasks, setProjects, clients, employees,
                   Cancel
                 </button>
                 <button type="submit" disabled={saving}
-                  style={{ padding: "9px 22px", borderRadius: 9, border: "none", background: "var(--app-accent, #7c3aed)", color: "#fff", fontWeight: 700, cursor: saving ? "default" : "pointer", fontSize: 13, opacity: saving ? 0.7 : 1 }}>
+                  style={{ padding: "9px 22px", borderRadius: 9, border: "none", background: "var(--app-accent, #2563eb)", color: "#fff", fontWeight: 700, cursor: saving ? "default" : "pointer", fontSize: 13, opacity: saving ? 0.7 : 1 }}>
                   {saving ? "Saving…" : "Yes Next"}
                 </button>
               </div>

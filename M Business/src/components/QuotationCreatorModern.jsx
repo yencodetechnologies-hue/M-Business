@@ -513,11 +513,11 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
   const CSS = `
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
     :root{
-      --teal: var(--app-accent, var(--app-accent, #00BCD4));--teal2:var(--app-accent2, #00BCD4);--teal3:#26D0CE;--teal4:#006E7F;
-      --teal-light:var(--teal-light, var(--teal-light, #E0F7FA));--teal-lighter:var(--teal-lighter, #F0FDFE);
-      --bg:#F5FAFA;--surface:#FFFFFF;--surface2:#F8FAFB;--border:#E0EEF0;--border2:#C5DDE0;
-      --text:#1A2E35;--text2:#607D86;--text3:#A0B8BE;
-      --green:#26C281;--green-bg:#E8FAF3;
+      --teal: var(--app-accent, var(--app-accent, #2563EB));--teal2:var(--app-accent2, #2563EB);--teal3:#26D0CE;--teal4:#006E7F;
+      --teal-light:var(--teal-light, var(--teal-light, #EFF6FF));--teal-lighter:var(--teal-lighter, #EFF6FF);
+      --bg:#F8FAFC;--surface:#FFFFFF;--surface2:#F8FAFB;--border:#E2E8F0;--border2:#E2E8F0;
+      --text:#1E293B;--text2:#64748B;--text3:#64748B;
+      --green:#16A34A;--green-bg:#E8FAF3;
       --amber:#F5A623;--amber-bg:#FEF5E6;
       --red:#F05C5C;--red-bg:#FEF2F2;
       --purple:#7C5CFC;--purple-bg:#EEE9FF;
@@ -525,7 +525,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
       --font:'Nunito',sans-serif;--radius:14px;
     }
     .mqc-wrap{font-family:var(--font);font-size:14px;background:var(--bg);color:var(--text);min-height:100vh}
-    .mqc-topbar{background:var(--surface);border-bottom:1.5px solid var(--border);padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:0 1px 8px rgba(0,188,212,.06)}
+    .mqc-topbar{background:var(--surface);border-bottom:1.5px solid var(--border);padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:0 1px 8px rgba(37, 99, 235,.06)}
     .mqc-topbar-left{display:flex;align-items:center;gap:10px}
     .mqc-back{display:flex;align-items:center;gap:5px;padding:7px 13px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;font-size:12px;font-weight:700;color:var(--text2);cursor:pointer;font-family:var(--font);transition:all .15s}
     .mqc-back:hover{border-color:var(--teal);color:var(--teal)}
@@ -533,7 +533,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
     .mqc-actions{display:flex;align-items:center;gap:8px}
     .mqc-btn-outline{display:flex;align-items:center;gap:5px;padding:8px 14px;background:var(--surface);border:1.5px solid var(--border);border-radius:9px;font-size:12px;font-weight:700;color:var(--text2);cursor:pointer;font-family:var(--font);transition:all .15s}
     .mqc-btn-outline:hover{border-color:var(--teal);color:var(--teal)}
-    .mqc-btn-teal{display:flex;align-items:center;gap:6px;padding:8px 16px;background:var(--teal);color:#fff;border:none;border-radius:9px;font-size:12px;font-weight:700;font-family:var(--font);cursor:pointer;transition:all .15s;box-shadow:0 3px 10px rgba(0,188,212,.25)}
+    .mqc-btn-teal{display:flex;align-items:center;gap:6px;padding:8px 16px;background:var(--teal);color:#fff;border:none;border-radius:9px;font-size:12px;font-weight:700;font-family:var(--font);cursor:pointer;transition:all .15s;box-shadow:0 3px 10px rgba(37, 99, 235,.25)}
     .mqc-btn-teal:hover{background:var(--teal2)}
     .mqc-btn-amber{background:var(--amber)!important;box-shadow:0 3px 10px rgba(245,166,35,.2)!important}
     .mqc-btn-green{background:var(--green)!important;box-shadow:0 3px 10px rgba(38,194,129,.25)!important}
@@ -550,13 +550,13 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
     .mqc-form-group:last-child{margin-bottom:0}
     .mqc-label{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;display:block}
     .mqc-input{width:100%;padding:10px 13px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;font-size:13px;color:var(--text);font-family:var(--font);outline:none;transition:all .15s}
-    .mqc-input:focus{border-color:var(--teal);background:var(--surface);box-shadow:0 0 0 3px rgba(0,188,212,.08)}
+    .mqc-input:focus{border-color:var(--teal);background:var(--surface);box-shadow:0 0 0 3px rgba(37, 99, 235,.08)}
     .mqc-input::placeholder{color:var(--text3)}
     .mqc-input:read-only{background:var(--surface2);color:var(--text3)}
     .mqc-select{width:100%;padding:10px 13px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;font-size:13px;color:var(--text);font-family:var(--font);outline:none;cursor:pointer;appearance:none;transition:all .15s;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23A0B8BE' stroke-width='2'%3E%3Cpolyline points='6,9 12,15 18,9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
-    .mqc-select:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(0,188,212,.08)}
+    .mqc-select:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(37, 99, 235,.08)}
     .mqc-textarea{width:100%;padding:10px 13px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;font-size:13px;color:var(--text);font-family:var(--font);outline:none;resize:vertical;min-height:80px;transition:all .15s;line-height:1.6}
-    .mqc-textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(0,188,212,.08)}
+    .mqc-textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(37, 99, 235,.08)}
     .mqc-textarea::placeholder{color:var(--text3)}
     .mqc-status-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:14px}
     .mqc-status-chip{padding:9px 6px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;text-align:center;transition:all .15s;font-family:var(--font)}
@@ -635,7 +635,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
     .mqc-pt-title{font-size:12px;font-weight:800;color:var(--text)}
     .mqc-pt-btn{display:flex;align-items:center;gap:4px;padding:5px 10px;background:var(--surface);border:1.5px solid var(--border);border-radius:7px;font-size:10px;font-weight:700;color:var(--text2);cursor:pointer;font-family:var(--font);transition:all .15s}
     .mqc-pt-btn:hover{border-color:var(--teal);color:var(--teal)}
-    .quo-preview{padding:22px;font-family:var(--font);font-size:12px;color:#1A2E35;background:#fff;min-height:600px;border-radius:0 0 14px 14px}
+    .quo-preview{padding:22px;font-family:var(--font);font-size:12px;color:#1E293B;background:#fff;min-height:600px;border-radius:0 0 14px 14px}
     .quo-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;padding-bottom:14px;border-bottom:3px solid var(--teal)}
     .quo-logo-box{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--teal),var(--teal4));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#fff;margin-bottom:7px}
     .quo-company{font-size:13px;font-weight:800;color:var(--text)}
@@ -715,8 +715,8 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
       <style>{CSS}</style>
       {autoSharing && (
         <div style={{ position: 'fixed', inset: 0, background: '#fff', zIndex: 999, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
-          <i className="ti ti-loader-2" style={{ fontSize: 32, color: 'var(--app-accent, #00BCD4)', animation: 'spin 1s linear infinite' }}></i>
-          <div style={{ fontSize: 13, fontWeight: 700, color: '#7B8FA1' }}>{prefillProject?._autoView ? 'Opening quotation PDF…' : 'Preparing quotation to share…'}</div>
+          <i className="ti ti-loader-2" style={{ fontSize: 32, color: 'var(--app-accent, #2563EB)', animation: 'spin 1s linear infinite' }}></i>
+          <div style={{ fontSize: 13, fontWeight: 700, color: '#64748B' }}>{prefillProject?._autoView ? 'Opening quotation PDF…' : 'Preparing quotation to share…'}</div>
         </div>
       )}
 
@@ -868,7 +868,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
                     borderRadius: 10, fontSize: 13, color: qt.toName ? 'var(--text)' : 'var(--text3)',
                     cursor: 'pointer', userSelect: 'none', boxSizing: 'border-box',
                     display: 'flex', alignItems: 'center', gap: 8, minHeight: 42,
-                    boxShadow: clientDropOpen ? '0 0 0 3px rgba(0,188,212,.08)' : 'none',
+                    boxShadow: clientDropOpen ? '0 0 0 3px rgba(37, 99, 235,.08)' : 'none',
                     transition: 'all .15s'
                   }}>
                   {qt.toName ? (
@@ -1455,35 +1455,35 @@ export async function shareQuotationAsPDF(q, mode = 'share') {
   const todayStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 
   const bodyHTML = `
-    <div style="padding:22px;font-family:'Nunito',sans-serif;font-size:12px;color:#1A2E35;background:#fff;">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;padding-bottom:14px;border-bottom:3px solid #00BCD4;">
+    <div style="padding:22px;font-family:'Nunito',sans-serif;font-size:12px;color:#1E293B;background:#fff;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;padding-bottom:14px;border-bottom:3px solid #2563EB;">
         <div>
           <div style="font-size:13px;font-weight:800;">${qt.fromCompany || '—'}</div>
-          <div style="font-size:10px;color:#A0B8BE;margin-top:2px;">${qt.fromEmail || ''}<br/>${qt.fromPhone || ''}</div>
+          <div style="font-size:10px;color:#64748B;margin-top:2px;">${qt.fromEmail || ''}<br/>${qt.fromPhone || ''}</div>
         </div>
         <div style="text-align:right;">
-          <div style="font-size:22px;font-weight:900;color:#00BCD4;">QUOTATION</div>
+          <div style="font-size:22px;font-weight:900;color:#2563EB;">QUOTATION</div>
           <div style="font-size:11px;font-weight:700;margin-top:3px;">#${qt.quoteNo || ''}</div>
-          <div style="font-size:10px;color:#A0B8BE;margin-top:2px;">Date: ${qt.quoteDate ? new Date(qt.quoteDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : todayStr}</div>
+          <div style="font-size:10px;color:#64748B;margin-top:2px;">Date: ${qt.quoteDate ? new Date(qt.quoteDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : todayStr}</div>
         </div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
         <div>
-          <div style="font-size:9px;font-weight:700;color:#00BCD4;text-transform:uppercase;">Prepared By</div>
+          <div style="font-size:9px;font-weight:700;color:#2563EB;text-transform:uppercase;">Prepared By</div>
           <div style="font-size:12px;font-weight:800;">${qt.fromName || '—'}</div>
         </div>
         <div>
-          <div style="font-size:9px;font-weight:700;color:#00BCD4;text-transform:uppercase;">Prepared For</div>
+          <div style="font-size:9px;font-weight:700;color:#2563EB;text-transform:uppercase;">Prepared For</div>
           <div style="font-size:12px;font-weight:800;">${qt.toName || '—'}</div>
-          <div style="font-size:10px;color:#A0B8BE;">${qt.toEmail || ''} ${qt.toPhone || ''}</div>
+          <div style="font-size:10px;color:#64748B;">${qt.toEmail || ''} ${qt.toPhone || ''}</div>
         </div>
       </div>
-      <div style="padding:8px 10px;background:#F0FDFE;border-radius:8px;border-left:3px solid #00BCD4;margin-bottom:12px;">
-        <div style="font-size:9px;font-weight:700;color:#00BCD4;text-transform:uppercase;">Project</div>
+      <div style="padding:8px 10px;background:#EFF6FF;border-radius:8px;border-left:3px solid #2563EB;margin-bottom:12px;">
+        <div style="font-size:9px;font-weight:700;color:#2563EB;text-transform:uppercase;">Project</div>
         <div style="font-size:13px;font-weight:800;">${qt.title || '—'}</div>
       </div>
       <table style="width:100%;border-collapse:collapse;margin-bottom:14px;">
-        <thead><tr style="background:linear-gradient(135deg,#00BCD4,#006E7F);">
+        <thead><tr style="background:linear-gradient(135deg,#2563EB,#006E7F);">
           <th style="padding:7px 9px;font-size:10px;color:#fff;text-align:left;">#</th>
           <th style="padding:7px 9px;font-size:10px;color:#fff;text-align:left;">Description</th>
           <th style="padding:7px 9px;font-size:10px;color:#fff;text-align:left;">Qty</th>
@@ -1492,7 +1492,7 @@ export async function shareQuotationAsPDF(q, mode = 'share') {
         </tr></thead>
         <tbody>
           ${items.map((item, idx) => `
-            <tr style="border-bottom:1px solid #E0EEF0;">
+            <tr style="border-bottom:1px solid #E2E8F0;">
               <td style="padding:7px 9px;font-size:11px;">${idx + 1}</td>
               <td style="padding:7px 9px;font-size:11px;">${item.description || item.desc || '—'}</td>
               <td style="padding:7px 9px;font-size:11px;">${item.quantity ?? item.qty ?? 1}</td>
@@ -1503,7 +1503,7 @@ export async function shareQuotationAsPDF(q, mode = 'share') {
         </tbody>
       </table>
       <div style="display:flex;justify-content:flex-end;">
-        <div style="width:200px;padding:7px 10px;background:linear-gradient(135deg,#00BCD4,#006E7F);border-radius:7px;display:flex;justify-content:space-between;">
+        <div style="width:200px;padding:7px 10px;background:linear-gradient(135deg,#2563EB,#006E7F);border-radius:7px;display:flex;justify-content:space-between;">
           <span style="font-size:11px;font-weight:800;color:#fff;">Total</span>
           <span style="font-size:13px;font-weight:900;color:#fff;">${fmt(subtotal)}</span>
         </div>

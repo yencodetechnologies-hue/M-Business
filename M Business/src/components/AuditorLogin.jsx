@@ -21,15 +21,15 @@ export default function AuditorLogin({ onLogin }) {
     <>
       <style>{`
 *{margin:0;padding:0;box-sizing:border-box;}
-.auditor-login-body {font-family:"Nunito",sans-serif;min-height:100vh;display:flex;background:#0D1B2A;}
-.left-panel{flex:1;background:linear-gradient(135deg,#0D1B2A 0%,#1a2a4a 50%,#0D2040 100%);display:flex;flex-direction:column;justify-content:center;padding:60px;position:relative;overflow:hidden;}
-.left-panel::before{content:"";position:absolute;top:-100px;right:-100px;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.15) 0%,transparent 70%);}
-.left-panel::after{content:"";position:absolute;bottom:-80px;left:-80px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(0,188,212,.1) 0%,transparent 70%);}
+.auditor-login-body {font-family:"Nunito",sans-serif;min-height:100vh;display:flex;background:#0F172A;}
+.left-panel{flex:1;background:linear-gradient(135deg,#0F172A 0%,#1a2a4a 50%,#0D2040 100%);display:flex;flex-direction:column;justify-content:center;padding:60px;position:relative;overflow:hidden;}
+.left-panel::before{content:"";position:absolute;top:-100px;right:-100px;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(37, 99, 235,.15) 0%,transparent 70%);}
+.left-panel::after{content:"";position:absolute;bottom:-80px;left:-80px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(37, 99, 235,.1) 0%,transparent 70%);}
 .brand{display:flex;align-items:center;gap:12px;margin-bottom:56px;}
-.brand-icon{width:44px;height:44px;background:linear-gradient(135deg,var(--app-accent),#00BCD4);border-radius:12px;display:flex;align-items:center;justify-content:center;}
+.brand-icon{width:44px;height:44px;background:linear-gradient(135deg,var(--app-accent),#2563EB);border-radius:12px;display:flex;align-items:center;justify-content:center;}
 .brand-icon i{font-size:22px;color:#fff;}
 .brand-name{font-size:22px;font-weight:900;color:#fff;}
-.brand-name span{color: var(--app-accent, var(--app-accent, #00BCD4));}
+.brand-name span{color: var(--app-accent, var(--app-accent, #2563EB));}
 .panel-title{font-size:36px;font-weight:900;color:#fff;line-height:1.2;margin-bottom:16px;}
 .panel-title span{color:#8B5CF6;}
 .panel-sub{font-size:15px;color:rgba(255,255,255,.55);line-height:1.7;max-width:380px;}
@@ -47,12 +47,12 @@ export default function AuditorLogin({ onLogin }) {
 .inp-icon-wrap{position:relative;}
 .inp-icon-wrap .inp{padding-left:44px;}
 .inp-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#718096;font-size:18px;}
-.login-btn{width:100%;padding:14px;background:linear-gradient(135deg,#8B5CF6,#7C3AED);color:#fff;border:none;border-radius:12px;font-family:"Nunito",sans-serif;font-size:15px;font-weight:800;cursor:pointer;transition:all .18s;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px;}
-.login-btn:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(139,92,246,.35);}
+.login-btn{width:100%;padding:14px;background:linear-gradient(135deg,#8B5CF6,#2563EB);color:#fff;border:none;border-radius:12px;font-family:"Nunito",sans-serif;font-size:15px;font-weight:800;cursor:pointer;transition:all .18s;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px;}
+.login-btn:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(37, 99, 235,.35);}
 .divider{display:flex;align-items:center;gap:12px;margin:22px 0;color:#718096;font-size:12px;font-weight:600;}
 .divider::before,.divider::after{content:"";flex:1;height:1px;background:#E2E8F0;}
 .otp-btn{width:100%;padding:12px;background:transparent;border:1.5px solid #E2E8F0;border-radius:12px;font-family:"Nunito",sans-serif;font-size:14px;font-weight:700;color:#4A5568;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .15s;}
-.otp-btn:hover{border-color:#8B5CF6;color:#8B5CF6;background:#F5F3FF;}
+.otp-btn:hover{border-color:#8B5CF6;color:#8B5CF6;background:#EFF6FF;}
 .login-footer{margin-top:28px;font-size:12px;color:#718096;text-align:center;}
 .login-footer a{color:#8B5CF6;font-weight:700;text-decoration:none;}
 .secure-badge{display:flex;align-items:center;gap:6px;background:#F0FFF4;border:1px solid #6EE7B7;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;color:#065F46;margin-bottom:24px;}
@@ -66,9 +66,9 @@ export default function AuditorLogin({ onLogin }) {
           <div className="panel-title">Auditor <span>Portal</span><br />Access</div>
           <div className="panel-sub">Securely review your client's financial records, download statements, and add audit remarks — all in one place.</div>
           <div className="features">
-            <div className="feat"><div className="feat-icon" style={{ background: 'rgba(139,92,246,.2)' }}><i className="ti ti-file-analytics" style={{ color: '#8B5CF6' }}></i></div>View full income & expense statements</div>
-            <div className="feat"><div className="feat-icon" style={{ background: 'rgba(0,188,212,.2)' }}><i className="ti ti-building-bank" style={{ color: ' var(--app-accent, var(--app-accent, #00BCD4))' }}></i></div>Bank reconciliation & transaction review</div>
-            <div className="feat"><div className="feat-icon" style={{ background: 'rgba(38,194,129,.2)' }}><i className="ti ti-download" style={{ color: '#26C281' }}></i></div>Download PDF, Excel & CSV reports</div>
+            <div className="feat"><div className="feat-icon" style={{ background: 'rgba(37, 99, 235,.2)' }}><i className="ti ti-file-analytics" style={{ color: '#8B5CF6' }}></i></div>View full income & expense statements</div>
+            <div className="feat"><div className="feat-icon" style={{ background: 'rgba(37, 99, 235,.2)' }}><i className="ti ti-building-bank" style={{ color: ' var(--app-accent, var(--app-accent, #2563EB))' }}></i></div>Bank reconciliation & transaction review</div>
+            <div className="feat"><div className="feat-icon" style={{ background: 'rgba(38,194,129,.2)' }}><i className="ti ti-download" style={{ color: '#16A34A' }}></i></div>Download PDF, Excel & CSV reports</div>
             <div className="feat"><div className="feat-icon" style={{ background: 'rgba(245,158,11,.2)' }}><i className="ti ti-message-2" style={{ color: '#F59E0B' }}></i></div>Add audit notes & flag transactions</div>
           </div>
         </div>

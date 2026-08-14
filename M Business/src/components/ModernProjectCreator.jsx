@@ -6,11 +6,11 @@ import AddClientView from './AddClientView';
 import { toast } from 'react-toastify';
 // ── Shared Colors ──
 const P = {
-  primary: ' var(--app-accent, var(--app-accent, #00BCD4))', primaryDark: '#00BCD4', primaryLight: 'var(--teal-light, var(--teal-light, #E0F7FA))', primaryMid: '#B2EBF2',
+  primary: ' var(--app-accent, var(--app-accent, #2563EB))', primaryDark: '#2563EB', primaryLight: 'var(--teal-light, var(--teal-light, #EFF6FF))', primaryMid: '#B2EBF2',
   textDark: '#1A2332', textMid: '#4A5568', textLight: '#718096',
   bg: '#F0F4F8', white: '#FFFFFF', border: '#E2E8F0',
-  green: '#26C281', greenLight: '#D1FAE5', orange: '#F59E0B', orangeLight: '#FEF3C7',
-  red: '#FF6B6B', redLight: '#FEE2E2', purple: '#8B5CF6', purpleLight: '#EDE9FE',
+  green: '#16A34A', greenLight: '#D1FAE5', orange: '#F59E0B', orangeLight: '#FEF3C7',
+  red: '#FF6B6B', redLight: '#FEE2E2', purple: '#8B5CF6', purpleLight: '#EFF6FF',
 };
 
 const CSS = `
@@ -29,7 +29,7 @@ const CSS = `
 .mpc-step-line.done { background:${P.green}; }
 
 /* CARDS */
-.mpc-section-card { background:#fff; border-radius:16px; box-shadow:0 2px 12px rgba(0,188,212,.08); padding:24px; margin-bottom:20px; border:1px solid #f1f5f9; }
+.mpc-section-card { background:#fff; border-radius:16px; box-shadow:0 2px 12px rgba(37, 99, 235,.08); padding:24px; margin-bottom:20px; border:1px solid #f1f5f9; }
 .mpc-section-heading { font-size:16px; font-weight:800; color:${P.textDark}; display:flex; align-items:center; gap:8px; margin-bottom:20px; padding-bottom:14px; border-bottom:1px solid ${P.border}; }
 .mpc-section-heading i { color:${P.primary}; font-size:20px; }
 
@@ -69,7 +69,7 @@ const CSS = `
 .mpc-bs-item input { width:100%; border:none; background:transparent; font-family:'Nunito',sans-serif; font-size:18px; font-weight:800; color:${P.primary}; text-align:center; outline:none; padding:0; }
 
 /* PREVIEW */
-.mpc-preview-card { background:#fff; border-radius:16px; box-shadow:0 8px 32px rgba(0,188,212,.08); padding:24px; position:sticky; top:80px; border:1px solid #f1f5f9; }
+.mpc-preview-card { background:#fff; border-radius:16px; box-shadow:0 8px 32px rgba(37, 99, 235,.08); padding:24px; position:sticky; top:80px; border:1px solid #f1f5f9; }
 .mpc-preview-card h3 { font-size:16px; font-weight:800; color:${P.textDark}; margin-bottom:20px; display:flex; align-items:center; gap:8px; }
 .mpc-preview-card h3 i { color:${P.primary}; font-size:20px; }
 .mpc-pv-row { display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px dashed ${P.border}; font-size:13px; }
@@ -86,7 +86,7 @@ const CSS = `
 /* ACTION BAR */
 .mpc-action-bar { background:#fff; border-top:1px solid ${P.border}; padding:16px 26px; display:flex; align-items:center; justify-content:space-between; position:sticky; bottom:0; z-index:40; box-shadow:0 -4px 20px rgba(0,0,0,.03); margin: 0 -26px -26px -26px; border-radius:0 0 16px 16px; }
 .mpc-btn { display:inline-flex; align-items:center; gap:8px; padding:10px 20px; border-radius:10px; font-family:'Nunito',sans-serif; font-size:14px; font-weight:800; cursor:pointer; border:none; transition:all .15s; }
-.mpc-btn-primary { background:${P.primary}; color:#fff; box-shadow:0 4px 12px rgba(0,188,212,.2); }
+.mpc-btn-primary { background:${P.primary}; color:#fff; box-shadow:0 4px 12px rgba(37, 99, 235,.2); }
 .mpc-btn-primary:hover { background:${P.primaryDark}; transform:translateY(-1px); }
 .mpc-btn-outline { background:transparent; border:1.5px solid ${P.border}; color:${P.textMid}; }
 .mpc-btn-outline:hover { border-color:${P.primary}; color:${P.primary}; background:${P.primaryLight}; }
@@ -104,7 +104,7 @@ function getInitials(name) {
 }
 
 function getAvatarColor(name) {
-  const colors = [' var(--app-accent, var(--app-accent, #00BCD4))', '#8B5CF6', '#F59E0B', '#26C281', '#EC4899', '#3B82F6'];
+  const colors = [' var(--app-accent, var(--app-accent, #2563EB))', '#8B5CF6', '#F59E0B', '#16A34A', '#EC4899', '#3B82F6'];
   if (!name) return colors[0];
   return colors[name.charCodeAt(0) % colors.length];
 }
@@ -680,12 +680,12 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                     <div style={{
                       flex: 1,
                       padding: '11px 14px',
-                      border: '1.5px solid  var(--app-accent, var(--app-accent, #00BCD4))',
+                      border: '1.5px solid  var(--app-accent, var(--app-accent, #2563EB))',
                       borderRadius: 10,
                       fontSize: 14,
                       fontWeight: 700,
                       color: '#0D2027',
-                      background: 'var(--teal-light, var(--teal-light, #E0F7FA))',
+                      background: 'var(--teal-light, var(--teal-light, #EFF6FF))',
                       display: 'flex',
                       alignItems: 'center',
                       gap: 10,
@@ -693,7 +693,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                     }}>
                       <div style={{
                         width: 28, height: 28, borderRadius: '50%',
-                        background: 'linear-gradient(135deg, var(--app-accent, var(--app-accent, #00BCD4)),#00BCD4)',
+                        background: 'linear-gradient(135deg, var(--app-accent, var(--app-accent, #2563EB)),#2563EB)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         color: '#fff', fontSize: 12, fontWeight: 800, flexShrink: 0
                       }}>
@@ -988,7 +988,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                         style={{
                           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
                           width: '100%', textAlign: 'center',
-                          background: P.primaryLight || '#E0F7FA', border: `1.5px dashed ${P.primary}`,
+                          background: P.primaryLight || '#EFF6FF', border: `1.5px dashed ${P.primary}`,
                           color: P.primary, fontSize: 13, fontWeight: 800,
                           padding: '10px', borderRadius: 10, cursor: 'pointer', marginTop: 6
                         }}

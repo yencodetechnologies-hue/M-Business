@@ -360,7 +360,7 @@ export default function AccountsPage({
     background: on ? THEME.accent : "transparent",
     color: on ? "#fff" : THEME.muted,
     transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
-    boxShadow: on ? "0 4px 12px rgba(99,102,241,0.25)" : "none"
+    boxShadow: on ? "0 4px 12px rgba(37, 99, 235,0.25)" : "none"
   });
   if (loading) return <div style={{ textAlign: "center", padding: 100, color: THEME.muted, fontWeight: 800 }}>Action Generating Financial Dashboard...</div>;
 
@@ -372,7 +372,7 @@ export default function AccountsPage({
             onClick={onBack}
             style={{
               display: "flex", alignItems: "center", gap: 6,
-              background: "transparent", border: "1.5px solid #E0EEF0",
+              background: "transparent", border: "1.5px solid #E2E8F0",
               borderRadius: 8, padding: "6px 12px", fontSize: 13,
               fontWeight: 700, color: THEME.accent, cursor: "pointer"
             }}
@@ -422,7 +422,7 @@ export default function AccountsPage({
 
 // ── Expenses Page Component -------------------------------------
 const CATEGORIES = ["Food", "Travel", "Office", "Utilities", "Marketing", "Salary", "Miscellaneous"];
-const CATEGORY_COLOR = { Food: "#f59e0b", Travel: "#3b82f6", Office: "#7c3aed", Utilities: "#06b6d4", Marketing: "#ec4899", Salary: "#22c55e", Miscellaneous: "#64748b" };
+const CATEGORY_COLOR = { Food: "#f59e0b", Travel: "#3b82f6", Office: "#2563eb", Utilities: "#06b6d4", Marketing: "#ec4899", Salary: "#22c55e", Miscellaneous: "#64748b" };
 const CATEGORY_ICON = { Food: "Food", Travel: "Travel", Office: "Company", Utilities: "Tip", Marketing: "Marketing", Salary: "Cost", Miscellaneous: "Package" };
 const STATUS_COLOR = { Pending: "#f59e0b", Approved: "#22c55e", Rejected: "#ef4444" };
 
@@ -909,9 +909,9 @@ export function IncomePage({ THEME, income = [], setIncome, fetchIncome }) {
                   <stop offset="100%" stopColor="#F5A623" stopOpacity="0" />
                 </linearGradient>
               </defs>
-              <line x1="0" y1="30" x2="560" y2="30" stroke="#E0EEF0" strokeWidth="1" />
-              <line x1="0" y1="60" x2="560" y2="60" stroke="#E0EEF0" strokeWidth="1" />
-              <line x1="0" y1="90" x2="560" y2="90" stroke="#E0EEF0" strokeWidth="1" />
+              <line x1="0" y1="30" x2="560" y2="30" stroke="#E2E8F0" strokeWidth="1" />
+              <line x1="0" y1="60" x2="560" y2="60" stroke="#E2E8F0" strokeWidth="1" />
+              <line x1="0" y1="90" x2="560" y2="90" stroke="#E2E8F0" strokeWidth="1" />
               {/* Received */}
               <path d="M0,90 C60,75 100,45 160,40 C220,35 260,55 320,30 C380,10 420,50 480,25 C510,15 535,30 560,20 L560,120 L0,120Z" fill="url(#gReceived)" />
               <path d="M0,90 C60,75 100,45 160,40 C220,35 260,55 320,30 C380,10 420,50 480,25 C510,15 535,30 560,20" stroke="var(--teal)" strokeWidth="2.5" fill="none" strokeLinecap="round" />
@@ -923,11 +923,11 @@ export function IncomePage({ THEME, income = [], setIncome, fetchIncome }) {
               <circle cx="320" cy="30" r="4" fill="var(--teal)" stroke="#fff" strokeWidth="2" />
               <circle cx="480" cy="25" r="4" fill="#fff" stroke="var(--teal)" strokeWidth="2" />
               {/* Labels */}
-              <text x="56" y="118" fill="#A0B8BE" fontSize="9" fontFamily="Nunito" textAnchor="middle">Week 1</text>
-              <text x="168" y="118" fill="#A0B8BE" fontSize="9" fontFamily="Nunito" textAnchor="middle">Week 2</text>
-              <text x="280" y="118" fill="#A0B8BE" fontSize="9" fontFamily="Nunito" textAnchor="middle">Week 3</text>
-              <text x="392" y="118" fill="#A0B8BE" fontSize="9" fontFamily="Nunito" textAnchor="middle">Week 4</text>
-              <text x="504" y="118" fill="#A0B8BE" fontSize="9" fontFamily="Nunito" textAnchor="middle">Week 5</text>
+              <text x="56" y="118" fill="#64748B" fontSize="9" fontFamily="Nunito" textAnchor="middle">Week 1</text>
+              <text x="168" y="118" fill="#64748B" fontSize="9" fontFamily="Nunito" textAnchor="middle">Week 2</text>
+              <text x="280" y="118" fill="#64748B" fontSize="9" fontFamily="Nunito" textAnchor="middle">Week 3</text>
+              <text x="392" y="118" fill="#64748B" fontSize="9" fontFamily="Nunito" textAnchor="middle">Week 4</text>
+              <text x="504" y="118" fill="#64748B" fontSize="9" fontFamily="Nunito" textAnchor="middle">Week 5</text>
             </svg>
           </div>
         </div>

@@ -461,7 +461,7 @@ const css = `
 const sty = {
   page: {
     minHeight: "100vh",
-    background: "radial-gradient(ellipse at 20% 20%,rgba(var(--app-accent-rgb, 124, 58, 237),0.08) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(59,7,100,0.06) 0%,transparent 50%),var(--app-bg)",
+    background: "radial-gradient(ellipse at 20% 20%,rgba(var(--app-accent-rgb, 124, 58, 237),0.08) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(15, 23, 42,0.06) 0%,transparent 50%),var(--app-bg)",
     display: "flex", alignItems: "center", justifyContent: "center",
     padding: "32px 16px", fontFamily: "'DM Sans',sans-serif",
   },

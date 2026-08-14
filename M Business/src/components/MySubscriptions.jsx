@@ -87,7 +87,7 @@ function PlanPickerModal({ subscription, payLoading, onClose, onSelectPlan, onSt
   const currentPlan = subscription?.planName;
   const trialAlreadyUsed = !!(subscription?.isTrial || subscription?.planName === "Trial" || subscription?.billingCycle === "trial");
   return (
-    <div style={{ position: "fixed", inset: 0, zIndex: 99990, background: "linear-gradient(135deg,#e0f7fa 0%,#e8f5e9 50%,#e3f2fd 100%)", overflowY: "auto", display: "flex", flexDirection: "column" }}>
+    <div style={{ position: "fixed", inset: 0, zIndex: 99990, background: "linear-gradient(135deg,#eff6ff 0%,#e8f5e9 50%,#e3f2fd 100%)", overflowY: "auto", display: "flex", flexDirection: "column" }}>
       <style>{`
         @keyframes ppFadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
         .pp-card { transition: transform 0.22s, box-shadow 0.22s; cursor:default; }
@@ -235,8 +235,8 @@ function MockPaymentGateway({ plan, userEmail, userName, payLoading, onClose, on
         .pg-input { width:100%; padding:12px 14px; border:1.5px solid #e2e8f0; borderRadius:10px; fontSize:14px; fontFamily:inherit; outline:none; transition:border 0.2s; background:#fafafa; }
         .pg-input:focus { border-color:#6366f1; background:#fff; }
         .pg-method { display:flex; alignItems:center; gap:10px; padding:12px 16px; border:2px solid #e2e8f0; borderRadius:12px; cursor:pointer; transition:all 0.2s; fontWeight:600; fontSize:13px; }
-        .pg-method.active { border-color:#6366f1; background:#f5f3ff; color:#6366f1; }
-        .pg-method:hover { border-color:#a5b4fc; }
+        .pg-method.active { border-color:#6366f1; background:#eff6ff; color:#6366f1; }
+        .pg-method:hover { border-color:#64748b; }
       `}</style>
 
       <div style={{ background: "#fff", borderRadius: 24, width: "100%", maxWidth: 480, boxShadow: "0 30px 60px rgba(0,0,0,0.3)", animation: "slideUp 0.35s ease", overflow: "hidden" }}>
@@ -259,7 +259,7 @@ function MockPaymentGateway({ plan, userEmail, userName, payLoading, onClose, on
               { id: "netbanking", icon: "Bank", label: "Net Banking" }
             ].map(m => (
               <div key={m.id} className={`pg-method${method === m.id ? " active" : ""}`} onClick={() => setMethod(m.id)}
-                style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 12px", border: `2px solid ${method === m.id ? "#6366f1" : "#e2e8f0"}`, borderRadius: 12, cursor: "pointer", background: method === m.id ? "#f5f3ff" : "#fafafa", color: method === m.id ? "#6366f1" : "#64748b", fontWeight: 700, fontSize: 12, transition: "all 0.2s" }}>
+                style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 12px", border: `2px solid ${method === m.id ? "#6366f1" : "#e2e8f0"}`, borderRadius: 12, cursor: "pointer", background: method === m.id ? "#eff6ff" : "#fafafa", color: method === m.id ? "#6366f1" : "#64748b", fontWeight: 700, fontSize: 12, transition: "all 0.2s" }}>
                 <span style={{ fontSize: 18 }}>{m.icon}</span> {m.label}
               </div>
             ))}
@@ -314,7 +314,7 @@ function MockPaymentGateway({ plan, userEmail, userName, payLoading, onClose, on
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                 {[{ id: "sbi", label: "State Bank of India" }, { id: "hdfc", label: "HDFC Bank" }, { id: "icici", label: "ICICI Bank" }, { id: "axis", label: "Axis Bank" }, { id: "kotak", label: "Kotak Bank" }, { id: "other", label: "Other Bank" }].map(b => (
                   <div key={b.id} onClick={() => setBank(b.id)}
-                    style={{ padding: "10px 14px", border: `2px solid ${bank === b.id ? "#6366f1" : "#e2e8f0"}`, borderRadius: 10, cursor: "pointer", fontSize: 12, fontWeight: 700, color: bank === b.id ? "#6366f1" : "#475569", background: bank === b.id ? "#f5f3ff" : "#fafafa", transition: "all 0.15s" }}>
+                    style={{ padding: "10px 14px", border: `2px solid ${bank === b.id ? "#6366f1" : "#e2e8f0"}`, borderRadius: 10, cursor: "pointer", fontSize: 12, fontWeight: 700, color: bank === b.id ? "#6366f1" : "#475569", background: bank === b.id ? "#eff6ff" : "#fafafa", transition: "all 0.15s" }}>
                     {b.label}
                   </div>
                 ))}
@@ -332,7 +332,7 @@ function MockPaymentGateway({ plan, userEmail, userName, payLoading, onClose, on
           <button
             onClick={onPay}
             disabled={!canPay || loading}
-            style={{ marginTop: 16, width: "100%", padding: "15px", background: canPay && !loading ? "linear-gradient(135deg,#6366f1,#4f46e5)" : "#e2e8f0", color: canPay && !loading ? "#fff" : "#94a3b8", border: "none", borderRadius: 12, fontSize: 16, fontWeight: 800, cursor: canPay && !loading ? "pointer" : "not-allowed", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, transition: "all 0.2s", boxShadow: canPay && !loading ? "0 8px 20px rgba(99,102,241,0.35)" : "none" }}
+            style={{ marginTop: 16, width: "100%", padding: "15px", background: canPay && !loading ? "linear-gradient(135deg,#6366f1,#4f46e5)" : "#e2e8f0", color: canPay && !loading ? "#fff" : "#94a3b8", border: "none", borderRadius: 12, fontSize: 16, fontWeight: 800, cursor: canPay && !loading ? "pointer" : "not-allowed", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, transition: "all 0.2s", boxShadow: canPay && !loading ? "0 8px 20px rgba(37, 99, 235,0.35)" : "none" }}
           >
             {loading
               ? <><div style={{ width: 18, height: 18, border: "2.5px solid #fff", borderTopColor: "transparent", borderRadius: "50%", animation: "pgSpin 0.8s linear infinite" }} /> Processing...</>
@@ -759,7 +759,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
                     }}>Current Plan</div>
                   )}
 
-                  <div style={{ width: 52, height: 52, borderRadius: "50%", background: "#e0f7fa", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 18 }}>
+                  <div style={{ width: 52, height: 52, borderRadius: "50%", background: "#eff6ff", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 18 }}>
                     <span style={{ fontSize: 24 }}>🌱</span>
                   </div>
 
@@ -883,8 +883,8 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
                 background: "#fff",
                 borderRadius: 20,
                 padding: "36px 28px 28px",
-                border: plan.popular ? "2px solid  var(--app-accent, var(--app-accent, #00BCD4))" : "1.5px solid #e2e8f0",
-                boxShadow: plan.popular ? "0 8px 32px rgba(0,188,212,0.13)" : "0 4px 16px rgba(0,0,0,0.04)",
+                border: plan.popular ? "2px solid  var(--app-accent, var(--app-accent, #2563EB))" : "1.5px solid #e2e8f0",
+                boxShadow: plan.popular ? "0 8px 32px rgba(37, 99, 235,0.13)" : "0 4px 16px rgba(0,0,0,0.04)",
                 position: "relative",
                 display: "flex",
                 flexDirection: "column",
@@ -892,14 +892,14 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
                 {plan.popular && (
                   <div style={{
                     position: "absolute", top: -16, left: "50%", transform: "translateX(-50%)",
-                    background: " var(--app-accent, var(--app-accent, #00BCD4))", color: "#fff", padding: "6px 22px",
+                    background: " var(--app-accent, var(--app-accent, #2563EB))", color: "#fff", padding: "6px 22px",
                     borderRadius: 20, fontSize: 11, fontWeight: 900, textTransform: "uppercase",
                     letterSpacing: 1, whiteSpace: "nowrap"
                   }}>POPULAR</div>
                 )}
 
                 {/* Icon */}
-                <div style={{ width: 52, height: 52, borderRadius: "50%", background: "#e0f7fa", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 18 }}>
+                <div style={{ width: 52, height: 52, borderRadius: "50%", background: "#eff6ff", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 18 }}>
                   <span style={{ fontSize: 24 }}>🌱</span>
                 </div>
 
@@ -919,7 +919,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
                 <div style={{ display: "flex", flexDirection: "column", gap: 10, flex: 1, marginBottom: 28 }}>
                   {plan.features.map((f, i) => (
                     <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                      <span style={{ color: " var(--app-accent, var(--app-accent, #00BCD4))", fontSize: 15, flexShrink: 0 }}>✓</span>
+                      <span style={{ color: " var(--app-accent, var(--app-accent, #2563EB))", fontSize: 15, flexShrink: 0 }}>✓</span>
                       <span style={{ fontSize: 13.5, color: "#475569", fontWeight: 500 }}>{f}</span>
                     </div>
                   ))}
@@ -932,9 +932,9 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
                   style={{
                     width: "100%", padding: "14px", borderRadius: 12, fontSize: 15, fontWeight: 800,
                     cursor: payLoading ? "wait" : "pointer", fontFamily: "inherit", border: "none",
-                    background: plan.popular ? " var(--app-accent, var(--app-accent, #00BCD4))" : "#f1f5f9",
+                    background: plan.popular ? " var(--app-accent, var(--app-accent, #2563EB))" : "#f1f5f9",
                     color: plan.popular ? "#fff" : "#1e293b",
-                    boxShadow: plan.popular ? "0 6px 18px rgba(0,188,212,0.3)" : "none",
+                    boxShadow: plan.popular ? "0 6px 18px rgba(37, 99, 235,0.3)" : "none",
                     transition: "all 0.18s"
                   }}
                 >
@@ -947,7 +947,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
 
         <div style={{ textAlign: "center", marginTop: 8, color: "#94a3b8", fontSize: 13, fontWeight: 500 }}>
           Need a custom solution or have questions?{" "}
-          <span style={{ color: " var(--app-accent, var(--app-accent, #00BCD4))", cursor: "pointer", textDecoration: "underline" }}>Chat with our billing team</span>
+          <span style={{ color: " var(--app-accent, var(--app-accent, #2563EB))", cursor: "pointer", textDecoration: "underline" }}>Chat with our billing team</span>
           {" "}or call us at +91 98765 43210
         </div>
       </div>
@@ -1011,7 +1011,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
               <div className="plan-features">
                 {plan.features.map((f, i) => (
                   <div key={i} className="plan-feature included">
-                    <span style={{ color: " var(--app-accent, var(--app-accent, #00BCD4))", fontWeight: 700, marginRight: 6 }}>✓</span> {f}
+                    <span style={{ color: " var(--app-accent, var(--app-accent, #2563EB))", fontWeight: 700, marginRight: 6 }}>✓</span> {f}
                   </div>
                 ))}
               </div>
@@ -1142,19 +1142,19 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
                     background: "#fff",
                     borderRadius: 20,
                     padding: "36px 28px 28px",
-                    border: (plan.popular && !isCurrent) ? "2px solid  var(--app-accent, var(--app-accent, #00BCD4))" : isCurrent ? "2px solid  var(--app-accent, var(--app-accent, #00BCD4))" : "1.5px solid #e2e8f0",
-                    boxShadow: plan.popular ? "0 8px 32px rgba(0,188,212,0.13)" : "0 4px 16px rgba(0,0,0,0.04)",
+                    border: (plan.popular && !isCurrent) ? "2px solid  var(--app-accent, var(--app-accent, #2563EB))" : isCurrent ? "2px solid  var(--app-accent, var(--app-accent, #2563EB))" : "1.5px solid #e2e8f0",
+                    boxShadow: plan.popular ? "0 8px 32px rgba(37, 99, 235,0.13)" : "0 4px 16px rgba(0,0,0,0.04)",
                     position: "relative",
                     display: "flex",
                     flexDirection: "column",
                   }}>
                     {isCurrent && (
-                      <div style={{ position: "absolute", top: -16, left: "50%", transform: "translateX(-50%)", background: " var(--app-accent, var(--app-accent, #00BCD4))", color: "#fff", padding: "6px 22px", borderRadius: 20, fontSize: 11, fontWeight: 900, textTransform: "uppercase", letterSpacing: 1, whiteSpace: "nowrap" }}>CURRENT PLAN</div>
+                      <div style={{ position: "absolute", top: -16, left: "50%", transform: "translateX(-50%)", background: " var(--app-accent, var(--app-accent, #2563EB))", color: "#fff", padding: "6px 22px", borderRadius: 20, fontSize: 11, fontWeight: 900, textTransform: "uppercase", letterSpacing: 1, whiteSpace: "nowrap" }}>CURRENT PLAN</div>
                     )}
                     {!isCurrent && plan.popular && (
-                      <div style={{ position: "absolute", top: -16, left: "50%", transform: "translateX(-50%)", background: " var(--app-accent, var(--app-accent, #00BCD4))", color: "#fff", padding: "6px 22px", borderRadius: 20, fontSize: 11, fontWeight: 900, textTransform: "uppercase", letterSpacing: 1, whiteSpace: "nowrap" }}>POPULAR</div>
+                      <div style={{ position: "absolute", top: -16, left: "50%", transform: "translateX(-50%)", background: " var(--app-accent, var(--app-accent, #2563EB))", color: "#fff", padding: "6px 22px", borderRadius: 20, fontSize: 11, fontWeight: 900, textTransform: "uppercase", letterSpacing: 1, whiteSpace: "nowrap" }}>POPULAR</div>
                     )}
-                    <div style={{ width: 52, height: 52, borderRadius: "50%", background: "#e0f7fa", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 18 }}>
+                    <div style={{ width: 52, height: 52, borderRadius: "50%", background: "#eff6ff", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 18 }}>
                       <span style={{ fontSize: 24 }}>🌱</span>
                     </div>
                     <h3 style={{ fontSize: 22, fontWeight: 800, color: "#1e293b", margin: "0 0 4px" }}>{plan.name}</h3>
@@ -1168,7 +1168,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
                     <div style={{ display: "flex", flexDirection: "column", gap: 10, flex: 1, marginBottom: 28 }}>
                       {plan.features.map((f, i) => (
                         <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                          <span style={{ color: " var(--app-accent, var(--app-accent, #00BCD4))", fontSize: 15, flexShrink: 0 }}>✓</span>
+                          <span style={{ color: " var(--app-accent, var(--app-accent, #2563EB))", fontSize: 15, flexShrink: 0 }}>✓</span>
                           <span style={{ fontSize: 13.5, color: "#475569", fontWeight: 500 }}>{f}</span>
                         </div>
                       ))}
@@ -1180,9 +1180,9 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
                         width: "100%", padding: "14px", borderRadius: 12, fontSize: 15, fontWeight: 800,
                         cursor: (isCurrent || payLoading) ? "not-allowed" : "pointer",
                         fontFamily: "inherit", border: "none",
-                        background: isCurrent ? "#e0f7fa" : plan.popular ? " var(--app-accent, var(--app-accent, #00BCD4))" : "#f1f5f9",
-                        color: isCurrent ? " var(--app-accent, var(--app-accent, #00BCD4))" : plan.popular ? "#fff" : "#1e293b",
-                        boxShadow: (plan.popular && !isCurrent) ? "0 6px 18px rgba(0,188,212,0.3)" : "none",
+                        background: isCurrent ? "#eff6ff" : plan.popular ? " var(--app-accent, var(--app-accent, #2563EB))" : "#f1f5f9",
+                        color: isCurrent ? " var(--app-accent, var(--app-accent, #2563EB))" : plan.popular ? "#fff" : "#1e293b",
+                        boxShadow: (plan.popular && !isCurrent) ? "0 6px 18px rgba(37, 99, 235,0.3)" : "none",
                         transition: "all 0.18s"
                       }}
                     >

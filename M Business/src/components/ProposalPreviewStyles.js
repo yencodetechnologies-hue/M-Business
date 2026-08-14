@@ -5,21 +5,21 @@
 // so every place that shows a saved proposal renders it identically.
 export const PROPOSAL_PREVIEW_CSS = `
 :root{
-  --teal: var(--app-accent, var(--app-accent, #00BCD4));--teal2:var(--app-accent2, #00BCD4);--teal3:#26D0CE;--teal4:#006E7F;
-  --teal-light:var(--teal-light, #E0F7FA);--teal-lighter:var(--teal-lighter, #F0FDFE);
-  --bg:#F5FAFA;--surface:#FFFFFF;--surface2:#F8FAFB;--border:#E0EEF0;--border2:#C5DDE0;
-  --text:#1A2E35;--text2:#607D86;--text3:#A0B8BE;
-  --green:#26C281;--green-bg:#E8FAF3;
+  --teal: var(--app-accent, var(--app-accent, #2563EB));--teal2:var(--app-accent2, #2563EB);--teal3:#26D0CE;--teal4:#006E7F;
+  --teal-light:var(--teal-light, #EFF6FF);--teal-lighter:var(--teal-lighter, #EFF6FF);
+  --bg:#F8FAFC;--surface:#FFFFFF;--surface2:#F8FAFB;--border:#E2E8F0;--border2:#E2E8F0;
+  --text:#1E293B;--text2:#64748B;--text3:#64748B;
+  --green:#16A34A;--green-bg:#E8FAF3;
   --amber:#F5A623;--amber-bg:#FEF5E6;
   --red:#F05C5C;--red-bg:#FEF2F2;
   --purple:#7C5CFC;--purple-bg:#EEE9FF;
   --blue:#2563EB;--blue-bg:#EFF4FF;
-  --sidebar-grad:linear-gradient(180deg,#26D0CE 0%, var(--app-accent, var(--app-accent, #00BCD4)) 35%,var(--app-accent2, #00BCD4) 65%,#006E7F 100%);
+  --sidebar-grad:linear-gradient(180deg,#26D0CE 0%, var(--app-accent, var(--app-accent, #2563EB)) 35%,var(--app-accent2, #2563EB) 65%,#006E7F 100%);
   --font:'Nunito',sans-serif;--radius:14px;
 }
 
 /* PROPOSAL DOC */
-.prop-doc{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;font-family:var(--font);font-size:12px;color:#1A2E35;min-height:0}
+.prop-doc{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;font-family:var(--font);font-size:12px;color:#1E293B;min-height:0}
 
 /* COVER */
 .p-cover{background:linear-gradient(135deg,#003E4E 0%,#005F73 35%,#0096B4 70%,#26D0CE 100%);padding:26px 22px;position:relative;overflow:hidden;flex-shrink:0}

@@ -179,7 +179,7 @@ function ChartView({ groups, config }) {
       </div>
 
       {/* Group Progress */}
-      <div style={{ background: "#fff", borderRadius: 14, border: `1px solid ${P.border}`, padding: 22, boxShadow: "0 2px 12px rgba(124,58,237,0.07)" }}>
+      <div style={{ background: "#fff", borderRadius: 14, border: `1px solid ${P.border}`, padding: 22, boxShadow: "0 2px 12px rgba(37, 99, 235,0.07)" }}>
         <div style={{ fontSize: 14, fontWeight: 800, color: P.text, marginBottom: 3 }}>Group Progress</div>
         <div style={{ fontSize: 12, color: P.muted, marginBottom: 18 }}>Completion per group</div>
         <div style={{ display: "flex", gap: 16, alignItems: "flex-end", height: 160, overflowX: "auto" }}>
@@ -207,7 +207,7 @@ function ChartView({ groups, config }) {
 
       {/* Priority breakdown */}
       {priorityData.length > 0 && (
-        <div style={{ background: "#fff", borderRadius: 14, border: `1px solid ${P.border}`, padding: 22, boxShadow: "0 2px 12px rgba(124,58,237,0.07)" }}>
+        <div style={{ background: "#fff", borderRadius: 14, border: `1px solid ${P.border}`, padding: 22, boxShadow: "0 2px 12px rgba(37, 99, 235,0.07)" }}>
           <div style={{ fontSize: 14, fontWeight: 800, color: P.text, marginBottom: 3 }}>Priority Breakdown</div>
           <div style={{ fontSize: 12, color: P.muted, marginBottom: 18 }}>Tasks by priority level</div>
           {priorityData.map(item => {
@@ -256,7 +256,7 @@ function GanttView({ groups, config }) {
 
   return (
     <div style={{ padding: 24 }}>
-      <div style={{ background: "#fff", borderRadius: 14, border: `1px solid ${P.border}`, overflow: "hidden", boxShadow: "0 2px 12px rgba(124,58,237,0.07)" }}>
+      <div style={{ background: "#fff", borderRadius: 14, border: `1px solid ${P.border}`, overflow: "hidden", boxShadow: "0 2px 12px rgba(37, 99, 235,0.07)" }}>
         <div style={{ overflowX: "auto" }}>
           <div style={{ minWidth: 260 + totalDays * dayW }}>
             {/* Header */}
@@ -349,7 +349,7 @@ function CalendarView({ groups, config }) {
 
   return (
     <div style={{ padding: 24 }}>
-      <div style={{ background: "#fff", borderRadius: 14, border: `1px solid ${P.border}`, overflow: "hidden", boxShadow: "0 2px 12px rgba(124,58,237,0.07)" }}>
+      <div style={{ background: "#fff", borderRadius: 14, border: `1px solid ${P.border}`, overflow: "hidden", boxShadow: "0 2px 12px rgba(37, 99, 235,0.07)" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 20px", borderBottom: `1px solid ${P.border}` }}>
           <div style={{ fontSize: 16, fontWeight: 800, color: P.text }}>{MN[mo]} {yr}</div>
           <div style={{ display: "flex", gap: 8 }}>
@@ -465,7 +465,7 @@ function Toast({ msg, type }) {
     <div style={{
       position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff",
       border: `1.5px solid ${c}`, borderRadius: 12, padding: "11px 18px", fontSize: 13,
-      fontWeight: 700, color: c, boxShadow: "0 8px 32px rgba(124,58,237,0.2)",
+      fontWeight: 700, color: c, boxShadow: "0 8px 32px rgba(37, 99, 235,0.2)",
       display: "flex", alignItems: "center", gap: 8, animation: "toastIn .2s ease", fontFamily: "inherit"
     }}>
       {type === "error" ? "Error" : type === "info" ? "Info" : "Success"} {msg}
@@ -558,7 +558,7 @@ function ViewSwitcherDropdown({ anchor, currentView, onSelect, onClose }) {
     <div ref={ref} style={{
       position: "fixed", top: pos.top, left: pos.left, zIndex: 7000,
       background: "#fff", border: `1px solid ${P.border}`, borderRadius: 12,
-      boxShadow: "0 8px 40px rgba(124,58,237,0.22)", fontFamily: "inherit",
+      boxShadow: "0 8px 40px rgba(37, 99, 235,0.22)", fontFamily: "inherit",
       overflow: "hidden", animation: "ddIn .12s ease", minWidth: 220
     }}>
       <div style={{ padding: "10px 14px 6px", fontSize: 11, fontWeight: 700, color: P.muted, letterSpacing: .8, textTransform: "uppercase" }}>
@@ -1175,7 +1175,7 @@ function SidekickPanel({ onClose, groups }) {
             </div>
           </div>
           <div style={{ flex: 1, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
-            {[{ label: "Total", val: allTasks.length, color: "#e9d5ff" }, { label: "Done", val: done, color: "#86efac" }, { label: "Active", val: wip, color: "#fde68a" }, { label: "Stuck", val: stuck, color: "#fca5a5" }].map(({ label, val, color }) => (
+            {[{ label: "Total", val: allTasks.length, color: "#eff6ff" }, { label: "Done", val: done, color: "#86efac" }, { label: "Active", val: wip, color: "#fde68a" }, { label: "Stuck", val: stuck, color: "#fca5a5" }].map(({ label, val, color }) => (
               <div key={label} style={{ background: "rgba(255,255,255,0.12)", borderRadius: 8, padding: "6px 8px", textAlign: "center" }}>
                 <div style={{ fontSize: 17, fontWeight: 800, color }}>{val}</div>
                 <div style={{ fontSize: 9, color: "rgba(255,255,255,0.5)", fontWeight: 600, marginTop: 2 }}>{label}</div>
@@ -1258,7 +1258,7 @@ function IntegrateModal({ onClose, showToast }) {
 
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(30,10,60,0.45)", zIndex: 8000, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "inherit" }} onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
-      <div style={{ background: "#fff", borderRadius: 16, width: 520, maxHeight: "80vh", boxShadow: "0 24px 80px rgba(124,58,237,0.25)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+      <div style={{ background: "#fff", borderRadius: 16, width: 520, maxHeight: "80vh", boxShadow: "0 24px 80px rgba(37, 99, 235,0.25)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
         <div style={{ background: `linear-gradient(135deg,${P.dark},${P.mid})`, padding: "18px 20px" }}><div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}><div style={{ fontSize: 17, fontWeight: 800, color: "#fff" }}> Integrations</div><button onClick={onClose} style={{ background: "rgba(255,255,255,0.15)", border: "none", borderRadius: 8, width: 32, height: 32, cursor: "pointer", color: "#fff", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button></div></div>
         <div style={{ flex: 1, overflowY: "auto", padding: "4px 20px 16px" }}>
           {integrations.map(({ icon, name, desc, badge }) => (
@@ -1298,7 +1298,7 @@ function AutomateModal({ onClose }) {
   const [states, setStates] = useState(Object.fromEntries(automations.map(a => [a.title, a.active])));
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(30,10,60,0.45)", zIndex: 8000, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "inherit" }} onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
-      <div style={{ background: "#fff", borderRadius: 16, width: 520, maxHeight: "80vh", boxShadow: "0 24px 80px rgba(124,58,237,0.25)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+      <div style={{ background: "#fff", borderRadius: 16, width: 520, maxHeight: "80vh", boxShadow: "0 24px 80px rgba(37, 99, 235,0.25)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
         <div style={{ background: `linear-gradient(135deg,${P.dark},${P.mid})`, padding: "18px 20px" }}><div style={{ display: "flex", justifyContent: "space-between" }}><div style={{ fontSize: 17, fontWeight: 800, color: "#fff" }}>Automations</div><button onClick={onClose} style={{ background: "rgba(255,255,255,0.15)", border: "none", borderRadius: 8, width: 32, height: 32, cursor: "pointer", color: "#fff", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button></div></div>
         <div style={{ flex: 1, overflowY: "auto", padding: "8px 20px 16px" }}>
           {automations.map(({ icon, title, desc }) => (
@@ -1445,7 +1445,7 @@ function AddColumnModal({ onAdd, onClose }) {
   const filtered = COLUMN_TYPES.filter(c => !search || c.label.toLowerCase().includes(search.toLowerCase()));
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(30,10,60,0.4)", zIndex: 8000, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "inherit" }} onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
-      <div style={{ background: "#fff", borderRadius: 16, width: 480, boxShadow: "0 24px 80px rgba(124,58,237,0.25)", overflow: "hidden" }}>
+      <div style={{ background: "#fff", borderRadius: 16, width: 480, boxShadow: "0 24px 80px rgba(37, 99, 235,0.25)", overflow: "hidden" }}>
         <div style={{ background: `linear-gradient(135deg,${P.dark},${P.mid})`, padding: "16px 20px" }}>
           <div style={{ display: "flex", justifyContent: "space-between" }}><div style={{ fontSize: 16, fontWeight: 800, color: "#fff" }}>Add Column</div><button onClick={onClose} style={{ background: "rgba(255,255,255,0.15)", border: "none", borderRadius: 7, width: 28, height: 28, cursor: "pointer", color: "#fff", fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button></div>
           <div style={{ marginTop: 12, display: "flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,0.15)", borderRadius: 8, padding: "7px 11px" }}><span style={{ fontSize: 13, color: "rgba(255,255,255,0.6)" }}>Search</span><input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search column types…" style={{ border: "none", outline: "none", background: "transparent", fontSize: 13, color: "#fff", fontFamily: "inherit", flex: 1 }} /></div>
@@ -1643,7 +1643,7 @@ function TaskRow({ task, onCheck, onField, onStatus, onPriority, onDup, onDel, o
             border: "none",
             outline: "none",
             fontSize: 14,
-            color: "#1e1b4b", // Darker indigo/black for maximum visibility
+            color: "#1e293b", // Darker indigo/black for maximum visibility
             fontFamily: "inherit",
             width: "100%",
             padding: "12px 8px",
@@ -2176,7 +2176,7 @@ function DetailPanel({ task, onClose, onField, projects }) {
         <div>
           <div style={{ fontSize: 10, color: P.muted, fontWeight: 700, letterSpacing: 0.8, marginBottom: 5, textTransform: "uppercase" }}>Assigned To</div>
           {task.assignTo && task.assignTo !== "Unassigned" ? (
-            <div style={{ display: "flex", alignItems: "center", gap: 8, background: "var(--app-bg)", border: "1px solid #ddd6fe", borderRadius: 8, padding: "6px 12px", width: "fit-content" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, background: "var(--app-bg)", border: "1px solid #e2e8f0", borderRadius: 8, padding: "6px 12px", width: "fit-content" }}>
               <div style={{ width: 24, height: 24, borderRadius: "50%", background: getAvatarColor(task.assignTo), display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700 }}>{task.assignTo.slice(0, 2).toUpperCase()}</div>
               <span style={{ fontSize: 13, fontWeight: 600, color: "var(--app-accent)" }}>{task.assignTo}</span>
               <button onClick={() => onField(id, "assignTo", "Unassigned")} style={{ background: "none", border: "none", cursor: "pointer", color: "#ef4444", fontSize: 16, padding: "0 4px", fontWeight: 700 }}>✕</button>
@@ -2620,7 +2620,7 @@ export default function TaskPage({ projects = [], employees = [], config, user, 
       <div style={{ position: "sticky", top: 0, zIndex: 500, background: "#fff" }}>
 
         {/* TOP HEADER */}
-        <div style={{ background: "#fff", borderBottom: `1px solid ${P.border}`, padding: "8px 18px", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: "0 1px 4px rgba(124,58,237,0.05)", flexShrink: 0 }}>
+        <div style={{ background: "#fff", borderBottom: `1px solid ${P.border}`, padding: "8px 18px", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: "0 1px 4px rgba(37, 99, 235,0.05)", flexShrink: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <span style={{ fontSize: 22, fontWeight: 800, color: P.text, letterSpacing: -0.5 }}>
               {selectedProjectName ? `Project: ${selectedProjectName}` : "Task Dashboard"}
@@ -2690,7 +2690,7 @@ export default function TaskPage({ projects = [], employees = [], config, user, 
 
         {/* TOOLBAR — only for table view */}
         {currentView === "table" && (
-          <div style={{ background: "#fff", borderBottom: `1.5px solid ${P.border}`, padding: "6px 18px", display: "flex", alignItems: "center", gap: 4, flexShrink: 0, zIndex: 100, boxShadow: "0 2px 8px rgba(124,58,237,0.06)" }}>
+          <div style={{ background: "#fff", borderBottom: `1.5px solid ${P.border}`, padding: "6px 18px", display: "flex", alignItems: "center", gap: 4, flexShrink: 0, zIndex: 100, boxShadow: "0 2px 8px rgba(37, 99, 235,0.06)" }}>
             <NewTaskBtn onAddTask={addNewTask} onTriggerGroup={() => addGroupTrigger.current?.trigger()} showToast={showToast} onImport={() => setShowImport(true)} groups={groups} onAddTaskToGroup={addTask} setGroups={setGroups} projects={projects} defaultProjectId={selectedProjectId} autoOpenAddModal={autoOpenAddModal} onAddModalOpened={onAddModalOpened} />
             <div style={{ width: 1, height: 22, background: P.border, margin: "0 4px", flexShrink: 0 }} />
             <div style={{ display: "flex", alignItems: "center", gap: 10, flex: 1 }}>

@@ -12,7 +12,7 @@ const EXPENSE_TYPES = ['Operational', 'Capital', 'Recurring', 'One-Time'];
 function Toast({ msg, type }) {
   if (!msg) return null;
   return (
-    <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 9999, background: type === 'error' ? '#EF4444' : '#26C281', color: '#fff', borderRadius: 12, padding: '13px 22px', fontWeight: 700, fontSize: 14, boxShadow: '0 4px 20px rgba(0,0,0,.18)' }}>
+    <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 9999, background: type === 'error' ? '#EF4444' : '#16A34A', color: '#fff', borderRadius: 12, padding: '13px 22px', fontWeight: 700, fontSize: 14, boxShadow: '0 4px 20px rgba(0,0,0,.18)' }}>
       {msg}
     </div>
   );
@@ -131,19 +131,19 @@ export default function FinExpenses({ expenses: propExpenses, setExpenses: propS
         </div>
         {/* KPI CARDS */}
         <div style={{ display: 'flex', gap: 16, marginBottom: 22, flexWrap: 'wrap' }}>
-          <div style={{ cursor: 'default', flex: '1 1 200px', minWidth: 200, background: '#fff', border: '1.5px solid #E0EEF0', borderRadius: 14, padding: '18px 20px', display: 'flex', alignItems: 'center', gap: 12, boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
+          <div style={{ cursor: 'default', flex: '1 1 200px', minWidth: 200, background: '#fff', border: '1.5px solid #E2E8F0', borderRadius: 14, padding: '18px 20px', display: 'flex', alignItems: 'center', gap: 12, boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
             <div style={{ width: 40, height: 40, borderRadius: 10, background: '#EF44441a', color: '#EF4444', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}><i className="ti ti-receipt" /></div>
             <div>
               <div style={{ fontSize: 24, fontWeight: 800, color: '#1A2332' }}>{fmt(total)}</div>
-              <div style={{ fontSize: 12, fontWeight: 700, color: '#607D86' }}>Total Expenses</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: '#64748B' }}>Total Expenses</div>
             </div>
           </div>
           {byCategory.map(c => (
-            <div key={c.name} style={{ cursor: 'default', flex: '1 1 200px', minWidth: 200, background: '#fff', border: '1.5px solid #E0EEF0', borderRadius: 14, padding: '18px 20px', display: 'flex', alignItems: 'center', gap: 12, boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
-              <div style={{ width: 40, height: 40, borderRadius: 10, background: 'rgba(0,188,212,0.1)', color: 'var(--app-accent, #00BCD4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}><i className="ti ti-category" /></div>
+            <div key={c.name} style={{ cursor: 'default', flex: '1 1 200px', minWidth: 200, background: '#fff', border: '1.5px solid #E2E8F0', borderRadius: 14, padding: '18px 20px', display: 'flex', alignItems: 'center', gap: 12, boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
+              <div style={{ width: 40, height: 40, borderRadius: 10, background: 'rgba(37, 99, 235,0.1)', color: 'var(--app-accent, #2563EB)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}><i className="ti ti-category" /></div>
               <div>
                 <div style={{ fontSize: 24, fontWeight: 800, color: '#1A2332' }}>{fmt(c.total)}</div>
-                <div style={{ fontSize: 12, fontWeight: 700, color: '#607D86' }}>{c.name}</div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: '#64748B' }}>{c.name}</div>
               </div>
             </div>
           ))}
@@ -166,7 +166,7 @@ export default function FinExpenses({ expenses: propExpenses, setExpenses: propS
         </div>
 
         {/* TABLE */}
-        <div style={{ background: '#fff', borderRadius: 14, boxShadow: '0 2px 12px rgba(0,188,212,.08)', overflow: 'hidden' }}>
+        <div style={{ background: '#fff', borderRadius: 14, boxShadow: '0 2px 12px rgba(37, 99, 235,.08)', overflow: 'hidden' }}>
           <div style={{ overflowX: 'auto' }}>
             <table className="fe-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>

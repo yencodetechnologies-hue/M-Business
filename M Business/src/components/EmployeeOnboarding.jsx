@@ -38,22 +38,22 @@ function buildSections(accent) {
 }
 
 const THEME_PRESETS = {
-  purple: "#7c3aed", ocean: "#0284c7", forest: "#16a34a", sunset: "#ea580c",
-  rose: "#e11d48", slate: "#475569", mint: "#0d9488", candy: "#c026d3", teal: "#00BCD4",
+  purple: "#2563eb", ocean: "#0284c7", forest: "#16a34a", sunset: "#ea580c",
+  rose: "#e11d48", slate: "#475569", mint: "#2563eb", candy: "#c026d3", teal: "#2563EB",
 };
 
 function hexToRgbStr(hex) {
-  const h = (hex || "#0D9488").replace("#", "");
+  const h = (hex || "#2563EB").replace("#", "");
   const bigint = parseInt(h.length === 3 ? h.split("").map(c => c + c).join("") : h, 16);
   const r = (bigint >> 16) & 255, g = (bigint >> 8) & 255, b = bigint & 255;
   return `${r},${g},${b}`;
 }
 
-const T = buildTheme("#0D9488");
-const SECTIONS = buildSections("#0D9488");
+const T = buildTheme("#2563EB");
+const SECTIONS = buildSections("#2563EB");
 
 export default function EmployeeOnboarding() {
-  const [accentColor, setAccentColor] = useState("#0D9488");
+  const [accentColor, setAccentColor] = useState("#2563EB");
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -95,8 +95,8 @@ export default function EmployeeOnboarding() {
       .then(res => {
         const cfg = res.data || {};
         const resolved = cfg.appTheme === "custom"
-          ? (cfg.customColor || "#0D9488")
-          : (THEME_PRESETS[cfg.appTheme] || "#0D9488");
+          ? (cfg.customColor || "#2563EB")
+          : (THEME_PRESETS[cfg.appTheme] || "#2563EB");
         setAccentColor(resolved);
       })
       .catch(() => { /* keep default teal on failure */ });

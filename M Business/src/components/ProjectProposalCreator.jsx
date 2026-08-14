@@ -18,7 +18,7 @@ const THEMES = [
   { name: "Rose", p: "#e11d48", g: "linear-gradient(135deg,#9f1239,#f43f5e)", l: "var(--app-border)", t: "#881337" },
   { name: "Amber", p: "#d97706", g: "linear-gradient(135deg,#92400e,#fbbf24)", l: "var(--app-border)", t: "#78350f" },
   { name: "Slate", p: "#334155", g: "linear-gradient(135deg,#0f172a,#475569)", l: "var(--app-border)", t: "#0f172a" },
-  { name: "Teal", p: "#0d9488", g: "linear-gradient(135deg,#134e4a,#2dd4bf)", l: "var(--app-border)", t: "#134e4a" },
+  { name: "Teal", p: "#2563eb", g: "linear-gradient(135deg,#134e4a,#2dd4bf)", l: "var(--app-border)", t: "#134e4a" },
   { name: "Fuchsia", p: "var(--app-accent)", g: "linear-gradient(135deg,#701a75,#e879f9)", l: "var(--app-border)", t: "#4a044e" },
 ];
 // ─── COVERS -------------------------------------------------------------------
@@ -353,8 +353,8 @@ function Slide({ slide, theme: tn, docFormat, editing, onChange, selectedId, onS
       onCh(v);
     };
     return big
-      ? <textarea value={val} onChange={onInputChange} rows={4} style={s} onFocus={e => e.target.style.background = "rgba(124,58,237,0.05)"} onBlur={e => e.target.style.background = "transparent"} />
-      : <input value={val} onChange={onInputChange} style={s} onFocus={e => e.target.style.background = "rgba(124,58,237,0.05)"} onBlur={e => e.target.style.background = "transparent"} />;
+      ? <textarea value={val} onChange={onInputChange} rows={4} style={s} onFocus={e => e.target.style.background = "rgba(37, 99, 235,0.05)"} onBlur={e => e.target.style.background = "transparent"} />
+      : <input value={val} onChange={onInputChange} style={s} onFocus={e => e.target.style.background = "rgba(37, 99, 235,0.05)"} onBlur={e => e.target.style.background = "transparent"} />;
   };
 
   const elementsOverlay = (
@@ -476,7 +476,7 @@ function Slide({ slide, theme: tn, docFormat, editing, onChange, selectedId, onS
       )}
 
       {/* Footer Element */}
-      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "linear-gradient(135deg,#020617,#1e1b4b)", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
+      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "linear-gradient(135deg,#020617,#1e293b)", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
         <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>{slide.companyName || companyName}</div>
         <div style={{ fontSize: 12, fontWeight: 700, color: "#6ee7b7" }}>{footerMessage || slide.footerMessage || " Thank you for considering us!"}</div>
         <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>{slide.id}</div>
@@ -803,14 +803,14 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
       }}>
       {/* ── Top Bar ── */}
       <div style={{
-        background: "#fff", borderBottom: "1px solid #e0eef0",
+        background: "#fff", borderBottom: "1px solid #e2e8f0",
         padding: "12px 24px", display: "flex", alignItems: "center",
         flexWrap: "wrap", gap: 10, flexShrink: 0, boxShadow: "0 2px 12px rgba(0,0,0,0.08)"
       }}>
         <button onClick={onClose} style={{
-          background: "#f0fdfe", border: "1.5px solid #e0eef0",
+          background: "#eff6ff", border: "1.5px solid #e2e8f0",
           borderRadius: 8, padding: "5px 10px", fontSize: 11,
-          fontWeight: 700, cursor: "pointer", color: " var(--app-accent, var(--app-accent, #00BCD4))",
+          fontWeight: 700, cursor: "pointer", color: " var(--app-accent, var(--app-accent, #2563EB))",
           display: "flex", alignItems: "center", gap: 4, flexShrink: 0
         }}>
           <i className="ti ti-arrow-left" style={{ fontSize: 12 }}></i> Back
@@ -853,16 +853,16 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
         )}
 
         <button onClick={onShare} style={{
-          background: "#f0fdfe", border: "1.5px solid #e0eef0",
+          background: "#eff6ff", border: "1.5px solid #e2e8f0",
           borderRadius: 8, padding: "7px 14px", fontSize: 12,
-          fontWeight: 700, cursor: "pointer", color: " var(--app-accent, var(--app-accent, #00BCD4))",
+          fontWeight: 700, cursor: "pointer", color: " var(--app-accent, var(--app-accent, #2563EB))",
           display: "flex", alignItems: "center", gap: 6
         }}>
           <i className="ti ti-share"></i> Share
         </button>
 
         <button onClick={onPrint} style={{
-          background: " var(--app-accent, var(--app-accent, #00BCD4))", border: "none",
+          background: " var(--app-accent, var(--app-accent, #2563EB))", border: "none",
           borderRadius: 8, padding: "7px 16px", fontSize: 12,
           fontWeight: 700, cursor: "pointer", color: "#fff",
           display: "flex", alignItems: "center", gap: 6
@@ -872,11 +872,11 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
       </div>
 
       {/* ── Body ── */}
-      <div style={{ flex: 1, overflowY: "auto", background: "#f5fafa", padding: "28px 24px" }}>
+      <div style={{ flex: 1, overflowY: "auto", background: "#f8fafc", padding: "28px 24px" }}>
         <div style={{ maxWidth: 860, margin: "0 auto", display: "flex", flexDirection: "column", gap: 20 }}>
           {/* Canvas-based proposal — show read-only canvas */}
           {prop.format === "canvas" && prop.canvasElements && prop.canvasElements.length > 0 ? (
-            <div style={{ background: '#fff', borderRadius: 14, border: '1.5px solid #e0eef0', overflow: 'hidden' }}>
+            <div style={{ background: '#fff', borderRadius: 14, border: '1.5px solid #e2e8f0', overflow: 'hidden' }}>
               <CanvasProposalEditor
                 isPreviewMode={true}
                 proposalData={prop}
@@ -891,7 +891,7 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
                 <style>{PROPOSAL_PREVIEW_CSS}</style>
                 <div className="prop-doc" style={{
                   background: "#fff", borderRadius: 14,
-                  border: "1.5px solid #e0eef0",
+                  border: "1.5px solid #e2e8f0",
                   boxShadow: "0 2px 14px rgba(0,0,0,0.06)",
                   maxHeight: "none", overflow: "visible"
                 }}
@@ -901,15 +901,15 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
             ) : prop.slides && prop.slides.length > 0 ? (
               <div style={{
                 background: "#fff", borderRadius: 14,
-                border: "1.5px solid #e0eef0", padding: "36px 44px",
+                border: "1.5px solid #e2e8f0", padding: "36px 44px",
                 boxShadow: "0 2px 14px rgba(0,0,0,0.06)"
               }}>
                 {/* Cover */}
-                <div style={{ textAlign: "center", marginBottom: 32, paddingBottom: 24, borderBottom: "3px solid  var(--app-accent, var(--app-accent, #00BCD4))" }}>
+                <div style={{ textAlign: "center", marginBottom: 32, paddingBottom: 24, borderBottom: "3px solid  var(--app-accent, var(--app-accent, #2563EB))" }}>
                   <div style={{ fontSize: 30, fontWeight: 900, color: "#0D2027", marginBottom: 8 }}>
                     {prop.title || "Project Proposal"}
                   </div>
-                  <div style={{ fontSize: 14, color: "#607D86", marginBottom: 4 }}>
+                  <div style={{ fontSize: 14, color: "#64748B", marginBottom: 4 }}>
                     Prepared for <strong>{prop.client || prop.clientName || "—"}</strong>
                   </div>
                   {prop.sentAt && (
@@ -920,9 +920,9 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
                   {prop.value > 0 && (
                     <div style={{
                       display: "inline-block", marginTop: 12,
-                      background: "#f0fdfe", border: "1.5px solid #e0eef0",
+                      background: "#eff6ff", border: "1.5px solid #e2e8f0",
                       borderRadius: 10, padding: "8px 20px",
-                      fontSize: 16, fontWeight: 800, color: " var(--app-accent, var(--app-accent, #00BCD4))"
+                      fontSize: 16, fontWeight: 800, color: " var(--app-accent, var(--app-accent, #2563EB))"
                     }}>
                       ₹{Number(prop.value).toLocaleString("en-IN")}
                     </div>
@@ -934,10 +934,10 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
                   <div key={si} style={{
                     marginBottom: 18, padding: "18px 22px",
                     background: "#f8fafb", borderRadius: 12,
-                    border: "1.5px solid #e0eef0"
+                    border: "1.5px solid #e2e8f0"
                   }}>
                     <div style={{
-                      fontSize: 10, fontWeight: 800, color: " var(--app-accent, var(--app-accent, #00BCD4))",
+                      fontSize: 10, fontWeight: 800, color: " var(--app-accent, var(--app-accent, #2563EB))",
                       textTransform: "uppercase", letterSpacing: 1, marginBottom: 10
                     }}>
                       {SLIDE_TYPES.find(x => x.id === slide.type)?.label || slide.type}
@@ -949,7 +949,7 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
                       </div>
                     )}
                     {slide.subtitle && (
-                      <div style={{ fontSize: 13, color: "#607D86", marginBottom: 6 }}>{slide.subtitle}</div>
+                      <div style={{ fontSize: 13, color: "#64748B", marginBottom: 6 }}>{slide.subtitle}</div>
                     )}
                     {slide.body && (
                       <div style={{ fontSize: 13, color: "#4E6B75", lineHeight: 1.8, whiteSpace: "pre-wrap" }}>{slide.body}</div>
@@ -960,9 +960,9 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
                           <div key={ii} style={{
                             display: "flex", alignItems: "flex-start", gap: 10,
                             padding: "8px 12px", background: "#fff",
-                            borderRadius: 8, border: "1px solid #e0eef0", fontSize: 13, color: "#374151"
+                            borderRadius: 8, border: "1px solid #e2e8f0", fontSize: 13, color: "#374151"
                           }}>
-                            <span style={{ color: " var(--app-accent, var(--app-accent, #00BCD4))", fontWeight: 900, marginTop: 1 }}>Yes</span> {item}
+                            <span style={{ color: " var(--app-accent, var(--app-accent, #2563EB))", fontWeight: 900, marginTop: 1 }}>Yes</span> {item}
                           </div>
                         ))}
                       </div>
@@ -972,11 +972,11 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
                         {slide.phases.map((ph, pi) => (
                           <div key={pi} style={{
                             padding: "8px 14px", background: "#fff",
-                            borderRadius: 8, border: "1px solid #e0eef0", fontSize: 12
+                            borderRadius: 8, border: "1px solid #e2e8f0", fontSize: 12
                           }}>
                             <span style={{ fontWeight: 700, color: "#0D2027" }}>Phase {pi + 1}:</span>{" "}
-                            <span style={{ color: "#607D86" }}>{ph.label}</span>{" "}
-                            <span style={{ color: " var(--app-accent, var(--app-accent, #00BCD4))", fontWeight: 700 }}>{ph.dur}</span>
+                            <span style={{ color: "#64748B" }}>{ph.label}</span>{" "}
+                            <span style={{ color: " var(--app-accent, var(--app-accent, #2563EB))", fontWeight: 700 }}>{ph.dur}</span>
                           </div>
                         ))}
                       </div>
@@ -984,14 +984,14 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
                     {slide.rows && slide.rows.length > 0 && (
                       <table style={{ width: "100%", borderCollapse: "collapse", marginTop: 8 }}>
                         <thead>
-                          <tr style={{ background: " var(--app-accent, var(--app-accent, #00BCD4))" }}>
+                          <tr style={{ background: " var(--app-accent, var(--app-accent, #2563EB))" }}>
                             <th style={{ padding: "8px 14px", color: "#fff", fontSize: 12, textAlign: "left", borderRadius: "6px 0 0 6px" }}>Item</th>
                             <th style={{ padding: "8px 14px", color: "#fff", fontSize: 12, textAlign: "right", borderRadius: "0 6px 6px 0" }}>Cost</th>
                           </tr>
                         </thead>
                         <tbody>
                           {slide.rows.map((row, ri) => (
-                            <tr key={ri} style={{ borderBottom: "1px solid #e0eef0", background: ri % 2 ? "#f8fafb" : "#fff" }}>
+                            <tr key={ri} style={{ borderBottom: "1px solid #e2e8f0", background: ri % 2 ? "#f8fafb" : "#fff" }}>
                               <td style={{ padding: "8px 14px", fontSize: 13, color: "#374151" }}>{row.item}</td>
                               <td style={{ padding: "8px 14px", fontSize: 13, fontWeight: 700, color: "#0D2027", textAlign: "right" }}>{row.cost}</td>
                             </tr>
@@ -1003,7 +1003,7 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
                       <div style={{
                         display: "flex", justifyContent: "flex-end",
                         marginTop: 10, padding: "10px 14px",
-                        background: " var(--app-accent, var(--app-accent, #00BCD4))", borderRadius: 8,
+                        background: " var(--app-accent, var(--app-accent, #2563EB))", borderRadius: 8,
                         fontSize: 15, fontWeight: 900, color: "#fff"
                       }}>
                         Total: {slide.total}
@@ -1014,12 +1014,12 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
                         {slide.members.map((m, mi) => (
                           <div key={mi} style={{
                             padding: "12px 16px", background: "#fff",
-                            borderRadius: 10, border: "1px solid #e0eef0",
+                            borderRadius: 10, border: "1px solid #e2e8f0",
                             textAlign: "center", minWidth: 110
                           }}>
                             <div style={{
                               width: 40, height: 40, borderRadius: "50%",
-                              background: " var(--app-accent, var(--app-accent, #00BCD4))", color: "#fff",
+                              background: " var(--app-accent, var(--app-accent, #2563EB))", color: "#fff",
                               display: "flex", alignItems: "center", justifyContent: "center",
                               fontWeight: 800, fontSize: 14, margin: "0 auto 8px"
                             }}>{m.avatar || m.name?.[0]}</div>
@@ -1032,7 +1032,7 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
                     {slide.cta && (
                       <div style={{
                         marginTop: 16, display: "inline-block",
-                        background: " var(--app-accent, var(--app-accent, #00BCD4))", color: "#fff",
+                        background: " var(--app-accent, var(--app-accent, #2563EB))", color: "#fff",
                         borderRadius: 10, padding: "12px 28px",
                         fontSize: 14, fontWeight: 700
                       }}>{slide.cta}</div>
@@ -1043,7 +1043,7 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
             ) : (
               <div style={{
                 background: "#fff", borderRadius: 14,
-                border: "1.5px solid #e0eef0", padding: 48,
+                border: "1.5px solid #e2e8f0", padding: 48,
                 textAlign: "center", color: "#96B0B8", fontSize: 14
               }}>
                 No proposal content to display.
@@ -1147,7 +1147,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
 
   const sendThemeToIframe = () => {
     if (iframeRef.current && iframeRef.current.contentWindow) {
-      const color = getComputedStyle(document.documentElement).getPropertyValue('--app-accent').trim() || ' var(--app-accent, var(--app-accent, #00BCD4))';
+      const color = getComputedStyle(document.documentElement).getPropertyValue('--app-accent').trim() || ' var(--app-accent, var(--app-accent, #2563EB))';
       iframeRef.current.contentWindow.postMessage({ type: 'SET_THEME', color }, '*');
     }
   };
@@ -1614,7 +1614,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
           clonedDoc.head.appendChild(cloned);
         });
         const rootStyles = getComputedStyle(document.documentElement);
-        const teal = rootStyles.getPropertyValue('--app-accent').trim() || '#00BCD4';
+        const teal = rootStyles.getPropertyValue('--app-accent').trim() || '#2563EB';
         clonedDoc.documentElement.style.setProperty('--app-accent', teal);
         clonedDoc.documentElement.style.setProperty('--teal', teal);
       }
@@ -1732,7 +1732,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                     clonedDoc.head.appendChild(cloned);
                   });
                   const rootStyles = getComputedStyle(document.documentElement);
-                  const teal = rootStyles.getPropertyValue('--app-accent').trim() || '#00BCD4';
+                  const teal = rootStyles.getPropertyValue('--app-accent').trim() || '#2563EB';
                   clonedDoc.documentElement.style.setProperty('--app-accent', teal);
                   clonedDoc.documentElement.style.setProperty('--teal', teal);
                 }
@@ -1792,12 +1792,12 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
       <div style={{ padding: "16px 14px", background: "#F5F8FA", minHeight: "100%", boxSizing: "border-box", maxWidth: "100%", overflowX: "hidden" }}>
         <div
           onClick={() => onBackOverride && onBackOverride()}
-          style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 4px 16px", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #00BCD4)" }}
+          style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 4px 16px", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #2563EB)" }}
         >
           <i className="ti ti-arrow-left" style={{ fontSize: 16 }}></i> Back to Dashboard
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #00BCD4), #0891b2)", borderRadius: 16, padding: "16px 18px", marginBottom: 14, boxShadow: "0 6px 18px rgba(0,188,212,0.25)" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #2563EB), #0891b2)", borderRadius: 16, padding: "16px 18px", marginBottom: 14, boxShadow: "0 6px 18px rgba(37, 99, 235,0.25)" }}>
           <div>
             <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.8)", letterSpacing: 0.5, textTransform: "uppercase" }}>Total Proposals</div>
             <div style={{ fontSize: 26, fontWeight: 800, color: "#fff" }}>{proposals.length}</div>
@@ -1808,7 +1808,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
         </div>
 
         {proposals.length === 0 ? (
-          <div style={{ padding: "40px 16px", textAlign: "center", color: "#A0B8BE", fontSize: 13, fontWeight: 600, background: "#fff", borderRadius: 16, boxShadow: "0 2px 10px rgba(15,28,46,0.05)" }}>
+          <div style={{ padding: "40px 16px", textAlign: "center", color: "#64748B", fontSize: 13, fontWeight: 600, background: "#fff", borderRadius: 16, boxShadow: "0 2px 10px rgba(15,28,46,0.05)" }}>
             No proposals found.
           </div>
         ) : (
@@ -1834,14 +1834,14 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                     <div style={{ display: "flex", alignItems: "flex-start", gap: 10, minWidth: 0, flex: 1 }}>
                       <div style={{
                         width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
-                        background: "linear-gradient(135deg, var(--app-accent, #00BCD4), #0891b2)", color: "#fff",
+                        background: "linear-gradient(135deg, var(--app-accent, #2563EB), #0891b2)", color: "#fff",
                         display: "flex", alignItems: "center", justifyContent: "center",
                         fontSize: 14, fontWeight: 800
                       }}>
                         {initials(title)}
                       </div>
                       <div style={{ minWidth: 0, flex: 1 }}>
-                        <div style={{ fontWeight: 800, color: "#0f1c2e", fontSize: 14.5, wordBreak: "break-word" }}>{title}</div>
+                        <div style={{ fontWeight: 800, color: "#0f172a", fontSize: 14.5, wordBreak: "break-word" }}>{title}</div>
                       </div>
                     </div>
                     <span style={{
@@ -1851,7 +1851,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                       {p.status || "Draft"}
                     </span>
                   </div>
-                  <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 4, color: "var(--app-accent, #00BCD4)", fontSize: 12, fontWeight: 700 }}>
+                  <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 4, color: "var(--app-accent, #2563EB)", fontSize: 12, fontWeight: 700 }}>
                     View details <i className="ti ti-chevron-right" style={{ fontSize: 13 }} />
                   </div>
                 </div>
@@ -1922,45 +1922,45 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
     };
 
     return (
-      <div style={{ fontFamily: "var(--font,'Nunito',sans-serif)", minHeight: "100%", background: "var(--bg,#F5FAFA)", padding: "24px 28px 40px" }}>
+      <div style={{ fontFamily: "var(--font,'Nunito',sans-serif)", minHeight: "100%", background: "var(--bg,#F8FAFC)", padding: "24px 28px 40px" }}>
         <style>{`
-          .prop-list-wrap .stat-card{background:var(--surface,#fff);border:1.5px solid var(--border,#E0EEF0);border-radius:16px;padding:18px 20px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .15s;}
-          .prop-list-wrap .stat-card:hover{border-color:var(--border,#E0EEF0);box-shadow:none;}
-          .prop-list-wrap .proposal-card{background:var(--surface,#fff);border:1.5px solid var(--border,#E0EEF0);border-radius:16px;overflow:hidden;cursor:pointer;transition:all .2s;margin-bottom:14px;}
-          .prop-list-wrap .proposal-card:hover{border-color:var(--teal, var(--app-accent, var(--app-accent, #00BCD4)));box-shadow:0 6px 24px rgba(0,188,212,.1);}
-          .prop-list-wrap .prop-tab{padding:7px 18px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;color:var(--text2,#607D86);transition:all .15s;border:none;background:none;font-family:inherit;}
-          .prop-list-wrap .prop-tab.active{background:var(--teal, var(--app-accent, var(--app-accent, #00BCD4)));color:#fff;box-shadow:0 2px 10px rgba(0,188,212,.3);}
-          .prop-list-wrap .prop-tab:not(.active):hover{background:var(--teal-light,var(--teal-light, var(--teal-light, #E0F7FA)));color:var(--teal, var(--app-accent, var(--app-accent, #00BCD4)));}
-          .prop-list-wrap .pf-btn{display:flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;border:1.5px solid var(--border,#E0EEF0);background:none;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--text2,#607D86);transition:all .15s;}
-          .prop-list-wrap .pf-btn:hover{border-color:var(--teal, var(--app-accent, var(--app-accent, #00BCD4)));color:var(--teal, var(--app-accent, var(--app-accent, #00BCD4)));background:var(--teal-light,var(--teal-light, var(--teal-light, #E0F7FA)));}
-          .prop-list-wrap .pf-btn.primary{background:var(--teal, var(--app-accent, var(--app-accent, #00BCD4)));color:#fff;border-color:var(--teal, var(--app-accent, var(--app-accent, #00BCD4)));}
-          .prop-list-wrap .pf-btn.primary:hover{background:var(--teal2,var(--app-accent2, #00BCD4));}
+          .prop-list-wrap .stat-card{background:var(--surface,#fff);border:1.5px solid var(--border,#E2E8F0);border-radius:16px;padding:18px 20px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .15s;}
+          .prop-list-wrap .stat-card:hover{border-color:var(--border,#E2E8F0);box-shadow:none;}
+          .prop-list-wrap .proposal-card{background:var(--surface,#fff);border:1.5px solid var(--border,#E2E8F0);border-radius:16px;overflow:hidden;cursor:pointer;transition:all .2s;margin-bottom:14px;}
+          .prop-list-wrap .proposal-card:hover{border-color:var(--teal, var(--app-accent, var(--app-accent, #2563EB)));box-shadow:0 6px 24px rgba(37, 99, 235,.1);}
+          .prop-list-wrap .prop-tab{padding:7px 18px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;color:var(--text2,#64748B);transition:all .15s;border:none;background:none;font-family:inherit;}
+          .prop-list-wrap .prop-tab.active{background:var(--teal, var(--app-accent, var(--app-accent, #2563EB)));color:#fff;box-shadow:0 2px 10px rgba(37, 99, 235,.3);}
+          .prop-list-wrap .prop-tab:not(.active):hover{background:var(--teal-light,var(--teal-light, var(--teal-light, #EFF6FF)));color:var(--teal, var(--app-accent, var(--app-accent, #2563EB)));}
+          .prop-list-wrap .pf-btn{display:flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;border:1.5px solid var(--border,#E2E8F0);background:none;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--text2,#64748B);transition:all .15s;}
+          .prop-list-wrap .pf-btn:hover{border-color:var(--teal, var(--app-accent, var(--app-accent, #2563EB)));color:var(--teal, var(--app-accent, var(--app-accent, #2563EB)));background:var(--teal-light,var(--teal-light, var(--teal-light, #EFF6FF)));}
+          .prop-list-wrap .pf-btn.primary{background:var(--teal, var(--app-accent, var(--app-accent, #2563EB)));color:#fff;border-color:var(--teal, var(--app-accent, var(--app-accent, #2563EB)));}
+          .prop-list-wrap .pf-btn.primary:hover{background:var(--teal2,var(--app-accent2, #2563EB));}
           .prop-list-wrap .pf-btn.danger{color:var(--red,#F05C5C);border-color:var(--red-bg,#FEF2F2);}
           .prop-list-wrap .badge-pill{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:700;}
           .prop-list-wrap .badge-pill::before{content:'';width:5px;height:5px;border-radius:50%;}
-          .prop-list-wrap .badge-won{background:var(--green-bg,#E8FAF3);color:var(--green,#26C281);} .prop-list-wrap .badge-won::before{background:var(--green,#26C281);}
+          .prop-list-wrap .badge-won{background:var(--green-bg,#E8FAF3);color:var(--green,#16A34A);} .prop-list-wrap .badge-won::before{background:var(--green,#16A34A);}
           .prop-list-wrap .badge-sent{background:var(--blue-bg,#EFF4FF);color:var(--blue,#2563EB);} .prop-list-wrap .badge-sent::before{background:var(--blue,#2563EB);}
           .prop-list-wrap .badge-review{background:var(--amber-bg,#FEF5E6);color:var(--amber,#F5A623);} .prop-list-wrap .badge-review::before{background:var(--amber,#F5A623);}
-          .prop-list-wrap .badge-draft{background:var(--surface2,#F8FAFB);color:var(--text3,#A0B8BE);border:1px solid var(--border,#E0EEF0);} .prop-list-wrap .badge-draft::before{background:var(--text3,#A0B8BE);}
+          .prop-list-wrap .badge-draft{background:var(--surface2,#F8FAFB);color:var(--text3,#64748B);border:1px solid var(--border,#E2E8F0);} .prop-list-wrap .badge-draft::before{background:var(--text3,#64748B);}
           .prop-list-wrap .badge-lost{background:var(--red-bg,#FEF2F2);color:var(--red,#F05C5C);} .prop-list-wrap .badge-lost::before{background:var(--red,#F05C5C);}
           .prop-list-wrap .badge-negotiation{background:var(--purple-bg,#EEE9FF);color:var(--purple,#7C5CFC);} .prop-list-wrap .badge-negotiation::before{background:var(--purple,#7C5CFC);}
-          .prop-list-wrap .scope-tag{padding:4px 10px;background:var(--bg,#F5FAFA);border:1.5px solid var(--border,#E0EEF0);border-radius:20px;font-size:10px;font-weight:700;color:var(--text2,#607D86);}
-          .prop-list-wrap .add-card{background:var(--teal-lighter,var(--teal-lighter, #F0FDFE));border:2px dashed var(--teal, var(--app-accent, var(--app-accent, #00BCD4)));border-radius:16px;padding:28px;cursor:pointer;display:flex;align-items:center;gap:18px;transition:all .2s;}
-          .prop-list-wrap .add-card:hover{background:var(--teal-light,var(--teal-light, var(--teal-light, #E0F7FA)));}
-          .prop-list-wrap .tmpl-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg,#F5FAFA);border-radius:9px;border:1.5px solid var(--border,#E0EEF0);margin-bottom:8px;cursor:pointer;transition:all .15s;}
+          .prop-list-wrap .scope-tag{padding:4px 10px;background:var(--bg,#F8FAFC);border:1.5px solid var(--border,#E2E8F0);border-radius:20px;font-size:10px;font-weight:700;color:var(--text2,#64748B);}
+          .prop-list-wrap .add-card{background:var(--teal-lighter,var(--teal-lighter, #EFF6FF));border:2px dashed var(--teal, var(--app-accent, var(--app-accent, #2563EB)));border-radius:16px;padding:28px;cursor:pointer;display:flex;align-items:center;gap:18px;transition:all .2s;}
+          .prop-list-wrap .add-card:hover{background:var(--teal-light,var(--teal-light, var(--teal-light, #EFF6FF)));}
+          .prop-list-wrap .tmpl-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg,#F8FAFC);border-radius:9px;border:1.5px solid var(--border,#E2E8F0);margin-bottom:8px;cursor:pointer;transition:all .15s;}
           .prop-list-wrap .tmpl-item:last-child{margin-bottom:0;}
-          .prop-list-wrap .tmpl-item:hover{border-color:var(--teal, var(--app-accent, var(--app-accent, #00BCD4)));background:var(--teal-lighter,var(--teal-lighter, #F0FDFE));}
-          .prop-list-wrap .stage-item-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg,#F5FAFA);border-radius:10px;border:1.5px solid var(--border,#E0EEF0);margin-bottom:8px;}
-          .prop-list-wrap .filter-btn{display:flex;align-items:center;gap:6px;padding:9px 16px;background:var(--surface,#fff);border:1.5px solid var(--border,#E0EEF0);border-radius:10px;font-size:12px;font-weight:700;color:var(--text2,#607D86);cursor:pointer;font-family:inherit;transition:all .15s;}
-          .prop-list-wrap .filter-btn:hover{border-color:var(--teal, var(--app-accent, var(--app-accent, #00BCD4)));color:var(--teal, var(--app-accent, var(--app-accent, #00BCD4)));}
-          .prop-list-wrap .new-prop-btn{display:flex;align-items:center;gap:7px;padding:11px 20px;background:var(--teal, var(--app-accent, var(--app-accent, #00BCD4)));color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;transition:background .15s;box-shadow:0 4px 14px rgba(0,188,212,.25);}
-          .prop-list-wrap .new-prop-btn:hover{background:var(--teal2,var(--app-accent2, #00BCD4));}
-          .prop-list-wrap .prog-bar{height:5px;background:var(--border,#E0EEF0);border-radius:3px;overflow:hidden;margin-top:8px;}
+          .prop-list-wrap .tmpl-item:hover{border-color:var(--teal, var(--app-accent, var(--app-accent, #2563EB)));background:var(--teal-lighter,var(--teal-lighter, #EFF6FF));}
+          .prop-list-wrap .stage-item-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg,#F8FAFC);border-radius:10px;border:1.5px solid var(--border,#E2E8F0);margin-bottom:8px;}
+          .prop-list-wrap .filter-btn{display:flex;align-items:center;gap:6px;padding:9px 16px;background:var(--surface,#fff);border:1.5px solid var(--border,#E2E8F0);border-radius:10px;font-size:12px;font-weight:700;color:var(--text2,#64748B);cursor:pointer;font-family:inherit;transition:all .15s;}
+          .prop-list-wrap .filter-btn:hover{border-color:var(--teal, var(--app-accent, var(--app-accent, #2563EB)));color:var(--teal, var(--app-accent, var(--app-accent, #2563EB)));}
+          .prop-list-wrap .new-prop-btn{display:flex;align-items:center;gap:7px;padding:11px 20px;background:var(--teal, var(--app-accent, var(--app-accent, #2563EB)));color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;transition:background .15s;box-shadow:0 4px 14px rgba(37, 99, 235,.25);}
+          .prop-list-wrap .new-prop-btn:hover{background:var(--teal2,var(--app-accent2, #2563EB));}
+          .prop-list-wrap .prog-bar{height:5px;background:var(--border,#E2E8F0);border-radius:3px;overflow:hidden;margin-top:8px;}
           .prop-list-wrap .prog-fill{height:100%;border-radius:3px;}
           .prop-list-wrap .search-wrap{position:relative;flex:1;max-width:320px;}
-          .prop-list-wrap .search-wrap i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text3,#A0B8BE);font-size:15px;}
-          .prop-list-wrap .search-wrap input{width:100%;padding:10px 14px 10px 36px;background:var(--surface,#fff);border:1.5px solid var(--border,#E0EEF0);border-radius:12px;font-size:13px;color:var(--text,#1A2E35);font-family:inherit;outline:none;transition:all .15s;}
-      .prop-list-wrap .search-wrap input:focus{border-color:var(--teal, var(--app-accent, var(--app-accent, #00BCD4)));box-shadow:0 0 0 3px rgba(0,188,212,.08);}
+          .prop-list-wrap .search-wrap i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text3,#64748B);font-size:15px;}
+          .prop-list-wrap .search-wrap input{width:100%;padding:10px 14px 10px 36px;background:var(--surface,#fff);border:1.5px solid var(--border,#E2E8F0);border-radius:12px;font-size:13px;color:var(--text,#1E293B);font-family:inherit;outline:none;transition:all .15s;}
+      .prop-list-wrap .search-wrap input:focus{border-color:var(--teal, var(--app-accent, var(--app-accent, #2563EB)));box-shadow:0 0 0 3px rgba(37, 99, 235,.08);}
           @media (max-width: 700px) {
             .prop-stats-row { grid-template-columns: repeat(2,1fr) !important; }
             .prop-header-row { flex-wrap: wrap !important; gap: 10px !important; }
@@ -1976,8 +1976,8 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
           {/* PAGE HEADER */}
           <div className="prop-header-row" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 22 }}>
             <div>
-              <h1 style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1A2E35)", margin: 0 }}>Project Proposals</h1>
-              <p style={{ fontSize: 12, color: "var(--text3,#A0B8BE)", marginTop: 3 }}>Manage and track your client project proposals</p>
+              <h1 style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1E293B)", margin: 0 }}>Project Proposals</h1>
+              <p style={{ fontSize: 12, color: "var(--text3,#64748B)", marginTop: 3 }}>Manage and track your client project proposals</p>
             </div>
             <div className="prop-header-actions" style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <input
@@ -1986,12 +1986,12 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                 onChange={e => setSelectedMonth(e.target.value)}
                 style={{
                   padding: "8px 14px",
-                  border: "1.5px solid var(--border,#E0EEF0)",
+                  border: "1.5px solid var(--border,#E2E8F0)",
                   borderRadius: 10,
                   fontFamily: "inherit",
                   fontSize: 13,
                   fontWeight: 600,
-                  color: "var(--text,#1A2E35)",
+                  color: "var(--text,#1E293B)",
                   background: "#fff",
                   cursor: "pointer",
                   outline: "none"
@@ -2003,35 +2003,35 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
 
           {/* STATS ROW */}
           <div className="prop-stats-row" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14, marginBottom: 22 }}>
-            <div className="stat-card" style={{ display: "flex", alignItems: "center", gap: 12, border: "1.5px solid var(--border,#E0EEF0)", cursor: "default" }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, background: "var(--teal-light,var(--teal-light, var(--teal-light, #E0F7FA)))", color: "var(--teal, var(--app-accent, var(--app-accent, #00BCD4)))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, marginBottom: 8, flexShrink: 0 }}><i className="ti ti-presentation"></i></div>
+            <div className="stat-card" style={{ display: "flex", alignItems: "center", gap: 12, border: "1.5px solid var(--border,#E2E8F0)", cursor: "default" }}>
+              <div style={{ width: 36, height: 36, borderRadius: 10, background: "var(--teal-light,var(--teal-light, var(--teal-light, #EFF6FF)))", color: "var(--teal, var(--app-accent, var(--app-accent, #2563EB)))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, marginBottom: 8, flexShrink: 0 }}><i className="ti ti-presentation"></i></div>
               <div>
-                <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1A2E35)", lineHeight: 1 }}>{total}</div>
-                <div style={{ fontSize: 11, color: "var(--text3,#A0B8BE)", fontWeight: 600, marginTop: 3 }}>Total Proposals</div>
-                <div style={{ fontSize: 10, fontWeight: 700, marginTop: 4, color: "var(--teal, var(--app-accent, var(--app-accent, #00BCD4)))" }}>₹{totalVal.toLocaleString("en-IN")} pipeline</div>
+                <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1E293B)", lineHeight: 1 }}>{total}</div>
+                <div style={{ fontSize: 11, color: "var(--text3,#64748B)", fontWeight: 600, marginTop: 3 }}>Total Proposals</div>
+                <div style={{ fontSize: 10, fontWeight: 700, marginTop: 4, color: "var(--teal, var(--app-accent, var(--app-accent, #2563EB)))" }}>₹{totalVal.toLocaleString("en-IN")} pipeline</div>
               </div>
             </div>
-            <div className="stat-card" style={{ border: "1.5px solid var(--border,#E0EEF0)", cursor: "default" }}>
-              <div style={{ width: 44, height: 44, borderRadius: 12, background: "var(--green-bg,#E8FAF3)", color: "var(--green,#26C281)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}><i className="ti ti-trophy"></i></div>
+            <div className="stat-card" style={{ border: "1.5px solid var(--border,#E2E8F0)", cursor: "default" }}>
+              <div style={{ width: 44, height: 44, borderRadius: 12, background: "var(--green-bg,#E8FAF3)", color: "var(--green,#16A34A)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}><i className="ti ti-trophy"></i></div>
               <div>
-                <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1A2E35)", lineHeight: 1 }}>{wonCount}</div>
-                <div style={{ fontSize: 11, color: "var(--text3,#A0B8BE)", fontWeight: 600, marginTop: 3 }}>Won</div>
-                <div style={{ fontSize: 10, fontWeight: 700, marginTop: 4, color: "var(--green,#26C281)" }}>₹{wonVal.toLocaleString("en-IN")} closed</div>
+                <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1E293B)", lineHeight: 1 }}>{wonCount}</div>
+                <div style={{ fontSize: 11, color: "var(--text3,#64748B)", fontWeight: 600, marginTop: 3 }}>Won</div>
+                <div style={{ fontSize: 10, fontWeight: 700, marginTop: 4, color: "var(--green,#16A34A)" }}>₹{wonVal.toLocaleString("en-IN")} closed</div>
               </div>
             </div>
-            <div className="stat-card" style={{ border: "1.5px solid var(--border,#E0EEF0)", cursor: "default" }}>
+            <div className="stat-card" style={{ border: "1.5px solid var(--border,#E2E8F0)", cursor: "default" }}>
               <div style={{ width: 44, height: 44, borderRadius: 12, background: "var(--purple-bg,#EEE9FF)", color: "var(--purple,#7C5CFC)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}><i className="ti ti-arrows-exchange"></i></div>
               <div>
-                <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1A2E35)", lineHeight: 1 }}>{activeCount}</div>
-                <div style={{ fontSize: 11, color: "var(--text3,#A0B8BE)", fontWeight: 600, marginTop: 3 }}>In Progress</div>
+                <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1E293B)", lineHeight: 1 }}>{activeCount}</div>
+                <div style={{ fontSize: 11, color: "var(--text3,#64748B)", fontWeight: 600, marginTop: 3 }}>In Progress</div>
                 <div style={{ fontSize: 10, fontWeight: 700, marginTop: 4, color: "var(--purple,#7C5CFC)" }}>Active pipeline</div>
               </div>
             </div>
-            <div className="stat-card" style={{ border: "1.5px solid var(--border,#E0EEF0)", cursor: "default" }}>
+            <div className="stat-card" style={{ border: "1.5px solid var(--border,#E2E8F0)", cursor: "default" }}>
               <div style={{ width: 44, height: 44, borderRadius: 12, background: "var(--amber-bg,#FEF5E6)", color: "var(--amber,#F5A623)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}><i className="ti ti-percentage"></i></div>
               <div>
-                <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1A2E35)", lineHeight: 1 }}>{successRate}%</div>
-                <div style={{ fontSize: 11, color: "var(--text3,#A0B8BE)", fontWeight: 600, marginTop: 3 }}>Success Rate</div>
+                <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1E293B)", lineHeight: 1 }}>{successRate}%</div>
+                <div style={{ fontSize: 11, color: "var(--text3,#64748B)", fontWeight: 600, marginTop: 3 }}>Success Rate</div>
                 <div style={{ fontSize: 10, fontWeight: 700, marginTop: 4, color: "var(--amber,#F5A623)" }}>{wonCount} of {decided} decided</div>
               </div>
             </div>
@@ -2039,7 +2039,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
 
           {/* TABS + SEARCH */}
           <div className="prop-tabs-search-row" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
-            <div style={{ display: "flex", gap: 4, flexWrap: "wrap", background: "var(--surface,#fff)", border: "1.5px solid var(--border,#E0EEF0)", borderRadius: 12, padding: 4 }}>
+            <div style={{ display: "flex", gap: 4, flexWrap: "wrap", background: "var(--surface,#fff)", border: "1.5px solid var(--border,#E2E8F0)", borderRadius: 12, padding: 4 }}>
               {["all", "draft", "sent", "negotiation", "won", "lost"].map(t => (
                 <button key={t} className={`prop-tab${propTab === t ? " active" : ""}`} onClick={() => { setPropTab(t); setActiveCard(t === "all" ? "all" : t === "won" ? "won" : t === "negotiation" ? "inprogress" : ""); }} style={{ whiteSpace: "nowrap" }}>
                   {t.charAt(0).toUpperCase() + t.slice(1)}
@@ -2051,7 +2051,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                 <i className="ti ti-search"></i>
                 <input placeholder="Search proposals…" value={propSearch} onChange={e => setPropSearch(e.target.value)} />
               </div>
-              <div style={{ fontSize: 12, color: "var(--text3,#A0B8BE)", fontWeight: 600, whiteSpace: "nowrap" }}>{filtered.length} proposals · ₹{totalVal.toLocaleString("en-IN")}</div>
+              <div style={{ fontSize: 12, color: "var(--text3,#64748B)", fontWeight: 600, whiteSpace: "nowrap" }}>{filtered.length} proposals · ₹{totalVal.toLocaleString("en-IN")}</div>
             </div>
           </div>
 
@@ -2061,9 +2061,9 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
             {/* LEFT – PROPOSALS */}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 20 }}>
               {loading ? (
-                <div style={{ textAlign: "center", padding: "60px 20px", color: "var(--text3,#A0B8BE)", fontSize: 14 }}></div>
+                <div style={{ textAlign: "center", padding: "60px 20px", color: "var(--text3,#64748B)", fontSize: 14 }}></div>
               ) : filtered.length === 0 ? (
-                <div style={{ textAlign: "center", padding: "60px 20px", color: "var(--text3,#A0B8BE)", fontSize: 14 }}>No proposals found</div>
+                <div style={{ textAlign: "center", padding: "60px 20px", color: "var(--text3,#64748B)", fontSize: 14 }}>No proposals found</div>
               ) : (
                 <>
                   {filtered.map(p => {
@@ -2077,14 +2077,14 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                     return (
                       <div key={p.id || p._id} className="proposal-card" onClick={() => { setOpenMenuId(null); openDoc(p); }}>
                         {/* Header */}
-                        <div style={{ display: "flex", alignItems: "center", gap: 16, padding: "18px 20px", borderBottom: "1px solid var(--border,#E0EEF0)" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 16, padding: "18px 20px", borderBottom: "1px solid var(--border,#E2E8F0)" }}>
                           <div style={{ width: 48, height: 48, borderRadius: 13, background: grad, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 800, color: "#fff", flexShrink: 0 }}>{initials}</div>
                           <div style={{ flex: 1, minWidth: 0 }}>
-                            <div style={{ fontSize: 10, fontWeight: 800, color: "var(--teal, var(--app-accent, var(--app-accent, #00BCD4)))", letterSpacing: 0.5, marginBottom: 2 }}>{p.id}</div>
-                            <div style={{ fontSize: 14, fontWeight: 800, color: "var(--text,#1A2E35)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.title || "Untitled Proposal"}</div>
+                            <div style={{ fontSize: 10, fontWeight: 800, color: "var(--teal, var(--app-accent, var(--app-accent, #2563EB)))", letterSpacing: 0.5, marginBottom: 2 }}>{p.id}</div>
+                            <div style={{ fontSize: 14, fontWeight: 800, color: "var(--text,#1E293B)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.title || "Untitled Proposal"}</div>
                             <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 3 }}>
-                              <div style={{ width: 18, height: 18, borderRadius: "50%", background: "var(--teal, var(--app-accent, var(--app-accent, #00BCD4)))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 7, fontWeight: 800, color: "#fff", flexShrink: 0 }}>{clientInitial}</div>
-                              <span style={{ fontSize: 11, color: "var(--text2,#607D86)", fontWeight: 600 }}>{p.client || "No client assigned"}</span>
+                              <div style={{ width: 18, height: 18, borderRadius: "50%", background: "var(--teal, var(--app-accent, var(--app-accent, #2563EB)))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 7, fontWeight: 800, color: "#fff", flexShrink: 0 }}>{clientInitial}</div>
+                              <span style={{ fontSize: 11, color: "var(--text2,#64748B)", fontWeight: 600 }}>{p.client || "No client assigned"}</span>
                             </div>
                           </div>
                           <div style={{ display: "flex", alignItems: "center", gap: 12, flexShrink: 0, position: "relative" }}>
@@ -2107,13 +2107,13 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                                 <option key={s} value={s}>{s === 'approved' ? 'Won' : s === 'rejected' ? 'Lost' : s.charAt(0).toUpperCase() + s.slice(1)}</option>
                               ))}
                             </select>
-                            <button onClick={e => { e.stopPropagation(); setOpenMenuId(openMenuId === (p.id || p._id) ? null : (p.id || p._id)); }} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text3,#A0B8BE)", fontSize: 17, padding: 4 }}><i className="ti ti-dots-vertical"></i></button>
+                            <button onClick={e => { e.stopPropagation(); setOpenMenuId(openMenuId === (p.id || p._id) ? null : (p.id || p._id)); }} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text3,#64748B)", fontSize: 17, padding: 4 }}><i className="ti ti-dots-vertical"></i></button>
                             {openMenuId === (p.id || p._id) && (
-                              <div onClick={e => e.stopPropagation()} style={{ position: "absolute", top: 28, right: 0, background: "#fff", border: "1.5px solid #e0eef0", borderRadius: 10, boxShadow: "0 8px 24px rgba(0,0,0,0.12)", zIndex: 999, minWidth: 160, overflow: "hidden" }}>
-                                <div onClick={e => { setOpenMenuId(null); openDoc(p); }} style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "#1A2E35", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid #f0f4f8" }} onMouseEnter={e => e.currentTarget.style.background = "#f0fdfe"} onMouseLeave={e => e.currentTarget.style.background = ""}><i className="ti ti-eye" style={{ color: " var(--app-accent, var(--app-accent, #00BCD4))" }}></i> View</div>
-                                <div onClick={e => { setOpenMenuId(null); setDoc(p); setPage(0); setView("form"); }} style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "#1A2E35", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid #f0f4f8" }} onMouseEnter={e => e.currentTarget.style.background = "#f0fdfe"} onMouseLeave={e => e.currentTarget.style.background = ""}><i className="ti ti-edit" style={{ color: "#F59E0B" }}></i> Edit</div>
-                                <div onClick={e => { setOpenMenuId(null); shareProposalPDF(p); }} style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "#1A2E35", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid #f0f4f8" }} onMouseEnter={e => e.currentTarget.style.background = "#f0fdfe"} onMouseLeave={e => e.currentTarget.style.background = ""}><i className="ti ti-share" style={{ color: "#7C5CFC" }}></i> Share</div>
-                                <div onClick={e => { setOpenMenuId(null); printProposal(p); }} style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "#1A2E35", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid #f0f4f8" }} onMouseEnter={e => e.currentTarget.style.background = "#f0fdfe"} onMouseLeave={e => e.currentTarget.style.background = ""}><i className="ti ti-download" style={{ color: "#2563EB" }}></i> PDF</div>
+                              <div onClick={e => e.stopPropagation()} style={{ position: "absolute", top: 28, right: 0, background: "#fff", border: "1.5px solid #e2e8f0", borderRadius: 10, boxShadow: "0 8px 24px rgba(0,0,0,0.12)", zIndex: 999, minWidth: 160, overflow: "hidden" }}>
+                                <div onClick={e => { setOpenMenuId(null); openDoc(p); }} style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "#1E293B", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid #f0f4f8" }} onMouseEnter={e => e.currentTarget.style.background = "#eff6ff"} onMouseLeave={e => e.currentTarget.style.background = ""}><i className="ti ti-eye" style={{ color: " var(--app-accent, var(--app-accent, #2563EB))" }}></i> View</div>
+                                <div onClick={e => { setOpenMenuId(null); setDoc(p); setPage(0); setView("form"); }} style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "#1E293B", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid #f0f4f8" }} onMouseEnter={e => e.currentTarget.style.background = "#eff6ff"} onMouseLeave={e => e.currentTarget.style.background = ""}><i className="ti ti-edit" style={{ color: "#F59E0B" }}></i> Edit</div>
+                                <div onClick={e => { setOpenMenuId(null); shareProposalPDF(p); }} style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "#1E293B", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid #f0f4f8" }} onMouseEnter={e => e.currentTarget.style.background = "#eff6ff"} onMouseLeave={e => e.currentTarget.style.background = ""}><i className="ti ti-share" style={{ color: "#7C5CFC" }}></i> Share</div>
+                                <div onClick={e => { setOpenMenuId(null); printProposal(p); }} style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "#1E293B", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid #f0f4f8" }} onMouseEnter={e => e.currentTarget.style.background = "#eff6ff"} onMouseLeave={e => e.currentTarget.style.background = ""}><i className="ti ti-download" style={{ color: "#2563EB" }}></i> PDF</div>
                                 <div onClick={e => { setOpenMenuId(null); deleteProposal(p.id, p._id, e); }} style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "#EF4444", cursor: "pointer", display: "flex", alignItems: "center", gap: 8 }} onMouseEnter={e => e.currentTarget.style.background = "#fff1f2"} onMouseLeave={e => e.currentTarget.style.background = ""}><i className="ti ti-trash" style={{ color: "#EF4444" }}></i> Delete</div>
                               </div>
                             )}
@@ -2121,28 +2121,28 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                         </div>
 
                         {/* Body */}
-                        <div style={{ padding: "16px 20px", display: "flex", flexDirection: "column", gap: 10, borderBottom: "1px solid var(--border,#E0EEF0)" }}>
+                        <div style={{ padding: "16px 20px", display: "flex", flexDirection: "column", gap: 10, borderBottom: "1px solid var(--border,#E2E8F0)" }}>
                           <div>
-                            <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text3,#A0B8BE)", textTransform: "uppercase", letterSpacing: 0.6, marginBottom: 4 }}>Proposal Value</div>
-                            <div style={{ fontSize: 14, fontWeight: 800, color: "var(--teal, var(--app-accent, var(--app-accent, #00BCD4)))" }}>₹{value.toLocaleString("en-IN")}</div>
-                            <div style={{ fontSize: 10, color: "var(--text3,#A0B8BE)", marginTop: 2 }}>Estimated</div>
+                            <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text3,#64748B)", textTransform: "uppercase", letterSpacing: 0.6, marginBottom: 4 }}>Proposal Value</div>
+                            <div style={{ fontSize: 14, fontWeight: 800, color: "var(--teal, var(--app-accent, var(--app-accent, #2563EB)))" }}>₹{value.toLocaleString("en-IN")}</div>
+                            <div style={{ fontSize: 10, color: "var(--text3,#64748B)", marginTop: 2 }}>Estimated</div>
                           </div>
                           <div>
-                            <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text3,#A0B8BE)", textTransform: "uppercase", letterSpacing: 0.6, marginBottom: 4 }}>Pages</div>
-                            <div style={{ fontSize: 14, fontWeight: 800, color: "var(--text,#1A2E35)" }}>{slides}</div>
-                            <div style={{ fontSize: 10, color: "var(--text3,#A0B8BE)", marginTop: 2 }}>Slides included</div>
+                            <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text3,#64748B)", textTransform: "uppercase", letterSpacing: 0.6, marginBottom: 4 }}>Pages</div>
+                            <div style={{ fontSize: 14, fontWeight: 800, color: "var(--text,#1E293B)" }}>{slides}</div>
+                            <div style={{ fontSize: 10, color: "var(--text3,#64748B)", marginTop: 2 }}>Slides included</div>
                           </div>
                           <div>
-                            <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text3,#A0B8BE)", textTransform: "uppercase", letterSpacing: 0.6, marginBottom: 4 }}>Last Updated</div>
-                            <div style={{ fontSize: 13, fontWeight: 800, color: "var(--text,#1A2E35)" }}>{fmtDate(created)}</div>
-                            <div style={{ fontSize: 10, color: "var(--text3,#A0B8BE)", marginTop: 2 }}>Modified</div>
+                            <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text3,#64748B)", textTransform: "uppercase", letterSpacing: 0.6, marginBottom: 4 }}>Last Updated</div>
+                            <div style={{ fontSize: 13, fontWeight: 800, color: "var(--text,#1E293B)" }}>{fmtDate(created)}</div>
+                            <div style={{ fontSize: 10, color: "var(--text3,#64748B)", marginTop: 2 }}>Modified</div>
                           </div>
                         </div>
 
                         {/* Scope tags from slide types */}
                         {p.slides && p.slides.length > 0 && (
-                          <div style={{ padding: "12px 20px", borderBottom: "1px solid var(--border,#E0EEF0)" }}>
-                            <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text3,#A0B8BE)", textTransform: "uppercase", letterSpacing: 0.6, marginBottom: 8 }}>Slide Types</div>
+                          <div style={{ padding: "12px 20px", borderBottom: "1px solid var(--border,#E2E8F0)" }}>
+                            <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text3,#64748B)", textTransform: "uppercase", letterSpacing: 0.6, marginBottom: 8 }}>Slide Types</div>
                             <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                               {[...new Set(p.slides.map(s => s.type))].slice(0, 5).map((t, i) => (
                                 <span key={i} className="scope-tag">{SLIDE_TYPES.find(x => x.id === t)?.label || t}</span>
@@ -2153,22 +2153,22 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                         )}
 
                         {/* Progress bar */}
-                        <div style={{ padding: "12px 20px", borderBottom: "1px solid var(--border,#E0EEF0)" }}>
+                        <div style={{ padding: "12px 20px", borderBottom: "1px solid var(--border,#E2E8F0)" }}>
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                            <span style={{ fontSize: 11, fontWeight: 700, color: "var(--text2,#607D86)" }}>Proposal Stage</span>
-                            <span style={{ fontSize: 10, color: "var(--text3,#A0B8BE)", fontWeight: 600 }}>{badge.label}</span>
+                            <span style={{ fontSize: 11, fontWeight: 700, color: "var(--text2,#64748B)" }}>Proposal Stage</span>
+                            <span style={{ fontSize: 10, color: "var(--text3,#64748B)", fontWeight: 600 }}>{badge.label}</span>
                           </div>
                           <div className="prog-bar">
-                            <div className="prog-fill" style={{ width: badge.cls === "draft" ? "10%" : badge.cls === "sent" ? "30%" : badge.cls === "review" ? "50%" : badge.cls === "negotiation" ? "75%" : badge.cls === "won" ? "100%" : "5%", background: badge.cls === "won" ? "linear-gradient(90deg,var(--green,#26C281),#6EE7B7)" : badge.cls === "negotiation" ? "linear-gradient(90deg,var(--purple,#7C5CFC),#B39DFF)" : badge.cls === "sent" ? "linear-gradient(90deg,var(--blue,#2563EB),#7EC8FD)" : "linear-gradient(90deg,var(--teal, var(--app-accent, var(--app-accent, #00BCD4))),#26D0CE)" }}></div>
+                            <div className="prog-fill" style={{ width: badge.cls === "draft" ? "10%" : badge.cls === "sent" ? "30%" : badge.cls === "review" ? "50%" : badge.cls === "negotiation" ? "75%" : badge.cls === "won" ? "100%" : "5%", background: badge.cls === "won" ? "linear-gradient(90deg,var(--green,#16A34A),#6EE7B7)" : badge.cls === "negotiation" ? "linear-gradient(90deg,var(--purple,#7C5CFC),#B39DFF)" : badge.cls === "sent" ? "linear-gradient(90deg,var(--blue,#2563EB),#7EC8FD)" : "linear-gradient(90deg,var(--teal, var(--app-accent, var(--app-accent, #2563EB))),#26D0CE)" }}></div>
                           </div>
                         </div>
 
                         {/* Footer */}
                         <div style={{ padding: "12px 20px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                          <div style={{ fontSize: 11, color: "var(--text3,#A0B8BE)", display: "flex", alignItems: "center", gap: 5, fontWeight: 600 }}>
+                          <div style={{ fontSize: 11, color: "var(--text3,#64748B)", display: "flex", alignItems: "center", gap: 5, fontWeight: 600 }}>
                             <i className="ti ti-calendar" style={{ fontSize: 11 }}></i> Valid until {fmtDate(new Date(Date.now() + 30 * 86400000))}
                           </div>
-                          <div style={{ fontSize: 15, fontWeight: 800, color: "var(--teal, var(--app-accent, var(--app-accent, #00BCD4)))" }}>₹{value.toLocaleString("en-IN")}</div>
+                          <div style={{ fontSize: 15, fontWeight: 800, color: "var(--teal, var(--app-accent, var(--app-accent, #2563EB)))" }}>₹{value.toLocaleString("en-IN")}</div>
                           <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }} onClick={e => e.stopPropagation()}>
                             <button className="pf-btn" onClick={e => { e.stopPropagation(); openDoc(p); }}><i className="ti ti-eye" style={{ fontSize: 12 }}></i> View</button>
                             <button className="pf-btn" style={{ background: '#22C55E', color: '#fff', borderColor: '#22C55E' }} onClick={e => { e.stopPropagation(); setSendPopupProposal(p); setTargetPortalClient(p.client || p.clientName || ''); setShowSendPopup(true); }}><i className="ti ti-send" style={{ fontSize: 12 }}></i> Send</button>
@@ -2189,20 +2189,20 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
 
               {/* PIPELINE SUMMARY */}
-              <div style={{ background: "var(--surface,#fff)", border: "1.5px solid var(--border,#E0EEF0)", borderRadius: 16, padding: 20 }}>
-                <div style={{ fontSize: 13, fontWeight: 800, color: "var(--text,#1A2E35)", marginBottom: 4 }}>Pipeline Summary</div>
-                <div style={{ fontSize: 11, color: "var(--text3,#A0B8BE)", marginBottom: 16 }}>Total value across all stages</div>
-                <div style={{ textAlign: "center", padding: 14, background: "var(--teal-lighter,var(--teal-lighter, #F0FDFE))", borderRadius: 12, border: "1.5px solid var(--teal-light,var(--teal-light, var(--teal-light, #E0F7FA)))", marginBottom: 14 }}>
-                  <div style={{ fontSize: 10, color: "var(--text3,#A0B8BE)", fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.5 }}>Total Pipeline Value</div>
-                  <div style={{ fontSize: 26, fontWeight: 800, color: "var(--teal, var(--app-accent, var(--app-accent, #00BCD4)))", marginTop: 3, letterSpacing: -0.5 }}>₹{totalVal.toLocaleString("en-IN")}</div>
-                  <div style={{ fontSize: 11, color: "var(--text3,#A0B8BE)", marginTop: 2 }}>Across {total} proposals</div>
+              <div style={{ background: "var(--surface,#fff)", border: "1.5px solid var(--border,#E2E8F0)", borderRadius: 16, padding: 20 }}>
+                <div style={{ fontSize: 13, fontWeight: 800, color: "var(--text,#1E293B)", marginBottom: 4 }}>Pipeline Summary</div>
+                <div style={{ fontSize: 11, color: "var(--text3,#64748B)", marginBottom: 16 }}>Total value across all stages</div>
+                <div style={{ textAlign: "center", padding: 14, background: "var(--teal-lighter,var(--teal-lighter, #EFF6FF))", borderRadius: 12, border: "1.5px solid var(--teal-light,var(--teal-light, var(--teal-light, #EFF6FF)))", marginBottom: 14 }}>
+                  <div style={{ fontSize: 10, color: "var(--text3,#64748B)", fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.5 }}>Total Pipeline Value</div>
+                  <div style={{ fontSize: 26, fontWeight: 800, color: "var(--teal, var(--app-accent, var(--app-accent, #2563EB)))", marginTop: 3, letterSpacing: -0.5 }}>₹{totalVal.toLocaleString("en-IN")}</div>
+                  <div style={{ fontSize: 11, color: "var(--text3,#64748B)", marginTop: 2 }}>Across {total} proposals</div>
                 </div>
                 <div>
                   {pipelineStages.map((st, i) => (
                     <div key={i} className="stage-item-row">
                       <div style={{ width: 10, height: 10, borderRadius: "50%", background: st.color, flexShrink: 0 }}></div>
-                      <span style={{ fontSize: 12, fontWeight: 700, color: "var(--text,#1A2E35)", flex: 1 }}>{st.label}</span>
-                      <span style={{ fontSize: 11, color: "var(--text3,#A0B8BE)", fontWeight: 600 }}>{st.count} {st.count === 1 ? "proposal" : "proposals"}</span>
+                      <span style={{ fontSize: 12, fontWeight: 700, color: "var(--text,#1E293B)", flex: 1 }}>{st.label}</span>
+                      <span style={{ fontSize: 11, color: "var(--text3,#64748B)", fontWeight: 600 }}>{st.count} {st.count === 1 ? "proposal" : "proposals"}</span>
                       <span style={{ fontSize: 12, fontWeight: 800, color: st.color }}>₹{(st.val / 1000).toFixed(0)}K</span>
                     </div>
                   ))}
@@ -2210,45 +2210,45 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
               </div>
 
               {/* WIN RATE DONUT */}
-              <div style={{ background: "var(--surface,#fff)", border: "1.5px solid var(--border,#E0EEF0)", borderRadius: 16, padding: 18 }}>
-                <div style={{ fontSize: 13, fontWeight: 800, color: "var(--text,#1A2E35)", marginBottom: 14 }}>Win Rate</div>
+              <div style={{ background: "var(--surface,#fff)", border: "1.5px solid var(--border,#E2E8F0)", borderRadius: 16, padding: 18 }}>
+                <div style={{ fontSize: 13, fontWeight: 800, color: "var(--text,#1E293B)", marginBottom: 14 }}>Win Rate</div>
                 <div style={{ position: "relative", width: 100, height: 100, margin: "0 auto 14px" }}>
                   <svg viewBox="0 0 100 100" width="100" height="100">
-                    <circle cx="50" cy="50" r="38" fill="none" stroke="#E0EEF0" strokeWidth="12" />
+                    <circle cx="50" cy="50" r="38" fill="none" stroke="#E2E8F0" strokeWidth="12" />
                     <circle cx="50" cy="50" r="38" fill="none" stroke="url(#wg2)" strokeWidth="12"
                       strokeDasharray={`${successRate * 2.39} ${239 - successRate * 2.39}`} strokeDashoffset="28" strokeLinecap="round" />
                     <defs>
                       <linearGradient id="wg2" x1="0" y1="0" x2="1" y2="1">
-                        <stop offset="0%" stopColor=" var(--app-accent, var(--app-accent, #00BCD4))" />
-                        <stop offset="100%" stopColor="#26C281" />
+                        <stop offset="0%" stopColor=" var(--app-accent, var(--app-accent, #2563EB))" />
+                        <stop offset="100%" stopColor="#16A34A" />
                       </linearGradient>
                     </defs>
                   </svg>
                   <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", textAlign: "center" }}>
-                    <div style={{ fontSize: 18, fontWeight: 800, color: "var(--text,#1A2E35)" }}>{successRate}%</div>
-                    <div style={{ fontSize: 9, color: "var(--text3,#A0B8BE)", fontWeight: 600 }}>WIN RATE</div>
+                    <div style={{ fontSize: 18, fontWeight: 800, color: "var(--text,#1E293B)" }}>{successRate}%</div>
+                    <div style={{ fontSize: 9, color: "var(--text3,#64748B)", fontWeight: 600 }}>WIN RATE</div>
                   </div>
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                   {[
-                    { val: wonCount, label: "Won", color: "var(--green,#26C281)" },
+                    { val: wonCount, label: "Won", color: "var(--green,#16A34A)" },
                     { val: proposals.filter(p => p.status === "rejected" || p.status === "lost").length, label: "Lost", color: "var(--red,#F05C5C)" },
                     { val: activeCount, label: "Active", color: "var(--amber,#F5A623)" },
-                    { val: proposals.filter(p => !p.status || p.status === "draft").length, label: "Draft", color: "var(--text3,#A0B8BE)" },
+                    { val: proposals.filter(p => !p.status || p.status === "draft").length, label: "Draft", color: "var(--text3,#64748B)" },
                   ].map((s, i) => (
-                    <div key={i} style={{ padding: 10, background: "var(--bg,#F5FAFA)", borderRadius: 9, border: "1px solid var(--border,#E0EEF0)", textAlign: "center" }}>
+                    <div key={i} style={{ padding: 10, background: "var(--bg,#F8FAFC)", borderRadius: 9, border: "1px solid var(--border,#E2E8F0)", textAlign: "center" }}>
                       <div style={{ fontSize: 15, fontWeight: 800, color: s.color }}>{s.val}</div>
-                      <div style={{ fontSize: 9, color: "var(--text3,#A0B8BE)", fontWeight: 600, marginTop: 2 }}>{s.label}</div>
+                      <div style={{ fontSize: 9, color: "var(--text3,#64748B)", fontWeight: 600, marginTop: 2 }}>{s.label}</div>
                     </div>
                   ))}
                 </div>
               </div>
 
               {/* PROPOSAL TEMPLATES */}
-              <div style={{ background: "var(--surface,#fff)", border: "1.5px solid var(--border,#E0EEF0)", borderRadius: 16, padding: 18 }}>
-                <div style={{ fontSize: 13, fontWeight: 800, color: "var(--text,#1A2E35)", marginBottom: 12 }}>Quick Start Templates</div>
+              <div style={{ background: "var(--surface,#fff)", border: "1.5px solid var(--border,#E2E8F0)", borderRadius: 16, padding: 18 }}>
+                <div style={{ fontSize: 13, fontWeight: 800, color: "var(--text,#1E293B)", marginBottom: 12 }}>Quick Start Templates</div>
                 {[
-                  { icon: "ti-world", label: "Web Development", meta: "Full-stack project template", bg: "var(--teal-light,var(--teal-light, var(--teal-light, #E0F7FA)))", color: "var(--teal, var(--app-accent, var(--app-accent, #00BCD4)))" },
+                  { icon: "ti-world", label: "Web Development", meta: "Full-stack project template", bg: "var(--teal-light,var(--teal-light, var(--teal-light, #EFF6FF)))", color: "var(--teal, var(--app-accent, var(--app-accent, #2563EB)))" },
                   { icon: "ti-device-mobile", label: "Mobile App", meta: "iOS / Android template", bg: "var(--purple-bg,#EEE9FF)", color: "var(--purple,#7C5CFC)" },
                   { icon: "ti-chart-bar", label: "Digital Marketing", meta: "SEO, ads & content", bg: "var(--amber-bg,#FEF5E6)", color: "var(--amber,#F5A623)" },
                   { icon: "ti-cpu", label: "Custom Software", meta: "Enterprise solution", bg: "var(--blue-bg,#EFF4FF)", color: "var(--blue,#2563EB)" },
@@ -2256,10 +2256,10 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                   <div key={i} className="tmpl-item" onClick={openNewModal}>
                     <div style={{ width: 32, height: 32, borderRadius: 8, background: tmpl.bg, color: tmpl.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, flexShrink: 0 }}><i className={`ti ${tmpl.icon}`}></i></div>
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text,#1A2E35)" }}>{tmpl.label}</div>
-                      <div style={{ fontSize: 10, color: "var(--text3,#A0B8BE)" }}>{tmpl.meta}</div>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text,#1E293B)" }}>{tmpl.label}</div>
+                      <div style={{ fontSize: 10, color: "var(--text3,#64748B)" }}>{tmpl.meta}</div>
                     </div>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: "var(--teal, var(--app-accent, var(--app-accent, #00BCD4)))" }}>Use </span>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: "var(--teal, var(--app-accent, var(--app-accent, #2563EB)))" }}>Use </span>
                   </div>
                 ))}
               </div>
@@ -2292,7 +2292,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
           <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.5)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowSendPopup(false)}>
             <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: 16, padding: 24, width: 420, maxWidth: '92vw' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
-                <div style={{ fontSize: 16, fontWeight: 900, color: '#0D1B2A' }}>Send to Client Portal</div>
+                <div style={{ fontSize: 16, fontWeight: 900, color: '#0F172A' }}>Send to Client Portal</div>
                 <i className="ti ti-x" style={{ cursor: 'pointer', fontSize: 18 }} onClick={() => setShowSendPopup(false)}></i>
               </div>
               <div style={{ fontSize: 13, fontWeight: 700, color: '#374151', marginBottom: 8 }}>Select Client</div>
@@ -2313,14 +2313,14 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
           shareModalProposal && (
             <div style={{ position: "fixed", inset: 0, zIndex: 100000, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center" }} onClick={() => setShareModalProposal(null)}>
               <div onClick={e => e.stopPropagation()} style={{ background: "#fff", borderRadius: 16, padding: 24, width: 360, maxWidth: "90vw" }}>
-                <div style={{ fontSize: 15, fontWeight: 800, color: "#1A2E35", marginBottom: 4 }}>Share Proposal</div>
-                <div style={{ fontSize: 12, color: "#607D86", marginBottom: 18 }}>{shareModalProposal.title || "Untitled Proposal"}</div>
+                <div style={{ fontSize: 15, fontWeight: 800, color: "#1E293B", marginBottom: 4 }}>Share Proposal</div>
+                <div style={{ fontSize: 12, color: "#64748B", marginBottom: 18 }}>{shareModalProposal.title || "Untitled Proposal"}</div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                  <button onClick={async () => { await shareProposal(shareModalProposal); setShareModalProposal(null); }} style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", borderRadius: 10, border: "1.5px solid #e0eef0", background: "#f0fdfe", cursor: "pointer", fontSize: 13, fontWeight: 700, color: " var(--app-accent, var(--app-accent, #00BCD4))" }}><i className="ti ti-file-download"></i> Share as PDF</button>
-                  <button onClick={() => { shareWhatsApp(shareModalProposal); setShareModalProposal(null); }} style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", borderRadius: 10, border: "1.5px solid #e0eef0", background: "#f0fdf4", cursor: "pointer", fontSize: 13, fontWeight: 700, color: "#15803D" }}><i className="ti ti-brand-whatsapp"></i> Share via WhatsApp</button>
-                  <button onClick={async () => { const link = `${window.location.origin}${window.location.pathname}?view=${shareModalProposal._id || shareModalProposal.id}`; try { await navigator.clipboard.writeText(link); flash("Link copied to clipboard!"); } catch { prompt("Copy this link:", link); } setShareModalProposal(null); }} style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", borderRadius: 10, border: "1.5px solid #e0eef0", background: "#fff", cursor: "pointer", fontSize: 13, fontWeight: 700, color: "#374151" }}><i className="ti ti-link"></i> Copy Link</button>
+                  <button onClick={async () => { await shareProposal(shareModalProposal); setShareModalProposal(null); }} style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", borderRadius: 10, border: "1.5px solid #e2e8f0", background: "#eff6ff", cursor: "pointer", fontSize: 13, fontWeight: 700, color: " var(--app-accent, var(--app-accent, #2563EB))" }}><i className="ti ti-file-download"></i> Share as PDF</button>
+                  <button onClick={() => { shareWhatsApp(shareModalProposal); setShareModalProposal(null); }} style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", borderRadius: 10, border: "1.5px solid #e2e8f0", background: "#f0fdf4", cursor: "pointer", fontSize: 13, fontWeight: 700, color: "#15803D" }}><i className="ti ti-brand-whatsapp"></i> Share via WhatsApp</button>
+                  <button onClick={async () => { const link = `${window.location.origin}${window.location.pathname}?view=${shareModalProposal._id || shareModalProposal.id}`; try { await navigator.clipboard.writeText(link); flash("Link copied to clipboard!"); } catch { prompt("Copy this link:", link); } setShareModalProposal(null); }} style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", borderRadius: 10, border: "1.5px solid #e2e8f0", background: "#fff", cursor: "pointer", fontSize: 13, fontWeight: 700, color: "#374151" }}><i className="ti ti-link"></i> Copy Link</button>
                 </div>
-                <button onClick={() => setShareModalProposal(null)} style={{ marginTop: 16, width: "100%", padding: "9px", borderRadius: 10, border: "1.5px solid #e0eef0", background: "#fff", cursor: "pointer", fontSize: 12, fontWeight: 700, color: "#607D86" }}>Cancel</button>
+                <button onClick={() => setShareModalProposal(null)} style={{ marginTop: 16, width: "100%", padding: "9px", borderRadius: 10, border: "1.5px solid #e2e8f0", background: "#fff", cursor: "pointer", fontSize: 12, fontWeight: 700, color: "#64748B" }}>Cancel</button>
               </div>
             </div>
           )

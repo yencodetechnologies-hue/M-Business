@@ -23,15 +23,15 @@ export default function FinReports() {
       <style>{`
 /* ── M Business Finance Design System ── */
 :root {
-  --primary: var(--app-accent, var(--app-accent, #00BCD4)); --primary-dark:#00BCD4; --primary-light:var(--teal-light, var(--teal-light, #E0F7FA)); --primary-mid:#B2EBF2;
+  --primary: var(--app-accent, var(--app-accent, #2563EB)); --primary-dark:#2563EB; --primary-light:var(--teal-light, var(--teal-light, #EFF6FF)); --primary-mid:#B2EBF2;
   --text-dark:#1A2332; --text-mid:#4A5568; --text-light:#718096;
   --bg:#F0F4F8; --white:#FFFFFF; --border:#E2E8F0;
-  --green:#26C281; --green-light:#D1FAE5; --green-dark:#065F46;
+  --green:#16A34A; --green-light:#D1FAE5; --green-dark:#065F46;
   --orange:#F59E0B; --orange-light:#FEF3C7; --orange-dark:#92400E;
   --red:#FF6B6B; --red-dark:#EF4444; --red-light:#FEE2E2;
-  --purple:#8B5CF6; --purple-light:#EDE9FE;
+  --purple:#8B5CF6; --purple-light:#EFF6FF;
   --blue:#3B82F6; --blue-light:#DBEAFE;
-  --radius:14px; --shadow:0 2px 12px rgba(0,188,212,.08); --shadow-lg:0 8px 32px rgba(0,188,212,.14);
+  --radius:14px; --shadow:0 2px 12px rgba(37, 99, 235,.08); --shadow-lg:0 8px 32px rgba(37, 99, 235,.14);
 }
 * { box-sizing: border-box; }
 a { text-decoration: none; color: inherit; }
@@ -73,7 +73,7 @@ a { text-decoration: none; color: inherit; }
 .pc-chip.on,.pc-chip:hover{background:var(--primary);border-color:var(--primary);color:#fff;}
 .filter-sel{padding:9px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:600;color:var(--text-mid);background:var(--white);outline:none;}
 
-.share-section{background:linear-gradient(135deg,var(--purple),#7C3AED);border-radius:var(--radius);padding:22px 24px;color:#fff;margin-top:22px;}
+.share-section{background:linear-gradient(135deg,var(--purple),#2563EB);border-radius:var(--radius);padding:22px 24px;color:#fff;margin-top:22px;}
 .share-section h3{font-size:16px;font-weight:900;margin-bottom:6px;}
 .share-section p{font-size:13px;opacity:.85;margin-bottom:16px;}
 

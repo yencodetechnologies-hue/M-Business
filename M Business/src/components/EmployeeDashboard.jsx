@@ -22,7 +22,7 @@ const T = {
   // ── BACKGROUNDS ------------------------------------------
   bg: "var(--app-bg, #f8fafc)",
   surface: "#ffffff",
-  sidebar: "linear-gradient(180deg, var(--app-accent, #00BCD4) 0%, var(--app-accent2, #00BCD4) 100%)",
+  sidebar: "linear-gradient(180deg, var(--app-accent, #2563EB) 0%, var(--app-accent2, #2563EB) 100%)",
   sidebarActive: "rgba(255,255,255,0.22)",
   sidebarText: "rgba(255,255,255,0.65)",
   sidebarTextActive: "#ffffff",
@@ -37,8 +37,8 @@ const T = {
   textFaint: "var(--app-muted, #94a3b8)",
 
   // ── ACCENT -----------------------------------------------
-  accent: "var(--app-accent, #00BCD4)",
-  accentLight: "var(--teal-light, #E0F7FA)",
+  accent: "var(--app-accent, #2563EB)",
+  accentLight: "var(--teal-light, #EFF6FF)",
   accentRgb: "var(--app-accent-rgb, 0,188,212)",
 
   // ── STATUS (semantic — intentionally not tied to theme) ---
@@ -226,7 +226,7 @@ function Sidebar({ active, setActive, open, onClose, onLogout, user, navItems })
                 <img src={user.logoUrl} alt="logo" style={{ maxHeight: "100%", maxWidth: "100%", objectFit: "contain" }} />
               </div>
             ) : (
-              <div style={{ width: 42, height: 42, background: "linear-gradient(135deg,#ffffff,#f1f5f9)", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 900, color: "var(--app-accent, #00BCD4)", boxShadow: "0 6px 16px rgba(0,0,0,0.18), 0 0 0 1px rgba(255,255,255,0.2)" }}>
+              <div style={{ width: 42, height: 42, background: "linear-gradient(135deg,#ffffff,#f1f5f9)", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 900, color: "var(--app-accent, #2563EB)", boxShadow: "0 6px 16px rgba(0,0,0,0.18), 0 0 0 1px rgba(255,255,255,0.2)" }}>
                 {initials[0]}
               </div>
             )}
@@ -441,7 +441,7 @@ function EmployeeDocumentsPage({ user, notifications = [], onAcknowledge }) {
           <style>{`
             .emp-doc-view .lh-wrap { max-width: 760px; margin: 0 auto; background: #fff; box-shadow: 0 8px 30px rgba(0,0,0,0.12); border-radius: 4px; display: flex; flex-direction: column; border: 1px solid #eaeaea; font-family: 'Nunito', sans-serif; overflow: hidden; }
             .emp-doc-view .lb-editor { min-height: 0 !important; }
-            .emp-doc-view .doc-body { padding: 28px 40px; font-size: 12.5px; line-height: 1.8; color: #1A2E35; flex: 1; }
+            .emp-doc-view .doc-body { padding: 28px 40px; font-size: 12.5px; line-height: 1.8; color: #1E293B; flex: 1; }
             .emp-doc-view .lb-editor { white-space: pre-wrap; word-wrap: break-word; }
             .emp-doc-view .lb-recip { display: block !important; }
             .emp-doc-view .lb-ref { display: block !important; }
@@ -791,7 +791,7 @@ function MyProfilePage({ user, projects, tasks, attendance, onBack }) {
   const leaveHistory = attendance.filter(a => a.status === "leave" || a.status === "absent").slice(0, 3);
   const initials = name.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
 
-  const TC = { teal: " var(--app-accent, var(--app-accent, #00BCD4))", bg: "#f0f4f8", card: "#fff", border: "#e5eaf0", text: "#0f1c2e", textMid: "#4a5568", textSoft: "#94a3b8", green: "#16a34a", amber: "#d97706", red: "#dc2626", blue: "#2563eb" };
+  const TC = { teal: " var(--app-accent, var(--app-accent, #2563EB))", bg: "#f0f4f8", card: "#fff", border: "#e5eaf0", text: "#0f172a", textMid: "#4a5568", textSoft: "#94a3b8", green: "#16a34a", amber: "#d97706", red: "#dc2626", blue: "#2563eb" };
 
   const docItems = [
     { name: "Offer Letter", meta: "Jan 2024 · PDF", icon: "📄", color: "#6366F1" },
@@ -814,7 +814,7 @@ function MyProfilePage({ user, projects, tasks, attendance, onBack }) {
 
 
       {/* Hero */}
-      <div style={{ background: "linear-gradient(135deg,#0f9baa, var(--app-accent, var(--app-accent, #00BCD4)),#26c6da)", borderRadius: 18, padding: "24px 28px", display: "flex", alignItems: "center", gap: 18, color: "#fff", position: "relative", overflow: "hidden" }}>
+      <div style={{ background: "linear-gradient(135deg,#0f9baa, var(--app-accent, var(--app-accent, #2563EB)),#26c6da)", borderRadius: 18, padding: "24px 28px", display: "flex", alignItems: "center", gap: 18, color: "#fff", position: "relative", overflow: "hidden" }}>
         <div style={{ width: 56, height: 56, borderRadius: 16, background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, fontWeight: 900, border: "2px solid rgba(255,255,255,0.3)", flexShrink: 0 }}>{initials}</div>
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: 12, opacity: 0.7, fontWeight: 600 }}>My Profile</div>
@@ -833,7 +833,7 @@ function MyProfilePage({ user, projects, tasks, attendance, onBack }) {
       {/* Quick Stats */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14 }}>
         {[
-          { icon: "📅", val: presentDays, lbl: "Days Present", bg: "#e0f7fa", ic: TC.teal },
+          { icon: "📅", val: presentDays, lbl: "Days Present", bg: "#eff6ff", ic: TC.teal },
           { icon: "💼", val: activeProj, lbl: "Active Projects", bg: "#dcfce7", ic: TC.green },
           { icon: "✅", val: pendingTasks, lbl: "Tasks Pending", bg: "#fef3c7", ic: TC.amber },
           { icon: "🌴", val: leaveTotal - leaveUsed, lbl: "Leave Days Left", bg: "#dbeafe", ic: TC.blue },

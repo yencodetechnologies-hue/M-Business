@@ -29,7 +29,7 @@ function Modal({ title, onClose, children, wide }) {
   return (
     <div style={{
       position: "fixed", inset: 0, zIndex: 1000,
-      background: "rgba(59,7,100,0.55)", backdropFilter: "blur(8px)",
+      background: "rgba(15, 23, 42,0.55)", backdropFilter: "blur(8px)",
       display: "flex", alignItems: "center", justifyContent: "center", padding: 16,
     }}>
       <div style={{
@@ -253,7 +253,7 @@ export default function InterviewPage({ companyId = "69b8fe0a6e3d6f1e056f3109", 
       )}
 
       {/* Link Banner */}
-      <div style={{ background: "linear-gradient(135deg,var(--app-text),#2d1057)", borderRadius: 16, padding: "20px 24px", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", boxShadow: "0 8px 24px rgba(59,7,100,0.22)" }}>
+      <div style={{ background: "linear-gradient(135deg,var(--app-text),#0f172a)", borderRadius: 16, padding: "20px 24px", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", boxShadow: "0 8px 24px rgba(15, 23, 42,0.22)" }}>
         <div style={{ width: 44, height: 44, borderRadius: 12, background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0 }}></div>
         <div style={{ flex: 1, minWidth: 0 }}>
 

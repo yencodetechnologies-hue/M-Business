@@ -21,8 +21,8 @@ function ProposalFormInner({ onBack, onSave, initialData, clients, onAddClient, 
         if (opt) {
           selEl.value = newlyAddedClientName;
           selEl.style.transition = 'box-shadow .3s, border-color .3s';
-          selEl.style.borderColor = '#00BCD4';
-          selEl.style.boxShadow = '0 0 0 3px rgba(0,188,212,.25)';
+          selEl.style.borderColor = '#2563EB';
+          selEl.style.boxShadow = '0 0 0 3px rgba(37, 99, 235,.25)';
           setTimeout(() => { selEl.style.boxShadow = 'none'; }, 2000);
         }
       }
@@ -43,7 +43,7 @@ function ProposalFormInner({ onBack, onSave, initialData, clients, onAddClient, 
           ['draw', 'type', 'upload'].forEach(t => {
             const b = document.getElementById('sigTab-' + t);
             const c = document.getElementById('sigContent-' + t);
-            if (b) { b.style.color = t === tab ? 'var(--teal)' : '#607D86'; b.style.borderBottom = t === tab ? '2px solid var(--teal)' : '2px solid transparent'; }
+            if (b) { b.style.color = t === tab ? 'var(--teal)' : '#64748B'; b.style.borderBottom = t === tab ? '2px solid var(--teal)' : '2px solid transparent'; }
             if (c) c.style.display = t === tab ? 'block' : 'none';
           });
         };
@@ -62,7 +62,7 @@ function ProposalFormInner({ onBack, onSave, initialData, clients, onAddClient, 
         const box = document.getElementById('ourSigBox');
         const name = document.getElementById('pv-from')?.innerText || 'Signed';
         if (box) {
-          box.innerHTML = type === 'image' ? `<img src="${value}" style="max-height:50px;max-width:100%;object-fit:contain;"/><div style="font-size:10px;color:var(--teal);font-weight:700;margin-top:2px;">${name} — Signed</div>` : `<span style="font-family:'Dancing Script',cursive;font-size:22px;color:#1a2e35;font-weight:bold;">${value}</span><div style="font-size:10px;color:var(--teal);font-weight:700;margin-top:2px;">${name} — Signed</div>`;
+          box.innerHTML = type === 'image' ? `<img src="${value}" style="max-height:50px;max-width:100%;object-fit:contain;"/><div style="font-size:10px;color:var(--teal);font-weight:700;margin-top:2px;">${name} — Signed</div>` : `<span style="font-family:'Dancing Script',cursive;font-size:22px;color:#1e293b;font-weight:bold;">${value}</span><div style="font-size:10px;color:var(--teal);font-weight:700;margin-top:2px;">${name} — Signed</div>`;
           box.style.borderColor = 'var(--teal)'; box.style.background = 'var(--teal-lighter)';
         }
         const pvSig = document.getElementById('pv-sig1');
@@ -74,7 +74,7 @@ function ProposalFormInner({ onBack, onSave, initialData, clients, onAddClient, 
         const rect = cv.getBoundingClientRect();
         cv.width = rect.width || 420; cv.height = 160;
         const ctx = cv.getContext('2d');
-        ctx.strokeStyle = '#1a2e35'; ctx.lineWidth = 3.5; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+        ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 3.5; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
         let drawing = false, pts = [];
         function pos(e) { const r = cv.getBoundingClientRect(), cx = e.touches ? e.touches[0].clientX : e.clientX, cy = e.touches ? e.touches[0].clientY : e.clientY; return { x: (cx - r.left) * (cv.width / r.width), y: (cy - r.top) * (cv.height / r.height) }; }
         cv.onmousedown = (e) => { pts = [pos(e)]; drawing = true; };
@@ -113,8 +113,8 @@ function ProposalFormInner({ onBack, onSave, initialData, clients, onAddClient, 
       if (!initialData && newlyAddedClientName) {
         sel.value = newlyAddedClientName;
         sel.style.transition = 'box-shadow .3s, border-color .3s';
-        sel.style.borderColor = '#00BCD4';
-        sel.style.boxShadow = '0 0 0 3px rgba(0,188,212,.25)';
+        sel.style.borderColor = '#2563EB';
+        sel.style.boxShadow = '0 0 0 3px rgba(37, 99, 235,.25)';
         setTimeout(() => {
           sel.style.boxShadow = 'none';
         }, 2000);
@@ -360,16 +360,16 @@ function ProposalFormInner({ onBack, onSave, initialData, clients, onAddClient, 
       <style>{`
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
-  --teal: var(--app-accent, var(--app-accent, #00BCD4));--teal2:var(--app-accent2, #00BCD4);--teal3:#26D0CE;--teal4:#006E7F;
-  --teal-light:var(--teal-light, var(--teal-light, #E0F7FA));--teal-lighter:var(--teal-lighter, #F0FDFE);
-  --bg:#F5FAFA;--surface:#FFFFFF;--surface2:#F8FAFB;--border:#E0EEF0;--border2:#C5DDE0;
-  --text:#1A2E35;--text2:#607D86;--text3:#A0B8BE;
-  --green:#26C281;--green-bg:#E8FAF3;
+  --teal: var(--app-accent, var(--app-accent, #2563EB));--teal2:var(--app-accent2, #2563EB);--teal3:#26D0CE;--teal4:#006E7F;
+  --teal-light:var(--teal-light, var(--teal-light, #EFF6FF));--teal-lighter:var(--teal-lighter, #EFF6FF);
+  --bg:#F8FAFC;--surface:#FFFFFF;--surface2:#F8FAFB;--border:#E2E8F0;--border2:#E2E8F0;
+  --text:#1E293B;--text2:#64748B;--text3:#64748B;
+  --green:#16A34A;--green-bg:#E8FAF3;
   --amber:#F5A623;--amber-bg:#FEF5E6;
   --red:#F05C5C;--red-bg:#FEF2F2;
   --purple:#7C5CFC;--purple-bg:#EEE9FF;
   --blue:#2563EB;--blue-bg:#EFF4FF;
-  --sidebar-grad:linear-gradient(180deg,#26D0CE 0%, var(--app-accent, var(--app-accent, #00BCD4)) 35%,var(--app-accent2, #00BCD4) 65%,#006E7F 100%);
+  --sidebar-grad:linear-gradient(180deg,#26D0CE 0%, var(--app-accent, var(--app-accent, #2563EB)) 35%,var(--app-accent2, #2563EB) 65%,#006E7F 100%);
   --font:'Nunito',sans-serif;--radius:14px;
 }
 html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(--text)}
@@ -407,7 +407,7 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
 .topbar-actions{display:flex;align-items:center;gap:7px;flex-shrink:0}
 .btn-o{display:flex;align-items:center;gap:5px;padding:7px 12px;background:var(--surface);border:1.5px solid var(--border);border-radius:9px;font-size:12px;font-weight:700;color:var(--text2);cursor:pointer;font-family:var(--font);transition:all .15s;white-space:nowrap}
 .btn-o:hover{border-color:var(--teal);color:var(--teal)}
-.btn-t{display:flex;align-items:center;gap:6px;padding:7px 14px;background:var(--teal);color:#fff;border:none;border-radius:9px;font-size:12px;font-weight:700;font-family:var(--font);cursor:pointer;transition:all .15s;box-shadow:0 3px 10px rgba(0,188,212,.25);white-space:nowrap}
+.btn-t{display:flex;align-items:center;gap:6px;padding:7px 14px;background:var(--teal);color:#fff;border:none;border-radius:9px;font-size:12px;font-weight:700;font-family:var(--font);cursor:pointer;transition:all .15s;box-shadow:0 3px 10px rgba(37, 99, 235,.25);white-space:nowrap}
 .btn-t:hover{background:var(--teal2)}
 .btn-g{background:var(--green);box-shadow:0 3px 10px rgba(38,194,129,.2)}
 .btn-g:hover{background:#1da86e}
@@ -452,13 +452,13 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
 .fl{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;display:flex;align-items:center;justify-content:space-between}
 .fl-hint{font-size:9px;color:var(--text3);text-transform:none;letter-spacing:0;font-weight:600}
 .fi{width:100%;padding:9px 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;font-size:13px;color:var(--text);font-family:var(--font);outline:none;transition:all .15s}
-.fi:focus{border-color:var(--teal);background:var(--surface);box-shadow:0 0 0 3px rgba(0,188,212,.08)}
+.fi:focus{border-color:var(--teal);background:var(--surface);box-shadow:0 0 0 3px rgba(37, 99, 235,.08)}
 .fi::placeholder{color:var(--text3)}
 .fi:read-only{background:var(--surface2);color:var(--text3)}
 .fs{width:100%;padding:9px 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;font-size:13px;color:var(--text);font-family:var(--font);outline:none;cursor:pointer;appearance:none;-webkit-appearance:none;transition:all .15s;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23A0B8BE' stroke-width='2'%3E%3Cpolyline points='6,9 12,15 18,9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center}
-.fs:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(0,188,212,.08)}
+.fs:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(37, 99, 235,.08)}
 .ta{width:100%;padding:9px 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;font-size:13px;color:var(--text);font-family:var(--font);outline:none;resize:vertical;min-height:80px;line-height:1.6;transition:all .15s}
-.ta:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(0,188,212,.08)}
+.ta:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(37, 99, 235,.08)}
 .ta::placeholder{color:var(--text3)}
 
 /* ── STATUS CHIPS ── */
@@ -552,7 +552,7 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
 .sig-box:hover{border-color:var(--teal);background:var(--teal-lighter)}
 
 /* PROPOSAL DOC */
-.prop-doc{font-family:var(--font);font-size:12px;color:#1A2E35}
+.prop-doc{font-family:var(--font);font-size:12px;color:#1E293B}
 .p-cover{background:linear-gradient(135deg,#003E4E 0%,#005F73 35%,#0096B4 70%,#26D0CE 100%);padding:26px 22px;position:relative;overflow:hidden;flex-shrink:0}
 .p-cover::after{content:'';position:absolute;right:-50px;top:-50px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.06)}
 .p-cover::before{content:'';position:absolute;left:-20px;bottom:-60px;width:140px;height:140px;border-radius:50%;background:rgba(0,0,0,.1)}
@@ -897,11 +897,11 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
     
         <div id="sigModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9999;align-items:center;justify-content:center;">
           <div style="background:#fff;border-radius:16px;padding:24px;width:480px;max-width:95vw;box-shadow:0 8px 40px rgba(0,0,0,0.18);">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;"><div style="font-size:13px;font-weight:800;color:#0f1c2e">AUTHORISED SIGNATURE</div><button id="sigModalClose" style="background:none;border:none;font-size:20px;cursor:pointer;color:#607D86;">✕</button></div>
-            <div style="display:flex;border-bottom:2px solid #e5e7eb;margin-bottom:14px;"><button id="sigTab-draw" style="padding:6px 14px 8px;border:none;background:none;font-size:12px;font-weight:800;color:var(--teal);border-bottom:2px solid var(--teal);cursor:pointer;margin-bottom:-2px;">Draw</button><button id="sigTab-type" style="padding:6px 14px 8px;border:none;background:none;font-size:12px;font-weight:800;color:#607D86;border-bottom:2px solid transparent;cursor:pointer;margin-bottom:-2px;">Type</button><button id="sigTab-upload" style="padding:6px 14px 8px;border:none;background:none;font-size:12px;font-weight:800;color:#607D86;border-bottom:2px solid transparent;cursor:pointer;margin-bottom:-2px;">Upload</button></div>
-            <div id="sigContent-draw"><div style="background:#F5FAFA;border:1.5px solid #E0EEF0;border-radius:10px;padding:10px;"><canvas id="sigCanvas" width="420" height="160" style="border:1.5px dashed #C5DDE0;border-radius:8px;background:#fff;cursor:crosshair;width:100%;height:160px;display:block;touch-action:none;"></canvas></div><div style="display:flex;gap:10px;margin-top:10px;"><button id="sigClearBtn" style="padding:6px 14px;font-size:11px;background:#fff;border:1.5px solid #e5e7eb;border-radius:6px;cursor:pointer;font-weight:700;color:#374151;">Clear</button><button id="sigApplyDrawBtn" style="padding:6px 14px;font-size:11px;background:var(--teal);color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:800;">Apply Signature</button></div></div>
-            <div id="sigContent-type" style="display:none;"><div style="display:flex;gap:8px;align-items:center;"><input id="typedSigInput" type="text" placeholder="Type your name..." style="flex:1;padding:10px 14px;border:1.5px solid #e5e7eb;border-radius:10px;font-size:18px;font-family:'Dancing Script',cursive;font-weight:bold;color:#1a2e35;outline:none;" /><button id="sigApplyTypeBtn" style="padding:10px 14px;background:var(--teal);border:none;border-radius:10px;color:#fff;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap;">Apply</button></div><div id="typedSigPreview" style="margin-top:10px;font-size:11px;color:#64748b;display:none;">Preview: <span id="typedSigPreviewText" style="font-family:'Dancing Script',cursive;font-size:22px;color:#1a2e35;font-weight:bold;"></span></div></div>
-            <div id="sigContent-upload" style="display:none;"><div style="background:#F5FAFA;border:1.5px dashed #C5DDE0;border-radius:10px;padding:24px;text-align:center;cursor:pointer;position:relative;"><input id="sigUploadInput" type="file" accept="image/*" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;" /><i class="ti ti-upload" style="font-size:24px;color:#607D86;"></i><div style="font-size:12px;font-weight:700;color:#607D86;margin-top:4px;">Click to upload signature image</div></div></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;"><div style="font-size:13px;font-weight:800;color:#0f172a">AUTHORISED SIGNATURE</div><button id="sigModalClose" style="background:none;border:none;font-size:20px;cursor:pointer;color:#64748B;">✕</button></div>
+            <div style="display:flex;border-bottom:2px solid #e5e7eb;margin-bottom:14px;"><button id="sigTab-draw" style="padding:6px 14px 8px;border:none;background:none;font-size:12px;font-weight:800;color:var(--teal);border-bottom:2px solid var(--teal);cursor:pointer;margin-bottom:-2px;">Draw</button><button id="sigTab-type" style="padding:6px 14px 8px;border:none;background:none;font-size:12px;font-weight:800;color:#64748B;border-bottom:2px solid transparent;cursor:pointer;margin-bottom:-2px;">Type</button><button id="sigTab-upload" style="padding:6px 14px 8px;border:none;background:none;font-size:12px;font-weight:800;color:#64748B;border-bottom:2px solid transparent;cursor:pointer;margin-bottom:-2px;">Upload</button></div>
+            <div id="sigContent-draw"><div style="background:#F8FAFC;border:1.5px solid #E2E8F0;border-radius:10px;padding:10px;"><canvas id="sigCanvas" width="420" height="160" style="border:1.5px dashed #E2E8F0;border-radius:8px;background:#fff;cursor:crosshair;width:100%;height:160px;display:block;touch-action:none;"></canvas></div><div style="display:flex;gap:10px;margin-top:10px;"><button id="sigClearBtn" style="padding:6px 14px;font-size:11px;background:#fff;border:1.5px solid #e5e7eb;border-radius:6px;cursor:pointer;font-weight:700;color:#374151;">Clear</button><button id="sigApplyDrawBtn" style="padding:6px 14px;font-size:11px;background:var(--teal);color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:800;">Apply Signature</button></div></div>
+            <div id="sigContent-type" style="display:none;"><div style="display:flex;gap:8px;align-items:center;"><input id="typedSigInput" type="text" placeholder="Type your name..." style="flex:1;padding:10px 14px;border:1.5px solid #e5e7eb;border-radius:10px;font-size:18px;font-family:'Dancing Script',cursive;font-weight:bold;color:#1e293b;outline:none;" /><button id="sigApplyTypeBtn" style="padding:10px 14px;background:var(--teal);border:none;border-radius:10px;color:#fff;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap;">Apply</button></div><div id="typedSigPreview" style="margin-top:10px;font-size:11px;color:#64748b;display:none;">Preview: <span id="typedSigPreviewText" style="font-family:'Dancing Script',cursive;font-size:22px;color:#1e293b;font-weight:bold;"></span></div></div>
+            <div id="sigContent-upload" style="display:none;"><div style="background:#F8FAFC;border:1.5px dashed #E2E8F0;border-radius:10px;padding:24px;text-align:center;cursor:pointer;position:relative;"><input id="sigUploadInput" type="file" accept="image/*" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;" /><i class="ti ti-upload" style="font-size:24px;color:#64748B;"></i><div style="font-size:12px;font-weight:700;color:#64748B;margin-top:4px;">Click to upload signature image</div></div></div>
           </div>
         </div>
       </div>

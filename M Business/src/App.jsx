@@ -118,7 +118,7 @@ export default function App() {
   return (
     <Router>
       <ToastContainer position="top-right" autoClose={3000} />
-      <Suspense fallback={<div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#F3F8F9" }}><div style={{ width: 36, height: 36, border: "3px solid #E0EEF0", borderTop: "3px solid #00BCD4", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} /></div>}>
+      <Suspense fallback={<div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#F3F8F9" }}><div style={{ width: 36, height: 36, border: "3px solid #E2E8F0", borderTop: "3px solid #2563EB", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} /></div>}>
         <Routes>
           <Route path="/" element={getRootPage()} />
           <Route path="/add-account" element={<AuthPage setUser={(u) => { handleSetUser(u); window.location.href = "/"; }} initialTab="register" />} />

@@ -115,7 +115,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
 
   const projIcons = ['ti-world', 'ti-device-mobile', 'ti-chart-bar', 'ti-code', 'ti-building', 'ti-rocket'];
   const projColors = [
-    { bg: 'var(--teal-lighter, #F0FDFE)', color: ' var(--app-accent, var(--app-accent, #00BCD4))' },
+    { bg: 'var(--teal-lighter, #EFF6FF)', color: ' var(--app-accent, var(--app-accent, #2563EB))' },
     { bg: '#EEF2FF', color: '#6366F1' },
     { bg: '#ECFDF5', color: '#10B981' },
     { bg: '#FFF7ED', color: '#F59E0B' },
@@ -418,7 +418,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
     offer: { icon: 'ti-file-text', bg: '#EEF2FF', color: '#6366F1' },
     id: { icon: 'ti-id', bg: '#E0F2FE', color: '#0ea5e9' },
     contract: { icon: 'ti-file-certificate', bg: '#FFFBEB', color: '#f59e0b' },
-    degree: { icon: 'ti-certificate', bg: '#F5F3FF', color: '#8b5cf6' },
+    degree: { icon: 'ti-certificate', bg: '#EFF6FF', color: '#8b5cf6' },
     resume: { icon: 'ti-file-description', bg: '#FEF2F2', color: '#ef4444' },
     default: { icon: 'ti-file', bg: '#F1F5F9', color: '#64748B' },
   };
@@ -453,10 +453,10 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
 
   return (
     <div style={{
-      "--teal": " var(--app-accent, var(--app-accent, #00BCD4))",
+      "--teal": " var(--app-accent, var(--app-accent, #2563EB))",
       "--bg": "#F5F7FA",
       "--card": "#FFFFFF",
-      "--text": "#1A2E35",
+      "--text": "#1E293B",
       "--text-muted": "#64748B",
       "--border": "#E2E8F0",
       "--danger": "#EF4444",
@@ -526,7 +526,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
         .ed-proj-item:last-child { border-bottom: none; }
         .ed-proj-item:hover { background: #FAFAFA; }
         .ed-proj-info { display: flex; align-items: center; gap: 12px; }
-        .ed-proj-icon { width: 36px; height: 36px; border-radius: 8px; background: var(--teal-lighter, #F0FDFE); color: var(--teal); display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .ed-proj-icon { width: 36px; height: 36px; border-radius: 8px; background: var(--teal-lighter, #EFF6FF); color: var(--teal); display: flex; align-items: center; justify-content: center; font-size: 18px; }
         .ed-proj-name { font-size: 13px; font-weight: 800; color: #0F172A; }
         .ed-proj-role { font-size: 11px; font-weight: 600; color: #64748B; }
         .ed-proj-stat { text-align: right; }
@@ -555,7 +555,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
         .ed-doc-btn.view { background: #E0F2FE; color: #0284C7; }
         .ed-doc-btn.view:hover { background: #BAE6FD; }
         .ed-doc-btn.download { background: var(--teal); color: #fff; }
-        .ed-doc-btn.download:hover { background: #00BCD4; }
+        .ed-doc-btn.download:hover { background: #2563EB; }
         .ed-docs-sub { font-size: 10px; font-weight: 800; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
         .ed-docs-sub span { background: var(--teal); color: #fff; border-radius: 10px; padding: 1px 7px; font-size: 10px; }
         .ed-empty { text-align: center; padding: 24px 0; color: #94A3B8; font-size: 12px; font-weight: 600; }
@@ -955,8 +955,8 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
           <div style={{ background: '#fff', borderRadius: 18, width: '100%', maxWidth: 500, padding: '32px 32px 26px', boxShadow: '0 24px 60px rgba(0,0,0,0.18)', fontFamily: "'Nunito', sans-serif" }}
             onClick={e => e.stopPropagation()}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 26 }}>
-              <div style={{ fontSize: 17, fontWeight: 800, color: '#0f1c2e', display: 'flex', alignItems: 'center', gap: 8 }}>
-                <i className="ti ti-calendar-plus" style={{ color: ' var(--app-accent, var(--app-accent, #00BCD4))' }}></i> Add Leave Request
+              <div style={{ fontSize: 17, fontWeight: 800, color: '#0f172a', display: 'flex', alignItems: 'center', gap: 8 }}>
+                <i className="ti ti-calendar-plus" style={{ color: ' var(--app-accent, var(--app-accent, #2563EB))' }}></i> Add Leave Request
               </div>
               <button onClick={() => setShowLeaveModal(false)} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: '#94a3b8' }}>✕</button>
             </div>
@@ -969,7 +969,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
               {leaveForm.type === 'Other' && (
                 <input type="text" placeholder="Type your custom leave type..." value={leaveForm.customType}
                   onChange={e => setLeaveForm(p => ({ ...p, customType: e.target.value }))}
-                  style={{ width: '100%', marginTop: 8, padding: '10px 14px', border: '1.5px solid  var(--app-accent, var(--app-accent, #00BCD4))', borderRadius: 10, fontSize: 13, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }}
+                  style={{ width: '100%', marginTop: 8, padding: '10px 14px', border: '1.5px solid  var(--app-accent, var(--app-accent, #2563EB))', borderRadius: 10, fontSize: 13, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }}
                   autoFocus />
               )}
             </div>
@@ -998,7 +998,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
               </button>
               <button onClick={handleAddLeave} disabled={leaveSaving}
                 style={{
-                  flex: 1, padding: '11px', background: 'linear-gradient(135deg,var(--app-accent),#00BCD4)', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 700, color: '#fff', cursor: leaveSaving ? 'not - allowed' : 'pointer', fontFamily: 'inherit', opacity: leaveSaving ? 0.7 : 1
+                  flex: 1, padding: '11px', background: 'linear-gradient(135deg,var(--app-accent),#2563EB)', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 700, color: '#fff', cursor: leaveSaving ? 'not - allowed' : 'pointer', fontFamily: 'inherit', opacity: leaveSaving ? 0.7 : 1
                 }}>
                 {leaveSaving ? 'Saving...' : '+ Add Leave'}
               </button>

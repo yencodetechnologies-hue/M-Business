@@ -198,7 +198,7 @@ const ImageCropModal = ({ image, onCropComplete, onCancel, aspect: initialAspect
               fontWeight: '700',
               fontSize: 'clamp(12px, 3.5vw, 14px)',
               cursor: 'pointer',
-              boxShadow: '0 4px 12px rgba(124, 58, 237, 0.3)',
+              boxShadow: '0 4px 12px rgba(37, 99, 235, 0.3)',
               transition: 'all 0.2s'
             }}
           >

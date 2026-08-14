@@ -6,7 +6,7 @@ import InvoiceCreator from './InvoiceCreator';
 import { BASE_URL } from '../config';
 import './ModernProjectsPage.css';
 // ─── Avatar helpers --------------------------------------------
-const AV_COLORS = [' var(--app-accent, var(--app-accent, #00BCD4))', '#8B5CF6', '#F59E0B', '#26C281', '#EC4899', '#3B82F6', '#EF4444', '#10B981'];
+const AV_COLORS = [' var(--app-accent, var(--app-accent, #2563EB))', '#8B5CF6', '#F59E0B', '#16A34A', '#EC4899', '#3B82F6', '#EF4444', '#10B981'];
 function avColor(name, i = 0) {
   if (!name) return AV_COLORS[i % AV_COLORS.length];
   return AV_COLORS[(name.charCodeAt(0) + i) % AV_COLORS.length];
@@ -43,10 +43,10 @@ function daysLeft(dateStr) {
 
 // ─── Color for progress bar ------------------------------------
 function progGradient(cls) {
-  if (cls === 'completed') return 'linear-gradient(90deg,#26C281,#059669)';
+  if (cls === 'completed') return 'linear-gradient(90deg,#16A34A,#059669)';
   if (cls === 'overdue') return 'linear-gradient(90deg,#FF6B6B,#DC2626)';
-  if (cls === 'onhold') return 'linear-gradient(90deg,#8B5CF6,#7C3AED)';
-  return 'linear-gradient(90deg, var(--app-accent, var(--app-accent, #00BCD4)),#00BCD4)';
+  if (cls === 'onhold') return 'linear-gradient(90deg,#8B5CF6,#2563EB)';
+  return 'linear-gradient(90deg, var(--app-accent, var(--app-accent, #2563EB)),#2563EB)';
 }
 
 // ─── Empty form state ------------------------------------------
@@ -529,9 +529,9 @@ function openCreate() {
           {/* Stats */}
           <div className="m-stats-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 16, marginBottom: 24 }}>
             {[
-              { label: 'Total Projects', value: stats.all, icon: 'ti-briefcase', bg: 'var(--teal-light, var(--teal-light, #E0F7FA))', color: ' var(--app-accent, var(--app-accent, #00BCD4))', tab: 'All' },
+              { label: 'Total Projects', value: stats.all, icon: 'ti-briefcase', bg: 'var(--teal-light, var(--teal-light, #EFF6FF))', color: ' var(--app-accent, var(--app-accent, #2563EB))', tab: 'All' },
               { label: 'Active', value: stats.active, icon: 'ti-loader', bg: '#FEF3C7', color: '#F59E0B', tab: 'Active' },
-              { label: 'Completed', value: stats.completed, icon: 'ti-circle-check', bg: '#D1FAE5', color: '#26C281', tab: 'Completed' },
+              { label: 'Completed', value: stats.completed, icon: 'ti-circle-check', bg: '#D1FAE5', color: '#16A34A', tab: 'Completed' },
               { label: 'On Hold', value: stats.onhold, icon: 'ti-clock-pause', bg: '#FEE2E2', color: '#FF6B6B', tab: 'On Hold' },
               { label: 'Overdue', value: stats.overdue, icon: 'ti-alert-triangle', bg: '#FEE2E2', color: '#DC2626', tab: 'Overdue' },
             ].map(s => (
@@ -543,7 +543,7 @@ function openCreate() {
                 </div>
               </div>
             ))}
-            <div className="m-stat-card" style={{ cursor: 'default', background: 'var(--app-accent, var(--app-accent, #00BCD4))', border: 'none' }}>
+            <div className="m-stat-card" style={{ cursor: 'default', background: 'var(--app-accent, var(--app-accent, #2563EB))', border: 'none' }}>
               <div className="m-stat-icon" style={{ background: 'rgba(255,255,255,0.2)', color: '#fff' }}>
                 <i className="ti ti-currency-rupee"></i>
               </div>
@@ -577,7 +577,7 @@ function openCreate() {
           {/* Loading */}
           {loading && (
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 60, flexDirection: 'column', gap: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: '50%', border: '3px solid var(--teal-light, var(--teal-light, #E0F7FA))', borderTopColor: ' var(--app-accent, var(--app-accent, #00BCD4))', animation: 'spin 0.8s linear infinite' }}></div>
+              <div style={{ width: 36, height: 36, borderRadius: '50%', border: '3px solid var(--teal-light, var(--teal-light, #EFF6FF))', borderTopColor: ' var(--app-accent, var(--app-accent, #2563EB))', animation: 'spin 0.8s linear infinite' }}></div>
               <div style={{ color: '#718096', fontSize: 13, fontWeight: 600 }}>Loading projects…</div>
               <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
             </div>
@@ -613,12 +613,12 @@ function openCreate() {
                       <button
                         title="Log Time"
                         onClick={e => openLogTime(p, e)}
-                        style={{ background: 'rgba(0,188,212,.1)', border: 'none', borderRadius: 6, width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: ' var(--app-accent, var(--app-accent, #00BCD4))' }}
+                        style={{ background: 'rgba(37, 99, 235,.1)', border: 'none', borderRadius: 6, width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: ' var(--app-accent, var(--app-accent, #2563EB))' }}
                       ><i className="ti ti-clock" style={{ fontSize: 13 }}></i></button>
                       <button
                         title="Edit"
                         onClick={e => { e.stopPropagation(); openEdit(p, e); }}
-                        style={{ background: 'rgba(0,188,212,.1)', border: 'none', borderRadius: 6, width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: ' var(--app-accent, var(--app-accent, #00BCD4))' }}
+                        style={{ background: 'rgba(37, 99, 235,.1)', border: 'none', borderRadius: 6, width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: ' var(--app-accent, var(--app-accent, #2563EB))' }}
                       ><i className="ti ti-edit" style={{ fontSize: 13 }}></i></button>
                       <button
                         title="Delete"
@@ -630,7 +630,7 @@ function openCreate() {
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, flexWrap: 'wrap' }}>
                       <span className={`m-status-badge ${statusLabel.toLowerCase().replace(' ', '')}`}>{statusLabel}</span>
                       {p.priority && <span style={{ padding: '3px 9px', borderRadius: 20, fontSize: 11, fontWeight: 700, background: p.priority === 'high' ? '#FEE2E2' : p.priority === 'low' ? '#D1FAE5' : '#FEF3C7', color: p.priority === 'high' ? '#DC2626' : p.priority === 'low' ? '#059669' : '#D97706' }}>{p.priority.charAt(0).toUpperCase() + p.priority.slice(1)}</span>}
-                      {p.category && <span style={{ padding: '3px 9px', borderRadius: 20, fontSize: 11, fontWeight: 600, background: 'var(--teal-light, var(--teal-light, #E0F7FA))', color: '#00BCD4' }}>{p.category}</span>}
+                      {p.category && <span style={{ padding: '3px 9px', borderRadius: 20, fontSize: 11, fontWeight: 600, background: 'var(--teal-light, var(--teal-light, #EFF6FF))', color: '#2563EB' }}>{p.category}</span>}
                     </div>
 
                     <div className="m-pc-top" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, flexWrap: 'nowrap' }}>
@@ -687,7 +687,7 @@ function openCreate() {
 
                     {pt.length > 0 && (
                       <div style={{ padding: '8px 16px', borderTop: '1px solid rgba(0,0,0,.06)', fontSize: 11, color: '#718096', display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <i className="ti ti-checklist" style={{ fontSize: 13, color: ' var(--app-accent, var(--app-accent, #00BCD4))' }}></i>
+                        <i className="ti ti-checklist" style={{ fontSize: 13, color: ' var(--app-accent, var(--app-accent, #2563EB))' }}></i>
                         {pt.filter(t => ['done', 'completed'].includes(t.status)).length}/{pt.length} tasks done
                       </div>
                     )}
@@ -699,16 +699,16 @@ function openCreate() {
                         borderRadius: 20,
                         fontSize: 12,
                         fontWeight: 800,
-                        background: cls === 'active' ? 'var(--teal-light, var(--teal-light, #E0F7FA))' : cls === 'completed' ? '#D1FAE5' : cls === 'onhold' ? '#FEF3C7' : cls === 'overdue' ? '#FEE2E2' : 'var(--teal-light, var(--teal-light, #E0F7FA))',
-                        color: cls === 'active' ? '#00BCD4' : cls === 'completed' ? '#065F46' : cls === 'onhold' ? '#D97706' : cls === 'overdue' ? '#DC2626' : '#00BCD4',
-                        border: `1.5px solid ${cls === 'active' ? ' var(--app-accent, var(--app-accent, #00BCD4))' : cls === 'completed' ? '#26C281' : cls === 'onhold' ? '#F59E0B' : cls === 'overdue' ? '#FF6B6B' : ' var(--app-accent, var(--app-accent, #00BCD4))'}`,
+                        background: cls === 'active' ? 'var(--teal-light, var(--teal-light, #EFF6FF))' : cls === 'completed' ? '#D1FAE5' : cls === 'onhold' ? '#FEF3C7' : cls === 'overdue' ? '#FEE2E2' : 'var(--teal-light, var(--teal-light, #EFF6FF))',
+                        color: cls === 'active' ? '#2563EB' : cls === 'completed' ? '#065F46' : cls === 'onhold' ? '#D97706' : cls === 'overdue' ? '#DC2626' : '#2563EB',
+                        border: `1.5px solid ${cls === 'active' ? ' var(--app-accent, var(--app-accent, #2563EB))' : cls === 'completed' ? '#16A34A' : cls === 'onhold' ? '#F59E0B' : cls === 'overdue' ? '#FF6B6B' : ' var(--app-accent, var(--app-accent, #2563EB))'}`,
                         display: 'flex',
                         alignItems: 'center',
                         gap: 6
                       }}>
                         <span style={{
                           width: 7, height: 7, borderRadius: '50%',
-                          background: cls === 'active' ? ' var(--app-accent, var(--app-accent, #00BCD4))' : cls === 'completed' ? '#26C281' : cls === 'onhold' ? '#F59E0B' : cls === 'overdue' ? '#FF6B6B' : ' var(--app-accent, var(--app-accent, #00BCD4))',
+                          background: cls === 'active' ? ' var(--app-accent, var(--app-accent, #2563EB))' : cls === 'completed' ? '#16A34A' : cls === 'onhold' ? '#F59E0B' : cls === 'overdue' ? '#FF6B6B' : ' var(--app-accent, var(--app-accent, #2563EB))',
                           display: 'inline-block'
                         }}></span>
                         {statusLabel}
@@ -783,7 +783,7 @@ function ProjectFormModal({ form, setForm, onSave, onClose, saving, isEdit, empl
     f('assignedTo', teamMembers.filter(m => m !== name).join(', '));
   }
 
-  const AV_COLORS = [' var(--app-accent, var(--app-accent, #00BCD4))', '#8B5CF6', '#F59E0B', '#26C281', '#EC4899', '#3B82F6'];
+  const AV_COLORS = [' var(--app-accent, var(--app-accent, #2563EB))', '#8B5CF6', '#F59E0B', '#16A34A', '#EC4899', '#3B82F6'];
   const avColor = (name) => AV_COLORS[(name?.charCodeAt(0) || 0) % AV_COLORS.length];
 
   return (
@@ -814,7 +814,7 @@ function ProjectFormModal({ form, setForm, onSave, onClose, saving, isEdit, empl
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           padding: '20px 24px', borderBottom: '1.5px solid #E2E8F0',
-          background: 'var(--app-accent, var(--app-accent, #00BCD4))',
+          background: 'var(--app-accent, var(--app-accent, #2563EB))',
         }}>
           <div>
             <div style={{ fontSize: 17, fontWeight: 900, color: '#fff', display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -906,7 +906,7 @@ function ProjectFormModal({ form, setForm, onSave, onClose, saving, isEdit, empl
 
           {/* ── ASSIGN TEAM MEMBERS ── */}
           <div style={{ background: '#F0F9FF', border: '1.5px solid #B2EBF2', borderRadius: 12, padding: 16 }}>
-            <label style={{ ...LBL, color: '#00BCD4', marginBottom: 10 }}>
+            <label style={{ ...LBL, color: '#2563EB', marginBottom: 10 }}>
               <i className="ti ti-users" style={{ marginRight: 5 }}></i> ASSIGN TEAM MEMBERS
             </label>
 
@@ -928,7 +928,7 @@ function ProjectFormModal({ form, setForm, onSave, onClose, saving, isEdit, empl
                 onClick={addMember}
                 style={{
                   padding: '0 16px', borderRadius: 10, border: 'none', cursor: 'pointer',
-                  background: ' var(--app-accent, var(--app-accent, #00BCD4))', color: '#fff', fontFamily: 'Nunito,sans-serif',
+                  background: ' var(--app-accent, var(--app-accent, #2563EB))', color: '#fff', fontFamily: 'Nunito,sans-serif',
                   fontSize: 13, fontWeight: 800, whiteSpace: 'nowrap',
                   display: 'flex', alignItems: 'center', gap: 5,
                 }}
@@ -949,7 +949,7 @@ function ProjectFormModal({ form, setForm, onSave, onClose, saving, isEdit, empl
                     display: 'flex', alignItems: 'center', gap: 7,
                     background: '#fff', border: '1.5px solid #B2EBF2',
                     borderRadius: 20, padding: '5px 10px 5px 6px',
-                    boxShadow: '0 1px 4px rgba(0,188,212,0.08)',
+                    boxShadow: '0 1px 4px rgba(37, 99, 235,0.08)',
                   }}>
                     <div style={{
                       width: 24, height: 24, borderRadius: '50%',
@@ -1044,7 +1044,7 @@ function LogTimeModal({ form, setForm, onSave, onClose, saving, projectName }) {
       <div style={{ ...MODAL, maxWidth: 460 }}>
         <div style={MODAL_HDR}>
           <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 8 }}>
-            <i className="ti ti-clock" style={{ color: ' var(--app-accent, var(--app-accent, #00BCD4))' }}></i> Log Work Time
+            <i className="ti ti-clock" style={{ color: ' var(--app-accent, var(--app-accent, #2563EB))' }}></i> Log Work Time
           </h3>
           <button onClick={onClose} style={CLOSE_BTN}><i className="ti ti-x"></i></button>
         </div>
@@ -1106,8 +1106,8 @@ const INP = {
 const BTN_PRIMARY = {
   display: 'inline-flex', alignItems: 'center', gap: 6,
   padding: '10px 20px', borderRadius: 10, border: 'none', cursor: 'pointer',
-  background: ' var(--app-accent, var(--app-accent, #00BCD4))', color: '#fff', fontFamily: 'Nunito,sans-serif',
-  fontSize: 13, fontWeight: 800, boxShadow: '0 4px 12px rgba(0,188,212,.2)',
+  background: ' var(--app-accent, var(--app-accent, #2563EB))', color: '#fff', fontFamily: 'Nunito,sans-serif',
+  fontSize: 13, fontWeight: 800, boxShadow: '0 4px 12px rgba(37, 99, 235,.2)',
 };
 const BTN_OUTLINE = {
   display: 'inline-flex', alignItems: 'center', gap: 6,

@@ -3,9 +3,9 @@ import ProjectPdfButtons from './ProjectPdfButtons';
 
 // ── Colour palette (matches M Business design system) ----------
 const P = {
-  primary: ' var(--app-accent, var(--app-accent, #00BCD4))',
-  primaryDark: '#00BCD4',
-  primaryLight: 'var(--teal-light, var(--teal-light, #E0F7FA))',
+  primary: ' var(--app-accent, var(--app-accent, #2563EB))',
+  primaryDark: '#2563EB',
+  primaryLight: 'var(--teal-light, var(--teal-light, #EFF6FF))',
   primaryMid: '#B2EBF2',
   textDark: '#1A2332',
   textMid: '#4A5568',
@@ -13,18 +13,18 @@ const P = {
   bg: '#F0F4F8',
   white: '#FFFFFF',
   border: '#E2E8F0',
-  green: '#26C281',
+  green: '#16A34A',
   greenLight: '#D1FAE5',
   orange: '#F59E0B',
   orangeLight: '#FEF3C7',
   red: '#FF6B6B',
   redLight: '#FEE2E2',
   purple: '#8B5CF6',
-  purpleLight: '#EDE9FE',
+  purpleLight: '#EFF6FF',
 };
 
 // Avatar colour palette
-const AV_COLORS = [' var(--app-accent, var(--app-accent, #00BCD4))', '#8B5CF6', '#F59E0B', '#26C281', '#EC4899', '#3B82F6', '#EF4444', '#10B981'];
+const AV_COLORS = [' var(--app-accent, var(--app-accent, #2563EB))', '#8B5CF6', '#F59E0B', '#16A34A', '#EC4899', '#3B82F6', '#EF4444', '#10B981'];
 
 function getAvColor(name, idx) {
   if (!name) return AV_COLORS[idx % AV_COLORS.length];
@@ -52,7 +52,7 @@ function normaliseStatus(raw) {
 function progColor(statusCls) {
   if (statusCls === 'completed') return `linear-gradient(90deg,${P.green},#059669)`;
   if (statusCls === 'overdue') return `linear-gradient(90deg,${P.red},#DC2626)`;
-  if (statusCls === 'hold') return `linear-gradient(90deg,${P.purple},#7C3AED)`;
+  if (statusCls === 'hold') return `linear-gradient(90deg,${P.purple},#2563EB)`;
   return `linear-gradient(90deg,${P.primary},${P.primaryDark})`;
 }
 
@@ -86,7 +86,7 @@ const CSS = `
   gap:14px;
   margin-bottom:22px;
 }
-.mpv-kpi { background:#fff; border-radius:14px; padding:16px 18px; box-shadow:0 2px 12px rgba(0,188,212,.08);
+.mpv-kpi { background:#fff; border-radius:14px; padding:16px 18px; box-shadow:0 2px 12px rgba(37, 99, 235,.08);
   display:flex; align-items:center; gap:12px; cursor:pointer; transition:all .18s;
   border:2px solid transparent; }
 .mpv-kpi { border-color:transparent; }
@@ -124,14 +124,14 @@ const CSS = `
 .mpv-card {
   background:#fff;
   border-radius:14px;
-  box-shadow:0 2px 12px rgba(0,188,212,.08);
+  box-shadow:0 2px 12px rgba(37, 99, 235,.08);
   overflow:visible;
   position:relative;
   cursor:pointer;
   border:2px solid transparent;
   transition:all .2s;
 }
-.mpv-card:hover { transform:translateY(-3px); box-shadow:0 8px 32px rgba(0,188,212,.14); border-color:${P.primaryMid}; }
+.mpv-card:hover { transform:translateY(-3px); box-shadow:0 8px 32px rgba(37, 99, 235,.14); border-color:${P.primaryMid}; }
 .mpv-card-top { padding:18px 18px 0; }
 .mpv-card-row1 { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
 .mpv-card-title { font-size:15px; font-weight:800; color:${P.textDark}; margin-bottom:5px; line-height:1.3; }
@@ -473,7 +473,7 @@ export default function ModernProjectsView({
           {onAddProject && (
             <button
               onClick={onAddProject}
-              style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'var(--app-accent, #00BCD4)', color: '#fff', border: 'none', borderRadius: 10, padding: '9px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
+              style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'var(--app-accent, #2563EB)', color: '#fff', border: 'none', borderRadius: 10, padding: '9px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
             >
               <i className="ti ti-plus" style={{ fontSize: 14 }} /> New Project
             </button>

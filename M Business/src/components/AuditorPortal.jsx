@@ -99,22 +99,22 @@ export default function AuditorPortal({ onBack }) {
       <style>{`
 /* ── M Business Finance Design System ── */
 :root {
-  --primary: var(--app-accent, var(--app-accent, #00BCD4)); --primary-dark:#00BCD4; --primary-light:var(--teal-light, #E0F7FA); --primary-mid:#B2EBF2;
+  --primary: var(--app-accent, var(--app-accent, #2563EB)); --primary-dark:#2563EB; --primary-light:var(--teal-light, #EFF6FF); --primary-mid:#B2EBF2;
   --text-dark:#1A2332; --text-mid:#4A5568; --text-light:#718096;
   --bg:#F0F4F8; --white:#FFFFFF; --border:#E2E8F0;
-  --green:#26C281; --green-light:#D1FAE5; --green-dark:#065F46;
+  --green:#16A34A; --green-light:#D1FAE5; --green-dark:#065F46;
   --orange:#F59E0B; --orange-light:#FEF3C7; --orange-dark:#92400E;
   --red:#FF6B6B; --red-dark:#EF4444; --red-light:#FEE2E2;
-  --purple:#8B5CF6; --purple-light:#EDE9FE;
+  --purple:#8B5CF6; --purple-light:#EFF6FF;
   --blue:#3B82F6; --blue-light:#DBEAFE;
-  --radius:14px; --shadow:0 2px 12px rgba(0,188,212,.08); --shadow-lg:0 8px 32px rgba(0,188,212,.14);
+  --radius:14px; --shadow:0 2px 12px rgba(37, 99, 235,.08); --shadow-lg:0 8px 32px rgba(37, 99, 235,.14);
 }
 * { box-sizing: border-box; }
 .auditor-portal-body {font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text-dark);min-height:100vh;display:block;}
 a { text-decoration: none; color: inherit; }
 .aud-topnav{background:#1A2332;border-bottom:1px solid #2D3748;padding:0 32px;height:62px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
 .aud-brand{display:flex;align-items:center;gap:10px;}
-.aud-brand-icon{width:36px;height:36px;background:linear-gradient(135deg,#8B5CF6,#7C3AED);border-radius:10px;display:flex;align-items:center;justify-content:center;}
+.aud-brand-icon{width:36px;height:36px;background:linear-gradient(135deg,#8B5CF6,#2563EB);border-radius:10px;display:flex;align-items:center;justify-content:center;}
 .aud-brand-icon i{font-size:18px;color:#fff;}
 .aud-brand-name{font-size:16px;font-weight:900;color:#fff;}
 .aud-brand-sub{font-size:12px;color:rgba(255,255,255,.5);margin-left:4px;}

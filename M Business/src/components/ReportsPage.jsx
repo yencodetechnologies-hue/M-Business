@@ -216,7 +216,7 @@ export default function ReportsPage({ THEME, clients = [], projects = [], employ
           <h2 style={{ margin: 0, fontSize: 24, fontWeight: 900, letterSpacing: "-0.5px" }}>Available Reports</h2>
           <p style={{ margin: "4px 0 0", color: THEME.muted, fontSize: 14, fontWeight: 600 }}>Real-time business insights and analytics</p>
         </div>
-        <button onClick={fetchReports} style={{ background: THEME.accent, color: "#fff", border: "none", borderRadius: 12, padding: "12px 24px", fontWeight: 800, fontSize: 14, cursor: "pointer", boxShadow: "0 4px 12px rgba(99,102,241,0.2)", display: "flex", alignItems: "center", gap: 8 }}><i className="ti ti-refresh"></i> Refresh Reports</button>
+        <button onClick={fetchReports} style={{ background: THEME.accent, color: "#fff", border: "none", borderRadius: 12, padding: "12px 24px", fontWeight: 800, fontSize: 14, cursor: "pointer", boxShadow: "0 4px 12px rgba(37, 99, 235,0.2)", display: "flex", alignItems: "center", gap: 8 }}><i className="ti ti-refresh"></i> Refresh Reports</button>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(340px,1fr))", gap: 24, alignItems: "stretch" }}>

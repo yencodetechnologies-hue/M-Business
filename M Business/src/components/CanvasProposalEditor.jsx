@@ -10,7 +10,7 @@ const THEMES = [
   { name: "Rose", p: "#e11d48", g: "linear-gradient(135deg,#9f1239,#f43f5e)", l: "#ffe4e6", t: "#881337" },
   { name: "Amber", p: "#d97706", g: "linear-gradient(135deg,#92400e,#fbbf24)", l: "#fef3c7", t: "#78350f" },
   { name: "Slate", p: "#334155", g: "linear-gradient(135deg,#0f172a,#475569)", l: "#f1f5f9", t: "#0f172a" },
-  { name: "Teal", p: "#0d9488", g: "linear-gradient(135deg,#134e4a,#2dd4bf)", l: "#ccfbf1", t: "#134e4a" },
+  { name: "Teal", p: "#2563eb", g: "linear-gradient(135deg,#134e4a,#2dd4bf)", l: "#ccfbf1", t: "#134e4a" },
   { name: "Fuchsia", p: "var(--app-accent)", g: "linear-gradient(135deg,#701a75,#e879f9)", l: "var(--app-border)", t: "#4a044e" },
 ];
 

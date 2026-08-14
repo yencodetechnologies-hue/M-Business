@@ -1,13 +1,13 @@
 :root {
-  --teal: var(--app-accent, var(--app-accent, #00BCD4));
-  --teal-dim: rgba(0, 188, 212, 0.08);
-  --teal-mid: rgba(0, 188, 212, 0.15);
-  --teal-glow: rgba(0, 188, 212, 0.25);
+  --teal: var(--app-accent, var(--app-accent, #2563EB));
+  --teal-dim: rgba(37, 99, 235, 0.08);
+  --teal-mid: rgba(37, 99, 235, 0.15);
+  --teal-glow: rgba(37, 99, 235, 0.25);
   --bg: #f0f4f8;
   --card: #ffffff;
   --border: #e5eaf0;
   --border2: #d0dae4;
-  --text: #0f1c2e;
+  --text: #0f172a;
   --text-mid: #4a5568;
   --text-soft: #94a3b8;
   --green: #16a34a;
@@ -36,7 +36,7 @@
 
 /* ── GREETING HERO ── */
 .greet-hero {
-  background: linear-gradient(135deg, var(--app-accent, var(--app-accent, #00BCD4)) 0%, #0097a7 60%, #006978 100%);
+  background: linear-gradient(135deg, var(--app-accent, var(--app-accent, #2563EB)) 0%, #0097a7 60%, #006978 100%);
   border-radius: 16px;
   padding: 28px 32px;
   display: flex;
@@ -45,7 +45,7 @@
   margin-bottom: 20px;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 188, 212, 0.3);
+  box-shadow: 0 4px 20px rgba(37, 99, 235, 0.3);
   animation: fadeUp 0.4s ease both;
 }
 

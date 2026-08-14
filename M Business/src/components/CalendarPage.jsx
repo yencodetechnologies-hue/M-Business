@@ -14,13 +14,13 @@ const EMPTY = { name: "", project: "", client: "", date: "", start: "", end: "",
 
 export default function CalendarPage({ projects = [], tasks = [], clients = [], companyId, onUpdateProject, onUpdateTask, config, user, THEME, onAddProject, onAddClient, newlyAddedClientName, newlyAddedProjectName }) {
   const finalTheme = {
-    accent: "var(--app-accent, #00BCD4)",
-    gradient: "var(--app-accent-gradient, linear-gradient(135deg, #00BCD4, #00BCD4))",
-    muted: "var(--app-muted, #607D86)",
+    accent: "var(--app-accent, #2563EB)",
+    gradient: "var(--app-accent-gradient, linear-gradient(135deg, #2563EB, #2563EB))",
+    muted: "var(--app-muted, #64748B)",
     card: "#FFFFFF",
-    bg: "var(--app-bg, #F5FAFA)",
-    border: "var(--app-border, #E0EEF0)",
-    text: "#1A2E35",
+    bg: "var(--app-bg, #F8FAFC)",
+    border: "var(--app-border, #E2E8F0)",
+    text: "#1E293B",
     shadow: "0 20px 50px rgba(0,0,0,0.15)",
     ...THEME,
   };

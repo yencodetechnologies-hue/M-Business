@@ -66,20 +66,7 @@ export default function ProjectPaymentModals({
   // Generic form state
   const [form, setForm] = useState({});
   const [saving, setSaving] = useState(false);
-  const [projectInvoices, setProjectInvoices] = useState(() => {
-    try {
-      const cached = localStorage.getItem("cached_invoices");
-      if (!cached) return [];
-      const all = JSON.parse(cached);
-      const pName = currProject?.name || "";
-      const cName = currProject?.client || currProject?.clientName || "";
-      return (Array.isArray(all) ? all : []).filter(e => {
-        const eProj = e.inv?.project || e.project;
-        const eClient = e.inv?.clientName || e.inv?.client || e.client;
-        return (eProj && eProj === pName) || (!eProj && eClient === cName);
-      });
-    } catch { return []; }
-  });
+  const [projectInvoices, setProjectInvoices] = useState([]);
 
   useEffect(() => {
     if (showPayment && project?.name) {

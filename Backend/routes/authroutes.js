@@ -11,6 +11,32 @@ const DeletedClient = require("../models/DeletedClientModel"); // Blacklist
 const { sendOTPEmail, sendTrialWelcome } = require("../config/email");
 const jwt = require("jsonwebtoken");
 
+function toSessionUser(doc, roleOverride) {
+  const id = doc._id ? doc._id.toString() : "";
+  const role = (roleOverride || doc.role || "user").toLowerCase().trim();
+  const companyId = (doc.companyId && String(doc.companyId)) || id;
+  return {
+    _id: id,
+    id,
+    name: doc.clientName || doc.managerName || doc.name || "",
+    email: doc.email,
+    phone: doc.phone || "",
+    role,
+    companyId,
+    logoUrl: doc.logoUrl || "",
+    companyName: doc.companyName || "",
+    upiId: doc.upiId || "",
+    clientLimit: doc.clientLimit || "",
+    employeeLimit: doc.employeeLimit || "",
+    managerLimit: doc.managerLimit || "",
+    businessLimit: doc.businessLimit || "",
+    createdAt: doc.createdAt,
+    department: doc.department || "",
+    salary: doc.salary || "",
+    status: doc.status || "",
+  };
+}
+
 // ── GET /api/auth/login (Health Check) ───────────────────────────────────────
 router.get("/login", (req, res) => {
   res.json({ msg: "Login API is running. Please use POST to submit credentials." });
@@ -21,63 +47,6 @@ router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
     console.log("📧 Email received:", email);
-    console.log("🔑 Password received:", password);
-
-
-
-    // Hardcoded bypass for the specific admin user requested
-    if (email === "admin@gmail.com" && password === "admin1234") {
-      const u = await User.findOne({ email });
-      if (!u) return res.status(400).json({ msg: "Invalid email or password" });
-      console.log("✅ Admin Login Succesful!");
-      return res.json({
-        user: {
-          id: u._id,
-          name: u.name || "Super Admin",
-          email: "admin@gmail.com",
-          role: "admin",
-          companyId: u.companyId || "admin-company-id",
-          logoUrl: u.logoUrl || "",
-          companyName: u.companyName || "Your Business"
-        }
-      });
-    }
-
-    // Hardcoded bypass for the specific subadmin user requested
-    if (email === "subadmin@gmail.com" && password === "subadmin123") {
-      const u = await User.findOne({ email });
-      if (!u) return res.status(400).json({ msg: "Invalid email or password" });
-      console.log("✅ Subadmin Login Succesful!");
-      return res.json({
-        user: {
-          id: u._id,
-          name: u.name || "Demo Subadmin",
-          email: "subadmin@gmail.com",
-          role: "subadmin",
-          companyId: u.companyId || "admin-company-id",
-          logoUrl: u.logoUrl || "",
-          companyName: u.companyName || "Your Business"
-        }
-      });
-    }
-
-    // Hardcoded bypass for the specific client user requested
-    if (email === "client@gmail.com" && password === "client123") {
-      const u = await Client.findOne({ email });
-      if (!u) return res.status(400).json({ msg: "Invalid email or password" });
-      console.log("✅ Client Login Successful!");
-      return res.json({
-        user: {
-          id: u._id,
-          name: u.clientName || u.name || "Demo Client",
-          email: "client@gmail.com",
-          role: "client",
-          companyId: u.companyId || "client-company-id",
-          logoUrl: u.logoUrl || "",
-          companyName: u.companyName || "Your Business"
-        }
-      });
-    }
 
     let user = null;
     const normalizedLoginEmail = (email || "").toLowerCase().trim();
@@ -111,32 +80,14 @@ router.post("/login", async (req, res) => {
 
         if (!isMatch) return res.status(400).json({ msg: "Invalid email or password" });
 
-        return res.json({
-          user: {
-            id: employee._id,
-            name: employee.name,
-            email: employee.email,
-            phone: employee.phone || "",
-            role: "employee",   // ← lowercase directly
-            department: employee.department || "",
-            salary: employee.salary || "",
-            companyId: employee.companyId || "",
-            status: employee.status,
-            logoUrl: "",
-          },
-        });
+        return res.json({ user: toSessionUser(employee, "employee") });
       }
     }
 
     if (!user) return res.status(400).json({ msg: "Invalid email or password" });
 
-    let isMatch = await bcrypt.compare(password, user.password);
-
-    // Allow "123456" to work as a fallback/master password for clients
+    const isMatch = await bcrypt.compare(password, user.password);
     const tempRole = (user.role || "user").toLowerCase().trim();
-    if (!isMatch && password === "123456" && tempRole === "client") {
-      isMatch = true;
-    }
 
     console.log("Password match for user/client/manager:", isMatch);
 
@@ -148,24 +99,7 @@ router.post("/login", async (req, res) => {
       user.isVerified = true;
       await user.save();
     }
-    res.json({
-      user: {
-        id: user._id,
-        name: user.clientName || user.managerName || user.name || "",
-        email: user.email,
-        phone: user.phone || "",
-        role: role,
-        companyId: user.companyId || user._id.toString(),
-        logoUrl: user.logoUrl || "",
-        companyName: user.companyName || "",
-        upiId: user.upiId || "",
-        clientLimit: user.clientLimit || "",
-        employeeLimit: user.employeeLimit || "",
-        managerLimit: user.managerLimit || "",
-        businessLimit: user.businessLimit || "",
-        createdAt: user.createdAt,
-      },
-    });
+    res.json({ user: toSessionUser(user, role) });
 
   } catch (err) {
     console.error("Login error:", err);
@@ -306,20 +240,7 @@ router.post("/verify-otp", async (req, res) => {
 
     res.json({
       msg: "Email verified successfully",
-      user: {
-        id: user._id,
-        name: user.name || "",
-        email: user.email,
-        phone: user.phone || "",
-        role: "subadmin",
-        companyId: user.companyId || user._id.toString(),
-        logoUrl: user.logoUrl || "",
-        companyName: user.companyName || "",
-        upiId: user.upiId || "",
-        clientLimit: user.clientLimit || "",
-        employeeLimit: user.employeeLimit || "",
-        createdAt: user.createdAt,
-      }
+      user: toSessionUser(user, "subadmin")
     });
   } catch (err) {
     console.error("Verify OTP error:", err);
@@ -353,21 +274,7 @@ router.get("/profile/:id", async (req, res) => {
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ msg: "User not found" });
     res.json({
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        role: user.role,
-        companyId: user.companyId || user._id.toString(),
-        logoUrl: user.logoUrl || "",
-        companyName: user.companyName || "",
-        upiId: user.upiId || "",
-        clientLimit: user.clientLimit || "",
-        employeeLimit: user.employeeLimit || "",
-        managerLimit: user.managerLimit || "",
-        businessLimit: user.businessLimit || "",
-      }
+      user: toSessionUser(user)
     });
   } catch (err) {
     res.status(500).json({ msg: "Server error" });

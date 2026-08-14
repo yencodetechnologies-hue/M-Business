@@ -604,12 +604,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
 
   const [showAddClient, setShowAddClient] = useState(false);
   const [internalNav, setInternalNav] = useState(false);
-  const [invoiceList, setInvoiceList] = useState(() => {
-    try {
-      const c = localStorage.getItem("cached_invoices");
-      return c ? JSON.parse(c) : [];
-    } catch { return []; }
-  });
+  const [invoiceList, setInvoiceList] = useState([]);
   const [listLoading, setListLoading] = useState(false);
 
   useEffect(() => {
@@ -999,14 +994,12 @@ const [sortOrder, setSortOrder] = useState("desc");
       const res = await axios.get(`${BASE_URL}/api/invoices?_t=${Date.now()}`);
       if (res.data.success && Array.isArray(res.data.invoices)) {
         setInvoiceList(res.data.invoices);
-        try { localStorage.setItem("cached_invoices", JSON.stringify(res.data.invoices)); } catch { }
       } else {
-        console.warn("Invoice list fetch returned unexpected shape, falling back to local drafts");
-        setInvoiceList(loadAllDrafts());
+        setInvoiceList([]);
       }
     } catch (err) {
-      console.error("Invoice list fetch failed, falling back to local drafts", err);
-      setInvoiceList(loadAllDrafts());
+      console.error("Invoice list fetch failed", err);
+      setInvoiceList([]);
     }
   };
 

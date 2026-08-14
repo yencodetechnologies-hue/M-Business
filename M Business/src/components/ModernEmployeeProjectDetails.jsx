@@ -347,12 +347,6 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
     })) : [])
   ];
 
-  // ── Sample updates (fallback when no backend updates exist) --------
-  const sampleUpdates = project._id ? [] : [
-    { _id: 'u1', type: 'progress', title: 'Project progress updated', body: 'Progress has been updated. Keep up the good work!', postedBy: 'Admin', createdAt: new Date().toISOString(), unread: true },
-  ];
-
-  // ── Fetch project details from backend -----------
   useEffect(() => {
     if (!project._id) return;
     setUpdLoading(true);
@@ -399,7 +393,7 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
       setUpdateActionLoadingId(null);
     }
   };
-  const displayUpdates = updates.length > 0 ? updates : sampleUpdates;
+  const displayUpdates = updates;
   const unreadCount = displayUpdates.filter(u => !readIds.has(getUpdKey(u)) && u.unread !== false).length;
 
   const markRead = (u) => setReadIds(prev => {

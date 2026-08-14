@@ -2,6 +2,7 @@ import React, { useState, useEffect, lazy, Suspense } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { normalizeSessionUser } from "./config";
 
 // Lazy load all heavy components
 import AuthPage from "./components/AuthPage";
@@ -29,8 +30,7 @@ export default function App() {
     const saved = localStorage.getItem("user");
     if (saved) {
       try {
-        const parsed = JSON.parse(saved);
-        return { ...parsed, role: (parsed.role || "").toLowerCase().trim() };
+        return normalizeSessionUser(JSON.parse(saved));
       } catch {
         localStorage.removeItem("user");
       }
@@ -49,7 +49,7 @@ export default function App() {
           ? accounts.find(a => String(a._id || a.id) === String(uid))
           : accounts[0];
         if (match) {
-          const normalized = { ...match, role: (match.role || '').toLowerCase().trim() };
+          const normalized = normalizeSessionUser(match);
           localStorage.setItem('user', JSON.stringify(normalized));
           localStorage.removeItem("loggedOut");
           return normalized;
@@ -62,10 +62,7 @@ export default function App() {
   // ── Normalize role on every login / logout ----------------------------------
   const handleSetUser = (userData) => {
     if (userData) {
-      const normalized = {
-        ...userData,
-        role: (userData.role || "").toLowerCase().trim(),
-      };
+      const normalized = normalizeSessionUser(userData);
       localStorage.setItem("user", JSON.stringify(normalized));
       localStorage.removeItem("loggedOut");
 

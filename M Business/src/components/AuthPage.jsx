@@ -1,6 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
-import { BASE_URL } from "../config";
+import { BASE_URL, normalizeSessionUser } from "../config";
 
 export default function AuthPage({ setUser, initialTab = "login" }) {
   const [tab, setTab] = useState(initialTab === "login" ? "login" : "register");
@@ -62,20 +62,12 @@ export default function AuthPage({ setUser, initialTab = "login" }) {
       console.log("Sending:", loginData);
       const res = await axios.post(`${BASE_URL}/api/auth/login`, loginData);
       const userData = res.data.user || res.data;
-      const userWithLogo = { ...userData, logoUrl: userData.logoUrl || "" };
+      const userWithLogo = normalizeSessionUser({ ...userData, logoUrl: userData.logoUrl || "" });
 
-      // Clear stale cached data before setting new user session (so a
-      // re-created client never sees a deleted account's data), but keep
-      // "accounts", pending "justRegistered:*" trial-toast flags, and this
-      // same account's own cached_* entries — wiping those every login is
-      // what caused the Clients page/dashboard to always show empty right
-      // after logging back in, even for the same subadmin.
-      const incomingCid = String(userWithLogo?._id || userWithLogo?.id || userWithLogo?.userId || userWithLogo?.companyId || userWithLogo?.company || "").trim();
       Object.keys(localStorage).forEach(key => {
         if (key === "accounts" || key.startsWith("justRegistered:")) return;
-        if (incomingCid && key.endsWith("_" + incomingCid)) return;
         localStorage.removeItem(key);
-      });    // Also clear the accounts cache entry for this email so stale data is gone
+      });
       try {
         let accs = JSON.parse(localStorage.getItem("accounts") || "[]");
         accs = accs.filter(a => a.email !== userWithLogo.email);
@@ -83,13 +75,6 @@ export default function AuthPage({ setUser, initialTab = "login" }) {
       } catch (e) { }
 
       localStorage.setItem("user", JSON.stringify(userWithLogo));
-      try {
-        const cid = String(userWithLogo?._id || userWithLogo?.id || userWithLogo?.userId || userWithLogo?.companyId || userWithLogo?.company || "").trim();
-        if (cid) {
-          const cachedClients = localStorage.getItem("cached_clients_" + cid);
-          if (cachedClients) localStorage.setItem("__preload_clients_ready", "1");
-        }
-      } catch { }
       setUser(userWithLogo);
     } catch (e) {
       if (e.response?.data?.requiresOTP) {
@@ -144,15 +129,8 @@ export default function AuthPage({ setUser, initialTab = "login" }) {
       const res = await axios.post(`${BASE_URL}/api/auth/verify-otp`, { email: verifyEmail, otp: otp.trim() });
       const userData = res.data.user;
       if (userData) {
-        const userWithLogo = { ...userData, logoUrl: userData.logoUrl || "" };
+        const userWithLogo = normalizeSessionUser({ ...userData, logoUrl: userData.logoUrl || "" });
         localStorage.setItem("user", JSON.stringify(userWithLogo));
-        try {
-          const cid = String(userWithLogo?._id || userWithLogo?.id || userWithLogo?.userId || userWithLogo?.companyId || userWithLogo?.company || "").trim();
-          if (cid) {
-            const cachedClients = localStorage.getItem("cached_clients_" + cid);
-            if (cachedClients) localStorage.setItem("__preload_clients_ready", "1");
-          }
-        } catch { }
         setUser(userWithLogo);
       } else { setTab("login"); }
     } catch (e) { setError(e.response?.data?.msg || "Invalid OTP"); }

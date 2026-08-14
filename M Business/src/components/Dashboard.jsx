@@ -2012,25 +2012,16 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     return m ? parseInt(m[0]) : 10;
   };
   useEffect(() => {
-    // Show cached data immediately (no delay), then refresh in background
-    try { const c = JSON.parse(localStorage.getItem("cached_clients") || "null"); if (c) setClients(c); } catch { }
-    try { const e = JSON.parse(localStorage.getItem("cached_employees") || "null"); if (e) setEmployees(e); } catch { }
-    try { const p = JSON.parse(localStorage.getItem("cached_projects") || "null"); if (p) setProjects(p); } catch { }
-    try { const m = JSON.parse(localStorage.getItem("cached_managers") || "null"); if (m) setManagers(m); } catch { }
-    try { const t = JSON.parse(localStorage.getItem("cached_tasks") || "null"); if (t) setTasks(t); } catch { }
-    try { const inc = JSON.parse(localStorage.getItem("cached_income") || "null"); if (inc) setIncome(inc); } catch { }
-    try { const exp = JSON.parse(localStorage.getItem("cached_expenses") || "null"); if (exp) setExpenses(exp); } catch { }
-
     fetchClients(); fetchEmployees(); fetchProjects(); fetchManagers(); fetchTasks(); fetchConfig(); fetchSubscription(); fetchIncome(); fetchExpenses();
   }, []);
 
   const handleLogout = () => { localStorage.removeItem("user"); localStorage.setItem("loggedOut", "1"); setUser(null); };
   const onLogoChange = async (logo) => { setCompanyLogo(logo || fixedLogo); const updatedUser = { ...user, logoUrl: logo || "" }; localStorage.setItem("user", JSON.stringify(updatedUser)); setUser(updatedUser); try { await axios.post(BASE_URL + "/api/auth/save-logo", { userId: user._id || user.id, logoUrl: logo || "" }); } catch (e) { console.log(e); } };
 
-  try { const c = JSON.parse(localStorage.getItem(`cached_clients_${user?._id || user?.id}`) || "null"); if (c) setClients(c); } catch { }
-  const fetchClients = async () => { try { const res = await axios.get(BASE_URL + "/api/clients", { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }); setClients(res.data); try { localStorage.setItem(`cached_clients_${user?._id || user?.id}`, JSON.stringify(res.data)); } catch { } } catch (e) { console.log(e); } };
-  const fetchProjects = async () => { try { const res = await axios.get(BASE_URL + "/api/projects"); setProjects(res.data); try { localStorage.setItem("cached_projects", JSON.stringify(res.data)); } catch { } } catch (e) { console.log(e); } };
-  const fetchManagers = async () => { try { const res = await axios.get(BASE_URL + "/api/managers"); setManagers(res.data); try { localStorage.setItem("cached_managers", JSON.stringify(res.data)); } catch { } } catch (e) { console.log(e); } };
+  const fetchClients = async () => { try { const res = await axios.get(BASE_URL + "/api/clients"); setClients(res.data); } catch (e) { console.log(e); } };
+  const fetchEmployees = async () => { try { const res = await axios.get(BASE_URL + "/api/employees"); setEmployees(res.data); } catch (e) { console.log(e); } };
+  const fetchProjects = async () => { try { const res = await axios.get(BASE_URL + "/api/projects"); setProjects(res.data); } catch (e) { console.log(e); } };
+  const fetchManagers = async () => { try { const res = await axios.get(BASE_URL + "/api/managers"); setManagers(res.data); } catch (e) { console.log(e); } };
   const [selectedProjectForTasks, setSelectedProjectForTasksRaw] = useState(null);
   const setSelectedProjectForTasks = (p) => {
     setSelectedProjectForTasksRaw(p);
@@ -2116,7 +2107,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   }, [validActive, mobileShowAllProjects]);
   const [autoOpenTaskModal, setAutoOpenTaskModal] = useState(false);
 
-  const fetchTasks = async () => { try { const res = await axios.get(BASE_URL + "/api/tasks"); setTasks(res.data); try { localStorage.setItem("cached_tasks", JSON.stringify(res.data)); } catch { } } catch (e) { console.log(e); } };
+  const fetchTasks = async () => { try { const res = await axios.get(BASE_URL + "/api/tasks"); setTasks(res.data); } catch (e) { console.log(e); } };
 
   useEffect(() => {
     if (restoredContext || projects.length === 0) return;
@@ -2134,8 +2125,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     } catch { }
     setRestoredContext(true);
   }, [projects, restoredContext]);
-  const fetchIncome = async () => { try { const res = await axios.get(BASE_URL + "/api/income"); setIncome(res.data || []); try { localStorage.setItem("cached_income", JSON.stringify(res.data || [])); } catch { } } catch (e) { console.log(e); } };
-  const fetchExpenses = async () => { try { const res = await axios.get(BASE_URL + "/api/expenses"); setExpenses(res.data || []); try { localStorage.setItem("cached_expenses", JSON.stringify(res.data || [])); } catch { } } catch (e) { console.log(e); } };
+  const fetchIncome = async () => { try { const res = await axios.get(BASE_URL + "/api/income"); setIncome(res.data || []); } catch (e) { console.log(e); } };
+  const fetchExpenses = async () => { try { const res = await axios.get(BASE_URL + "/api/expenses"); setExpenses(res.data || []); } catch (e) { console.log(e); } };
   const fetchConfig = async () => { try { const cid = user?._id || user?.id; if (!cid) return; const res = await axios.get(`${BASE_URL}/api/config/${cid}`); setConfig(res.data); } catch (e) { console.log(e); } };
 
   const addClient = async () => {

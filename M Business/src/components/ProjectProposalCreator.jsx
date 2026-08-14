@@ -8,9 +8,6 @@ import { printProposal, shareProposalAsPDF } from "./proposalPrintUtils";
 // ─── UTILS --------------------------------------------------------------------
 const uid = () => `${Date.now()}_${Math.random().toString(36).slice(2)}`;
 const pid = () => `PROP-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9000) + 1000)}`;
-const LS = "canva_proposals_v1";
-const load = () => { try { const d = localStorage.getItem(LS); return d ? JSON.parse(d) : []; } catch { return []; } };
-const save = d => { try { localStorage.setItem(LS, JSON.stringify(d)); } catch { } };
 
 // ─── THEMES -------------------------------------------------------------------
 const THEMES = [
@@ -1080,7 +1077,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
     } catch (e) { }
     return "list";
   });    // list | editor
-  const [proposals, setProposals] = useState(() => load());
+  const [proposals, setProposals] = useState([]);
   const cameFromProjectRef = useRef(!!prefillProject);
   const [doc, setDoc] = useState(() => {
     try {
@@ -1298,9 +1295,8 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
       const res = await axios.get(`${BASE_URL}/api/proposals`);
       console.log(`Document Found ${res.data.length} proposals in backend`);
 
-      const list = res.data || [];
+      const list = Array.isArray(res.data?.proposals) ? res.data.proposals : (Array.isArray(res.data) ? res.data : []);
       setProposals(list);
-      save(list);
 
       if (list.length > 0) {
         console.log("Proposals loaded successfully");
@@ -1339,14 +1335,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
       }
     } catch (err) {
       console.error("Error Error fetching proposals:", err);
-      // Only show demo proposal in development mode
-      if (process.env.NODE_ENV === 'development') {
-        console.log(" Development mode: Showing demo proposal");
-        const d = [makeDemo()];
-        setProposals(d);
-      } else {
-        setProposals([]);
-      }
+      setProposals([]);
     } finally {
     }
   };

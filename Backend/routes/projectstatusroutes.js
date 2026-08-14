@@ -8,7 +8,7 @@ const ProjectStatusSchema = new mongoose.Schema({
   client:    { type: String, required: true },
   manager:   { type: String, default: "" },
   employee:  { type: String, default: "" },
-  deadline:  { type: String, required: true },
+  deadline:  { type: String, default: "" },
   status:    {
     type: String,
     default: "Pending",
@@ -49,7 +49,6 @@ router.post("/", async (req, res) => {
 
     if (!name?.trim())   return res.status(400).json({ msg: "name is required" });
     if (!client?.trim()) return res.status(400).json({ msg: "client is required" });
-    if (!deadline)       return res.status(400).json({ msg: "deadline is required" });
 
     const doc = new ProjectStatus({
       projectId,
@@ -57,7 +56,7 @@ router.post("/", async (req, res) => {
       client: client.trim(),
       manager: manager || "",
       employee: employee || "",
-      deadline,
+      deadline: deadline || "",
       status: status || "Pending",
       progress: Math.min(100, Math.max(0, Number(progress) || 0)),
       notes: notes || "",

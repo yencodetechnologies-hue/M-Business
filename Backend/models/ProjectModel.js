@@ -13,7 +13,7 @@ const projectSchema = new mongoose.Schema({
   contactEmail: { type: String, default: "" },
   start: { type: String, required: true, default: "" },
   end: { type: String, default: "" },
-  deadline: { type: String, required: true, default: "" },
+  deadline: { type: String, default: "" },
   budget: { type: Number, required: true, default: 0 },
   currency: { type: String, required: true, default: "₹" },
   billed: { type: Number, default: 0 },

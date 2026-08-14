@@ -520,14 +520,13 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
     if (!priority) errors.priority = true;
     if (!status) errors.status = true;
     if (!start) errors.start = true;
-    if (!end) errors.end = true;
     if (budget === '' || budget === null || budget === undefined || Number(budget) <= 0) errors.budget = true;
     if (!currency) errors.currency = true;
 
     if (Object.keys(errors).length > 0) {
       setFieldErrors(errors);
-      const refMap = { name: nameRef, client: clientRef, category: categoryRef, priority: priorityRef, status: statusRef, start: startRef, end: endRef, budget: budgetRef, currency: budgetRef };
-      const order = ['name', 'client', 'category', 'priority', 'status', 'start', 'end', 'budget', 'currency'];
+      const refMap = { name: nameRef, client: clientRef, category: categoryRef, priority: priorityRef, status: statusRef, start: startRef, budget: budgetRef, currency: budgetRef };
+      const order = ['name', 'client', 'category', 'priority', 'status', 'start', 'budget', 'currency'];
       const firstKey = order.find(k => errors[k]);
       const firstRef = refMap[firstKey];
       if (firstRef?.current) {
@@ -541,7 +540,6 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
         priority: 'Priority is required.',
         status: 'Status is required.',
         start: 'Start Date is required.',
-        end: 'Deadline is required.',
         budget: 'A valid Budget is required.',
         currency: 'Currency is required.',
       };
@@ -568,7 +566,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
         progress,
         start,
         end,
-        deadline: end || start || '',
+        deadline: end || '',
         budget: Number(budget) || 0,
         currency,
         billed: Number(billed) || 0,
@@ -906,17 +904,13 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                 )}
               </div>
               <div className="mpc-form-group">
-                <label>Deadline *</label>
+                <label>Deadline</label>
                 <input
                   ref={endRef}
                   type="date"
                   value={end}
-                  onChange={e => { setEnd(e.target.value); if (fieldErrors.end) setFieldErrors(f => ({ ...f, end: false })); }}
-                  style={fieldErrors.end ? { border: '1.5px solid #64748B' } : undefined}
+                  onChange={e => setEnd(e.target.value)}
                 />
-                {fieldErrors.end && (
-                  <div style={{ color: '#64748B', fontSize: 12, fontWeight: 700, marginTop: 4 }}>Required</div>
-                )}
               </div>
             </div>
           </div>

@@ -169,7 +169,7 @@ router.post("/add", async (req, res) => {
 
     // Enforce the required-field set on the server, mirroring the frontend
     // validation in ModernProjectCreator.jsx: name, client(+clientId),
-    // category, priority, status, start, deadline/end, budget(+currency).
+    // category, priority, status, start, budget(+currency). Deadline is optional.
     const requiredFieldChecks = {
       name: !!(name && String(name).trim()),
       client: !!(client && String(client).trim()),
@@ -178,7 +178,6 @@ router.post("/add", async (req, res) => {
       priority: !!(priority && String(priority).trim()),
       status: !!(status && String(status).trim()),
       start: !!(start && String(start).trim()),
-      deadline: !!((deadline || end) && String(deadline || end).trim()),
       budget: budget !== undefined && budget !== null && budget !== "" && Number(budget) > 0,
       currency: !!(currency && String(currency).trim()),
     };
@@ -279,7 +278,7 @@ router.post("/add", async (req, res) => {
           client: saved.client,
           manager: saved.manager || "",
           employee: (saved.assignedTo && saved.assignedTo.length) ? saved.assignedTo.join(", ") : "",
-          deadline: saved.deadline || saved.end || new Date().toISOString().split("T")[0],
+          deadline: saved.deadline || saved.end || "",
           status: saved.status || "Pending",
           progress: saved.progress || 0,
           notes: saved.description || "",
@@ -395,12 +394,6 @@ router.put("/:id", async (req, res) => {
       if (field === "budget") return !(val !== undefined && val !== null && val !== "" && Number(val) > 0);
       return !(val !== undefined && val !== null && String(val).trim() !== "");
     });
-    // "deadline" may be sent as either `deadline` or `end` — only flag it
-    // missing if the caller touched one of those keys and left both empty.
-    if ((Object.prototype.hasOwnProperty.call(updateData, "deadline") || Object.prototype.hasOwnProperty.call(updateData, "end"))) {
-      const deadlineVal = updateData.deadline || updateData.end;
-      if (!deadlineVal || !String(deadlineVal).trim()) invalidRequiredFields.push("deadline");
-    }
     if (invalidRequiredFields.length > 0) {
       return res.status(400).json({
         msg: `Required field(s) cannot be cleared: ${invalidRequiredFields.join(", ")}`,
@@ -472,7 +465,7 @@ router.put("/:id", async (req, res) => {
               client: project.client,
               manager: project.manager || "",
               employee: (project.assignedTo && project.assignedTo.length) ? project.assignedTo.join(", ") : "",
-              deadline: project.deadline || project.end || new Date().toISOString().split("T")[0],
+              deadline: project.deadline || project.end || "",
               status: project.status || "Pending",
               progress: project.progress || 0,
             }

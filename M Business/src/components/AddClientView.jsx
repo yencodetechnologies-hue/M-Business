@@ -1,10 +1,10 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { BASE_URL } from '../config';
 import {
-  X, ImagePlus, Building2, Phone, MapPin, Globe2, CreditCard, Lock,
-  StickyNote, Check, Eye, EyeOff, User, Briefcase, Loader2,
+  X, Building2, Phone, MapPin, CreditCard, Lock,
+  StickyNote, Check, Eye, EyeOff, Loader2,
   UserPlus, CheckCircle2
 } from 'lucide-react';
 
@@ -12,8 +12,8 @@ const STY = {
   label: { fontSize: 12, fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.05em' },
   field: { display: 'flex', flexDirection: 'column', gap: 6 },
   input: { width: '100%', height: 44, padding: '0 14px', border: '1.5px solid #E2E8F0', borderRadius: 10, fontSize: 14, background: '#F8FAFC', outline: 'none', transition: 'border-color 0.15s, box-shadow 0.15s, background 0.15s' },
-  errText: { fontSize: 11, color: '#DC2626', marginTop: 2, fontWeight: 600 },
-  required: { color: '#DC2626' }
+  errText: { fontSize: 11, color: '#1E293B', marginTop: 2, fontWeight: 600 },
+  required: { color: '#1E293B' }
 };
 
 function SectionCard({ icon: Icon, title, sub, tc, tcLight, children, id }) {
@@ -49,7 +49,7 @@ function TextField({ label, required, error, tc, ...props }) {
       <input
         {...props}
         className="acv-input"
-        style={{ ...STY.input, borderColor: error ? '#DC2626' : '#E2E8F0' }}
+        style={{ ...STY.input, borderColor: error ? '#1E293B' : '#E2E8F0' }}
       />
     </Field>
   );
@@ -69,7 +69,6 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
   });
 
   const [formData, setFormData] = useState({
-    clientType: editData?.clientType || 'b2b',
     name: editData?.clientName || editData?.name || '',
     company: editData?.companyName || editData?.company || '',
     gstNumber: editData?.gstNumber || '',
@@ -88,7 +87,6 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
     paymentTerms: editData?.paymentTerms || '',
     password: '',
     notes: editData?.internalNotes || editData?.notes || '',
-    logoUrl: editData?.logoUrl || '',
     sendCredentials: !editData
   });
 
@@ -104,8 +102,6 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
     paymentTerms: false
   });
 
-  const fileInputRef = useRef(null);
-
   useEffect(() => {
     if (isEdit) {
       const predefinedCountries = ['India', 'United States', 'United Kingdom', 'United Arab Emirates', 'Singapore', 'Australia', 'Canada', 'Germany', 'France'];
@@ -119,10 +115,9 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
   }, [isEdit, editData]);
 
   useEffect(() => {
-    // calculate progress
-    const fields = Object.values(formData).filter(v => typeof v === 'string' && v.trim() !== '');
-    const pct = Math.round((fields.length / 18) * 100);
-    setProgress(pct > 100 ? 100 : pct);
+    const keys = ['name', 'company', 'gstNumber', 'contactPersonName', 'designation', 'email', 'phone', 'address', 'city', 'state', 'pincode', 'country', 'website', 'paymentTerms', 'password', 'notes'];
+    const filled = keys.filter(k => String(formData[k] || '').trim() !== '').length;
+    setProgress(Math.min(100, Math.round((filled / keys.length) * 100)));
   }, [formData]);
 
   const handleChange = (e) => {
@@ -142,15 +137,6 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
       if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
     }
   };
-  const handleLogoUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => setFormData(prev => ({ ...prev, logoUrl: reader.result }));
-      reader.readAsDataURL(file);
-    }
-  };
-
   const submitForm = async () => {
     const newErrors = {};
     if (!formData.name.trim()) newErrors.name = 'Client / display name is required';
@@ -196,8 +182,6 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
         status: formData.status,
         contactPersonName: formData.contactPersonName,
         gstNumber: formData.gstNumber,
-        logoUrl: formData.logoUrl,
-        clientType: formData.clientType,
         onboardedOn: formData.onboardedOn,
         designation: formData.designation,
         officePhone: formData.phone,
@@ -267,11 +251,8 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
         .acv-input:focus, .acv-select:focus, .acv-textarea:focus { border-color: ${TC} !important; background: #FFFFFF !important; box-shadow: 0 0 0 4px ${TC_LIGHT}; }
         .acv-section { transition: box-shadow 0.2s ease, transform 0.2s ease; }
         .acv-section:hover { box-shadow: 0 6px 20px rgba(15, 23, 42, 0.08); }
-        .acv-type-card { transition: all 0.15s ease; }
-        .acv-type-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08); }
         .acv-submit-btn:hover:not(:disabled) { filter: brightness(1.06); transform: translateY(-1px); box-shadow: 0 8px 20px ${TC}55; }
         .acv-cancel-btn:hover { background: #EFF6FF !important; }
-        .acv-logo-drop:hover { border-color: ${TC} !important; background: ${TC_LIGHT} !important; }
         .acv-eye-btn:hover { color: ${TC} !important; }
         .acv-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
         @media (max-width: 640px) {
@@ -321,42 +302,8 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
 
         <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: 18 }}>
 
-          {/* Logo Section */}
-          <SectionCard id="logo" icon={ImagePlus} title="Client Logo" sub="Upload a company logo or avatar" tc={TC} tcLight={TC_LIGHT}>
-            <div onClick={() => fileInputRef.current.click()} className="acv-logo-drop" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: 28, border: '2px dashed #E2E8F0', borderRadius: 14, background: '#F8FAFC', cursor: 'pointer', transition: 'all 0.15s ease' }}>
-              <div style={{ width: 76, height: 76, borderRadius: 16, background: '#FFFFFF', border: '1.5px solid #E2E8F0', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', boxShadow: '0 4px 12px rgba(15, 23, 42, 0.06)' }}>
-                {formData.logoUrl ? <img src={formData.logoUrl} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <ImagePlus size={28} color="#E2E8F0" strokeWidth={1.8} />}
-              </div>
-              <button type="button" style={{ background: TC, color: 'white', padding: '9px 18px', borderRadius: 9, fontSize: 13, fontWeight: 700, border: 'none', cursor: 'pointer' }}>Choose logo</button>
-              <span style={{ fontSize: 12, color: '#64748B' }}>PNG, JPG or SVG · Max 2MB · Recommended 200✕200px</span>
-            </div>
-            <input type="file" ref={fileInputRef} accept="image/*" style={{ display: 'none' }} onChange={handleLogoUpload} />
-          </SectionCard>
-
           {/* Basic Info */}
           <SectionCard id="basic" icon={Building2} title="Basic Info" sub="Core client identity" tc={TC} tcLight={TC_LIGHT}>
-            <div style={{ marginBottom: 20 }}>
-              <label style={{ ...STY.label, marginBottom: 8, display: 'block' }}>Client type <span style={STY.required}>*</span></label>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
-                {[
-                  { id: 'b2b', icon: Building2, label: 'B2B', sub: 'Company / Business' },
-                  { id: 'b2c', icon: User, label: 'B2C', sub: 'Individual person' },
-                  { id: 'freelancer', icon: Briefcase, label: 'Freelancer', sub: 'Consultant / Solo' }
-                ].map(t => {
-                  const isSel = formData.clientType === t.id;
-                  const Ico = t.icon;
-                  return (
-                    <div key={t.id} onClick={() => setFormData({ ...formData, clientType: t.id })} className="acv-type-card" style={{ border: `2px solid ${isSel ? TC : '#E2E8F0'}`, borderRadius: 13, padding: '16px 12px', textAlign: 'center', cursor: 'pointer', background: isSel ? TC_LIGHT : '#FFFFFF', position: 'relative' }}>
-                      {isSel && <div style={{ position: 'absolute', top: 8, right: 8, width: 16, height: 16, borderRadius: '50%', background: TC, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Check size={10} color="#FFFFFF" strokeWidth={3.5} /></div>}
-                      <Ico size={22} color={isSel ? TC : '#64748B'} strokeWidth={2} style={{ display: 'block', margin: '0 auto 8px' }} />
-                      <div style={{ fontSize: 13, fontWeight: 700, color: isSel ? TC : '#64748B' }}>{t.label}</div>
-                      <div style={{ fontSize: 11, color: '#64748B', marginTop: 2 }}>{t.sub}</div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
             <div className="acv-grid-2">
               <TextField label="Client / display name" required name="name" value={formData.name} onChange={handleChange} placeholder="e.g. Acme Corp or Raj Kumar" error={errors.name} />
               <TextField label="Company name" required name="company" value={formData.company} onChange={handleChange} placeholder="Registered company name" error={errors.company} />
@@ -437,13 +384,13 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
             <div className="acv-grid-2">
               <Field label="Portal password" required error={errors.password}>
                 <div style={{ position: 'relative' }}>
-                  <input type={showPass ? 'text' : 'password'} name="password" value={formData.password} onChange={e => { handleChange(e); setErrors({ ...errors, password: '' }); }} placeholder="Set client portal password" className="acv-input" style={{ ...STY.input, padding: '0 46px 0 14px', borderColor: errors.password ? '#DC2626' : '#E2E8F0' }} />
+                  <input type={showPass ? 'text' : 'password'} name="password" value={formData.password} onChange={e => { handleChange(e); setErrors({ ...errors, password: '' }); }} placeholder="Set client portal password" className="acv-input" style={{ ...STY.input, padding: '0 46px 0 14px', borderColor: errors.password ? '#1E293B' : '#E2E8F0' }} />
                   <button onClick={() => setShowPass(!showPass)} className="acv-eye-btn" style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#64748B', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>{showPass ? <EyeOff size={16} /> : <Eye size={16} />}</button>
                 </div>
               </Field>
               <Field label="Confirm password" error={errors.confirmPassword}>
                 <div style={{ position: 'relative' }}>
-                  <input type={showConfirmPass ? 'text' : 'password'} value={confirmPassword} onChange={e => { setConfirmPassword(e.target.value); setErrors({ ...errors, confirmPassword: '' }) }} placeholder="Re-enter password" className="acv-input" style={{ ...STY.input, padding: '0 46px 0 14px', borderColor: errors.confirmPassword ? '#DC2626' : '#E2E8F0' }} />
+                  <input type={showConfirmPass ? 'text' : 'password'} value={confirmPassword} onChange={e => { setConfirmPassword(e.target.value); setErrors({ ...errors, confirmPassword: '' }) }} placeholder="Re-enter password" className="acv-input" style={{ ...STY.input, padding: '0 46px 0 14px', borderColor: errors.confirmPassword ? '#1E293B' : '#E2E8F0' }} />
                   <button onClick={() => setShowConfirmPass(!showConfirmPass)} className="acv-eye-btn" style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#64748B', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>{showConfirmPass ? <EyeOff size={16} /> : <Eye size={16} />}</button>
                 </div>
               </Field>

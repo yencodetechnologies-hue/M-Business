@@ -669,6 +669,7 @@ export default function ProjectPaymentModals({
                 </select>
               </div>
             </div>
+            <div style={{ marginBottom: 16 }}><label style={labelStyle}>Title</label><input required style={inputStyle} value={form.title || ''} onChange={e => handleInputChange('title', e.target.value)} placeholder="e.g. Advance Payment" /></div>
             <div style={{ marginBottom: 16 }}><label style={labelStyle}>Description</label><input required style={inputStyle} value={form.description || ''} onChange={e => handleInputChange('description', e.target.value)} placeholder="e.g. Sprint 2 Balance Payment" /></div>
             <div style={rowStyle}>
               <div><label style={labelStyle}>Amount Received</label><input required type="number" style={inputStyle} value={form.amount || ''} onChange={e => handleInputChange('amount', Number(e.target.value))} placeholder="INR 0" /></div>

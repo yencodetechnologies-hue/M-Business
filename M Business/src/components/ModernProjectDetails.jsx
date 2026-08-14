@@ -2851,7 +2851,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               </div>
               <div style={{ overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 700 }}>
-                  <thead><tr style={{ background: '#F8FAFC' }}>{['Payment #', 'Linked Invoice', 'Amount', 'Due Date', 'Payment Date', 'Mode', 'Actions'].map(h => <th key={h} style={{ padding: '9px 14px', textAlign: 'left', fontSize: 10, fontWeight: 900, color: '#64748B', textTransform: 'uppercase', letterSpacing: '.7px', borderBottom: '1px solid #E2E8F0', whiteSpace: 'nowrap' }}>{h}</th>)}</tr></thead>
+                  <thead><tr style={{ background: '#F8FAFC' }}>{['Payment #', 'Title', 'Linked Invoice', 'Amount', 'Due Date', 'Payment Date', 'Mode', 'Actions'].map(h => <th key={h} style={{ padding: '9px 14px', textAlign: 'left', fontSize: 10, fontWeight: 900, color: '#64748B', textTransform: 'uppercase', letterSpacing: '.7px', borderBottom: '1px solid #E2E8F0', whiteSpace: 'nowrap' }}>{h}</th>)}</tr></thead>
                   <tbody>
                     {(currProject.paymentsReceived || []).map((rec, i) => {
                       const localInvDueDate = (currProject.invoices || []).find(inv => inv.invoiceNo === rec.linkedInvoice)?.dueDate;
@@ -2861,6 +2861,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                       return (
                         <tr key={i} style={{ borderBottom: '1px solid #EFF6FF' }}>
                           <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 800, color: '#0F172A' }}>{rec.paymentNo || `PAY-00${i + 1}`}</td>
+                          <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#1E293B' }}>{rec.title || rec.description || '—'}</td>
                           <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))' }}>{rec.linkedInvoice || '—'}</td>
                           <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 800, color: '#16A34A' }}>{currency}{(rec.amount || 0).toLocaleString()}</td>
                           <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: isLate ? '#64748B' : '#1E293B' }}>
@@ -4347,7 +4348,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                       {(currProject.paymentsReceived || []).length > 0 ? (
                         <div style={{ overflowX: 'auto' }}>
                           <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 700 }}>
-                            <thead><tr style={{ background: '#F8FAFC' }}>{['Payment #', 'Linked Invoice', 'Amount', 'Due Date', 'Payment Date', 'Mode', 'Actions'].map(h => <th key={h} style={{ padding: '9px 14px', textAlign: 'left', fontSize: 10, fontWeight: 900, color: '#64748B', textTransform: 'uppercase', letterSpacing: '.7px', borderBottom: '1px solid #E2E8F0', whiteSpace: 'nowrap' }}>{h}</th>)}</tr></thead>
+                            <thead><tr style={{ background: '#F8FAFC' }}>{['Payment #', 'Title', 'Linked Invoice', 'Amount', 'Due Date', 'Payment Date', 'Mode', 'Actions'].map(h => <th key={h} style={{ padding: '9px 14px', textAlign: 'left', fontSize: 10, fontWeight: 900, color: '#64748B', textTransform: 'uppercase', letterSpacing: '.7px', borderBottom: '1px solid #E2E8F0', whiteSpace: 'nowrap' }}>{h}</th>)}</tr></thead>
                             <tbody>
                               {(currProject.paymentsReceived || []).map((rec, i) => {
                                 const localInvDueDate = (currProject.invoices || []).find(inv => inv.invoiceNo === rec.linkedInvoice)?.dueDate;
@@ -4357,6 +4358,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                 return (
                                   <tr key={i} style={{ borderBottom: '1px solid #EFF6FF' }}>
                                     <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 800, color: '#0F172A' }}>{rec.paymentNo || `PAY-00${i + 1}`}</td>
+                                    <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#1E293B' }}>{rec.title || rec.description || '—'}</td>
                                     <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #2563EB))' }}>{rec.linkedInvoice || '—'}</td>
                                     <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 800, color: '#16A34A' }}>{currency}{(rec.amount || 0).toLocaleString()}</td>
                                     <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: isLate ? '#64748B' : '#1E293B' }}>

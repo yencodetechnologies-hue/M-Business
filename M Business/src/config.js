@@ -26,6 +26,10 @@ export function normalizeSessionUser(userData) {
 
 axios.defaults.baseURL = BASE_URL;
 axios.interceptors.request.use((config) => {
+  const url = String(config.url || "");
+  // Never attach app headers to Cloudinary (or other third-party) requests —
+  // extra headers trigger a CORS preflight that Cloudinary rejects.
+  if (/cloudinary\.com/i.test(url)) return config;
   try {
     const user = JSON.parse(localStorage.getItem("user") || "null");
     const cid = getCompanyId(user);

@@ -2038,6 +2038,18 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       amount: bizParseAmt(p.amount),
       note: p.description || p.paymentNo || '',
     })),
+    ...(currProject.expenses || []).map(exp => ({
+      kind: 'Expense',
+      date: exp.expenseDate || exp.createdAt || '',
+      amount: bizParseAmt(exp.amount),
+      note: exp.description || exp.category || exp.expenseNo || '',
+    })),
+    ...(currProject.commissions || []).map(c => ({
+      kind: 'Commission',
+      date: c.createdAt || '',
+      amount: commissionAmount(c, budgetAmt),
+      note: `${c.name || ''}${c.type === 'percent' ? ` (${c.value}%)` : ''}${c.notes ? ` · ${c.notes}` : ''}`,
+    })),
   ].sort((a, b) => new Date(a.date || 0) - new Date(b.date || 0));
 
   const resolvedPdfs = resolveProjectPdfs(currProject, { quotations, proposals, invoices });
@@ -2166,7 +2178,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           <div style={{ marginTop: 18 }}>
             <div style={{ fontSize: 12, fontWeight: 800, marginBottom: 8 }}>Payments timeline</div>
             {paymentTimeline.length === 0 ? (
-              <div style={{ fontSize: 12, color: P.textLight }}>No advances or payments recorded yet.</div>
+              <div style={{ fontSize: 12, color: P.textLight }}>No advances, payments, expenses or commissions recorded yet.</div>
             ) : (
               paymentTimeline.map((row, i) => (
                 <div key={i} style={{ display: 'flex', justifyContent: 'space-between', gap: 10, fontSize: 12, padding: '7px 0', borderBottom: `1px solid ${P.border}` }}>

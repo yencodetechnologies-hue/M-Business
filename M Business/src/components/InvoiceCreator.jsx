@@ -1747,7 +1747,16 @@ const [sortOrder, setSortOrder] = useState("desc");
     };
 
     return (
-      <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", maxWidth: "100%", padding: "20px" }}>
+      <div className="inv-list-root" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", maxWidth: "100%", padding: "20px" }}>
+        <style>{`
+          .inv-hero-badge { width: 44px; height: 44px; border-radius: 13px; background: linear-gradient(135deg, var(--app-accent), var(--app-accent) 60%, var(--teal, var(--app-accent))); display: flex; align-items: center; justify-content: center; color: #FFFFFF; font-size: 20px; flex-shrink: 0; box-shadow: 0 6px 16px rgba(var(--app-accent-rgb), 0.28); }
+          @media (max-width: 640px) {
+            .inv-list-root { padding: 14px !important; }
+            .inv-hero-badge { width: 38px; height: 38px; border-radius: 11px; font-size: 17px; }
+            .page-title { font-size: 18px !important; }
+            .page-sub { display: none; }
+          }
+        `}</style>
 
         <Toast msg={toast} />
         {deleteTarget && <ConfirmModal invoiceNo={deleteTarget.invoiceNo} onConfirm={() => handleDelete(deleteTarget)} onCancel={() => setDeleteTarget(null)} />}
@@ -1891,11 +1900,11 @@ const [sortOrder, setSortOrder] = useState("desc");
 
         {/* PAGE HEADER */}
         <div className="page-header">
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-
+          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+            <div className="inv-hero-badge"><i className="ti ti-file-invoice"></i></div>
             <div>
               {onBack && !hideLivePreview && (
-                <div onClick={onBack} style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "var(--app-accent)", fontWeight: 800, fontSize: 14, cursor: "pointer", marginBottom: 10 }}>
+                <div onClick={onBack} style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "var(--app-accent)", fontWeight: 800, fontSize: 13, cursor: "pointer", marginBottom: 6 }}>
                   <i className="ti ti-chevron-left"></i> Back
                 </div>
               )}
@@ -1953,9 +1962,8 @@ const [sortOrder, setSortOrder] = useState("desc");
             <div className="stat-bar-wrap"><div className="stat-bar-fill" style={{ width: "11%", background: "var(--app-text)" }}></div></div>
           </div>
         </div>
-<div className="tabs-row-mobile-fix" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20, gap: 10 }}></div>
-      {/* TABS */}
-<div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20, gap: 10 }}>
+{/* TABS */}
+<div className="tabs-row-mobile-fix" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20, gap: 10 }}>
   {isMobileWidth ? (
     <select
       value={filterTab}

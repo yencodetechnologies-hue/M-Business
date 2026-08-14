@@ -192,32 +192,29 @@ body {
 /* Responsive Grids to prevent overflow */
 @media (max-width: 768px) {
   .table-toolbar {
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     gap: 8px;
   }
 
-  .toolbar-search {
-    display: none;
+  .toolbar-left {
+    flex: 1 1 100%;
+    min-width: 0;
   }
 
-  .toolbar-left {
-    flex: 1 1 0;
-    min-width: 0;
+  .toolbar-search {
+    flex: 1 1 100%;
+    max-width: none;
   }
 
   .sort-btn,
   .export-btn {
-    width: 100%;
+    flex: 1 1 0;
+    min-width: 0;
     box-sizing: border-box;
     padding: 10px 8px;
     justify-content: center;
     text-align: center;
     white-space: nowrap;
-  }
-
-  .export-btn {
-    flex: 1 1 0;
-    min-width: 0;
     margin-left: 0;
   }
 
@@ -1844,23 +1841,25 @@ td.exp-name {
   background: var(--app-card);
   border: 1.5px solid var(--app-border);
   border-radius: 16px;
-  padding: 18px 20px;
+  padding: 16px 20px;
   height: 96px;
   min-height: 96px;
   max-height: 96px;
   box-sizing: border-box;
-  transition: all 0.15s;
+  transition: all 0.2s;
   cursor: pointer;
   position: relative;
   overflow: hidden;
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  justify-content: center;
 }
 
 
 .stat-card:hover {
   border-color: var(--app-accent);
-  box-shadow: 0 4px 16px rgba(var(--app-accent-rgb), 0.1);
+  box-shadow: 0 8px 22px rgba(var(--app-accent-rgb), 0.12);
+  transform: translateY(-2px);
 }
 
 .stat-card-inner {
@@ -2096,32 +2095,29 @@ td.exp-name {
 }
 @media (max-width: 768px) {
   .table-toolbar {
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     gap: 8px;
   }
 
-  .toolbar-search {
-    display: none;
+  .toolbar-left {
+    flex: 1 1 100%;
+    min-width: 0;
   }
 
-  .toolbar-left {
-    flex: 1 1 0;
-    min-width: 0;
+  .toolbar-search {
+    flex: 1 1 100%;
+    max-width: none;
   }
 
   .sort-btn,
   .export-btn {
-    width: 100%;
+    flex: 1 1 0;
+    min-width: 0;
     box-sizing: border-box;
     padding: 10px 8px;
     justify-content: center;
     text-align: center;
     white-space: nowrap;
-  }
-
-  .export-btn {
-    flex: 1 1 0;
-    min-width: 0;
     margin-left: 0;
   }
 }

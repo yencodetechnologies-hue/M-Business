@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { BASE_URL } from '../config';
+import { attachProjectPdf } from '../utils/cloudinaryUpload';
 import AddClientView from './AddClientView';
 import { toast } from 'react-toastify';
 // ── Shared Colors ──
@@ -577,15 +578,13 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
       const pid = savedProject._id || savedProject.id;
       const uploadPdf = async (kind, file) => {
         if (!file || !pid) return null;
-        const endpoints = { proposal: '/api/proposals/upload', quotation: '/api/quotations/upload', invoice: '/api/invoices/upload' };
-        const form = new FormData();
-        form.append('file', file);
-        form.append('projectId', pid);
-        form.append('client', client || '');
-        form.append('project', name || '');
-        form.append('title', name || file.name);
-        const up = await axios.post(`${BASE_URL}${endpoints[kind]}`, form, { headers });
-        return up.data?.attachedFile || null;
+        const up = await attachProjectPdf(kind, file, {
+          projectId: pid,
+          client: client || '',
+          project: name || '',
+          title: name || file.name,
+        });
+        return up?.attachedFile || null;
       };
       try {
         if (proposalFile) {

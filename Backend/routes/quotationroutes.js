@@ -6,76 +6,40 @@ const Invoice = require("../models/InvoiceModels");
 const Notification = require("../models/NotificationModel");
 const Client = require("../models/ClientModel");
 const Project = require("../models/ProjectModel");
-const multer = require("multer");
-const cloudinary = require("cloudinary").v2;
-const streamifier = require("streamifier");
-const uploadMem = multer({ storage: multer.memoryStorage(), limits: { fileSize: 25 * 1024 * 1024 } });
 
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
-
-// ── POST upload a quotation file directly (creates a minimal Quotation entry
-// with the file attached, so it appears ONLY in the Quotation list) ──────────
-router.post("/upload", uploadMem.single("file"), async (req, res) => {
+// File is already on Cloudinary; this route only stores the URL metadata.
+router.post("/upload", async (req, res) => {
   try {
-    if (!req.file) return res.status(400).json({ msg: "No file uploaded" });
-    const { projectId, client, project } = req.body;
+    const { projectId, client, project, attachedFile } = req.body || {};
+    if (!attachedFile?.url) return res.status(400).json({ msg: "No file uploaded" });
 
-    const path = require("path");
-    const ext = path.extname(req.file.originalname || "");
-    const baseName = path.basename(req.file.originalname || "file", ext).replace(/[^a-zA-Z0-9_-]/g, "_");
-    const uniqueName = `${baseName}-${Date.now()}${ext}`;
-
-    const uploadStream = cloudinary.uploader.upload_stream(
-      {
-        folder: "mbusiness/quotations",
-        resource_type: req.file.mimetype.startsWith("image/") ? "image" : "raw",
-        public_id: uniqueName,
-        use_filename: true,
-        unique_filename: false,
-      },
-      async (error, result) => {
-        if (error) {
-          console.error("❌ Quotation upload error:", error);
-          return res.status(500).json({ msg: "Upload failed", error: error.message || error });
-        }
-        try {
-          const companyId = req.companyId || req.headers["x-company-id"] || "";
-          const attachedFile = {
-            name: req.file.originalname,
-            url: result.secure_url,
-            size: req.file.size,
-            type: req.file.mimetype,
-          };
-          const quoteNo = "QUO-" + new Date().getFullYear() + "-" + String(Math.floor(Math.random() * 9000) + 1000);
-          const newQuotation = new Quotation({
-            qt: { quoteNo, client: client || "", project: project || "", date: new Date().toISOString() },
-            items: [],
-            status: "draft",
-            projectId: projectId || "",
-            companyId,
-            attachedFile,
-          });
-          await newQuotation.save();
-          if (projectId) {
-            try {
-              const q = { _id: projectId };
-              if (companyId) q.companyId = companyId;
-              await Project.findOneAndUpdate(q, { $set: { quotationPdf: attachedFile } });
-            } catch (projErr) {
-              console.error("Failed to attach quotation PDF to project:", projErr.message);
-            }
-          }
-          res.json(newQuotation);
-        } catch (err) {
-          res.status(500).json({ msg: "Error saving quotation", error: err.message || err });
-        }
+    const companyId = req.companyId || req.headers["x-company-id"] || "";
+    const fileMeta = {
+      name: attachedFile.name || "quotation",
+      url: attachedFile.url,
+      size: Number(attachedFile.size) || 0,
+      type: attachedFile.type || "application/pdf",
+    };
+    const quoteNo = "QUO-" + new Date().getFullYear() + "-" + String(Math.floor(Math.random() * 9000) + 1000);
+    const newQuotation = new Quotation({
+      qt: { quoteNo, client: client || "", project: project || "", date: new Date().toISOString() },
+      items: [],
+      status: "draft",
+      projectId: projectId || "",
+      companyId,
+      attachedFile: fileMeta,
+    });
+    await newQuotation.save();
+    if (projectId) {
+      try {
+        const q = { _id: projectId };
+        if (companyId) q.companyId = companyId;
+        await Project.findOneAndUpdate(q, { $set: { quotationPdf: fileMeta } });
+      } catch (projErr) {
+        console.error("Failed to attach quotation PDF to project:", projErr.message);
       }
-    );
-    streamifier.createReadStream(req.file.buffer).pipe(uploadStream);
+    }
+    res.json({ ...newQuotation.toObject(), attachedFile: fileMeta });
   } catch (err) {
     res.status(500).json({ msg: "Upload failed", error: err.message || err });
   }

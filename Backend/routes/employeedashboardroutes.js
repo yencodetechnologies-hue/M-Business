@@ -1,11 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
-const multer = require("multer");
-const fs = require("fs");
-const path = require("path");
-const cloudinary = require("cloudinary").v2;
-const { CloudinaryStorage } = require("multer-storage-cloudinary");
 
 const Employee = require("../models/EmployeeModel");
 const Project = require("../models/ProjectModel");
@@ -95,26 +90,6 @@ try { EmployeeDoc = mongoose.model("EmployeeDoc"); } catch {
     uploadedAt: { type: Date, default: Date.now },
   }, { timestamps: true }));
 }
-
-// ── Multer setup (Cloudinary) ──────────────────────────────────────────────────
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
-
-const docStorage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: "M-Business/Documents",
-    resource_type: "auto", // supports pdf, images, etc.
-    type: "upload",
-    access_mode: "public",
-    public_id: (req, file) => `${Date.now()}-${file.originalname.replace(/\s+/g, '_')}`,
-  },
-});
-
-const docUpload = multer({ storage: docStorage, limits: { fileSize: 10 * 1024 * 1024 } });
 
 // ─────────────────────────────────────────────────────────────────────────────
 // PROFILE
@@ -558,24 +533,23 @@ router.get("/salary/:name", async (req, res) => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 // POST /api/employee-dashboard/documents/upload
-router.post("/documents/upload", docUpload.single("file"), async (req, res) => {
+router.post("/documents/upload", async (req, res) => {
   try {
-    const { employeeName, docType } = req.body;
-    if (!req.file || !employeeName || !docType)
+    const { employeeName, docType, url, fileName, fileSize } = req.body || {};
+    if (!url || !employeeName || !docType)
       return res.status(400).json({ msg: "File, employee name and doc type required" });
 
-    const url = req.file.path;
     const emp = await Employee.findOne({ name: { $regex: new RegExp(employeeName, "i") } });
-    const companyId = req.headers['x-company-id'] || emp?.companyId || "";   // ← ADD THIS LINE
+    const companyId = req.headers['x-company-id'] || emp?.companyId || "";
 
     const doc = await EmployeeDoc.findOneAndUpdate(
       { employeeName: { $regex: new RegExp(`^${employeeName}$`, "i") }, docType },
       {
         employeeName, employeeId: emp?._id || null,
-        companyId,                                                          // ← ADD THIS LINE
+        companyId,
         docType, url,
-        fileName: req.file.originalname,
-        fileSize: req.file.size,
+        fileName: fileName || "",
+        fileSize: Number(fileSize) || 0,
         uploadedAt: new Date()
       },
       { upsert: true, new: true, setDefaultsOnInsert: true }

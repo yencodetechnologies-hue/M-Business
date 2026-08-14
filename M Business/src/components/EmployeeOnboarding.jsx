@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
+import { CLOUDINARY_FOLDERS, uploadToCloudinary } from "../utils/cloudinaryUpload";
 
 /* ------------------------------------------------------------------
   Color system
@@ -172,11 +173,14 @@ export default function EmployeeOnboarding() {
 
       const uploadDoc = async (type, file) => {
         if (!file) return;
-        const fd = new FormData();
-        fd.append("file", file);
-        fd.append("employeeName", form.name);
-        fd.append("docType", type);
-        await axios.post(`${BASE_URL}/api/employee-dashboard/documents/upload`, fd);
+        const uploaded = await uploadToCloudinary(file, { folder: CLOUDINARY_FOLDERS.documents });
+        await axios.post(`${BASE_URL}/api/employee-dashboard/documents/upload`, {
+          employeeName: form.name,
+          docType: type,
+          url: uploaded.url,
+          fileName: uploaded.name,
+          fileSize: uploaded.size,
+        });
       };
 
       await Promise.all([

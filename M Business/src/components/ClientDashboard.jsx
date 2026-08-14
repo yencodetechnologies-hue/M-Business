@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { BASE_URL, FRONTEND_URL } from "../config";
+import { uploadFile } from "../utils/cloudinaryUpload";
 import { openPdf } from "../utils/openPdf";
 import SettingsPage from "./SettingsPage";
 import ModernProjectDetails from "./ModernProjectDetails";
@@ -1456,12 +1457,8 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     if (!file || !user) return;
     setAttachUploading(true);
     try {
-      const fd = new FormData();
-      fd.append("file", file);
-      const res = await axios.post(`${BASE_URL}/api/upload`, fd, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      await handleSendMessage({ url: res.data.url, name: res.data.name || file.name });
+      const res = await uploadFile(file);
+      await handleSendMessage({ url: res.url, name: res.name || file.name });
     } catch (err) {
       console.error("Failed to upload attachment", err);
       alert("Failed to upload file. Please try again.");

@@ -56,6 +56,7 @@ export default function ProjectPdfButtons({
 
   return (
     <div
+      className="bdh-pdfs"
       onClick={(e) => e.stopPropagation()}
       style={{ display: "flex", gap: 6, flexWrap: "wrap", width: "100%" }}
     >

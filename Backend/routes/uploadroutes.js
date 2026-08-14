@@ -1,40 +1,16 @@
 const express = require("express");
 const router = express.Router();
-const multer = require("multer");
-const cloudinary = require("cloudinary").v2;
-const streamifier = require("streamifier");
 const axios = require("axios");
 const Media = require("../models/MediaModel");
+const { signUpload } = require("../config/cloudinary");
 
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
-const uploadMem = multer({ storage: multer.memoryStorage(), limits: { fileSize: 25 * 1024 * 1024 } });
-
-const storage = multer.memoryStorage();
-const upload = multer({
-  storage,
-  limits: { fileSize: 25 * 1024 * 1024 }, // 25MB to allow larger docs/zips
-  fileFilter: (req, file, cb) => {
-    const allowedMimes = [
-      "image/", "application/pdf",
-      "application/msword",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .docx
-      "application/vnd.ms-excel",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xlsx
-      "application/vnd.ms-powerpoint",
-      "application/vnd.openxmlformats-officedocument.presentationml.presentation", // .pptx
-      "text/plain", "text/csv", "text/html",
-      "application/zip", "application/x-zip-compressed",
-      "application/x-rar-compressed", "application/vnd.rar",
-      "video/", "audio/",
-    ];
-    const isAllowed = allowedMimes.some(prefix => file.mimetype.startsWith(prefix));
-    if (isAllowed) cb(null, true);
-    else cb(new Error(`File type not allowed: ${file.mimetype}`), false);
-  },
+// Signed params so the browser can upload directly to Cloudinary (no multer).
+router.get("/sign", (req, res) => {
+  try {
+    res.json(signUpload({ folder: req.query.folder }));
+  } catch (err) {
+    res.status(err.status || 500).json({ msg: err.message || "Failed to sign upload" });
+  }
 });
 
 // Serve a raw-uploaded file (e.g. SVG) with the correct Content-Type so
@@ -44,7 +20,7 @@ router.get("/raw/*splat", async (req, res) => {
     const publicId = Array.isArray(req.params.splat) ? req.params.splat.join("/") : req.params.splat;
     const media = await Media.findOne({ public_id: publicId }) || await Media.findOne({ public_id: publicId.replace(/^\/+|\/+$/g, "") });
     if (!media) return res.status(404).json({ msg: "Not found" });
-    const response = await require("axios").get(media.url, { responseType: "arraybuffer" });
+    const response = await axios.get(media.url, { responseType: "arraybuffer" });
     res.set("Content-Type", media.type || "image/svg+xml");
     res.set("Cache-Control", "public, max-age=31536000");
     res.send(response.data);
@@ -54,7 +30,6 @@ router.get("/raw/*splat", async (req, res) => {
   }
 });
 
-// GET all uploaded media
 router.get("/", async (req, res) => {
   try {
     const media = await Media.find().sort({ createdAt: -1 });
@@ -64,98 +39,44 @@ router.get("/", async (req, res) => {
   }
 });
 
-// POST general upload
-router.post("/", upload.single("file"), async (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ msg: "No file uploaded" });
-  }
+// Register a file that was already uploaded to Cloudinary.
+router.post("/", async (req, res) => {
+  const { url, public_id, name, size, type } = req.body || {};
+  if (!url) return res.status(400).json({ msg: "No file uploaded" });
 
-  // Cloudinary blocks inline delivery of SVGs uploaded as resource_type "image"
-  // for security reasons (they render as a broken image instead of showing).
-  // Uploading them as "raw" instead makes the URL load/preview correctly.
-  const isSvg = req.file.mimetype === "image/svg+xml" || /\.svg$/i.test(req.file.originalname || "");
-  const resourceType = isSvg ? "raw" : "auto";
-
-  const path = require("path");
-  const ext = path.extname(req.file.originalname || "");
-  const baseName = path.basename(req.file.originalname || "file", ext).replace(/[^a-zA-Z0-9_-]/g, "_");
-  const uniqueName = `${baseName}-${Date.now()}${ext}`;
-  const isPdf = req.file.mimetype === "application/pdf";
-  const uploadStream = cloudinary.uploader.upload_stream(
-    {
-      resource_type: req.file.mimetype.startsWith("image/") ? "image" : "raw",
-      public_id: uniqueName,
-      use_filename: true,
-      unique_filename: false,
-      folder: "mbusiness/uploads",
-      type: "upload",
-      access_mode: "public",
-    },
-    async (error, result) => {
-      if (error) {
-        console.error("❌ Cloudinary error:", error);
-        return res.status(500).json({ msg: "Cloudinary upload failed", error: error.message || error });
-      }
-
-      try {
-
-        const isPdfFile = req.file.mimetype === "application/pdf";
-        const inlineUrl = result.secure_url;
-        const newMedia = new Media({
-          url: inlineUrl,
-          public_id: result.public_id,
-          name: req.file.originalname,
-          size: req.file.size,
-          type: req.file.mimetype,
-        });
-        await newMedia.save();
-        const responseMedia = newMedia.toObject();
-        if (isSvg) {
-          responseMedia.url = `${req.protocol}://${req.get("host")}/api/upload/raw/${result.public_id}`;
-        }
-        res.json(responseMedia);
-      } catch (err) {
-        res.status(500).json({ msg: "Error saving media to DB", error: err });
-      }
+  try {
+    const isSvg = type === "image/svg+xml" || /\.svg$/i.test(name || "");
+    const newMedia = new Media({
+      url,
+      public_id: public_id || `upload-${Date.now()}`,
+      name: name || "untitled",
+      size: Number(size) || 0,
+      type: type || "application/octet-stream",
+    });
+    await newMedia.save();
+    const responseMedia = newMedia.toObject();
+    if (isSvg && public_id) {
+      responseMedia.url = `${req.protocol}://${req.get("host")}/api/upload/raw/${public_id}`;
     }
-  );
-
-  streamifier.createReadStream(req.file.buffer).pipe(uploadStream);
+    res.json(responseMedia);
+  } catch (err) {
+    res.status(500).json({ msg: "Error saving media to DB", error: err.message || err });
+  }
 });
 
-// Legacy Logo Upload
-router.post("/logo", upload.single("file"), (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ msg: "No file uploaded" });
-  }
-  const uploadStream = cloudinary.uploader.upload_stream(
-    {
-      folder: "mbusiness/logos",
-      resource_type: "auto",
-      type: "upload",
-      access_mode: "public",
-      disposition: "inline",
-      flags: "attachment:false",
-      format: "png",
-    },
-    (error, result) => {
-      if (error) {
-        console.error("❌ Cloudinary error:", error);
-        return res.status(500).json({ msg: "Cloudinary upload failed", error });
-      }
-      return res.json({ logoUrl: result.secure_url });
-    }
-  );
-  streamifier.createReadStream(req.file.buffer).pipe(uploadStream);
+router.post("/logo", async (req, res) => {
+  const url = req.body?.url || req.body?.logoUrl;
+  if (!url) return res.status(400).json({ msg: "No file uploaded" });
+  return res.json({ logoUrl: url });
 });
 
 router.get("/proxy-pdf", async (req, res) => {
   try {
     const { url } = req.query;
     if (!url) return res.status(400).send("No URL provided");
-    const response = await axios.get(url, { responseType: 'stream' });
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', 'inline');
+    const response = await axios.get(url, { responseType: "stream" });
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", "inline");
     response.data.pipe(res);
   } catch (error) {
     console.error("PDF Proxy Error:", error.response?.status, error.response?.statusText, error.message);
@@ -166,4 +87,3 @@ router.get("/proxy-pdf", async (req, res) => {
 });
 
 module.exports = router;
-

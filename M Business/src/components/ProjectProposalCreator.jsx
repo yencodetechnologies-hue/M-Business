@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
+import { uploadFile } from "../utils/cloudinaryUpload";
 import ProposalForm from "./ProposalForm";
 import CanvasProposalEditor from "./CanvasProposalEditor";
 import { PROPOSAL_PREVIEW_CSS } from "./ProposalPreviewStyles";
@@ -1273,13 +1274,10 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
     const file = e.target.files[0];
     if (!file) return;
 
-    const formData = new FormData();
-    formData.append("file", file);
-
     setUploading(true);
     try {
-      const res = await axios.post(`${BASE_URL}/api/upload`, formData);
-      setUploads([res.data, ...uploads]);
+      const res = await uploadFile(file);
+      setUploads([res, ...uploads]);
       flash("Upload successful!");
     } catch (err) {
       console.error("Upload failed", err);

@@ -2,11 +2,14 @@ import React, { useMemo, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { BASE_URL } from "../config";
+import "./DashboardModern.css";
 import ProjectPdfButtons from "./ProjectPdfButtons";
 import {
   formatMoney,
   parseAmt,
   projectValue,
+  projectReceived,
+  projectPending,
   statusGroup,
   statusLabel,
 } from "../utils/projectBusiness";
@@ -24,6 +27,38 @@ function groupProjects(projects) {
     else ongoing.push(p);
   });
   return { ongoing, hold, completed };
+}
+
+function greetingForHour(hour) {
+  if (hour < 12) return "Good morning";
+  if (hour < 17) return "Good afternoon";
+  return "Good evening";
+}
+
+function formatDue(p) {
+  const raw = p?.end || p?.deadline || p?.endDate;
+  if (!raw) return null;
+  const d = new Date(raw);
+  if (Number.isNaN(d.getTime())) return null;
+  return d.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+}
+
+function initials(name) {
+  const parts = String(name || "")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+  if (!parts.length) return "P";
+  return parts.slice(0, 2).map((n) => n[0].toUpperCase()).join("");
+}
+
+function displayName() {
+  try {
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    return user.companyName || user.name || user.firstName || "there";
+  } catch {
+    return "there";
+  }
 }
 
 export default function BusinessDashboardHome({
@@ -45,26 +80,54 @@ export default function BusinessDashboardHome({
   });
   const [savingExpense, setSavingExpense] = useState(false);
   const [sectionFilter, setSectionFilter] = useState("all");
+  const [query, setQuery] = useState("");
+  const [expenseOpen, setExpenseOpen] = useState(false);
+
+  const now = useMemo(() => new Date(), []);
+  const hello = greetingForHour(now.getHours());
+  const dateLabel = now.toLocaleDateString("en-GB", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  });
 
   const totalValue = useMemo(
     () => (projects || []).reduce((sum, p) => sum + projectValue(p), 0),
     [projects]
   );
+  const totalReceived = useMemo(
+    () => (projects || []).reduce((sum, p) => sum + projectReceived(p), 0),
+    [projects]
+  );
+  const totalPending = useMemo(
+    () => (projects || []).reduce((sum, p) => sum + projectPending(p), 0),
+    [projects]
+  );
   const groups = useMemo(() => groupProjects(projects), [projects]);
-
-  const listed = useMemo(() => {
-    if (sectionFilter === "ongoing") return groups.ongoing;
-    if (sectionFilter === "hold") return groups.hold;
-    if (sectionFilter === "completed") return groups.completed;
-    return projects || [];
-  }, [projects, groups, sectionFilter]);
 
   const clientLabel = (p) => {
     const match = (clients || []).find(
       (c) => String(c._id) === String(p.clientId) || (c.clientName || c.name) === p.client
     );
-    return match?.clientName || match?.name || p.client || "—";
+    return match?.clientName || match?.name || p.client || "Internal";
   };
+
+  const listed = useMemo(() => {
+    let rows = projects || [];
+    if (sectionFilter === "ongoing") rows = groups.ongoing;
+    else if (sectionFilter === "hold") rows = groups.hold;
+    else if (sectionFilter === "completed") rows = groups.completed;
+    const q = query.trim().toLowerCase();
+    if (!q) return rows;
+    return rows.filter((p) => {
+      const client = clientLabel(p).toLowerCase();
+      return (
+        String(p.name || "").toLowerCase().includes(q) ||
+        client.includes(q) ||
+        String(p.status || "").toLowerCase().includes(q)
+      );
+    });
+  }, [projects, groups, sectionFilter, query, clients]);
 
   const headers = () => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -108,122 +171,195 @@ export default function BusinessDashboardHome({
     }
   };
 
-  const card = (p) => {
+  const kpis = [
+    {
+      key: "projects",
+      label: "Projects",
+      value: String((projects || []).length),
+      hint: `${groups.ongoing.length} in motion`,
+      icon: "ti-folders",
+      tone: "teal",
+    },
+    {
+      key: "value",
+      label: "Portfolio value",
+      value: formatMoney(totalValue),
+      hint: "All project budgets",
+      icon: "ti-currency-rupee",
+      tone: "green",
+    },
+    {
+      key: "received",
+      label: "Received",
+      value: formatMoney(totalReceived),
+      hint: "Collected so far",
+      icon: "ti-trending-up",
+      tone: "blue",
+    },
+    {
+      key: "pending",
+      label: "Pending",
+      value: formatMoney(totalPending),
+      hint: "Still to collect",
+      icon: "ti-clock-hour-4",
+      tone: "amber",
+    },
+  ];
+
+  const filters = [
+    { key: "all", label: "All", count: (projects || []).length },
+    { key: "ongoing", label: "Ongoing", count: groups.ongoing.length },
+    { key: "hold", label: "On hold", count: groups.hold.length },
+    { key: "completed", label: "Completed", count: groups.completed.length },
+  ];
+
+  const card = (p, idx) => {
     const g = statusGroup(p.status);
-    const badgeBg = g === "completed" ? "#DCFCE7" : g === "hold" ? "#FEF3C7" : g === "pending" ? "#FEE2E2" : "#E0F7FA";
-    const badgeFg = g === "completed" ? "#166534" : g === "hold" ? "#B45309" : g === "pending" ? "#B91C1C" : "#0E7490";
+    const pct = Math.min(100, Math.max(0, Number(p.progress || p.pct || (g === "completed" ? 100 : 0))));
+    const due = formatDue(p);
+    const client = clientLabel(p);
+    const pending = projectPending(p);
     return (
-      <div
+      <article
         key={p._id || p.id}
+        className={`bdh-project bdh-project--${g}`}
+        style={{ animationDelay: `${Math.min(idx, 12) * 40}ms` }}
         onClick={() => onOpenProject && onOpenProject(p)}
-        style={{
-          background: "#fff",
-          border: "1px solid #E2E8F0",
-          borderRadius: 16,
-          padding: 16,
-          cursor: "pointer",
-          boxShadow: "0 2px 10px rgba(15,28,46,0.04)",
-          display: "flex",
-          flexDirection: "column",
-          gap: 10,
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            onOpenProject && onOpenProject(p);
+          }
         }}
+        role="button"
+        tabIndex={0}
       >
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10 }}>
-          <div style={{ minWidth: 0 }}>
-            <div style={{ fontSize: 15, fontWeight: 800, color: "#0f1c2e", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-              {p.name || "Untitled project"}
+        <div className="bdh-project-top">
+          <div className="bdh-project-who">
+            <div className={`bdh-avatar bdh-avatar--${g}`} aria-hidden="true">
+              {initials(p.name)}
             </div>
-            <div style={{ fontSize: 12, color: "#64748b", marginTop: 2 }}>{clientLabel(p)}</div>
+            <div className="bdh-project-copy">
+              <h3 className="bdh-project-name">{p.name || "Untitled project"}</h3>
+              <p className="bdh-project-client">{client}</p>
+            </div>
           </div>
-          <span style={{ background: badgeBg, color: badgeFg, fontSize: 11, fontWeight: 800, padding: "4px 10px", borderRadius: 999, flexShrink: 0 }}>
-            {statusLabel(p.status)}
+          <span className={`bdh-badge bdh-badge--${g}`}>{statusLabel(p.status)}</span>
+        </div>
+
+        <div className="bdh-project-money">
+          <div>
+            <span className="bdh-money-label">Value</span>
+            <strong>{formatMoney(projectValue(p), p.currency || "₹")}</strong>
+          </div>
+          <div className="bdh-money-right">
+            <span className="bdh-money-label">Pending</span>
+            <strong className={pending > 0 ? "bdh-pending" : ""}>
+              {formatMoney(pending, p.currency || "₹")}
+            </strong>
+          </div>
+        </div>
+
+        <div className="bdh-progress">
+          <div className="bdh-progress-meta">
+            <span>Progress</span>
+            <span>{pct}%</span>
+          </div>
+          <div className="bdh-progress-track" aria-hidden="true">
+            <div className={`bdh-progress-fill bdh-progress-fill--${g}`} style={{ width: `${pct}%` }} />
+          </div>
+        </div>
+
+        <div className="bdh-project-foot">
+          <span className="bdh-due">
+            <i className="ti ti-calendar-event" aria-hidden="true" />
+            {due ? `Due ${due}` : "No deadline"}
           </span>
         </div>
-        <div style={{ fontSize: 18, fontWeight: 800, color: "#059669" }}>
-          {formatMoney(projectValue(p), p.currency || "₹")}
-        </div>
+
         <ProjectPdfButtons
           project={p}
           quotations={quotations}
           proposals={proposals}
           invoices={invoices}
         />
-      </div>
+      </article>
     );
   };
 
-  const section = (title, list, empty) => (
-    <div style={{ marginTop: 22 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-        <div style={{ fontSize: 15, fontWeight: 800, color: "#0f1c2e" }}>{title}</div>
-        <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b" }}>{list.length}</div>
-      </div>
-      {list.length === 0 ? (
-        <div style={{ fontSize: 13, color: "#94a3b8", padding: "12px 0" }}>{empty}</div>
-      ) : (
-        <div style={{ display: "grid", gridTemplateColumns: isDesktop ? "repeat(auto-fill, minmax(280px, 1fr))" : "1fr", gap: 12 }}>
-          {list.map(card)}
-        </div>
-      )}
-    </div>
-  );
-
   return (
-    <div style={{ padding: isDesktop ? "24px 28px 40px" : "16px 16px 28px", fontFamily: "'Nunito', sans-serif" }}>
-      <style>{`
-        .bdh-expense-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr auto; gap: 10px; align-items: end; }
-        @media (max-width: 1100px) { .bdh-expense-grid { grid-template-columns: 1fr 1fr; } }
-      `}</style>
-      <div style={{ display: "grid", gridTemplateColumns: isDesktop ? "1fr 1fr" : "1fr 1fr", gap: 12, marginBottom: 18 }}>
-        <div style={{ background: "#fff", border: "1px solid #E2E8F0", borderRadius: 16, padding: 18 }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", marginBottom: 6 }}>Projects</div>
-          <div style={{ fontSize: 28, fontWeight: 800, color: "#0f1c2e" }}>{(projects || []).length}</div>
+    <div className={`bdh ${isDesktop ? "bdh--desktop" : "bdh--mobile"}`}>
+      <header className="bdh-hero">
+        <div className="bdh-hero-copy">
+          <p className="bdh-kicker">{dateLabel}</p>
+          <h1 className="bdh-title">
+            {hello}, <span>{displayName()}</span>
+          </h1>
+          <p className="bdh-subtitle">A clear view of projects, collections, and work in progress.</p>
         </div>
-        <div style={{ background: "#fff", border: "1px solid #E2E8F0", borderRadius: 16, padding: 18 }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", marginBottom: 6 }}>Total project value</div>
-          <div style={{ fontSize: 28, fontWeight: 800, color: "#059669" }}>{formatMoney(totalValue)}</div>
-        </div>
-      </div>
-
-      {isDesktop && (
-        <form
-          onSubmit={submitExpense}
-          style={{
-            background: "#fff",
-            border: "1px solid #E2E8F0",
-            borderRadius: 16,
-            padding: 16,
-            marginBottom: 20,
-          }}
+        <button
+          type="button"
+          className="bdh-expense-toggle"
+          onClick={() => setExpenseOpen((v) => !v)}
         >
-          <div style={{ fontSize: 14, fontWeight: 800, color: "#0f1c2e", marginBottom: 12 }}>
-            Enter project expense
+          <i className="ti ti-receipt-2" aria-hidden="true" />
+          {expenseOpen ? "Hide expense" : "Log expense"}
+        </button>
+      </header>
+
+      <section className="bdh-kpis" aria-label="Business summary">
+        {kpis.map((kpi) => (
+          <div key={kpi.key} className={`bdh-kpi bdh-kpi--${kpi.tone}`}>
+            <div className="bdh-kpi-icon" aria-hidden="true">
+              <i className={`ti ${kpi.icon}`} />
+            </div>
+            <div className="bdh-kpi-body">
+              <div className="bdh-kpi-label">{kpi.label}</div>
+              <div className="bdh-kpi-value">{kpi.value}</div>
+              <div className="bdh-kpi-hint">{kpi.hint}</div>
+            </div>
+          </div>
+        ))}
+      </section>
+
+      {(isDesktop || expenseOpen) && (
+        <form className="bdh-expense" onSubmit={submitExpense}>
+          <div className="bdh-expense-head">
+            <div className="bdh-expense-icon" aria-hidden="true">
+              <i className="ti ti-wallet" />
+            </div>
+            <div>
+              <h2>Enter project expense</h2>
+              <p>Track spend against a live project without leaving the dashboard.</p>
+            </div>
           </div>
           <div className="bdh-expense-grid">
-            <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b" }}>
+            <label>
               Project
               <select
                 value={expenseProjectId}
                 onChange={(e) => setExpenseProjectId(e.target.value)}
-                style={{ width: "100%", marginTop: 4, padding: "10px 12px", borderRadius: 10, border: "1.5px solid #E2E8F0", fontFamily: "inherit" }}
               >
                 <option value="">Select project</option>
                 {(projects || []).map((p) => (
-                  <option key={p._id || p.id} value={p._id || p.id}>{p.name}</option>
+                  <option key={p._id || p.id} value={p._id || p.id}>
+                    {p.name}
+                  </option>
                 ))}
               </select>
             </label>
-            <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b" }}>
+            <label>
               Category
               <select
                 value={expenseForm.category}
                 onChange={(e) => setExpenseForm((f) => ({ ...f, category: e.target.value }))}
-                style={{ width: "100%", marginTop: 4, padding: "10px 12px", borderRadius: 10, border: "1.5px solid #E2E8F0", fontFamily: "inherit" }}
               >
-                {EXPENSE_CATEGORIES.map((c) => <option key={c}>{c}</option>)}
+                {EXPENSE_CATEGORIES.map((c) => (
+                  <option key={c}>{c}</option>
+                ))}
               </select>
             </label>
-            <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b" }}>
+            <label>
               Amount
               <input
                 type="number"
@@ -231,88 +367,70 @@ export default function BusinessDashboardHome({
                 value={expenseForm.amount}
                 onChange={(e) => setExpenseForm((f) => ({ ...f, amount: e.target.value }))}
                 placeholder="0"
-                style={{ width: "100%", marginTop: 4, padding: "10px 12px", borderRadius: 10, border: "1.5px solid #E2E8F0", fontFamily: "inherit", boxSizing: "border-box" }}
               />
             </label>
-            <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b" }}>
+            <label>
               Date
               <input
                 type="date"
                 value={expenseForm.date}
                 onChange={(e) => setExpenseForm((f) => ({ ...f, date: e.target.value }))}
-                style={{ width: "100%", marginTop: 4, padding: "10px 12px", borderRadius: 10, border: "1.5px solid #E2E8F0", fontFamily: "inherit", boxSizing: "border-box" }}
               />
             </label>
-            <button
-              type="submit"
-              disabled={savingExpense}
-              style={{
-                padding: "11px 16px",
-                borderRadius: 10,
-                border: "none",
-                background: "var(--app-accent, #00BCD4)",
-                color: "#fff",
-                fontWeight: 800,
-                cursor: "pointer",
-                fontFamily: "inherit",
-                whiteSpace: "nowrap",
-              }}
-            >
+            <button type="submit" disabled={savingExpense}>
               {savingExpense ? "Saving…" : "Add"}
             </button>
           </div>
           <input
+            className="bdh-expense-desc"
             value={expenseForm.description}
             onChange={(e) => setExpenseForm((f) => ({ ...f, description: e.target.value }))}
             placeholder="Description (optional)"
-            style={{ width: "100%", marginTop: 10, padding: "10px 12px", borderRadius: 10, border: "1.5px solid #E2E8F0", fontFamily: "inherit", boxSizing: "border-box" }}
           />
         </form>
       )}
 
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
-        {[
-          ["all", `All (${(projects || []).length})`],
-          ["ongoing", `Ongoing (${groups.ongoing.length})`],
-          ["hold", `On Hold (${groups.hold.length})`],
-          ["completed", `Completed (${groups.completed.length})`],
-        ].map(([key, label]) => (
-          <button
-            key={key}
-            type="button"
-            onClick={() => setSectionFilter(key)}
-            style={{
-              border: sectionFilter === key ? "1.5px solid var(--app-accent, #00BCD4)" : "1.5px solid #E2E8F0",
-              background: sectionFilter === key ? "var(--teal-light, #E0F7FA)" : "#fff",
-              color: sectionFilter === key ? "var(--app-accent, #00BCD4)" : "#475569",
-              borderRadius: 999,
-              padding: "6px 12px",
-              fontSize: 12,
-              fontWeight: 800,
-              cursor: "pointer",
-              fontFamily: "inherit",
-            }}
-          >
-            {label}
-          </button>
-        ))}
+      <div className="bdh-toolbar">
+        <div className="bdh-filters" role="tablist" aria-label="Filter projects">
+          {filters.map((f) => (
+            <button
+              key={f.key}
+              type="button"
+              role="tab"
+              aria-selected={sectionFilter === f.key}
+              className={sectionFilter === f.key ? "is-active" : ""}
+              onClick={() => setSectionFilter(f.key)}
+            >
+              {f.label}
+              <em>{f.count}</em>
+            </button>
+          ))}
+        </div>
+        <label className="bdh-search">
+          <i className="ti ti-search" aria-hidden="true" />
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search projects or clients"
+            aria-label="Search projects or clients"
+          />
+        </label>
       </div>
 
-      <div style={{ fontSize: 15, fontWeight: 800, color: "#0f1c2e", marginBottom: 10 }}>All projects</div>
       {listed.length === 0 ? (
-        <div style={{ fontSize: 13, color: "#94a3b8", padding: "16px 0" }}>No projects yet.</div>
-      ) : (
-        <div style={{ display: "grid", gridTemplateColumns: isDesktop ? "repeat(auto-fill, minmax(280px, 1fr))" : "1fr", gap: 12 }}>
-          {listed.map(card)}
+        <div className="bdh-empty">
+          <div className="bdh-empty-icon" aria-hidden="true">
+            <i className="ti ti-folder-off" />
+          </div>
+          <h3>{query ? "No matching projects" : "No projects yet"}</h3>
+          <p>
+            {query
+              ? "Try a different name, client, or status."
+              : "Create a project to see value, progress, and documents here."}
+          </p>
         </div>
-      )}
-
-      {sectionFilter === "all" && (
-        <>
-          {section("Ongoing projects", groups.ongoing, "No ongoing projects.")}
-          {section("Projects on hold", groups.hold, "No projects on hold.")}
-          {section("Completed projects", groups.completed, "No completed projects.")}
-        </>
+      ) : (
+        <div className="bdh-grid">{listed.map(card)}</div>
       )}
     </div>
   );

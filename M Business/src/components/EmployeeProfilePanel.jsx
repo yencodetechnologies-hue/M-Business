@@ -7,6 +7,7 @@ import axios from "axios";
 
 
 import { BASE_URL } from "../config";
+import { CLOUDINARY_FOLDERS, uploadToCloudinary } from "../utils/cloudinaryUpload";
 const BASE = `${BASE_URL}/api/employee-dashboard`;
 
 export const DOC_TYPES = [
@@ -60,12 +61,17 @@ function DocCard({ doc, empName, onUploaded, notify }) {
     reader.onload = e => setPreview(e.target.result);
     reader.readAsDataURL(file);
     setUploading(true); setProgress(0);
-    const fd = new FormData();
-    fd.append("file", file); fd.append("employeeName", empName); fd.append("docType", doc.key);
     try {
-      const res = await axios.post(`${BASE}/documents/upload`, fd, {
-        headers: { "Content-Type": "multipart/form-data" },
-        onUploadProgress: e => setProgress(Math.round((e.loaded * 100) / e.total)),
+      const uploaded = await uploadToCloudinary(file, {
+        folder: CLOUDINARY_FOLDERS.documents,
+        onProgress: (pct) => setProgress(pct),
+      });
+      const res = await axios.post(`${BASE}/documents/upload`, {
+        employeeName: empName,
+        docType: doc.key,
+        url: uploaded.url,
+        fileName: uploaded.name,
+        fileSize: uploaded.size,
       });
       const saved = res.data.document || { url: preview, docType: doc.key };
       setExisting(saved);

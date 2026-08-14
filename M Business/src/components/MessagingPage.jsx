@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { T } from "../index";
 import { BASE_URL } from "../config";
+import { uploadFile } from "../utils/cloudinaryUpload";
 
 const QUICK_EMOJIS = ["😀", "😂", "😍", "👍", "🙏", "🎉", "🔥", "❤️", "😢", "😮", "👏", "✅"];
 
@@ -81,12 +82,8 @@ export default function MessagingPage({ user }) {
     if (!file || !selectedUser) return;
     setAttachUploading(true);
     try {
-      const fd = new FormData();
-      fd.append("file", file);
-      const res = await axios.post(`${BASE_URL}/api/upload`, fd, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      await sendMessage({ url: res.data.url, name: res.data.name || file.name });
+      const res = await uploadFile(file);
+      await sendMessage({ url: res.url, name: res.name || file.name });
     } catch (err) {
       console.error("Failed to upload attachment", err);
       alert("Failed to upload file. Please try again.");

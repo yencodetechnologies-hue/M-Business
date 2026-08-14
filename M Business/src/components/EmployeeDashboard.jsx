@@ -6,6 +6,7 @@ import axios from "axios";
 import { EmployeeProfilePanel, DOC_TYPES } from "./EmployeeProfilePanel";
 import AuthPage from "./AuthPage";
 import { BASE_URL } from "../config";
+import { uploadFile } from "../utils/cloudinaryUpload";
 import EmployeeSubscriptionWarning from "./EmployeeSubscriptionWarning";
 import CalendarPage from "./CalendarPage";
 import MessagingPage from "./MessagingPage";
@@ -355,14 +356,10 @@ function EmployeeDocumentsPage({ user, notifications = [], onAcknowledge }) {
     if (!file) return;
     setUploadingId(request._id);
     try {
-      const fd = new FormData();
-      fd.append("file", file);
-      const uploadRes = await axios.post(`${BASE_URL}/api/upload`, fd, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const uploadRes = await uploadFile(file);
       await axios.patch(`${BASE_URL}/api/document-requests/${request._id}/upload`, {
-        fileUrl: uploadRes.data.url,
-        fileName: uploadRes.data.name || file.name,
+        fileUrl: uploadRes.url,
+        fileName: uploadRes.name || file.name,
       });
       await fetchDocRequests();
     } catch (err) {

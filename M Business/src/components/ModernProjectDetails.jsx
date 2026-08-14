@@ -6,6 +6,7 @@ import ProjectPaymentModals from './ProjectPaymentModals';
 import { printProposal, shareProposalAsPDF } from './proposalPrintUtils';
 import { openPdf } from '../utils/openPdf';
 import { commissionAmount, formatMoney, parseAmt as bizParseAmt, resolveProjectPdfs, statusLabel } from '../utils/projectBusiness';
+import { attachProjectPdf, uploadFile } from '../utils/cloudinaryUpload';
 
 const MILESTONE_OPTIONS = [
   "Custom",
@@ -1075,12 +1076,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
     if (!isTeam && !approvalForm.clientId) { alert("Please select a client to send this to."); return; }
     setSendingFileApproval(true);
     try {
-      const formData = new FormData();
-      formData.append("file", uploadFileObj);
-      const uploadRes = await axios.post(`${BASE_URL}/api/upload`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-      const rawUrl = uploadRes.data.url || '';
+      const uploadRes = await uploadFile(uploadFileObj);
+      const rawUrl = uploadRes.url || '';
       const uploadedUrl = rawUrl.startsWith('http') ? rawUrl : `${BASE_URL}${rawUrl.startsWith('/') ? '' : '/'}${rawUrl}`;
       const approvalCompanyId = user?.companyId || user?.company || user?._id || user?.id || currProject.companyId || '';
       await axios.post(`${BASE_URL}/api/approvals`, {
@@ -1597,15 +1594,10 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
     if (!file) return;
 
     setUploadingFile(true);
-    const formData = new FormData();
-    formData.append("file", file);
-
     try {
-      const res = await axios.post(`${BASE_URL}/api/upload`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      const res = await uploadFile(file);
 
-      const uploadedUrl = (res.data.url || '').startsWith('http') ? res.data.url : `${BASE_URL}${res.data.url || ''}`;
+      const uploadedUrl = (res.url || '').startsWith('http') ? res.url : `${BASE_URL}${res.url || ''}`;
       const newFileObj = {
         name: file.name,
         url: uploadedUrl,
@@ -1634,15 +1626,11 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
     const file = e.target.files[0];
     if (!file) return;
     setUploadingFile(true);
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("projectId", currProject._id || "");
-    formData.append("client", currProject.client || "");
-    formData.append("project", currProject.name || "");
-
     try {
-      await axios.post(`${BASE_URL}/api/quotations/upload`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
+      await attachProjectPdf('quotation', file, {
+        projectId: currProject._id || "",
+        client: currProject.client || "",
+        project: currProject.name || "",
       });
       fetchProjectQuotationsAndProposals();
       loadLatest();
@@ -1661,15 +1649,11 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
     const file = e.target.files[0];
     if (!file) return;
     setUploadingFile(true);
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("projectId", currProject._id || "");
-    formData.append("client", currProject.client || "");
-    formData.append("title", file.name);
-
     try {
-      await axios.post(`${BASE_URL}/api/proposals/upload`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
+      await attachProjectPdf('proposal', file, {
+        projectId: currProject._id || "",
+        client: currProject.client || "",
+        title: file.name,
       });
       fetchProjectQuotationsAndProposals();
       loadLatest();
@@ -1708,12 +1692,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       if (uploadFiles.length > 0) {
         for (let i = 0; i < uploadFiles.length; i++) {
           const fileObj = uploadFiles[i];
-          const formData = new FormData();
-          formData.append("file", fileObj);
-          const res = await axios.post(`${BASE_URL}/api/upload`, formData, {
-            headers: { 'Content-Type': 'multipart/form-data' }
-          });
-          const uploadedUrl = (res.data.url || res.data.secure_url || '').startsWith('http') ? (res.data.url || res.data.secure_url) : `${BASE_URL}${res.data.url || res.data.secure_url || ''}`;
+          const res = await uploadFile(fileObj);
+          const uploadedUrl = (res.url || res.secure_url || '').startsWith('http') ? (res.url || res.secure_url) : `${BASE_URL}${res.url || res.secure_url || ''}`;
           // If multiple files share one heading, number them so titles stay unique
           const heading = uploadHeading
             ? (uploadFiles.length > 1 ? `${uploadHeading} (${i + 1})` : uploadHeading)
@@ -1979,21 +1959,15 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
   const uploadProjectPdf = async (kind, file) => {
     if (!file) return;
-    const endpoints = {
-      proposal: '/api/proposals/upload',
-      quotation: '/api/quotations/upload',
-      invoice: '/api/invoices/upload',
-    };
     setUploadingPdfKind(kind);
     try {
-      const form = new FormData();
-      form.append('file', file);
-      form.append('projectId', currProject._id);
-      form.append('client', currProject.client || linkedClient.clientName || '');
-      form.append('project', currProject.name || '');
-      form.append('title', currProject.name || file.name);
-      const res = await axios.post(`${BASE_URL}${endpoints[kind]}`, form, { headers: companyHeaders() });
-      const attached = res.data?.attachedFile;
+      const res = await attachProjectPdf(kind, file, {
+        projectId: currProject._id,
+        client: currProject.client || linkedClient.clientName || '',
+        project: currProject.name || '',
+        title: currProject.name || file.name,
+      });
+      const attached = res?.attachedFile;
       if (attached?.url) {
         const field = kind === 'proposal' ? 'proposalPdf' : kind === 'quotation' ? 'quotationPdf' : 'invoicePdf';
         setCurrProject(prev => ({ ...prev, [field]: attached }));
@@ -3517,21 +3491,17 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                   const tempId = `${file.name}-${Date.now()}-${Math.random()}`;
                                   setPostUpdateAttachments(prev => [...prev, { name: file.name, url: '', type: file.type, uploading: true, progress: 0, tempId }]);
                                   try {
-                                    const formData = new FormData();
-                                    formData.append('file', file);
-                                    const res = await axios.post(`${BASE_URL}/api/upload`, formData, {
-                                      headers: { 'Content-Type': 'multipart/form-data' },
-                                      onUploadProgress: (evt) => {
-                                        const pct = evt.total ? Math.round((evt.loaded * 100) / evt.total) : 0;
+                                    const res = await uploadFile(file, {
+                                      onProgress: (pct) => {
                                         setPostUpdateAttachments(prev => prev.map(a => a.tempId === tempId ? { ...a, progress: pct } : a));
                                       }
                                     });
-                                    const rawUrl = res.data.url || '';
+                                    const rawUrl = res.url || '';
                                     const resolvedUrl = /^https?:\/\//i.test(rawUrl)
                                       ? rawUrl
                                       : `${BASE_URL}${rawUrl.startsWith('/') ? '' : '/'}${rawUrl}`;
                                     if (!rawUrl) {
-                                      console.error('Upload response missing url for', file.name, res.data);
+                                      console.error('Upload response missing url for', file.name, res);
                                     }
                                     setPostUpdateAttachments(prev => prev.map(a => a.tempId === tempId ? { name: file.name, url: resolvedUrl, type: file.type, uploading: false, progress: 100 } : a));
                                   } catch (err) {
@@ -3961,15 +3931,13 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                           setEditUpdateAttaching(true);
                           for (const file of files) {
                             try {
-                              const formData = new FormData();
-                              formData.append('file', file);
-                              const res = await axios.post(`${BASE_URL}/api/upload`, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
-                              const rawUrl = res.data.url || '';
+                              const res = await uploadFile(file);
+                              const rawUrl = res.url || '';
                               const resolvedUrl = /^https?:\/\//i.test(rawUrl)
                                 ? rawUrl
                                 : `${BASE_URL}${rawUrl.startsWith('/') ? '' : '/'}${rawUrl}`;
                               if (!rawUrl) {
-                                console.error('Upload response missing url for', file.name, res.data);
+                                console.error('Upload response missing url for', file.name, res);
                               }
                               setEditingUpdate(prev => prev ? ({ ...prev, attachments: [...prev.attachments, { name: file.name, url: resolvedUrl, type: file.type }] }) : prev);
                             } catch (err) {

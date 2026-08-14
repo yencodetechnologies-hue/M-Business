@@ -1,28 +1,36 @@
-const onLogoChange = async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
+const cloudinary = require("cloudinary").v2;
 
-  // Step 1: Local preview — show immediately without Cloudinary
-  const localUrl = URL.createObjectURL(file);
-  setLogoUrl(localUrl);
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
-  // Step 2: Cloudinary upload
-  const formData = new FormData();
-  formData.append("file", file);
-  formData.append("upload_preset", "ml_default");
+function sanitizeFolder(folder) {
+  const cleaned = String(folder || "mbusiness/uploads").replace(/[^a-zA-Z0-9/_-]/g, "");
+  return cleaned || "mbusiness/uploads";
+}
 
-  try {
-    setLogoLoading(true);
-    const res = await axios.post(
-      "https://api.cloudinary.com/v1_1/dvbzhmysy/image/upload",
-      formData
-    );
-    setLogoUrl(res.data.secure_url); // Replace with Cloudinary URL
-    console.log("✅ Cloudinary URL:", res.data.secure_url);
-  } catch (err) {
-    console.error("❌ Cloudinary error:", err.response?.data || err.message);
-    // Keep local preview (even if Cloudinary fails)
-  } finally {
-    setLogoLoading(false);
+function signUpload({ folder = "mbusiness/uploads" } = {}) {
+  const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+  const apiKey = process.env.CLOUDINARY_API_KEY;
+  const apiSecret = process.env.CLOUDINARY_API_SECRET;
+  if (!cloudName || !apiKey || !apiSecret) {
+    const err = new Error("Cloudinary is not configured");
+    err.status = 500;
+    throw err;
   }
-};
+  const timestamp = Math.round(Date.now() / 1000);
+  const safeFolder = sanitizeFolder(folder);
+  const paramsToSign = { folder: safeFolder, timestamp };
+  const signature = cloudinary.utils.api_sign_request(paramsToSign, apiSecret);
+  return {
+    timestamp,
+    signature,
+    folder: safeFolder,
+    apiKey,
+    cloudName,
+  };
+}
+
+module.exports = { cloudinary, signUpload, sanitizeFolder };

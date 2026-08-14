@@ -6,6 +6,7 @@ import { useParams } from "react-router-dom";
 import { createPortal } from "react-dom";
 
 import { BASE_URL as API_URL } from "../config";
+import { CLOUDINARY_FOLDERS, uploadToCloudinary } from "../utils/cloudinaryUpload";
 
 const ROLES = [
   "Software Engineer", "Frontend Developer", "Backend Developer", "Full Stack Developer",
@@ -226,20 +227,26 @@ export default function InterviewApplyForm() {
   const handleSubmit = async () => {
     if (!validate()) return;
     setLoading(true); setApiError("");
-    const data = new FormData();
-    data.append("companyId", companyId);
-    data.append("companyName", companyName);
-    data.append("name", form.name.trim());
-    data.append("email", form.email.trim());
-    data.append("mobile", form.mobile.trim());
-    data.append("experience", exp);
-    data.append("years", form.years || "");
-    data.append("role", role);
-    data.append("notes", form.notes || "");
-    data.append("interviewerName", interviewerName || "");
-    data.append("resume", resumeFile);
     try {
-      const res = await fetch(`${API_URL}/api/interviews/apply`, { method: "POST", body: data });
+      const resume = await uploadToCloudinary(resumeFile, { folder: CLOUDINARY_FOLDERS.resumes });
+      const res = await fetch(`${API_URL}/api/interviews/apply`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          companyId,
+          companyName,
+          name: form.name.trim(),
+          email: form.email.trim(),
+          mobile: form.mobile.trim(),
+          experience: exp,
+          years: form.years || "",
+          role,
+          notes: form.notes || "",
+          interviewerName: interviewerName || "",
+          resumeUrl: resume.url,
+          resumeName: resume.name,
+        }),
+      });
       if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error(err.msg || "Submission failed"); }
       setSubmitted(true);
     } catch (err) {

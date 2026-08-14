@@ -11509,7 +11509,7 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
             {/* ── Dashboard ── */}{validActive === "dashboard" && (
               <>
                 {/* MOBILE DASHBOARD (visible only under 768px) */}
-                <div className="mobile-dashboard-view" style={{ display: "none", width: "100vw", marginLeft: "calc(50% - 50vw)", marginRight: "calc(50% - 50vw)", marginTop: 0, background: "#ffffff", paddingBottom: 90 }}>
+                <div className="mobile-dashboard-view" style={{ display: "none", width: "100vw", marginLeft: "calc(50% - 50vw)", marginRight: "calc(50% - 50vw)", marginTop: 0, background: "var(--app-bg, #F5FAFA)", paddingBottom: 90 }}>
                   <style>{`
     @media (max-width: 768px) {
       .mobile-dashboard-view { display: block !important; }

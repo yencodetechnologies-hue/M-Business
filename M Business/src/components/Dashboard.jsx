@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import React from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
+import { CLOUDINARY_FOLDERS, uploadToCloudinary } from "../utils/cloudinaryUpload";
 import InvoiceCreator from "./InvoiceCreator";
 import TaskPage from "./TaskPage";
 import CalendarPage from "./CalendarPage";
@@ -22,6 +23,31 @@ import MessagingPage from "./MessagingPage";
 import SettingsPage from "./SettingsPage";
 import ImageCropModal from "./ImageCropModal";
 import { T } from "../index";
+import {
+  LayoutDashboard, Users, UserCog, UsersRound, FolderKanban, FileText,
+  FileSignature, Receipt, Activity, CheckSquare, Calendar, MessageSquare,
+  Settings, UserCircle2, Wallet, Target, BarChart3, LogOut, X
+} from "lucide-react";
+
+const NAV_ICONS = {
+  dashboard: LayoutDashboard,
+  clients: Users,
+  employees: UserCog,
+  managers: UsersRound,
+  projects: FolderKanban,
+  quotations: FileText,
+  proposals: FileSignature,
+  invoices: Receipt,
+  tracking: Activity,
+  tasks: CheckSquare,
+  calendar: Calendar,
+  messaging: MessageSquare,
+  settings: Settings,
+  accounts: UserCircle2,
+  expenses: Wallet,
+  interviews: Target,
+  reports: BarChart3
+};
 
 
 
@@ -1763,7 +1789,7 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
           </div>
         </div>
         <input ref={logoRef} type="file" accept="image/*" style={{ display: "none" }}
-          onChange={async (e) => { const file = e.target.files[0]; if (!file) return; const formData = new FormData(); formData.append("file", file); try { const cloudRes = await axios.post(BASE_URL + "/api/upload/logo", formData); const uploadedUrl = cloudRes.data.logoUrl; await axios.post(BASE_URL + "/api/auth/save-logo", { userId: user.id || user._id, logoUrl: uploadedUrl }); const updatedUser = { ...user, logoUrl: uploadedUrl }; localStorage.setItem("user", JSON.stringify(updatedUser)); setUser(updatedUser); onLogoChange(uploadedUrl); } catch (err) { console.error(err); alert("Upload failed!"); } }}
+          onChange={async (e) => { const file = e.target.files[0]; if (!file) return; try { const uploaded = await uploadToCloudinary(file, { folder: CLOUDINARY_FOLDERS.logos }); const uploadedUrl = uploaded.url; await axios.post(BASE_URL + "/api/auth/save-logo", { userId: user.id || user._id, logoUrl: uploadedUrl }); const updatedUser = { ...user, logoUrl: uploadedUrl }; localStorage.setItem("user", JSON.stringify(updatedUser)); setUser(updatedUser); onLogoChange(uploadedUrl); } catch (err) { console.error(err); alert("Upload failed!"); } }}
         />
       </div>
     </div>
@@ -1777,60 +1803,104 @@ function Sidebar({ active, setActive, onLogout, open, onClose, navItems, initial
   const items = navItems || NAV;
   return (
     <>
-      {open && <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 998, display: "block" }} className="mob-overlay" />}
-      <div style={{ width: 225, background: "linear-gradient(180deg,var(--app-sidebar) 0%,#2d1057 60%,var(--app-sidebar) 100%)", color: "#fff", display: "flex", flexDirection: "column", height: "100vh", position: "fixed", top: 0, left: 0, zIndex: 999, flexShrink: 0, overflow: "hidden", boxShadow: "4px 0 24px rgba(0,0,0,0.25)", transform: open ? "translateX(0)" : "translateX(-100%)", transition: "transform 0.28s cubic-bezier(0.4,0,0.2,1)" }} className="sidebar">
-        <div style={{ padding: "18px 16px 14px", borderBottom: "1px solid rgba(255,255,255,0.08)", position: "relative", zIndex: 1, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, width: "100%" }}>
+      {open && <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(15,3,38,0.55)", backdropFilter: "blur(2px)", zIndex: 998, display: "block" }} className="mob-overlay" />}
+      <div
+        className="sidebar app-sidebar-scroll"
+        style={{
+          width: 235,
+          background: "linear-gradient(165deg,#2d0f5c 0%,var(--app-sidebar) 45%,#25094a 100%)",
+          color: "#fff", display: "flex", flexDirection: "column", height: "100vh",
+          position: "fixed", top: 0, left: 0, zIndex: 999, flexShrink: 0, overflow: "hidden",
+          boxShadow: "6px 0 32px rgba(20,0,50,0.35)",
+          transform: open ? "translateX(0)" : "translateX(-100%)",
+          transition: "transform 0.3s cubic-bezier(0.4,0,0.2,1)",
+          borderRight: "1px solid rgba(255,255,255,0.06)"
+        }}
+      >
+        {/* ambient glow accents */}
+        <div style={{ position: "absolute", top: -60, right: -60, width: 180, height: 180, borderRadius: "50%", background: "radial-gradient(circle,rgba(0,188,212,0.25),transparent 70%)", pointerEvents: "none", zIndex: 0 }} />
+        <div style={{ position: "absolute", bottom: -80, left: -60, width: 200, height: 200, borderRadius: "50%", background: "radial-gradient(circle,rgba(124,58,237,0.35),transparent 70%)", pointerEvents: "none", zIndex: 0 }} />
+
+        <button onClick={onClose} className="sidebar-close" style={{ position: "absolute", top: 12, right: 12, zIndex: 2, width: 28, height: 28, borderRadius: 8, background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.8)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+          <X size={15} strokeWidth={2.5} />
+        </button>
+
+        <div style={{ padding: "24px 16px 18px", position: "relative", zIndex: 1, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12, width: "100%" }}>
             <div style={{
-              height: 48,
-              minWidth: 48,
-              width: companyLogo ? "auto" : 48,
+              height: 52,
+              minWidth: 52,
+              width: companyLogo ? "auto" : 52,
               maxWidth: "100%",
-              background: "#fff",
-              borderRadius: 12,
+              background: "linear-gradient(135deg,#ffffff,#f1f5f9)",
+              borderRadius: 14,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               fontWeight: 900,
-              fontSize: 20,
+              fontSize: 21,
               color: T.accent,
-              boxShadow: "0 8px 20px rgba(0,0,0,0.2)",
+              boxShadow: "0 10px 26px rgba(0,0,0,0.28), 0 0 0 1px rgba(255,255,255,0.15)",
               overflow: "hidden",
-              padding: companyLogo ? "0 12px" : 0,
+              padding: companyLogo ? "0 14px" : 0,
               transition: "all 0.3s ease"
             }}>
               {companyLogo ? (
-                <img src={companyLogo} alt="logo" style={{ height: "75%", width: "auto", maxWidth: "100%", objectFit: "contain" }} />
+                <img src={companyLogo} alt="logo" style={{ height: "72%", width: "auto", maxWidth: "100%", objectFit: "contain" }} />
               ) : (initials || "M")}
             </div>
             <div style={{ textAlign: "center" }}>
-              <div style={{ fontWeight: 800, fontSize: 14, color: "#fff", maxWidth: 180, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", letterSpacing: 0.5, fontFamily: T.fontSyne }}>{companyName || "Your Business"}</div>
-              <div style={{ fontSize: 8, color: "rgba(255,255,255,0.4)", letterSpacing: 1.5, marginTop: 2, fontWeight: 700 }}>MANAGEMENT SUITE</div>
+              <div style={{ fontWeight: 800, fontSize: 14.5, color: "#fff", maxWidth: 190, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", letterSpacing: 0.3, fontFamily: T.fontSyne }}>{companyName || "Your Business"}</div>
+              <div style={{ fontSize: 8, color: "rgba(255,255,255,0.45)", letterSpacing: 2, marginTop: 3, fontWeight: 700 }}>MANAGEMENT SUITE</div>
             </div>
           </div>
         </div>
-        <nav style={{ flex: 1, minHeight: 0, padding: "10px 8px", overflowY: "auto", position: "relative", zIndex: 1 }}>
-          {items.map(n => (
-            <div
-              key={n.key}
-              onClick={() => { setActive(n.key); if (n.key === "invoices" && typeof setSidebarInvoiceClick === "function") setSidebarInvoiceClick(true); onClose(); }}
-              style={{
-                display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 10,
-                marginBottom: 3, cursor: "pointer", fontSize: 13, fontWeight: active === n.key ? 700 : 500,
-                background: active === n.key ? "rgba(255,255,255,0.12)" : "transparent",
-                color: active === n.key ? "#fff" : "rgba(255,255,255,0.65)"
-              }}
-            >
-              <span style={{ width: 18, textAlign: "center" }}>{n.icon}</span>
-              <span>{n.label}</span>
-            </div>
-          ))}
+
+        <div style={{ height: 1, margin: "0 16px", background: "linear-gradient(90deg,transparent,rgba(255,255,255,0.14),transparent)", flexShrink: 0, position: "relative", zIndex: 1 }} />
+
+        <nav style={{ flex: 1, minHeight: 0, padding: "14px 10px", overflowY: "auto", position: "relative", zIndex: 1 }}>
+          {items.map(n => {
+            const Icon = NAV_ICONS[n.key] || LayoutDashboard;
+            const isActive = active === n.key;
+            return (
+              <div
+                key={n.key}
+                onClick={() => { setActive(n.key); if (n.key === "invoices" && typeof setSidebarInvoiceClick === "function") setSidebarInvoiceClick(true); onClose(); }}
+                className="sidebar-nav-item"
+                style={{
+                  position: "relative",
+                  display: "flex", alignItems: "center", gap: 11, padding: "9px 12px", borderRadius: 11,
+                  marginBottom: 4, cursor: "pointer", fontSize: 13, fontWeight: isActive ? 700 : 500,
+                  background: isActive ? "linear-gradient(135deg,rgba(0,188,212,0.22),rgba(255,255,255,0.08))" : "transparent",
+                  color: isActive ? "#fff" : "rgba(255,255,255,0.62)",
+                  boxShadow: isActive ? "0 4px 14px rgba(0,188,212,0.18), inset 0 0 0 1px rgba(255,255,255,0.1)" : "none",
+                  transition: "background 0.18s ease, color 0.18s ease"
+                }}
+              >
+                {isActive && <span style={{ position: "absolute", left: -10, top: "50%", transform: "translateY(-50%)", width: 4, height: 18, borderRadius: 4, background: "var(--app-accent)", boxShadow: "0 0 10px var(--app-accent)" }} />}
+                <span style={{
+                  width: 30, height: 30, borderRadius: 9, flexShrink: 0,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  background: isActive ? "rgba(255,255,255,0.16)" : "rgba(255,255,255,0.06)",
+                  color: isActive ? "var(--app-accent)" : "rgba(255,255,255,0.55)",
+                  transition: "background 0.18s ease, color 0.18s ease"
+                }}>
+                  <Icon size={16} strokeWidth={2.2} />
+                </span>
+                <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{n.label}</span>
+              </div>
+            );
+          })}
         </nav>
-        <div style={{ padding: "10px 8px 14px", borderTop: "1px solid rgba(255,255,255,0.07)", position: "relative", zIndex: 1, flexShrink: 0 }}>
-          <button onClick={onLogout} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 9, padding: "10px 12px", background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.35)", borderRadius: 11, color: "#fca5a5", fontSize: 12.5, cursor: "pointer", fontWeight: 700, fontFamily: "inherit" }}> Logout</button>
+
+        <div style={{ padding: "12px 10px 16px", position: "relative", zIndex: 1, flexShrink: 0 }}>
+          <div style={{ height: 1, margin: "0 6px 12px", background: "linear-gradient(90deg,transparent,rgba(255,255,255,0.14),transparent)" }} />
+          <button onClick={onLogout} className="sidebar-logout-btn" style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 9, padding: "10px 12px", background: "rgba(239,68,68,0.14)", border: "1px solid rgba(239,68,68,0.32)", borderRadius: 11, color: "#fca5a5", fontSize: 12.5, cursor: "pointer", fontWeight: 700, fontFamily: "inherit", transition: "background 0.18s ease, transform 0.18s ease" }}>
+            <LogOut size={15} strokeWidth={2.3} /> Logout
+          </button>
         </div>
       </div>
-      <div className="sidebar-spacer" style={{ width: 225, flexShrink: 0 }} />
+      <div className="sidebar-spacer" style={{ width: 235, flexShrink: 0 }} />
     </>
   );
 }
@@ -2263,6 +2333,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         ::-webkit-scrollbar{width:5px}
         ::-webkit-scrollbar-thumb{background:#d8b4fe;border-radius:3px}
         button,input,select,textarea{font-family:inherit}
+        .sidebar-nav-item:hover{background:rgba(255,255,255,0.09)!important;color:#fff!important;}
+        .sidebar-logout-btn:hover{background:rgba(239,68,68,0.24)!important;transform:translateY(-1px);}
+        .app-sidebar-scroll nav::-webkit-scrollbar{width:4px}
+        .app-sidebar-scroll nav::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.18);border-radius:3px}
+        .app-sidebar-scroll nav::-webkit-scrollbar-track{background:transparent}
         @media(min-width:769px){.sidebar{transform:translateX(0)!important;position:sticky!important;top:0!important;}.sidebar-close{display:none!important;}.mob-overlay{display:none!important;}.mob-topbar{display:none!important;}.sidebar-spacer{display:none!important;}}
       @media(min-width:769px){.app-bottom-nav{display:none!important;}}
       @media(max-width:768px){.sidebar-spacer{display:none!important;}.mob-topbar-hide{display:none!important;}.main-content{padding:12px!important;padding-bottom:96px!important;}.dash-stats{grid-template-columns:repeat(2,1fr)!important;gap:10px!important;}.dash-2col{grid-template-columns:1fr!important;}.modal-2col{grid-template-columns:1fr!important;}.page-header{flex-wrap:wrap;gap:8px;}.header-actions{flex-wrap:wrap;gap:8px;}.app-bottom-nav{display:flex!important;position:fixed!important;bottom:0!important;left:0!important;right:0!important;}}

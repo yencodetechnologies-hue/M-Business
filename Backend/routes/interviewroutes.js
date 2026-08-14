@@ -6,49 +6,11 @@
 //  Already added in server.js:
 //    const interviewRoutes = require("./routes/interviewroutes");
 //    app.use("/api/interviews", interviewRoutes);
-//
-//  Install (if not already):
-//    npm install multer
 // =============================================
 
 const express    = require("express");
-const multer     = require("multer");
 const mongoose   = require("mongoose");
-const path       = require("path");
-const fs         = require("fs");
-const cloudinary = require("cloudinary").v2;
-const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const router     = express.Router();
-
-// ── Multer Config (Cloudinary) ─────────────────────────────
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
-
-const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: "M-Business/Resumes",
-    resource_type: "raw", // 'raw' needed for non-image files like PDF, DOCX in Cloudinary
-    public_id: (req, file) => `${Date.now()}_${file.originalname.replace(/\s+/g, "_")}`,
-  },
-});
-
-const fileFilter = (req, file, cb) => {
-  const allowed = [".pdf", ".doc", ".docx"];
-  const ext = path.extname(file.originalname).toLowerCase();
-  allowed.includes(ext)
-    ? cb(null, true)
-    : cb(new Error("Only PDF, DOC, DOCX files are allowed"));
-};
-
-const upload = multer({
-  storage,
-  fileFilter,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
-});
 
 // ── Schema & Model ────────────────────────────
 const interviewSchema = new mongoose.Schema(
@@ -91,14 +53,14 @@ const withResumeUrl = (req, doc) => {
 
 // ── POST /api/interviews/apply ────────────────
 //    Candidate submits application form
-router.post("/apply", upload.single("resume"), async (req, res) => {
+router.post("/apply", async (req, res) => {
   try {
-    const { companyId, companyName, name, email, mobile, experience, years, role, notes } = req.body;
+    const { companyId, companyName, name, email, mobile, experience, years, role, notes, resumeUrl, resumeName } = req.body;
 
     if (!name || !email || !mobile || !role || !experience) {
       return res.status(400).json({ msg: "Name, email, mobile, role, and experience are required" });
     }
-    if (!req.file) {
+    if (!resumeUrl) {
       return res.status(400).json({ msg: "Resume file is required" });
     }
 
@@ -112,8 +74,8 @@ router.post("/apply", upload.single("resume"), async (req, res) => {
       years:       years || "",
       role,
       notes:       notes || "",
-      resumeName:  req.file.originalname,
-      resumePath:  req.file.path, // Cloudinary URL
+      resumeName:  resumeName || "resume",
+      resumePath:  resumeUrl,
       status:      "Pending",
     });
 
@@ -239,17 +201,6 @@ router.delete("/:id", async (req, res) => {
   } catch (err) {
     res.status(500).json({ msg: err.message });
   }
-});
-
-// ── Multer error handler ──────────────────────
-router.use((err, req, res, next) => {
-  if (err instanceof multer.MulterError) {
-    if (err.code === "LIMIT_FILE_SIZE")
-      return res.status(400).json({ msg: "File too large (max 5MB)" });
-    return res.status(400).json({ msg: err.message });
-  }
-  if (err) return res.status(400).json({ msg: err.message });
-  next();
 });
 
 module.exports = router;

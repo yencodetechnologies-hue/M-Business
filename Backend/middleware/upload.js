@@ -1,6 +1,3 @@
-const multer = require("multer");
+const { signUpload } = require("../config/cloudinary");
 
-const storage = multer.memoryStorage();
-const upload = multer({ storage: multer.memoryStorage() });
-
-module.exports = upload;
+module.exports = { signUpload };

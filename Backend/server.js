@@ -26,36 +26,35 @@ const allowedOrigins = [
 function originAllowed(origin) {
   if (!origin || origin === "null") return true;
   const o = String(origin).replace(/\/$/, "");
-  return isLocalhost(o) || allowedOrigins.includes(o) || o.endsWith("payu.in");
+  return isLocalhost(o) || allowedOrigins.includes(o) || o.endsWith("payu.in") || o.endsWith("vercel.app") || o.endsWith("mbusiness.cloud");
 }
-
-const corsOptions = {
-  origin: (origin, callback) => {
-    if (originAllowed(origin)) return callback(null, true);
-    console.error("[CORS BLOCKED] Origin not allowed:", origin);
-    return callback(null, false);
-  },
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization", "x-company-id", "company-id", "x-user-name", "x-user-role", "Accept"],
-  optionsSuccessStatus: 204
-};
 
 app.use((req, res, next) => {
   const origin = req.headers.origin;
-  if (originAllowed(origin) && origin && origin !== "null") {
+  if (origin && origin !== "null") {
     res.header("Access-Control-Allow-Origin", origin);
     res.header("Vary", "Origin");
     res.header("Access-Control-Allow-Credentials", "true");
-    res.header("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS");
-    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, x-company-id, company-id, x-user-name, x-user-role, Accept");
-    res.header("Access-Control-Max-Age", "86400");
+  } else {
+    res.header("Access-Control-Allow-Origin", "*");
   }
+  res.header("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS");
+  res.header(
+    "Access-Control-Allow-Headers",
+    req.headers["access-control-request-headers"] || "Content-Type, Authorization, x-company-id, company-id, x-user-name, x-user-role, Accept"
+  );
+  res.header("Access-Control-Max-Age", "86400");
   if (req.method === "OPTIONS") return res.sendStatus(204);
   next();
 });
 
-app.use(cors(corsOptions));
+app.use(cors({
+  origin: true,
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "x-company-id", "company-id", "x-user-name", "x-user-role", "Accept"],
+  optionsSuccessStatus: 204
+}));
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 

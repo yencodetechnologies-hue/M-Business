@@ -1,17 +1,7 @@
 import axios from "axios";
 
 export const LIVE_API_URL = "https://mbusiness.octosofttechnologies.in";
-
-function defaultBaseUrl() {
-  if (typeof window === "undefined") return LIVE_API_URL;
-  const host = window.location.hostname;
-  if (host === "localhost" || host === "127.0.0.1") return "http://localhost:5008";
-  // Same-origin on the live site: vercel.json proxies /api and /uploads to octosoft.
-  if (host.includes("vercel.app") || host.includes("mbusiness.cloud")) return "";
-  return LIVE_API_URL;
-}
-
-export const BASE_URL = import.meta.env.VITE_API_URL || defaultBaseUrl();
+export const BASE_URL = import.meta.env.VITE_API_URL || LIVE_API_URL;
 export const FRONTEND_URL = import.meta.env.VITE_FRONTEND_URL || (typeof window !== "undefined" ? window.location.origin : "");
 
 export function getCompanyId(user) {

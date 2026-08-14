@@ -4,7 +4,7 @@ const { chromium } = require('playwright');
   const browser = await chromium.launch();
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
   const page = await context.newPage();
-  const url = process.argv[2] || 'http://localhost:5173/';
+  const url = process.argv[2] || 'http://localhost:5180/';
   const outPath = process.argv[3] || 'shot.png';
   const role = process.argv[4] || 'subadmin';
 
@@ -18,12 +18,20 @@ const { chromium } = require('playwright');
 
   const errors = [];
   page.on('console', msg => { if (msg.type() === 'error') errors.push(msg.text()); });
-  page.on('pageerror', err => errors.push('PAGEERROR: ' + err.message + '\n' + err.stack));
+  page.on('pageerror', err => errors.push('PAGEERROR: ' + err.message));
 
   await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
   await page.waitForTimeout(2000);
+
+  // Try to dismiss any subscription/upgrade modal
+  try {
+    const closeBtn = page.locator('button:has-text("✕"), button:has-text("×"), [class*="close"]').first();
+    if (await closeBtn.isVisible({ timeout: 1000 })) await closeBtn.click();
+  } catch (e) {}
+  await page.waitForTimeout(500);
+
   await page.screenshot({ path: outPath, fullPage: true });
   console.log('Saved:', outPath);
-  console.log('Errors:', JSON.stringify(errors.slice(0, 15), null, 2));
+  console.log('Errors:', JSON.stringify(errors.slice(0, 10), null, 2));
   await browser.close();
 })();

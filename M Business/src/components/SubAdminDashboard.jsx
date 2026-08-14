@@ -7716,6 +7716,7 @@ function VendorsPage({ vendors, setVendors, onAddVendorClick }) {
 export default function Dashboard({ setUser, user, fixedLogo }) {
 
   const companyNameStr = user?.companyName || "M Business";
+  const companyId = user?.companyId || user?.company || user?._id || user?.id || "default";
 
   const [dashSearch, setDashSearch] = useState("");
   const [dashTasksProj, setDashTasksProj] = useState(null);
@@ -11037,9 +11038,6 @@ const HIDE_NAV_PAGES = ["team", "employees", "revenue", "income", "unpaidInvoice
 
   };
 
-
-
-  const companyId = user?.companyId || user?.company || user?._id || user?.id || "default";
 
 
 
